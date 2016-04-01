@@ -10,6 +10,7 @@
 		B508CD891CA0ABA200127B97 /* BGETextureBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD871CA0ABA200127B97 /* BGETextureBase.cpp */; };
 		B508CD8E1CA8ABA100127B97 /* Arial Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */; };
 		B508CD901CA901B700127B97 /* Avenir.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8F1CA901B700127B97 /* Avenir.ttc */; };
+		B508CD931CAE285000127B97 /* BGERenderNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD911CAE285000127B97 /* BGERenderNode.cpp */; };
 		B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */; };
 		B525E36F1C8957A700C691C0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E36E1C8957A700C691C0 /* main.m */; };
 		B525E3721C8957A700C691C0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E3711C8957A700C691C0 /* AppDelegate.m */; };
@@ -101,6 +102,8 @@
 		B508CD881CA0ABA200127B97 /* BGETextureBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGETextureBase.h; sourceTree = "<group>"; };
 		B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Black.ttf"; sourceTree = "<group>"; };
 		B508CD8F1CA901B700127B97 /* Avenir.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Avenir.ttc; sourceTree = "<group>"; };
+		B508CD911CAE285000127B97 /* BGERenderNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGERenderNode.cpp; sourceTree = "<group>"; };
+		B508CD921CAE285000127B97 /* BGERenderNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGERenderNode.h; sourceTree = "<group>"; };
 		B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleGothic.ttf; sourceTree = "<group>"; };
 		B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBenGameEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B525E36B1C8957A700C691C0 /* BenGameEngineTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BenGameEngineTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -267,6 +270,8 @@
 				B525E3901C89587000C691C0 /* BGEMathTypes.h */,
 				B525E3911C89587000C691C0 /* BGERenderContext.cpp */,
 				B525E3921C89587000C691C0 /* BGERenderContext.h */,
+				B508CD911CAE285000127B97 /* BGERenderNode.cpp */,
+				B508CD921CAE285000127B97 /* BGERenderNode.h */,
 				B525E3951C89587000C691C0 /* BGERenderService.cpp */,
 				B525E3961C89587000C691C0 /* BGERenderService.h */,
 				B525E3991C89587000C691C0 /* BGERenderView.cpp */,
@@ -469,7 +474,7 @@
 			attributes = {
 				CLASSPREFIX = BGE;
 				LastUpgradeCheck = 0720;
-				ORGANIZATIONNAME = "Benjamin Lee";
+				ORGANIZATIONNAME = "2n Productions";
 				TargetAttributes = {
 					B525E35A1C8950DA00C691C0 = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -566,6 +571,7 @@
 				B571F1831C97D92E007F5A90 /* BGEFont.cpp in Sources */,
 				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
 				B525E3BB1C89587000C691C0 /* BGERenderContext.cpp in Sources */,
+				B508CD931CAE285000127B97 /* BGERenderNode.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* BGEGame.cpp in Sources */,
 				B525E3B51C89587000C691C0 /* BGEError.cpp in Sources */,
 				B508CD891CA0ABA200127B97 /* BGETextureBase.cpp in Sources */,

@@ -3,7 +3,7 @@
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 3/14/16.
-//  Copyright © 2016 Benjamin Lee. All rights reserved.
+//  Copyright © 2016 2n Productions. All rights reserved.
 //
 
 #include "BGEFont.h"
