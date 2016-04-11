@@ -10,10 +10,10 @@
 #include "BGETextureAtlas.h"
 #include "BGETextureAtlasOpenGLES2.h"
 
-BGETextureOpenGLES2::BGETextureOpenGLES2(std::string name) : BGETexture(name), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
+BGETextureOpenGLES2::BGETextureOpenGLES2(uint64_t texId, std::string name) : BGETexture(texId, name), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
 }
 
-BGETextureOpenGLES2::BGETextureOpenGLES2(std::string name, GLKTextureInfo *textureInfo) : BGETexture(name), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(textureInfo) {
+BGETextureOpenGLES2::BGETextureOpenGLES2(uint64_t texId, std::string name, GLKTextureInfo *textureInfo) : BGETexture(texId, name), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(textureInfo) {
     format_ = BGETextureFormat::RGBA8888;
     
     if (textureInfo) {
@@ -132,7 +132,7 @@ std::shared_ptr<BGEError> BGETextureOpenGLES2::createSubTexture(std::shared_ptr<
             updateUVs();
             updateXYs();
             
-            NSLog(@"Created Subtexture %s", name_.c_str());
+            NSLog(@"Created Subtexture %s", getName().c_str());
         }
     } else {
         error = std::make_shared<BGEError>(BGETextureBase::ErrorDomain, BGETextureErrorInvalidSubTexture);

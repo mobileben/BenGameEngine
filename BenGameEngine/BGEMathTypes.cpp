@@ -392,3 +392,131 @@ void BGEMatrix4MultiplyVector3(BGEVector3 &result, BGEMatrix4& matrix, BGEVector
     result.y = matrix.m[1]*v3.x + matrix.m[5]*v3.y + matrix.m[9]*v3.z;
     result.z = matrix.m[2]*v3.x + matrix.m[6]*v3.y + matrix.m[10]*v3.z;
 }
+
+bool BGEMatrix2IsIdentity(BGEMatrix2& matrix) {
+    if (matrix.m00 != 1) {
+        return false;
+    }
+    
+    if (matrix.m01 != 0) {
+        return false;
+    }
+    
+    if (matrix.m10 != 0) {
+        return false;
+    }
+    
+    if (matrix.m11 != 1) {
+        return false;
+    }
+    
+    return true;
+}
+
+bool BGEMatrix3IsIdentity(BGEMatrix3& matrix) {
+    if (matrix.m00 != 1) {
+        return false;
+    }
+    
+    if (matrix.m01 != 0) {
+        return false;
+    }
+    
+    if (matrix.m02 != 0) {
+        return false;
+    }
+    
+    if (matrix.m10 != 0) {
+        return false;
+    }
+    
+    if (matrix.m11 != 1) {
+        return false;
+    }
+    
+    if (matrix.m12 != 0) {
+        return false;
+    }
+    
+    if (matrix.m20 != 0) {
+        return false;
+    }
+    
+    if (matrix.m21 != 0) {
+        return false;
+    }
+    
+    if (matrix.m22 != 1) {
+        return false;
+    }
+    
+    return true;
+}
+
+bool BGEMatrix4IsIdentity(BGEMatrix4& matrix) {
+    if (matrix.m00 != 1) {
+        return false;
+    }
+    
+    if (matrix.m01 != 0) {
+        return false;
+    }
+    
+    if (matrix.m02 != 0) {
+        return false;
+    }
+    
+    if (matrix.m03 != 0) {
+        return false;
+    }
+    
+    if (matrix.m10 != 0) {
+        return false;
+    }
+    
+    if (matrix.m11 != 1) {
+        return false;
+    }
+    
+    if (matrix.m12 != 0) {
+        return false;
+    }
+    
+    if (matrix.m13 != 0) {
+        return false;
+    }
+    
+    if (matrix.m20 != 0) {
+        return false;
+    }
+    
+    if (matrix.m21 != 0) {
+        return false;
+    }
+    
+    if (matrix.m22 != 1) {
+        return false;
+    }
+    
+    if (matrix.m23 != 0) {
+        return false;
+    }
+    
+    if (matrix.m30 != 0) {
+        return false;
+    }
+    
+    if (matrix.m31 != 0) {
+        return false;
+    }
+    
+    if (matrix.m32 != 0) {
+        return false;
+    }
+    
+    if (matrix.m33 != 1) {
+        return false;
+    }
+    
+    return true;
+}

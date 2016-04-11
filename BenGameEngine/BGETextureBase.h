@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <string>
-
+#include "BGEObject.h"
 #include "BGEMathTypes.h"
 
 enum class BGETextureState {
@@ -48,19 +48,20 @@ typedef enum {
     BGETextureErrorExistingTextureWrongType,
 } BGETextureError;
 
-class BGETextureBase : public  std::enable_shared_from_this<BGETextureBase>
+class BGETextureBase : public BGEObject
 {
 public:
     static const std::string ErrorDomain;
     
-    BGETextureBase(std::string name);
+    BGETextureBase(uint64_t texId, std::string name);
+    BGETextureBase() = delete;
+    BGETextureBase(BGETextureBase &) = delete;
     virtual ~BGETextureBase() {}
     
     BGETextureAlphaState getAlphaState() const { return alphaState_; }
     BGETextureFormat getFormat() const { return format_; }
     
     bool isValid() const { return valid_; }
-    std::string getName() const { return name_; }
 
     virtual uint32_t getHWTextureId() const =0;
     
@@ -93,8 +94,6 @@ protected:
     bool                    valid_;
     BGETextureFormat        format_;
     BGETextureAlphaState    alphaState_;
-    
-    std::string             name_;
     
     uint32_t                x_;
     uint32_t                y_;

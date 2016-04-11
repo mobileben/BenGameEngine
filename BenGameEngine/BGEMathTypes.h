@@ -15,6 +15,11 @@
 extern "C" {
 #endif
     
+    typedef struct {
+        float x, y;
+        float w, h;
+    } BGERect;
+    
     // Matrices are column major order
     // Convention for an element is m01, where 0 is the column and 1 is the row
     typedef union {
@@ -121,6 +126,10 @@ extern "C" {
     extern void BGEMatrix4Translate(BGEMatrix4& matrix, float tx, float ty, float tz);
     
     extern void BGEMatrix4MultiplyVector3(BGEVector3 &result, BGEMatrix4& matrix, BGEVector3 vector3);
+    
+    extern bool BGEMatrix2IsIdentity(BGEMatrix2& matrix);
+    extern bool BGEMatrix3IsIdentity(BGEMatrix3& matrix);
+    extern bool BGEMatrix4IsIdentity(BGEMatrix4& matrix);
     
 #ifdef __cplusplus
 }

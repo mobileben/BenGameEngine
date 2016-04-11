@@ -81,7 +81,7 @@
             typedef void (*func)(id, SEL, std::shared_ptr<BGETextureBase>, std::shared_ptr<BGEError>);
             func impl = (func)[self methodForSelector:@selector(racer:error:)];
             std::function<void(std::shared_ptr<BGETextureBase>, std::shared_ptr<BGEError> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
-            BGEGame::getInstance()->getTextureService()->namedTextureFromFile("fish", [path UTF8String], fnc);
+            BGEGame::getInstance()->getTextureService()->namedTextureFromFile("fish", [path UTF8String], nullptr);
         }
     }
     
@@ -93,6 +93,12 @@
     std::shared_ptr<BGETextureOpenGLES2> glTex = std::dynamic_pointer_cast<BGETextureOpenGLES2>(texture);
     renderer->setGLKTextureInfo(glTex->getTextureInfo());
     BGEGame::getInstance()->getRenderService()->render();
+    
+    // Let's create and add a game object
+    std::string name = "hello";
+    auto gameObj = BGEGame::getInstance()->getGameObjectService()->createObject<BGEGameObject>();
+    
+//    NSLog(@"game object name %s", gameObj->getName().c_str());
 }
 
 - (void)viewDidLayoutSubviews

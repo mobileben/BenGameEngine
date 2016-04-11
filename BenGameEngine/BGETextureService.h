@@ -10,7 +10,7 @@
 #define BGETextureService_h
 
 #include <stdio.h>
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <memory>
 #include <functional>
@@ -40,7 +40,7 @@ public:
     std::shared_ptr<BGETextureBase> textureWithName(std::string name);
     
 protected:
-    std::map<std::string, std::shared_ptr<BGETextureBase>> textures_;
+    std::unordered_map<std::string, std::shared_ptr<BGETextureBase>> textures_;
 };
 
 #endif /* BGETextureService_h */

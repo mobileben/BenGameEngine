@@ -26,7 +26,7 @@ typedef struct {
 class BGETextureAtlas : public BGETextureBase
 {
 public:
-    BGETextureAtlas(std::string name);
+    BGETextureAtlas(uint64_t objId, std::string name);
     
     virtual uint32_t getHWTextureId() const =0;
     

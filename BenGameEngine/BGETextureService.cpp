@@ -18,7 +18,7 @@ std::shared_ptr<BGETextureBase> BGETextureService::textureWithName(std::string n
 }
 
 void BGETextureService::removeTexture(std::string name) {
-    std::map<std::string, std::shared_ptr<BGETextureBase>>::iterator it;
+    std::unordered_map<std::string, std::shared_ptr<BGETextureBase>>::iterator it;
     
     it = textures_.find(name);
     textures_.erase(it);

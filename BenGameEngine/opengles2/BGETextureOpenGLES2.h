@@ -18,8 +18,8 @@
 class BGETextureOpenGLES2 : public BGETexture
 {
 public:
-    BGETextureOpenGLES2(std::string name);
-    BGETextureOpenGLES2(std::string name, GLKTextureInfo *textureInfo);
+    BGETextureOpenGLES2(uint64_t texId, std::string name);
+    BGETextureOpenGLES2(uint64_t texId, std::string name, GLKTextureInfo *textureInfo);
     ~BGETextureOpenGLES2();
     
     GLKTextureInfo *getTextureInfo() const { return textureInfo_; }

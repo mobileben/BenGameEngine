@@ -10,7 +10,12 @@
 		B508CD891CA0ABA200127B97 /* BGETextureBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD871CA0ABA200127B97 /* BGETextureBase.cpp */; };
 		B508CD8E1CA8ABA100127B97 /* Arial Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */; };
 		B508CD901CA901B700127B97 /* Avenir.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8F1CA901B700127B97 /* Avenir.ttc */; };
-		B508CD931CAE285000127B97 /* BGERenderNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD911CAE285000127B97 /* BGERenderNode.cpp */; };
+		B508CD931CAE285000127B97 /* BGETransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD911CAE285000127B97 /* BGETransformComponent.cpp */; };
+		B508CD9D1CAF95A000127B97 /* libBenGameEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */; };
+		B508CDA51CB4DD5B00127B97 /* BGEComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA31CB4DD5B00127B97 /* BGEComponent.cpp */; };
+		B508CDA81CB4DE6D00127B97 /* BGEGameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA61CB4DE6D00127B97 /* BGEGameObject.cpp */; };
+		B508CDAB1CB4DE8E00127B97 /* BGEObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA91CB4DE8E00127B97 /* BGEObject.cpp */; };
+		B508CDAE1CB78DA100127B97 /* BGEGameObjectService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDAC1CB78DA100127B97 /* BGEGameObjectService.cpp */; };
 		B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */; };
 		B525E36F1C8957A700C691C0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E36E1C8957A700C691C0 /* main.m */; };
 		B525E3721C8957A700C691C0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E3711C8957A700C691C0 /* AppDelegate.m */; };
@@ -51,6 +56,9 @@
 		B525E3E41C895FC500C691C0 /* BenGameEngineTestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3E21C895FC500C691C0 /* BenGameEngineTestApp.cpp */; };
 		B525E3E61C895FCC00C691C0 /* item_powerup_fish.png in Resources */ = {isa = PBXBuildFile; fileRef = B525E3E51C895FCC00C691C0 /* item_powerup_fish.png */; };
 		B525E3EA1C8960BA00C691C0 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B525E3E91C8960BA00C691C0 /* GLKit.framework */; };
+		B52B760D1CBA183900758249 /* BGEMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B760B1CBA183900758249 /* BGEMaterial.cpp */; };
+		B52B76111CBA2C7F00758249 /* BGERenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B760F1CBA2C7F00758249 /* BGERenderComponent.cpp */; };
+		B52B76141CBADF5E00758249 /* BGEMaterialService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B76121CBADF5E00758249 /* BGEMaterialService.cpp */; };
 		B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */; };
 		B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */; };
 		B571F1771C93B604007F5A90 /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = B571F1761C93B604007F5A90 /* sample.png */; };
@@ -66,9 +74,18 @@
 		B571F1931C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1911C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp */; };
 		B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1941C9E1B94007F5A90 /* FontVertex.glsl */; };
 		B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */; };
+		B5ACE88F1CBB08D5004B6871 /* BGETransformComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE88D1CBB08D2004B6871 /* BGETransformComponentTests.m */; };
+		B5ACE8921CBB56CE004B6871 /* BGEComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* BGEComponentService.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B508CD9E1CAF95A000127B97 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B525E3531C8950DA00C691C0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B525E35A1C8950DA00C691C0;
+			remoteInfo = BenGameEngine;
+		};
 		B525E3821C8957B900C691C0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B525E3531C8950DA00C691C0 /* Project object */;
@@ -102,8 +119,18 @@
 		B508CD881CA0ABA200127B97 /* BGETextureBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGETextureBase.h; sourceTree = "<group>"; };
 		B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Black.ttf"; sourceTree = "<group>"; };
 		B508CD8F1CA901B700127B97 /* Avenir.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Avenir.ttc; sourceTree = "<group>"; };
-		B508CD911CAE285000127B97 /* BGERenderNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGERenderNode.cpp; sourceTree = "<group>"; };
-		B508CD921CAE285000127B97 /* BGERenderNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGERenderNode.h; sourceTree = "<group>"; };
+		B508CD911CAE285000127B97 /* BGETransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BGETransformComponent.cpp; path = components/BGETransformComponent.cpp; sourceTree = "<group>"; };
+		B508CD921CAE285000127B97 /* BGETransformComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGETransformComponent.h; path = components/BGETransformComponent.h; sourceTree = "<group>"; };
+		B508CD981CAF95A000127B97 /* BGEGameObjectAndComponentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BGEGameObjectAndComponentTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B508CD9C1CAF95A000127B97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = BGEGameObjectAndComponentTests/Info.plist; sourceTree = "<group>"; };
+		B508CDA31CB4DD5B00127B97 /* BGEComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEComponent.cpp; sourceTree = "<group>"; };
+		B508CDA41CB4DD5B00127B97 /* BGEComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEComponent.h; sourceTree = "<group>"; };
+		B508CDA61CB4DE6D00127B97 /* BGEGameObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEGameObject.cpp; sourceTree = "<group>"; };
+		B508CDA71CB4DE6D00127B97 /* BGEGameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEGameObject.h; sourceTree = "<group>"; };
+		B508CDA91CB4DE8E00127B97 /* BGEObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEObject.cpp; sourceTree = "<group>"; };
+		B508CDAA1CB4DE8E00127B97 /* BGEObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEObject.h; sourceTree = "<group>"; };
+		B508CDAC1CB78DA100127B97 /* BGEGameObjectService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEGameObjectService.cpp; sourceTree = "<group>"; };
+		B508CDAD1CB78DA100127B97 /* BGEGameObjectService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEGameObjectService.h; sourceTree = "<group>"; };
 		B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleGothic.ttf; sourceTree = "<group>"; };
 		B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBenGameEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B525E36B1C8957A700C691C0 /* BenGameEngineTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BenGameEngineTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -174,6 +201,12 @@
 		B525E3E31C895FC500C691C0 /* BenGameEngineTestApp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BenGameEngineTestApp.hpp; sourceTree = "<group>"; };
 		B525E3E51C895FCC00C691C0 /* item_powerup_fish.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = item_powerup_fish.png; path = textures/item_powerup_fish.png; sourceTree = "<group>"; };
 		B525E3E91C8960BA00C691C0 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		B52B760B1CBA183900758249 /* BGEMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEMaterial.cpp; sourceTree = "<group>"; };
+		B52B760C1CBA183900758249 /* BGEMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEMaterial.h; sourceTree = "<group>"; };
+		B52B760F1CBA2C7F00758249 /* BGERenderComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BGERenderComponent.cpp; path = components/BGERenderComponent.cpp; sourceTree = "<group>"; };
+		B52B76101CBA2C7F00758249 /* BGERenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGERenderComponent.h; path = components/BGERenderComponent.h; sourceTree = "<group>"; };
+		B52B76121CBADF5E00758249 /* BGEMaterialService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEMaterialService.cpp; sourceTree = "<group>"; };
+		B52B76131CBADF5E00758249 /* BGEMaterialService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEMaterialService.h; sourceTree = "<group>"; };
 		B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureVertex.glsl; path = shaders/ColorMatrixTextureVertex.glsl; sourceTree = "<group>"; };
 		B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureFragment.glsl; path = shaders/ColorMatrixTextureFragment.glsl; sourceTree = "<group>"; };
 		B571F1761C93B604007F5A90 /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sample.png; path = textures/sample.png; sourceTree = "<group>"; };
@@ -196,9 +229,20 @@
 		B571F1921C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGETextureAtlasOpenGLES2.h; path = opengles2/BGETextureAtlasOpenGLES2.h; sourceTree = "<group>"; };
 		B571F1941C9E1B94007F5A90 /* FontVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontVertex.glsl; path = shaders/FontVertex.glsl; sourceTree = "<group>"; };
 		B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontFragment.glsl; path = shaders/FontFragment.glsl; sourceTree = "<group>"; };
+		B5ACE88D1CBB08D2004B6871 /* BGETransformComponentTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGETransformComponentTests.m; path = BGEGameObjectAndComponentTests/BGETransformComponentTests.m; sourceTree = SOURCE_ROOT; };
+		B5ACE8901CBB56CE004B6871 /* BGEComponentService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEComponentService.cpp; sourceTree = "<group>"; };
+		B5ACE8911CBB56CE004B6871 /* BGEComponentService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEComponentService.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B508CD951CAF95A000127B97 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B508CD9D1CAF95A000127B97 /* libBenGameEngine.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B525E3581C8950DA00C691C0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -226,6 +270,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B508CD991CAF95A000127B97 /* BGEGameObejctAndComponentTests */ = {
+			isa = PBXGroup;
+			children = (
+				B5ACE88D1CBB08D2004B6871 /* BGETransformComponentTests.m */,
+				B508CD9C1CAF95A000127B97 /* Info.plist */,
+			);
+			name = BGEGameObejctAndComponentTests;
+			path = BGERenderNodeTests;
+			sourceTree = "<group>";
+		};
+		B508CDAF1CB8B2EA00127B97 /* components */ = {
+			isa = PBXGroup;
+			children = (
+				B52B760F1CBA2C7F00758249 /* BGERenderComponent.cpp */,
+				B52B76101CBA2C7F00758249 /* BGERenderComponent.h */,
+				B508CD911CAE285000127B97 /* BGETransformComponent.cpp */,
+				B508CD921CAE285000127B97 /* BGETransformComponent.h */,
+			);
+			name = components;
+			sourceTree = "<group>";
+		};
 		B525E3521C8950DA00C691C0 = {
 			isa = PBXGroup;
 			children = (
@@ -233,6 +298,7 @@
 				B525E35D1C8950DA00C691C0 /* BenGameEngine */,
 				B525E36C1C8957A700C691C0 /* BenGameEngineTestApp */,
 				B525E3D71C8959D200C691C0 /* BenGameEngineBundle */,
+				B508CD991CAF95A000127B97 /* BGEGameObejctAndComponentTests */,
 				B525E35C1C8950DA00C691C0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -243,6 +309,7 @@
 				B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */,
 				B525E36B1C8957A700C691C0 /* BenGameEngineTestApp.app */,
 				B525E3D61C8959D200C691C0 /* BenGameEngineBundle.bundle */,
+				B508CD981CAF95A000127B97 /* BGEGameObjectAndComponentTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -250,6 +317,10 @@
 		B525E35D1C8950DA00C691C0 /* BenGameEngine */ = {
 			isa = PBXGroup;
 			children = (
+				B508CDA31CB4DD5B00127B97 /* BGEComponent.cpp */,
+				B508CDA41CB4DD5B00127B97 /* BGEComponent.h */,
+				B5ACE8901CBB56CE004B6871 /* BGEComponentService.cpp */,
+				B5ACE8911CBB56CE004B6871 /* BGEComponentService.h */,
 				B525E3851C89587000C691C0 /* BGEError.cpp */,
 				B525E3861C89587000C691C0 /* BGEError.h */,
 				B571F1811C97D92E007F5A90 /* BGEFont.cpp */,
@@ -260,18 +331,26 @@
 				B571F17F1C97D88E007F5A90 /* BGEFontService.h */,
 				B525E3871C89587000C691C0 /* BGEGame.cpp */,
 				B525E3881C89587000C691C0 /* BGEGame.h */,
+				B508CDA61CB4DE6D00127B97 /* BGEGameObject.cpp */,
+				B508CDA71CB4DE6D00127B97 /* BGEGameObject.h */,
+				B508CDAC1CB78DA100127B97 /* BGEGameObjectService.cpp */,
+				B508CDAD1CB78DA100127B97 /* BGEGameObjectService.h */,
 				B525E3891C89587000C691C0 /* BGEGLKView.h */,
 				B525E38A1C89587000C691C0 /* BGEGLKView.m */,
 				B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */,
 				B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */,
 				B525E38D1C89587000C691C0 /* BGEHeartbeatService.cpp */,
 				B525E38E1C89587000C691C0 /* BGEHeartbeatService.h */,
+				B52B760B1CBA183900758249 /* BGEMaterial.cpp */,
+				B52B760C1CBA183900758249 /* BGEMaterial.h */,
+				B52B76121CBADF5E00758249 /* BGEMaterialService.cpp */,
+				B52B76131CBADF5E00758249 /* BGEMaterialService.h */,
 				B525E38F1C89587000C691C0 /* BGEMathTypes.cpp */,
 				B525E3901C89587000C691C0 /* BGEMathTypes.h */,
+				B508CDA91CB4DE8E00127B97 /* BGEObject.cpp */,
+				B508CDAA1CB4DE8E00127B97 /* BGEObject.h */,
 				B525E3911C89587000C691C0 /* BGERenderContext.cpp */,
 				B525E3921C89587000C691C0 /* BGERenderContext.h */,
-				B508CD911CAE285000127B97 /* BGERenderNode.cpp */,
-				B508CD921CAE285000127B97 /* BGERenderNode.h */,
 				B525E3951C89587000C691C0 /* BGERenderService.cpp */,
 				B525E3961C89587000C691C0 /* BGERenderService.h */,
 				B525E3991C89587000C691C0 /* BGERenderView.cpp */,
@@ -294,7 +373,9 @@
 				B508CD881CA0ABA200127B97 /* BGETextureBase.h */,
 				B525E3B11C89587000C691C0 /* BGETextureService.cpp */,
 				B525E3B21C89587000C691C0 /* BGETextureService.h */,
+				B508CDAF1CB8B2EA00127B97 /* components */,
 				B571F17C1C97CF42007F5A90 /* external */,
+				B52B760E1CBA1E7C00758249 /* game objects */,
 				B571F1741C928BA5007F5A90 /* opengles2 */,
 				B525E3CD1C89587900C691C0 /* shaders */,
 			);
@@ -375,6 +456,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B52B760E1CBA1E7C00758249 /* game objects */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "game objects";
+			sourceTree = "<group>";
+		};
 		B571F1741C928BA5007F5A90 /* opengles2 */ = {
 			isa = PBXGroup;
 			children = (
@@ -413,6 +501,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B508CD971CAF95A000127B97 /* BGEGameObjectAndComponentTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B508CDA01CAF95A000127B97 /* Build configuration list for PBXNativeTarget "BGEGameObjectAndComponentTests" */;
+			buildPhases = (
+				B508CD941CAF95A000127B97 /* Sources */,
+				B508CD951CAF95A000127B97 /* Frameworks */,
+				B508CD961CAF95A000127B97 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B508CD9F1CAF95A000127B97 /* PBXTargetDependency */,
+			);
+			name = BGEGameObjectAndComponentTests;
+			productName = BGERenderNodeTests;
+			productReference = B508CD981CAF95A000127B97 /* BGEGameObjectAndComponentTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		B525E35A1C8950DA00C691C0 /* BenGameEngine */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B525E3641C8950DA00C691C0 /* Build configuration list for PBXNativeTarget "BenGameEngine" */;
@@ -476,6 +582,9 @@
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "2n Productions";
 				TargetAttributes = {
+					B508CD971CAF95A000127B97 = {
+						CreatedOnToolsVersion = 7.2.1;
+					};
 					B525E35A1C8950DA00C691C0 = {
 						CreatedOnToolsVersion = 7.2.1;
 					};
@@ -503,11 +612,19 @@
 				B525E35A1C8950DA00C691C0 /* BenGameEngine */,
 				B525E3D51C8959D200C691C0 /* BenGameEngineBundle */,
 				B525E36A1C8957A700C691C0 /* BenGameEngineTestApp */,
+				B508CD971CAF95A000127B97 /* BGEGameObjectAndComponentTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B508CD961CAF95A000127B97 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B525E3691C8957A700C691C0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -545,6 +662,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B508CD941CAF95A000127B97 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B5ACE88F1CBB08D5004B6871 /* BGETransformComponentTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B525E3571C8950DA00C691C0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -556,31 +681,39 @@
 				B525E3C61C89587000C691C0 /* BGEShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* BGERenderService.cpp in Sources */,
 				B571F1931C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp in Sources */,
+				B52B760D1CBA183900758249 /* BGEMaterial.cpp in Sources */,
 				B525E3C41C89587000C691C0 /* BGEShaderProgram.cpp in Sources */,
 				B525E3BC1C89587000C691C0 /* BGERenderContextOpenGLES2.cpp in Sources */,
 				B525E3CC1C89587000C691C0 /* BGETextureServiceOpenGLES2.cpp in Sources */,
+				B508CDAB1CB4DE8E00127B97 /* BGEObject.cpp in Sources */,
 				B525E3BA1C89587000C691C0 /* BGEMathTypes.cpp in Sources */,
 				B571F1901C9D0A34007F5A90 /* BGEFontGlyph.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* BGETextureAtlas.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* BGEHeartbeatService.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* BGEShader.cpp in Sources */,
 				B571F1801C97D88E007F5A90 /* BGEFontService.cpp in Sources */,
+				B5ACE8921CBB56CE004B6871 /* BGEComponentService.cpp in Sources */,
 				B525E3C31C89587000C691C0 /* BGEShaderOpenGLES2.cpp in Sources */,
 				B525E3B71C89587000C691C0 /* BGEGLKView.m in Sources */,
+				B52B76111CBA2C7F00758249 /* BGERenderComponent.cpp in Sources */,
 				B525E3C81C89587000C691C0 /* BGETexture.cpp in Sources */,
 				B571F1831C97D92E007F5A90 /* BGEFont.cpp in Sources */,
 				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
 				B525E3BB1C89587000C691C0 /* BGERenderContext.cpp in Sources */,
-				B508CD931CAE285000127B97 /* BGERenderNode.cpp in Sources */,
+				B508CD931CAE285000127B97 /* BGETransformComponent.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* BGEGame.cpp in Sources */,
+				B508CDA51CB4DD5B00127B97 /* BGEComponent.cpp in Sources */,
 				B525E3B51C89587000C691C0 /* BGEError.cpp in Sources */,
+				B508CDAE1CB78DA100127B97 /* BGEGameObjectService.cpp in Sources */,
 				B508CD891CA0ABA200127B97 /* BGETextureBase.cpp in Sources */,
+				B508CDA81CB4DE6D00127B97 /* BGEGameObject.cpp in Sources */,
 				B525E3C01C89587000C691C0 /* BGERenderWindow.cpp in Sources */,
 				B525E3C51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp in Sources */,
 				B525E3CA1C89587000C691C0 /* BGETextureOpenGLES2.cpp in Sources */,
 				B525E3C11C89587000C691C0 /* BGEService.cpp in Sources */,
 				B525E3BF1C89587000C691C0 /* BGERenderView.cpp in Sources */,
 				B525E3C71C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp in Sources */,
+				B52B76141CBADF5E00758249 /* BGEMaterialService.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -605,6 +738,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B508CD9F1CAF95A000127B97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B525E35A1C8950DA00C691C0 /* BenGameEngine */;
+			targetProxy = B508CD9E1CAF95A000127B97 /* PBXContainerItemProxy */;
+		};
 		B525E3831C8957B900C691C0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B525E35A1C8950DA00C691C0 /* BenGameEngine */;
@@ -637,6 +775,26 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		B508CDA11CAF95A000127B97 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = BGEGameObjectAndComponentTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BGEGameObjectAndComponentTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B508CDA21CAF95A000127B97 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = BGEGameObjectAndComponentTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BGEGameObjectAndComponentTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		B525E3621C8950DA00C691C0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -667,6 +825,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					"UNIT_TESTING=1",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -806,6 +965,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B508CDA01CAF95A000127B97 /* Build configuration list for PBXNativeTarget "BGEGameObjectAndComponentTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B508CDA11CAF95A000127B97 /* Debug */,
+				B508CDA21CAF95A000127B97 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		B525E3561C8950DA00C691C0 /* Build configuration list for PBXProject "BenGameEngine" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

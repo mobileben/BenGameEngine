@@ -17,7 +17,7 @@
 class BGETextureAtlasOpenGLES2 : public BGETextureAtlas
 {
 public:
-    BGETextureAtlasOpenGLES2(std::string name);
+    BGETextureAtlasOpenGLES2(uint64_t texId, std::string name);
     ~BGETextureAtlasOpenGLES2();
     
     uint32_t getHWTextureId() const;

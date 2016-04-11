@@ -10,7 +10,7 @@
 #include "BGETextureOpenGLES2.h"
 #include "BGEGame.h"
 
-BGETextureAtlasOpenGLES2::BGETextureAtlasOpenGLES2(std::string name) : BGETextureAtlas(name) {
+BGETextureAtlasOpenGLES2::BGETextureAtlasOpenGLES2(uint64_t texId, std::string name) : BGETextureAtlas(texId ,name) {
 }
 
 BGETextureAtlasOpenGLES2::~BGETextureAtlasOpenGLES2() {

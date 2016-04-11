@@ -9,11 +9,11 @@
 #include "BGETextureAtlas.h"
 #include "BGEGame.h"
 
-BGETextureAtlas::BGETextureAtlas(std::string name) : BGETextureBase(name){
+BGETextureAtlas::BGETextureAtlas(uint64_t texId, std::string name) : BGETextureBase(texId, name){
 }
 
 std::string BGETextureAtlas::atlasTextureKey() const {
-    return "__" + name_ + "_texture";
+    return "__" + getName() + "_texture";
 }
 
 void BGETextureAtlas::releaseCurrentTexture() {

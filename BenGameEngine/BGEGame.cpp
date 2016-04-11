@@ -15,6 +15,8 @@ std::shared_ptr<BGEGame> BGEGame::getInstance() {
 
 BGEGame::BGEGame()
 {
+    gameObjectService_ = std::make_shared<BGEGameObjectService>();
+    materialService_ = std::make_shared<BGEMaterialService>();
     heartbeatService_ = std::make_shared<BGEHeartbeatService>();
 }
 

@@ -10,7 +10,7 @@
 #include "BGETextureAtlas.h"
 #include "BGEGame.h"
 
-BGETexture::BGETexture(std::string name) : BGETextureBase(name), x_(0), y_(0), isSubTexture_(false) {
+BGETexture::BGETexture(uint64_t texId, std::string name) : BGETextureBase(texId, name), x_(0), y_(0), isSubTexture_(false) {
 }
 
 void BGETexture::releaseCurrentTexture() {

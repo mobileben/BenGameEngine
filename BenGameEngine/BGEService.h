@@ -10,6 +10,7 @@
 #define BGEService_h
 
 #include <stdio.h>
+#include <atomic>
 
 class BGEService
 {
@@ -24,6 +25,12 @@ public:
     virtual void pause() =0;
     virtual void resume() =0;
     virtual void destroy() =0;
+    
+protected:
+    uint64_t getIdAndIncrement();
+    
+private:
+    std::atomic<uint64_t>   identifier_;
 };
 
 #endif /* BGEService_h */

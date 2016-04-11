@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <memory>
 #include "BGEService.h"
+#include "BGEGameObjectService.h"
+#include "BGEMaterialService.h"
 #include "BGERenderService.h"
 #include "BGETextureService.h"
 #include "BGEFontService.h"
@@ -33,8 +35,10 @@ public:
     std::shared_ptr<BGEFontService> getFontService() { return fontService_; }
     void provide(std::shared_ptr<BGEFontService> fontService);
     
+    // Services which are implicitly built
+    std::shared_ptr<BGEGameObjectService> getGameObjectService() { return gameObjectService_; }
+    std::shared_ptr<BGEMaterialService> getMaterialService() { return materialService_; }
     std::shared_ptr<BGEHeartbeatService> getHeartbeatService() { return heartbeatService_; }
-    // No provide for heartbeat as it is implicitly built
     
     // BGEService functions
     void initialize();
@@ -50,6 +54,8 @@ protected:
     std::shared_ptr<BGETextureService> textureService_;
     std::shared_ptr<BGEFontService> fontService_;
     std::shared_ptr<BGEHeartbeatService> heartbeatService_;
+    std::shared_ptr<BGEMaterialService> materialService_;
+    std::shared_ptr<BGEGameObjectService> gameObjectService_;
 };
 
 #endif /* BGEGame_h */

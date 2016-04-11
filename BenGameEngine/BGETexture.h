@@ -22,7 +22,7 @@ class BGETextureAtlas;
 class BGETexture : public BGETextureBase
 {
 public:
-    BGETexture(std::string name);
+    BGETexture(uint64_t texId, std::string name);
     
     virtual ~BGETexture() {}
     
