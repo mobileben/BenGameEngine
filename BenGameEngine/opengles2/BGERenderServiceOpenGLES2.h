@@ -14,8 +14,8 @@
 #include "BGEShaderServiceOpenGLES2.h"
 #include "BGEMathTypes.h"
 #include "BGETexture.h"
-#include "BGEMaterial.h"
-#include "BGEGameObject.h"
+#include "Material.h"
+#include "GameObject.h"
 
 // TODO: REmove
 #include <GLKit/GLKit.h>
@@ -53,10 +53,10 @@ public:
     void drawTexture(BGEVector2 &position, std::shared_ptr<BGETextureBase> texture);
     
     // Using the more updated means
-    void drawFlatRect(std::shared_ptr<BGEGameObject> gameObject);
+    void drawFlatRect(std::shared_ptr<BGE::GameObject> gameObject);
     // TODO: Transform
-    void drawLines(const std::vector<BGEVector2>& points, float thickness, bool loop, std::shared_ptr<BGEMaterial> material);
-    void drawSprite(std::shared_ptr<BGEGameObject> gameObject);
+    void drawLines(const std::vector<BGEVector2>& points, float thickness, bool loop, std::shared_ptr<BGE::Material> material);
+    void drawSprite(std::shared_ptr<BGE::GameObject> gameObject);
     
     int8_t createMask(BGEVector2 &position, std::shared_ptr<BGETextureBase> mask);
     void enableMask(int8_t maskId);

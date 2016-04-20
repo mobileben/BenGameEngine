@@ -14,13 +14,13 @@
 #include <string>
 #include <memory>
 #include <functional>
-#include "BGEService.h"
+#include "Service.h"
 #include "BGETextureBase.h"
 #include "BGETexture.h"
 #include "BGETextureAtlas.h"
 #include "Error.h"
 
-class BGETextureService : public BGEService
+class BGETextureService : public BGE::Service
 {
 public:
     BGETextureService();

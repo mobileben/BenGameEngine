@@ -25,12 +25,12 @@ public:
 protected:
     BGELineRenderComponent(uint32_t componentId);
     BGELineRenderComponent(uint32_t componentId, std::string name);
-    BGELineRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGEGameObject> gameObject);
+    BGELineRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject);
     
     void materialsUpdated() {}
     
 private:
-    friend BGEComponentService;
+    friend BGE::ComponentService;
     
     float thickness_;
     std::vector<BGEVector2> points_;

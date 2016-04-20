@@ -26,14 +26,14 @@ public:
 protected:
     BGEFlatRectRenderComponent(uint32_t componentId);
     BGEFlatRectRenderComponent(uint32_t componentId, std::string name);
-    BGEFlatRectRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGEGameObject> gameObject);
+    BGEFlatRectRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject);
     
     BGEVertex* const getVertices() { return vertices_; }
     
     void materialsUpdated();
 
 private:
-    friend BGEComponentService;
+    friend BGE::ComponentService;
     friend BGERenderService;
     friend BGERenderServiceOpenGLES2;
     

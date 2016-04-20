@@ -11,7 +11,7 @@
 
 const std::string BGETextureBase::ErrorDomain = "Texture";
 
-BGETextureBase::BGETextureBase(uint64_t texId, std::string name) : BGEObject(texId, name) ,valid_(false), format_(BGETextureFormat::Undefined), alphaState_(BGETextureAlphaState::None), width_(0), height_(0) {
+BGETextureBase::BGETextureBase(uint64_t texId, std::string name) : BGE::Object(texId, name) ,valid_(false), format_(BGETextureFormat::Undefined), alphaState_(BGETextureAlphaState::None), width_(0), height_(0) {
     updateUVs();
     updateXYs();
 }

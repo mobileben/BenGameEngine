@@ -14,9 +14,9 @@
 #include <memory>
 #include <vector>
 #include "BGEMathTypes.h"
-#include "BGEComponent.h"
+#include "Component.h"
 
-class BGETransformComponent : public BGEComponent
+class BGETransformComponent : public BGE::Component
 {
 public:
     virtual ~BGETransformComponent() {}
@@ -82,7 +82,7 @@ public:
     virtual bool inParentHierarchy(std::shared_ptr<BGETransformComponent> parent);
     
 protected:
-    friend BGEComponentService;
+    friend BGE::ComponentService;
     
     BGETransformComponent(uint64_t componentId);
     BGETransformComponent(uint64_t componentId, std::string name);

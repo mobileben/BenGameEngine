@@ -6,8 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#ifndef Error_h
-#define Error_h
+#ifndef BGEError_h
+#define BGEError_h
 
 #include <stdio.h>
 #include <memory>
@@ -31,4 +31,4 @@ namespace BGE {
     };
 }
 
-#endif /* Error_h */
+#endif /* BGEError_h */

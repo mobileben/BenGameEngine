@@ -20,9 +20,9 @@
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 
-#include "BGEService.h"
+#include "Service.h"
 
-class BGEHeartbeatService : public BGEService {
+class BGEHeartbeatService : public BGE::Service {
 public:
     BGEHeartbeatService();
     virtual ~BGEHeartbeatService() {}

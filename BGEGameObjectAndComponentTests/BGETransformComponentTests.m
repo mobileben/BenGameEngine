@@ -7,10 +7,10 @@
 //
 
 #import <XCTest/XCTest.h>
-#include "BGEComponentService.h"
+#include "ComponentService.h"
 #include "BGETransformComponent.h"
 
-static BGEComponentService componentService;
+static ComponentService componentService;
 
 @interface BGETransformComponentTests : XCTestCase
 

@@ -12,16 +12,16 @@
 #include <stdio.h>
 #include <memory>
 #include <vector>
-#include "BGEComponent.h"
+#include "Component.h"
 #include "BGEMathTypes.h"
-#include "BGEMaterial.h"
+#include "Material.h"
 
 enum class BGERenderComponentAnchor {
     // TODO: add upper left, lower left, upper right, lower right
     Center
 };
 
-class BGERenderComponent : public BGEComponent {
+class BGERenderComponent : public BGE::Component {
 public:
     float getLocalWidth() { return localBounds_.w; }
     float getLocalHeight() { return localBounds_.h; }
@@ -34,13 +34,13 @@ public:
     void setEnabled(bool enabled) { enabled_ = enabled; }
     BGERenderComponentAnchor getAnchor() const { return anchor_; }
     
-    std::weak_ptr<BGEMaterial> getMaterial(uint32_t index=0);
-    void setMaterials(std::vector<std::shared_ptr<BGEMaterial>> materials);
+    std::weak_ptr<BGE::Material> getMaterial(uint32_t index=0);
+    void setMaterials(std::vector<std::shared_ptr<BGE::Material>> materials);
 
 protected:
     BGERenderComponent(uint64_t componentId);
     BGERenderComponent(uint64_t componentId, std::string name);
-    BGERenderComponent(uint64_t componentId, std::string name, std::shared_ptr<BGEGameObject> gameObject);
+    BGERenderComponent(uint64_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject);
     
     bool getGlobalBoundsDirty() const { return globalBoundsDirty_; }
     void setGlobalBoundsDirty(bool dirty) { globalBoundsDirty_ = dirty; }
@@ -51,7 +51,7 @@ protected:
     virtual void materialsUpdated() =0;
     
 private:
-    friend BGEComponentService;
+    friend BGE::ComponentService;
     
     bool                    enabled_;
     bool                    globalBoundsDirty_;
@@ -59,7 +59,7 @@ private:
     BGERect                 globalBounds_;  // Global. This includes any transforms applied
     BGERenderComponentAnchor   anchor_;
     
-    std::vector<std::weak_ptr<BGEMaterial>> materials_;
+    std::vector<std::weak_ptr<BGE::Material>> materials_;
 };
 
 #endif /* BGERenderComponent_h */

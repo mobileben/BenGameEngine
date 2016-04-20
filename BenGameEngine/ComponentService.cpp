@@ -1,21 +1,21 @@
 //
-//  BGEComponentService.cpp
+//  ComponentService.cpp
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 4/10/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGEComponentService.h"
+#include "ComponentService.h"
 
-BGEComponentService::BGEComponentService() {
+BGE::ComponentService::ComponentService() {
 }
 
-BGEComponentService::~BGEComponentService() {
+BGE::ComponentService::~ComponentService() {
 }
 
 template <typename T>
-std::shared_ptr<T> BGEComponentService::getComponent(uint64_t componentId) {
+std::shared_ptr<T> BGE::ComponentService::getComponent(uint64_t componentId) {
     std::type_index index(typeid(T));
     ComponentMapIterator it = components_.find(index);
     
@@ -31,7 +31,7 @@ std::shared_ptr<T> BGEComponentService::getComponent(uint64_t componentId) {
 }
 
 template <typename T>
-std::shared_ptr<T> BGEComponentService::getComponent(std::string name) {
+std::shared_ptr<T> BGE::ComponentService::getComponent(std::string name) {
     std::type_index index(typeid(T));
     ComponentMapIterator it = components_.find(index);
     
@@ -47,7 +47,7 @@ std::shared_ptr<T> BGEComponentService::getComponent(std::string name) {
 }
 
 template <typename T>
-void BGEComponentService::removeComponent(uint64_t componentId) {
+void BGE::ComponentService::removeComponent(uint64_t componentId) {
     std::type_index index(typeid(T));
     ComponentMapIterator it = components_.find(index);
     
@@ -64,7 +64,7 @@ void BGEComponentService::removeComponent(uint64_t componentId) {
 }
 
 template <typename T>
-void BGEComponentService::removeComponent(std::string name) {
+void BGE::ComponentService::removeComponent(std::string name) {
     std::type_index index(typeid(T));
     ComponentMapIterator it = components_.find(index);
     
@@ -81,6 +81,6 @@ void BGEComponentService::removeComponent(std::string name) {
 }
 
 template <typename T>
-void BGEComponentService::removeAllComponents() {
+void BGE::ComponentService::removeAllComponents() {
     components_.erase(typeid(T));
 }

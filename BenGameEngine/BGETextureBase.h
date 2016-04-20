@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <string>
-#include "BGEObject.h"
+#include "Object.h"
 #include "BGEMathTypes.h"
 
 enum class BGETextureState {
@@ -48,7 +48,7 @@ typedef enum {
     BGETextureErrorExistingTextureWrongType,
 } BGETextureError;
 
-class BGETextureBase : public BGEObject
+class BGETextureBase : public BGE::Object
 {
 public:
     static const std::string ErrorDomain;

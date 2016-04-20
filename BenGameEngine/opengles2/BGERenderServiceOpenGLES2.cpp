@@ -630,13 +630,13 @@ void BGERenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_pt
     }
 }
 
-void BGERenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGEGameObject> gameObject) {
+void BGERenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> gameObject) {
     if (gameObject) {
         std::shared_ptr<BGEFlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<BGEFlatRectRenderComponent>(gameObject->getComponent<BGEFlatRectRenderComponent>());
         
         if (flatRect) {
             BGEVertex *const vertices = flatRect->getVertices();
-            std::shared_ptr<BGEMaterial> material = flatRect->getMaterial().lock();
+            std::shared_ptr<BGE::Material> material = flatRect->getMaterial().lock();
             
             if (material) {
                 std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Line"));
@@ -662,7 +662,7 @@ void BGERenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGEGameObject> game
     }
 }
 
-void BGERenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& points, float thickness, bool loop, std::shared_ptr<BGEMaterial> material) {
+void BGERenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& points, float thickness, bool loop, std::shared_ptr<BGE::Material> material) {
     BGEVector3 vertices[points.size()];
     GLubyte indices[points.size()];
     
@@ -700,13 +700,13 @@ void BGERenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& points,
 }
 
 
-void BGERenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGEGameObject> gameObject) {
+void BGERenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> gameObject) {
     if (gameObject) {
         std::shared_ptr<BGESpriteRenderComponent> sprite = std::dynamic_pointer_cast<BGESpriteRenderComponent>(gameObject->getComponent<BGESpriteRenderComponent>());
         
         if (sprite) {
             BGEVertexTex *const vertices = sprite->getVertices();
-            std::shared_ptr<BGEMaterial> material = sprite->getMaterial().lock();
+            std::shared_ptr<BGE::Material> material = sprite->getMaterial().lock();
             if (material) {
                 std::shared_ptr<BGETextureBase> texture = material->getTexture().lock();
                 

@@ -8,10 +8,8 @@
 
 #include "Error.h"
 
-namespace BGE {
-    Error::Error(std::string domain, int32_t errorCode) : domain_(domain), errorCode_(errorCode) {
-    }
-    
-    Error::Error(std::string domain, int32_t errorCode, std::shared_ptr<Error> underlyingError) : domain_(domain), errorCode_(errorCode), underlyingError_(underlyingError) {
-    }
+BGE::Error::Error(std::string domain, int32_t errorCode) : domain_(domain), errorCode_(errorCode) {
+}
+
+BGE::Error::Error(std::string domain, int32_t errorCode, std::shared_ptr<Error> underlyingError) : domain_(domain), errorCode_(errorCode), underlyingError_(underlyingError) {
 }

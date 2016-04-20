@@ -15,7 +15,7 @@ BGESpriteRenderComponent::BGESpriteRenderComponent(uint32_t componentId) : BGERe
 BGESpriteRenderComponent::BGESpriteRenderComponent(uint32_t componentId, std::string name) : BGERenderComponent(componentId, name) {
 }
 
-BGESpriteRenderComponent::BGESpriteRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGEGameObject> gameObject) : BGERenderComponent(componentId, name, gameObject) {
+BGESpriteRenderComponent::BGESpriteRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject) : BGERenderComponent(componentId, name, gameObject) {
 }
 
 void BGESpriteRenderComponent::materialsUpdated() {
@@ -27,7 +27,7 @@ void BGESpriteRenderComponent::materialsUpdated() {
 
 void BGESpriteRenderComponent::updateLocalBoundsAndVertices() {
     // Right now we are only supporting one material
-    std::shared_ptr<BGEMaterial> material = getMaterial().lock();
+    std::shared_ptr<BGE::Material> material = getMaterial().lock();
     
     assert(material);
     

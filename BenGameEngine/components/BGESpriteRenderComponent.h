@@ -24,14 +24,14 @@ public:
 protected:
     BGESpriteRenderComponent(uint32_t componentId);
     BGESpriteRenderComponent(uint32_t componentId, std::string name);
-    BGESpriteRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGEGameObject> gameObject);
+    BGESpriteRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject);
 
     void materialsUpdated();
     
     BGEVertexTex* const getVertices() { return vertices_; }
 
 private:
-    friend BGEComponentService;
+    friend BGE::ComponentService;
     friend BGERenderService;
     friend BGERenderServiceOpenGLES2;
     

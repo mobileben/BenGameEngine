@@ -14,7 +14,7 @@ BGELineRenderComponent::BGELineRenderComponent(uint32_t componentId) : BGERender
 BGELineRenderComponent::BGELineRenderComponent(uint32_t componentId, std::string name) : BGERenderComponent(componentId, name), closedLoop_(false) {
 }
 
-BGELineRenderComponent::BGELineRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGEGameObject> gameObject) : BGERenderComponent(componentId, name, gameObject), closedLoop_(false) {
+BGELineRenderComponent::BGELineRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject) : BGERenderComponent(componentId, name, gameObject), closedLoop_(false) {
 }
 
 const std::vector<BGEVector2>& BGELineRenderComponent::getPoints() const {

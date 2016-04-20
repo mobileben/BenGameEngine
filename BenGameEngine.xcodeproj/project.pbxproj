@@ -12,10 +12,10 @@
 		B508CD901CA901B700127B97 /* Avenir.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8F1CA901B700127B97 /* Avenir.ttc */; };
 		B508CD931CAE285000127B97 /* BGETransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD911CAE285000127B97 /* BGETransformComponent.cpp */; };
 		B508CD9D1CAF95A000127B97 /* libBenGameEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */; };
-		B508CDA51CB4DD5B00127B97 /* BGEComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA31CB4DD5B00127B97 /* BGEComponent.cpp */; };
-		B508CDA81CB4DE6D00127B97 /* BGEGameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA61CB4DE6D00127B97 /* BGEGameObject.cpp */; };
-		B508CDAB1CB4DE8E00127B97 /* BGEObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA91CB4DE8E00127B97 /* BGEObject.cpp */; };
-		B508CDAE1CB78DA100127B97 /* BGEGameObjectService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDAC1CB78DA100127B97 /* BGEGameObjectService.cpp */; };
+		B508CDA51CB4DD5B00127B97 /* Component.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA31CB4DD5B00127B97 /* Component.cpp */; };
+		B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA61CB4DE6D00127B97 /* GameObject.cpp */; };
+		B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA91CB4DE8E00127B97 /* Object.cpp */; };
+		B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */; };
 		B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */; };
 		B525E36F1C8957A700C691C0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E36E1C8957A700C691C0 /* main.m */; };
 		B525E3721C8957A700C691C0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E3711C8957A700C691C0 /* AppDelegate.m */; };
@@ -36,7 +36,7 @@
 		B525E3BE1C89587000C691C0 /* BGERenderServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3971C89587000C691C0 /* BGERenderServiceOpenGLES2.cpp */; };
 		B525E3BF1C89587000C691C0 /* BGERenderView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3991C89587000C691C0 /* BGERenderView.cpp */; };
 		B525E3C01C89587000C691C0 /* BGERenderWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39B1C89587000C691C0 /* BGERenderWindow.cpp */; };
-		B525E3C11C89587000C691C0 /* BGEService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39D1C89587000C691C0 /* BGEService.cpp */; };
+		B525E3C11C89587000C691C0 /* Service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39D1C89587000C691C0 /* Service.cpp */; };
 		B525E3C21C89587000C691C0 /* BGEShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39F1C89587000C691C0 /* BGEShader.cpp */; };
 		B525E3C31C89587000C691C0 /* BGEShaderOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A11C89587000C691C0 /* BGEShaderOpenGLES2.cpp */; };
 		B525E3C41C89587000C691C0 /* BGEShaderProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A31C89587000C691C0 /* BGEShaderProgram.cpp */; };
@@ -56,9 +56,9 @@
 		B525E3E41C895FC500C691C0 /* BenGameEngineTestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3E21C895FC500C691C0 /* BenGameEngineTestApp.cpp */; };
 		B525E3E61C895FCC00C691C0 /* item_powerup_fish.png in Resources */ = {isa = PBXBuildFile; fileRef = B525E3E51C895FCC00C691C0 /* item_powerup_fish.png */; };
 		B525E3EA1C8960BA00C691C0 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B525E3E91C8960BA00C691C0 /* GLKit.framework */; };
-		B52B760D1CBA183900758249 /* BGEMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B760B1CBA183900758249 /* BGEMaterial.cpp */; };
+		B52B760D1CBA183900758249 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B760B1CBA183900758249 /* Material.cpp */; };
 		B52B76111CBA2C7F00758249 /* BGERenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B760F1CBA2C7F00758249 /* BGERenderComponent.cpp */; };
-		B52B76141CBADF5E00758249 /* BGEMaterialService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B76121CBADF5E00758249 /* BGEMaterialService.cpp */; };
+		B52B76141CBADF5E00758249 /* MaterialService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B76121CBADF5E00758249 /* MaterialService.cpp */; };
 		B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */; };
 		B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */; };
 		B571F1771C93B604007F5A90 /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = B571F1761C93B604007F5A90 /* sample.png */; };
@@ -75,7 +75,7 @@
 		B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1941C9E1B94007F5A90 /* FontVertex.glsl */; };
 		B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */; };
 		B5ACE88F1CBB08D5004B6871 /* BGETransformComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE88D1CBB08D2004B6871 /* BGETransformComponentTests.m */; };
-		B5ACE8921CBB56CE004B6871 /* BGEComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* BGEComponentService.cpp */; };
+		B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */; };
 		B5ACE8951CBF7B00004B6871 /* BGELineRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8931CBF7AFF004B6871 /* BGELineRenderComponent.cpp */; };
 		B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5E7B9B51CC35B5000978F1A /* LineVertex.glsl */; };
 		B5E7B9B71CC35B5D00978F1A /* LineFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5E7B9B41CC35B5000978F1A /* LineFragment.glsl */; };
@@ -128,14 +128,14 @@
 		B508CD921CAE285000127B97 /* BGETransformComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGETransformComponent.h; path = components/BGETransformComponent.h; sourceTree = "<group>"; };
 		B508CD981CAF95A000127B97 /* BGEGameObjectAndComponentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BGEGameObjectAndComponentTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B508CD9C1CAF95A000127B97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = BGEGameObjectAndComponentTests/Info.plist; sourceTree = "<group>"; };
-		B508CDA31CB4DD5B00127B97 /* BGEComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEComponent.cpp; sourceTree = "<group>"; };
-		B508CDA41CB4DD5B00127B97 /* BGEComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEComponent.h; sourceTree = "<group>"; };
-		B508CDA61CB4DE6D00127B97 /* BGEGameObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEGameObject.cpp; sourceTree = "<group>"; };
-		B508CDA71CB4DE6D00127B97 /* BGEGameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEGameObject.h; sourceTree = "<group>"; };
-		B508CDA91CB4DE8E00127B97 /* BGEObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEObject.cpp; sourceTree = "<group>"; };
-		B508CDAA1CB4DE8E00127B97 /* BGEObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEObject.h; sourceTree = "<group>"; };
-		B508CDAC1CB78DA100127B97 /* BGEGameObjectService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEGameObjectService.cpp; sourceTree = "<group>"; };
-		B508CDAD1CB78DA100127B97 /* BGEGameObjectService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEGameObjectService.h; sourceTree = "<group>"; };
+		B508CDA31CB4DD5B00127B97 /* Component.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Component.cpp; sourceTree = "<group>"; };
+		B508CDA41CB4DD5B00127B97 /* Component.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Component.h; sourceTree = "<group>"; };
+		B508CDA61CB4DE6D00127B97 /* GameObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameObject.cpp; sourceTree = "<group>"; };
+		B508CDA71CB4DE6D00127B97 /* GameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
+		B508CDA91CB4DE8E00127B97 /* Object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Object.cpp; sourceTree = "<group>"; };
+		B508CDAA1CB4DE8E00127B97 /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
+		B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = GameObjectService.cpp; sourceTree = "<group>"; };
+		B508CDAD1CB78DA100127B97 /* GameObjectService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObjectService.h; sourceTree = "<group>"; };
 		B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleGothic.ttf; sourceTree = "<group>"; };
 		B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBenGameEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B525E36B1C8957A700C691C0 /* BenGameEngineTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BenGameEngineTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -172,8 +172,8 @@
 		B525E39A1C89587000C691C0 /* BGERenderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGERenderView.h; sourceTree = "<group>"; };
 		B525E39B1C89587000C691C0 /* BGERenderWindow.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGERenderWindow.cpp; sourceTree = "<group>"; };
 		B525E39C1C89587000C691C0 /* BGERenderWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGERenderWindow.h; sourceTree = "<group>"; };
-		B525E39D1C89587000C691C0 /* BGEService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEService.cpp; sourceTree = "<group>"; };
-		B525E39E1C89587000C691C0 /* BGEService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEService.h; sourceTree = "<group>"; };
+		B525E39D1C89587000C691C0 /* Service.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Service.cpp; sourceTree = "<group>"; };
+		B525E39E1C89587000C691C0 /* Service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Service.h; sourceTree = "<group>"; };
 		B525E39F1C89587000C691C0 /* BGEShader.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEShader.cpp; sourceTree = "<group>"; };
 		B525E3A01C89587000C691C0 /* BGEShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEShader.h; sourceTree = "<group>"; };
 		B525E3A11C89587000C691C0 /* BGEShaderOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEShaderOpenGLES2.cpp; path = opengles2/BGEShaderOpenGLES2.cpp; sourceTree = "<group>"; };
@@ -206,12 +206,12 @@
 		B525E3E31C895FC500C691C0 /* BenGameEngineTestApp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BenGameEngineTestApp.hpp; sourceTree = "<group>"; };
 		B525E3E51C895FCC00C691C0 /* item_powerup_fish.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = item_powerup_fish.png; path = textures/item_powerup_fish.png; sourceTree = "<group>"; };
 		B525E3E91C8960BA00C691C0 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
-		B52B760B1CBA183900758249 /* BGEMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEMaterial.cpp; sourceTree = "<group>"; };
-		B52B760C1CBA183900758249 /* BGEMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEMaterial.h; sourceTree = "<group>"; };
+		B52B760B1CBA183900758249 /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Material.cpp; sourceTree = "<group>"; };
+		B52B760C1CBA183900758249 /* Material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Material.h; sourceTree = "<group>"; };
 		B52B760F1CBA2C7F00758249 /* BGERenderComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BGERenderComponent.cpp; path = components/BGERenderComponent.cpp; sourceTree = "<group>"; };
 		B52B76101CBA2C7F00758249 /* BGERenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGERenderComponent.h; path = components/BGERenderComponent.h; sourceTree = "<group>"; };
-		B52B76121CBADF5E00758249 /* BGEMaterialService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEMaterialService.cpp; sourceTree = "<group>"; };
-		B52B76131CBADF5E00758249 /* BGEMaterialService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEMaterialService.h; sourceTree = "<group>"; };
+		B52B76121CBADF5E00758249 /* MaterialService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MaterialService.cpp; sourceTree = "<group>"; };
+		B52B76131CBADF5E00758249 /* MaterialService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaterialService.h; sourceTree = "<group>"; };
 		B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureVertex.glsl; path = shaders/ColorMatrixTextureVertex.glsl; sourceTree = "<group>"; };
 		B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureFragment.glsl; path = shaders/ColorMatrixTextureFragment.glsl; sourceTree = "<group>"; };
 		B571F1761C93B604007F5A90 /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sample.png; path = textures/sample.png; sourceTree = "<group>"; };
@@ -235,8 +235,8 @@
 		B571F1941C9E1B94007F5A90 /* FontVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontVertex.glsl; path = shaders/FontVertex.glsl; sourceTree = "<group>"; };
 		B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontFragment.glsl; path = shaders/FontFragment.glsl; sourceTree = "<group>"; };
 		B5ACE88D1CBB08D2004B6871 /* BGETransformComponentTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGETransformComponentTests.m; path = BGEGameObjectAndComponentTests/BGETransformComponentTests.m; sourceTree = SOURCE_ROOT; };
-		B5ACE8901CBB56CE004B6871 /* BGEComponentService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEComponentService.cpp; sourceTree = "<group>"; };
-		B5ACE8911CBB56CE004B6871 /* BGEComponentService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEComponentService.h; sourceTree = "<group>"; };
+		B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComponentService.cpp; sourceTree = "<group>"; };
+		B5ACE8911CBB56CE004B6871 /* ComponentService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComponentService.h; sourceTree = "<group>"; };
 		B5ACE8931CBF7AFF004B6871 /* BGELineRenderComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BGELineRenderComponent.cpp; path = components/BGELineRenderComponent.cpp; sourceTree = "<group>"; };
 		B5ACE8941CBF7AFF004B6871 /* BGELineRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGELineRenderComponent.h; path = components/BGELineRenderComponent.h; sourceTree = "<group>"; };
 		B5E7B9B41CC35B5000978F1A /* LineFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LineFragment.glsl; path = shaders/LineFragment.glsl; sourceTree = "<group>"; };
@@ -336,10 +336,10 @@
 		B525E35D1C8950DA00C691C0 /* BenGameEngine */ = {
 			isa = PBXGroup;
 			children = (
-				B508CDA31CB4DD5B00127B97 /* BGEComponent.cpp */,
-				B508CDA41CB4DD5B00127B97 /* BGEComponent.h */,
-				B5ACE8901CBB56CE004B6871 /* BGEComponentService.cpp */,
-				B5ACE8911CBB56CE004B6871 /* BGEComponentService.h */,
+				B508CDA31CB4DD5B00127B97 /* Component.cpp */,
+				B508CDA41CB4DD5B00127B97 /* Component.h */,
+				B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */,
+				B5ACE8911CBB56CE004B6871 /* ComponentService.h */,
 				B525E3851C89587000C691C0 /* Error.cpp */,
 				B525E3861C89587000C691C0 /* Error.h */,
 				B571F1811C97D92E007F5A90 /* BGEFont.cpp */,
@@ -350,24 +350,24 @@
 				B571F17F1C97D88E007F5A90 /* BGEFontService.h */,
 				B525E3871C89587000C691C0 /* BGEGame.cpp */,
 				B525E3881C89587000C691C0 /* BGEGame.h */,
-				B508CDA61CB4DE6D00127B97 /* BGEGameObject.cpp */,
-				B508CDA71CB4DE6D00127B97 /* BGEGameObject.h */,
-				B508CDAC1CB78DA100127B97 /* BGEGameObjectService.cpp */,
-				B508CDAD1CB78DA100127B97 /* BGEGameObjectService.h */,
+				B508CDA61CB4DE6D00127B97 /* GameObject.cpp */,
+				B508CDA71CB4DE6D00127B97 /* GameObject.h */,
+				B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */,
+				B508CDAD1CB78DA100127B97 /* GameObjectService.h */,
 				B525E3891C89587000C691C0 /* BGEGLKView.h */,
 				B525E38A1C89587000C691C0 /* BGEGLKView.m */,
 				B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */,
 				B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */,
 				B525E38D1C89587000C691C0 /* BGEHeartbeatService.cpp */,
 				B525E38E1C89587000C691C0 /* BGEHeartbeatService.h */,
-				B52B760B1CBA183900758249 /* BGEMaterial.cpp */,
-				B52B760C1CBA183900758249 /* BGEMaterial.h */,
-				B52B76121CBADF5E00758249 /* BGEMaterialService.cpp */,
-				B52B76131CBADF5E00758249 /* BGEMaterialService.h */,
+				B52B760B1CBA183900758249 /* Material.cpp */,
+				B52B760C1CBA183900758249 /* Material.h */,
+				B52B76121CBADF5E00758249 /* MaterialService.cpp */,
+				B52B76131CBADF5E00758249 /* MaterialService.h */,
 				B525E38F1C89587000C691C0 /* BGEMathTypes.cpp */,
 				B525E3901C89587000C691C0 /* BGEMathTypes.h */,
-				B508CDA91CB4DE8E00127B97 /* BGEObject.cpp */,
-				B508CDAA1CB4DE8E00127B97 /* BGEObject.h */,
+				B508CDA91CB4DE8E00127B97 /* Object.cpp */,
+				B508CDAA1CB4DE8E00127B97 /* Object.h */,
 				B525E3911C89587000C691C0 /* BGERenderContext.cpp */,
 				B525E3921C89587000C691C0 /* BGERenderContext.h */,
 				B525E3951C89587000C691C0 /* BGERenderService.cpp */,
@@ -376,8 +376,8 @@
 				B525E39A1C89587000C691C0 /* BGERenderView.h */,
 				B525E39B1C89587000C691C0 /* BGERenderWindow.cpp */,
 				B525E39C1C89587000C691C0 /* BGERenderWindow.h */,
-				B525E39D1C89587000C691C0 /* BGEService.cpp */,
-				B525E39E1C89587000C691C0 /* BGEService.h */,
+				B525E39D1C89587000C691C0 /* Service.cpp */,
+				B525E39E1C89587000C691C0 /* Service.h */,
 				B525E39F1C89587000C691C0 /* BGEShader.cpp */,
 				B525E3A01C89587000C691C0 /* BGEShader.h */,
 				B525E3A31C89587000C691C0 /* BGEShaderProgram.cpp */,
@@ -704,11 +704,11 @@
 				B525E3C61C89587000C691C0 /* BGEShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* BGERenderService.cpp in Sources */,
 				B571F1931C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp in Sources */,
-				B52B760D1CBA183900758249 /* BGEMaterial.cpp in Sources */,
+				B52B760D1CBA183900758249 /* Material.cpp in Sources */,
 				B525E3C41C89587000C691C0 /* BGEShaderProgram.cpp in Sources */,
 				B525E3BC1C89587000C691C0 /* BGERenderContextOpenGLES2.cpp in Sources */,
 				B525E3CC1C89587000C691C0 /* BGETextureServiceOpenGLES2.cpp in Sources */,
-				B508CDAB1CB4DE8E00127B97 /* BGEObject.cpp in Sources */,
+				B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */,
 				B525E3BA1C89587000C691C0 /* BGEMathTypes.cpp in Sources */,
 				B5ACE8951CBF7B00004B6871 /* BGELineRenderComponent.cpp in Sources */,
 				B571F1901C9D0A34007F5A90 /* BGEFontGlyph.cpp in Sources */,
@@ -716,7 +716,7 @@
 				B525E3B91C89587000C691C0 /* BGEHeartbeatService.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* BGEShader.cpp in Sources */,
 				B571F1801C97D88E007F5A90 /* BGEFontService.cpp in Sources */,
-				B5ACE8921CBB56CE004B6871 /* BGEComponentService.cpp in Sources */,
+				B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */,
 				B525E3C31C89587000C691C0 /* BGEShaderOpenGLES2.cpp in Sources */,
 				B525E3B71C89587000C691C0 /* BGEGLKView.m in Sources */,
 				B52B76111CBA2C7F00758249 /* BGERenderComponent.cpp in Sources */,
@@ -728,18 +728,18 @@
 				B508CD931CAE285000127B97 /* BGETransformComponent.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* BGEGame.cpp in Sources */,
 				B5E7B9BA1CC46A7500978F1A /* BGEFlatRectRenderComponent.cpp in Sources */,
-				B508CDA51CB4DD5B00127B97 /* BGEComponent.cpp in Sources */,
+				B508CDA51CB4DD5B00127B97 /* Component.cpp in Sources */,
 				B525E3B51C89587000C691C0 /* Error.cpp in Sources */,
-				B508CDAE1CB78DA100127B97 /* BGEGameObjectService.cpp in Sources */,
+				B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */,
 				B508CD891CA0ABA200127B97 /* BGETextureBase.cpp in Sources */,
-				B508CDA81CB4DE6D00127B97 /* BGEGameObject.cpp in Sources */,
+				B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */,
 				B525E3C01C89587000C691C0 /* BGERenderWindow.cpp in Sources */,
 				B525E3C51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp in Sources */,
 				B525E3CA1C89587000C691C0 /* BGETextureOpenGLES2.cpp in Sources */,
-				B525E3C11C89587000C691C0 /* BGEService.cpp in Sources */,
+				B525E3C11C89587000C691C0 /* Service.cpp in Sources */,
 				B525E3BF1C89587000C691C0 /* BGERenderView.cpp in Sources */,
 				B525E3C71C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp in Sources */,
-				B52B76141CBADF5E00758249 /* BGEMaterialService.cpp in Sources */,
+				B52B76141CBADF5E00758249 /* MaterialService.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,13 +14,13 @@
 #include <string>
 #include <memory>
 #include <functional>
-#include "BGEService.h"
+#include "Service.h"
 #include "BGEFont.h"
 #include "Error.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
 
-class BGEFontService : public BGEService
+class BGEFontService : public BGE::Service
 {
 public:
     static std::string fontAsKey(std::string name, uint32_t pixelSize);

@@ -15,7 +15,7 @@ BGEFlatRectRenderComponent::BGEFlatRectRenderComponent(uint32_t componentId) : B
 BGEFlatRectRenderComponent::BGEFlatRectRenderComponent(uint32_t componentId, std::string name) : BGERenderComponent(componentId, name) {
 }
 
-BGEFlatRectRenderComponent::BGEFlatRectRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGEGameObject> gameObject) : BGERenderComponent(componentId, name, gameObject) {
+BGEFlatRectRenderComponent::BGEFlatRectRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject) : BGERenderComponent(componentId, name, gameObject) {
 }
 
 void BGEFlatRectRenderComponent::setWidth(float width) {

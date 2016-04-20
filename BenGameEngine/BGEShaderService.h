@@ -13,10 +13,10 @@
 #include <map>
 #include <vector>
 #include <string>
-#include "BGEService.h"
+#include "Service.h"
 #include "BGEShaderProgram.h"
 
-class BGEShaderService : public BGEService
+class BGEShaderService : public BGE::Service
 {
 public:
     

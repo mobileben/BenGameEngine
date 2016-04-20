@@ -11,16 +11,16 @@
 
 #include <stdio.h>
 #include <memory>
-#include "BGEService.h"
-#include "BGEGameObjectService.h"
-#include "BGEMaterialService.h"
+#include "Service.h"
+#include "GameObjectService.h"
+#include "MaterialService.h"
 #include "BGERenderService.h"
 #include "BGETextureService.h"
 #include "BGEFontService.h"
 #include "BGEHeartbeatService.h"
-#include "BGEComponentService.h"
+#include "ComponentService.h"
 
-class BGEGame : public BGEService
+class BGEGame : public BGE::Service
 {
 public:
     BGEGame();
@@ -37,12 +37,12 @@ public:
     void provide(std::shared_ptr<BGEFontService> fontService);
     
     // Services which are implicitly built
-    std::shared_ptr<BGEGameObjectService> getGameObjectService() { return gameObjectService_; }
-    std::shared_ptr<BGEComponentService> getComponentService() { return componentService_; }
-    std::shared_ptr<BGEMaterialService> getMaterialService() { return materialService_; }
+    std::shared_ptr<BGE::GameObjectService> getGameObjectService() { return gameObjectService_; }
+    std::shared_ptr<BGE::ComponentService> getComponentService() { return componentService_; }
+    std::shared_ptr<BGE::MaterialService> getMaterialService() { return materialService_; }
     std::shared_ptr<BGEHeartbeatService> getHeartbeatService() { return heartbeatService_; }
     
-    // BGEService functions
+    // Service functions
     void initialize();
     void reset();
     void enteringBackground();
@@ -56,9 +56,9 @@ protected:
     std::shared_ptr<BGETextureService> textureService_;
     std::shared_ptr<BGEFontService> fontService_;
     std::shared_ptr<BGEHeartbeatService> heartbeatService_;
-    std::shared_ptr<BGEMaterialService> materialService_;
-    std::shared_ptr<BGEGameObjectService> gameObjectService_;
-    std::shared_ptr<BGEComponentService> componentService_;
+    std::shared_ptr<BGE::MaterialService> materialService_;
+    std::shared_ptr<BGE::GameObjectService> gameObjectService_;
+    std::shared_ptr<BGE::ComponentService> componentService_;
 };
 
 #endif /* BGEGame_h */

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <memory>
 #include <vector>
-#include "BGEService.h"
+#include "Service.h"
 #include "BGERenderWindow.h"
 #include "BGERenderContext.h"
 #include "BGEShaderService.h"
@@ -50,7 +50,7 @@ enum class BGERender2DCoordinateSystem {
     OpenGLCentered          // Center of screen (X-right, Y-up)
 };
 
-class BGERenderService: public BGEService
+class BGERenderService: public BGE::Service
 {
 public:
     BGERenderService();

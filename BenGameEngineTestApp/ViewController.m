@@ -100,11 +100,11 @@
     
     // Let's create and add a game object
     std::string name = "hello";
-    auto gameObj0 = BGEGame::getInstance()->getGameObjectService()->createObject<BGEGameObject>();
+    auto gameObj0 = BGEGame::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
 #if 1
-    auto gameObj1 = BGEGame::getInstance()->getGameObjectService()->createObject<BGEGameObject>();
+    auto gameObj1 = BGEGame::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
 #endif
-    auto gameObj2 = BGEGame::getInstance()->getGameObjectService()->createObject<BGEGameObject>();
+    auto gameObj2 = BGEGame::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
     
     auto material = BGEGame::getInstance()->getMaterialService()->createMaterial("mat", texture);
     auto transformComponent0 = BGEGame::getInstance()->getComponentService()->createComponent<BGETransformComponent>();
