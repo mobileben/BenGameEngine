@@ -12,7 +12,7 @@ BGE::RenderService::RenderService() : ready_(false)
 {
 }
 
-void BGE::RenderService::bindRenderWindow(std::shared_ptr<BGERenderContext> context, std::shared_ptr<BGERenderWindow> window)
+void BGE::RenderService::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)
 {
     this->renderContext_ = context;
     this->renderWindow_ = window;
@@ -27,18 +27,18 @@ void BGE::RenderService::createShaders()
 {
 }
 
-void BGE::RenderService::setCoordinateSystem2D(BGERender2DCoordinateSystem coordSystem2D)
+void BGE::RenderService::setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D)
 {
     coordSystem2D_ = coordSystem2D;
     
     switch (coordSystem2D) {
-        case BGERender2DCoordinateSystem::TraditionalCentered:
-        case BGERender2DCoordinateSystem::Traditional:
+        case Render2DCoordinateSystem::TraditionalCentered:
+        case Render2DCoordinateSystem::Traditional:
             invertedYAxis_ = false;
             break;
             
-        case BGERender2DCoordinateSystem::OpenGLCentered:
-        case BGERender2DCoordinateSystem::OpenGL:
+        case Render2DCoordinateSystem::OpenGLCentered:
+        case Render2DCoordinateSystem::OpenGL:
             invertedYAxis_ = true;
             break;
     }

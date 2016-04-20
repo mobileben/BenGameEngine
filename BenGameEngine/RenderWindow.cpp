@@ -1,5 +1,5 @@
 //
-//  BGERenderWindow.cpp
+//  RenderWindow.cpp
 //  GamePlayground
 //
 //  Created by Benjamin Lee on 2/9/16.
@@ -7,35 +7,35 @@
 //
 
 #include <CoreFoundation/CoreFoundation.h>
-#include "BGERenderWindow.h"
-#include "BGERenderView.h"
+#include "RenderWindow.h"
+#include "RenderView.h"
 
-std::string BGERenderWindow::DefaultRenderViewName = "DefaultRenderView";
+std::string BGE::RenderWindow::DefaultRenderViewName = "DefaultRenderView";
 
-BGERenderWindow::~BGERenderWindow()
+BGE::RenderWindow::~RenderWindow()
 {
 }
 
-void BGERenderWindow::setView(GLKView *view) {
+void BGE::RenderWindow::setView(GLKView *view) {
     if (view != this->view_) {
         this->view_ = view;
         
         this->renderViews_.clear();
 
         if (this->view_) {
-            // Create the default BGERenderView
-            this->renderViews_[DefaultRenderViewName] = std::make_shared<BGERenderView>(shared_from_this(), getX(), getY(), getWidth(), getHeight());
+            // Create the default RenderView
+            this->renderViews_[DefaultRenderViewName] = std::make_shared<BGE::RenderView>(shared_from_this(), getX(), getY(), getWidth(), getHeight());
             
         }
     }
 }
 
-void BGERenderWindow::setRenderContext(std::shared_ptr<BGERenderContext> renderContext)
+void BGE::RenderWindow::setRenderContext(std::shared_ptr<BGE::RenderContext> renderContext)
 {
     renderContext_ = renderContext;
 }
 
-float BGERenderWindow::getX() const {
+float BGE::RenderWindow::getX() const {
     if (this->view_) {
         return this->view_.frame.origin.x;
     } else {
@@ -43,7 +43,7 @@ float BGERenderWindow::getX() const {
     }
 }
 
-float BGERenderWindow::getY() const {
+float BGE::RenderWindow::getY() const {
     if (this->view_) {
         return this->view_.frame.origin.y;
     } else {
@@ -51,7 +51,7 @@ float BGERenderWindow::getY() const {
     }
 }
 
-float BGERenderWindow::getWidth() const {
+float BGE::RenderWindow::getWidth() const {
     if (this->view_) {
         return this->view_.frame.size.width;
     } else {
@@ -59,7 +59,7 @@ float BGERenderWindow::getWidth() const {
     }
 }
 
-float BGERenderWindow::getHeight() const {
+float BGE::RenderWindow::getHeight() const {
     if (this->view_) {
         return this->view_.frame.size.height;
     } else {
@@ -67,7 +67,7 @@ float BGERenderWindow::getHeight() const {
     }
 }
 
-float BGERenderWindow::getContentScaleFactor() const {
+float BGE::RenderWindow::getContentScaleFactor() const {
     if (this->view_) {
         return this->view_.contentScaleFactor;
     } else {

@@ -1,5 +1,5 @@
 //
-//  BGEHeartbeatService.cpp
+//  HeartbeatService.cpp
 //  GamePlayground
 //
 //  Created by Benjamin Lee on 2/27/16.
@@ -7,9 +7,9 @@
 //
 
 #include <cassert>
-#include "BGEHeartbeatService.h"
+#include "HeartbeatService.h"
 
-BGEHeartbeatService::BGEHeartbeatService() : running_(true), counter_(0), lastCounter_(0) {
+BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0) {
     iosHeartbeat_ = [[BGEHeartbeatIOS alloc] init];
     
     timebaseInfo_.numer = 0; timebaseInfo_.denom = 0;
@@ -21,22 +21,22 @@ BGEHeartbeatService::BGEHeartbeatService() : running_(true), counter_(0), lastCo
     lastCounter_ = counter_;
     
     // Attach
-    iosHeartbeat_.tickHandler = std::bind(&BGEHeartbeatService::tickHandler, this);
+    iosHeartbeat_.tickHandler = std::bind(&HeartbeatService::tickHandler, this);
 }
 
-void BGEHeartbeatService::initialize() {}
-void BGEHeartbeatService::reset() {}
-void BGEHeartbeatService::enteringBackground() {}
-void BGEHeartbeatService::enteringForeground() {}
-void BGEHeartbeatService::pause() {}
-void BGEHeartbeatService::resume() {}
-void BGEHeartbeatService::destroy() {}
+void BGE::HeartbeatService::initialize() {}
+void BGE::HeartbeatService::reset() {}
+void BGE::HeartbeatService::enteringBackground() {}
+void BGE::HeartbeatService::enteringForeground() {}
+void BGE::HeartbeatService::pause() {}
+void BGE::HeartbeatService::resume() {}
+void BGE::HeartbeatService::destroy() {}
 
-void BGEHeartbeatService::setRunning(bool running) {
+void BGE::HeartbeatService::setRunning(bool running) {
     running_ = running;
 }
 
-void BGEHeartbeatService::tickHandler() {
+void BGE::HeartbeatService::tickHandler() {
     if (running_) {
         counter_ = mach_absolute_time();
         
@@ -55,7 +55,7 @@ void BGEHeartbeatService::tickHandler() {
     }
 }
 
-void BGEHeartbeatService::registerListener(std::string name, std::function<void(double dt)> listener, uint32_t order) {
+void BGE::HeartbeatService::registerListener(std::string name, std::function<void(double dt)> listener, uint32_t order) {
     // Determine if we already exist, if we do, assert
     assert(listeners_.find(name) == listeners_.end());
     
@@ -70,11 +70,11 @@ void BGEHeartbeatService::registerListener(std::string name, std::function<void(
     rebuildOrderedListeners();
 }
 
-void BGEHeartbeatService::unregisterListener(std::string name) {
+void BGE::HeartbeatService::unregisterListener(std::string name) {
     
 }
 
-void BGEHeartbeatService::rebuildOrderedListeners() {
+void BGE::HeartbeatService::rebuildOrderedListeners() {
     std::vector<std::pair<std::function<void(double dt)>, uint32_t>> ordered;
     
     for (auto const& entry : listeners_) {

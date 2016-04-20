@@ -17,7 +17,7 @@
 #include "RenderService.h"
 #include "BGETextureService.h"
 #include "BGEFontService.h"
-#include "BGEHeartbeatService.h"
+#include "HeartbeatService.h"
 #include "ComponentService.h"
 
 class BGEGame : public BGE::Service
@@ -40,7 +40,7 @@ public:
     std::shared_ptr<BGE::GameObjectService> getGameObjectService() { return gameObjectService_; }
     std::shared_ptr<BGE::ComponentService> getComponentService() { return componentService_; }
     std::shared_ptr<BGE::MaterialService> getMaterialService() { return materialService_; }
-    std::shared_ptr<BGEHeartbeatService> getHeartbeatService() { return heartbeatService_; }
+    std::shared_ptr<BGE::HeartbeatService> getHeartbeatService() { return heartbeatService_; }
     
     // Service functions
     void initialize();
@@ -55,7 +55,7 @@ protected:
     std::shared_ptr<BGE::RenderService> renderService_;
     std::shared_ptr<BGETextureService> textureService_;
     std::shared_ptr<BGEFontService> fontService_;
-    std::shared_ptr<BGEHeartbeatService> heartbeatService_;
+    std::shared_ptr<BGE::HeartbeatService> heartbeatService_;
     std::shared_ptr<BGE::MaterialService> materialService_;
     std::shared_ptr<BGE::GameObjectService> gameObjectService_;
     std::shared_ptr<BGE::ComponentService> componentService_;

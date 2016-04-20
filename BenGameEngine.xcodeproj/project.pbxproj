@@ -28,14 +28,14 @@
 		B525E3B61C89587000C691C0 /* BGEGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3871C89587000C691C0 /* BGEGame.cpp */; };
 		B525E3B71C89587000C691C0 /* BGEGLKView.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E38A1C89587000C691C0 /* BGEGLKView.m */; };
 		B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */; };
-		B525E3B91C89587000C691C0 /* BGEHeartbeatService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E38D1C89587000C691C0 /* BGEHeartbeatService.cpp */; };
+		B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E38D1C89587000C691C0 /* HeartbeatService.cpp */; };
 		B525E3BA1C89587000C691C0 /* BGEMathTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E38F1C89587000C691C0 /* BGEMathTypes.cpp */; };
-		B525E3BB1C89587000C691C0 /* BGERenderContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3911C89587000C691C0 /* BGERenderContext.cpp */; };
-		B525E3BC1C89587000C691C0 /* BGERenderContextOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3931C89587000C691C0 /* BGERenderContextOpenGLES2.cpp */; };
+		B525E3BB1C89587000C691C0 /* RenderContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3911C89587000C691C0 /* RenderContext.cpp */; };
+		B525E3BC1C89587000C691C0 /* RenderContextOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3931C89587000C691C0 /* RenderContextOpenGLES2.cpp */; };
 		B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3951C89587000C691C0 /* RenderService.cpp */; };
 		B525E3BE1C89587000C691C0 /* RenderServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3971C89587000C691C0 /* RenderServiceOpenGLES2.cpp */; };
-		B525E3BF1C89587000C691C0 /* BGERenderView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3991C89587000C691C0 /* BGERenderView.cpp */; };
-		B525E3C01C89587000C691C0 /* BGERenderWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39B1C89587000C691C0 /* BGERenderWindow.cpp */; };
+		B525E3BF1C89587000C691C0 /* RenderView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3991C89587000C691C0 /* RenderView.cpp */; };
+		B525E3C01C89587000C691C0 /* RenderWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39B1C89587000C691C0 /* RenderWindow.cpp */; };
 		B525E3C11C89587000C691C0 /* Service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39D1C89587000C691C0 /* Service.cpp */; };
 		B525E3C21C89587000C691C0 /* BGEShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39F1C89587000C691C0 /* BGEShader.cpp */; };
 		B525E3C31C89587000C691C0 /* BGEShaderOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A11C89587000C691C0 /* BGEShaderOpenGLES2.cpp */; };
@@ -156,22 +156,22 @@
 		B525E38A1C89587000C691C0 /* BGEGLKView.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEGLKView.m; sourceTree = "<group>"; };
 		B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEHeartbeatIOS.h; sourceTree = "<group>"; };
 		B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEHeartbeatIOS.m; sourceTree = "<group>"; };
-		B525E38D1C89587000C691C0 /* BGEHeartbeatService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEHeartbeatService.cpp; sourceTree = "<group>"; };
-		B525E38E1C89587000C691C0 /* BGEHeartbeatService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEHeartbeatService.h; sourceTree = "<group>"; };
+		B525E38D1C89587000C691C0 /* HeartbeatService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = HeartbeatService.cpp; sourceTree = "<group>"; };
+		B525E38E1C89587000C691C0 /* HeartbeatService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeartbeatService.h; sourceTree = "<group>"; };
 		B525E38F1C89587000C691C0 /* BGEMathTypes.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEMathTypes.cpp; sourceTree = "<group>"; };
 		B525E3901C89587000C691C0 /* BGEMathTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEMathTypes.h; sourceTree = "<group>"; };
-		B525E3911C89587000C691C0 /* BGERenderContext.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGERenderContext.cpp; sourceTree = "<group>"; };
-		B525E3921C89587000C691C0 /* BGERenderContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGERenderContext.h; sourceTree = "<group>"; };
-		B525E3931C89587000C691C0 /* BGERenderContextOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGERenderContextOpenGLES2.cpp; path = opengles2/BGERenderContextOpenGLES2.cpp; sourceTree = "<group>"; };
-		B525E3941C89587000C691C0 /* BGERenderContextOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGERenderContextOpenGLES2.h; path = opengles2/BGERenderContextOpenGLES2.h; sourceTree = "<group>"; };
+		B525E3911C89587000C691C0 /* RenderContext.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = RenderContext.cpp; sourceTree = "<group>"; };
+		B525E3921C89587000C691C0 /* RenderContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderContext.h; sourceTree = "<group>"; };
+		B525E3931C89587000C691C0 /* RenderContextOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = RenderContextOpenGLES2.cpp; path = opengles2/RenderContextOpenGLES2.cpp; sourceTree = "<group>"; };
+		B525E3941C89587000C691C0 /* RenderContextOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderContextOpenGLES2.h; path = opengles2/RenderContextOpenGLES2.h; sourceTree = "<group>"; };
 		B525E3951C89587000C691C0 /* RenderService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = RenderService.cpp; sourceTree = "<group>"; };
 		B525E3961C89587000C691C0 /* RenderService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderService.h; sourceTree = "<group>"; };
 		B525E3971C89587000C691C0 /* RenderServiceOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = RenderServiceOpenGLES2.cpp; path = opengles2/RenderServiceOpenGLES2.cpp; sourceTree = "<group>"; };
 		B525E3981C89587000C691C0 /* RenderServiceOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderServiceOpenGLES2.h; path = opengles2/RenderServiceOpenGLES2.h; sourceTree = "<group>"; };
-		B525E3991C89587000C691C0 /* BGERenderView.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGERenderView.cpp; sourceTree = "<group>"; };
-		B525E39A1C89587000C691C0 /* BGERenderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGERenderView.h; sourceTree = "<group>"; };
-		B525E39B1C89587000C691C0 /* BGERenderWindow.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGERenderWindow.cpp; sourceTree = "<group>"; };
-		B525E39C1C89587000C691C0 /* BGERenderWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGERenderWindow.h; sourceTree = "<group>"; };
+		B525E3991C89587000C691C0 /* RenderView.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = RenderView.cpp; sourceTree = "<group>"; };
+		B525E39A1C89587000C691C0 /* RenderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderView.h; sourceTree = "<group>"; };
+		B525E39B1C89587000C691C0 /* RenderWindow.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = RenderWindow.cpp; sourceTree = "<group>"; };
+		B525E39C1C89587000C691C0 /* RenderWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderWindow.h; sourceTree = "<group>"; };
 		B525E39D1C89587000C691C0 /* Service.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Service.cpp; sourceTree = "<group>"; };
 		B525E39E1C89587000C691C0 /* Service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Service.h; sourceTree = "<group>"; };
 		B525E39F1C89587000C691C0 /* BGEShader.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEShader.cpp; sourceTree = "<group>"; };
@@ -358,8 +358,8 @@
 				B525E38A1C89587000C691C0 /* BGEGLKView.m */,
 				B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */,
 				B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */,
-				B525E38D1C89587000C691C0 /* BGEHeartbeatService.cpp */,
-				B525E38E1C89587000C691C0 /* BGEHeartbeatService.h */,
+				B525E38D1C89587000C691C0 /* HeartbeatService.cpp */,
+				B525E38E1C89587000C691C0 /* HeartbeatService.h */,
 				B52B760B1CBA183900758249 /* Material.cpp */,
 				B52B760C1CBA183900758249 /* Material.h */,
 				B52B76121CBADF5E00758249 /* MaterialService.cpp */,
@@ -368,14 +368,14 @@
 				B525E3901C89587000C691C0 /* BGEMathTypes.h */,
 				B508CDA91CB4DE8E00127B97 /* Object.cpp */,
 				B508CDAA1CB4DE8E00127B97 /* Object.h */,
-				B525E3911C89587000C691C0 /* BGERenderContext.cpp */,
-				B525E3921C89587000C691C0 /* BGERenderContext.h */,
+				B525E3911C89587000C691C0 /* RenderContext.cpp */,
+				B525E3921C89587000C691C0 /* RenderContext.h */,
 				B525E3951C89587000C691C0 /* RenderService.cpp */,
 				B525E3961C89587000C691C0 /* RenderService.h */,
-				B525E3991C89587000C691C0 /* BGERenderView.cpp */,
-				B525E39A1C89587000C691C0 /* BGERenderView.h */,
-				B525E39B1C89587000C691C0 /* BGERenderWindow.cpp */,
-				B525E39C1C89587000C691C0 /* BGERenderWindow.h */,
+				B525E3991C89587000C691C0 /* RenderView.cpp */,
+				B525E39A1C89587000C691C0 /* RenderView.h */,
+				B525E39B1C89587000C691C0 /* RenderWindow.cpp */,
+				B525E39C1C89587000C691C0 /* RenderWindow.h */,
 				B525E39D1C89587000C691C0 /* Service.cpp */,
 				B525E39E1C89587000C691C0 /* Service.h */,
 				B525E39F1C89587000C691C0 /* BGEShader.cpp */,
@@ -491,8 +491,8 @@
 				B571F1881C98C231007F5A90 /* BGEFontOpenGLES2.h */,
 				B571F1841C98C21C007F5A90 /* BGEFontServiceOpenGLES2.cpp */,
 				B571F1851C98C21C007F5A90 /* BGEFontServiceOpenGLES2.h */,
-				B525E3931C89587000C691C0 /* BGERenderContextOpenGLES2.cpp */,
-				B525E3941C89587000C691C0 /* BGERenderContextOpenGLES2.h */,
+				B525E3931C89587000C691C0 /* RenderContextOpenGLES2.cpp */,
+				B525E3941C89587000C691C0 /* RenderContextOpenGLES2.h */,
 				B525E3971C89587000C691C0 /* RenderServiceOpenGLES2.cpp */,
 				B525E3981C89587000C691C0 /* RenderServiceOpenGLES2.h */,
 				B525E3A11C89587000C691C0 /* BGEShaderOpenGLES2.cpp */,
@@ -706,14 +706,14 @@
 				B571F1931C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp in Sources */,
 				B52B760D1CBA183900758249 /* Material.cpp in Sources */,
 				B525E3C41C89587000C691C0 /* BGEShaderProgram.cpp in Sources */,
-				B525E3BC1C89587000C691C0 /* BGERenderContextOpenGLES2.cpp in Sources */,
+				B525E3BC1C89587000C691C0 /* RenderContextOpenGLES2.cpp in Sources */,
 				B525E3CC1C89587000C691C0 /* BGETextureServiceOpenGLES2.cpp in Sources */,
 				B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */,
 				B525E3BA1C89587000C691C0 /* BGEMathTypes.cpp in Sources */,
 				B5ACE8951CBF7B00004B6871 /* LineRenderComponent.cpp in Sources */,
 				B571F1901C9D0A34007F5A90 /* BGEFontGlyph.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* BGETextureAtlas.cpp in Sources */,
-				B525E3B91C89587000C691C0 /* BGEHeartbeatService.cpp in Sources */,
+				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* BGEShader.cpp in Sources */,
 				B571F1801C97D88E007F5A90 /* BGEFontService.cpp in Sources */,
 				B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */,
@@ -724,7 +724,7 @@
 				B571F1831C97D92E007F5A90 /* BGEFont.cpp in Sources */,
 				B5EE9D6C1CC4A4C8005D99CC /* SpriteRenderComponent.cpp in Sources */,
 				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
-				B525E3BB1C89587000C691C0 /* BGERenderContext.cpp in Sources */,
+				B525E3BB1C89587000C691C0 /* RenderContext.cpp in Sources */,
 				B508CD931CAE285000127B97 /* TransformComponent.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* BGEGame.cpp in Sources */,
 				B5E7B9BA1CC46A7500978F1A /* FlatRectRenderComponent.cpp in Sources */,
@@ -733,11 +733,11 @@
 				B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */,
 				B508CD891CA0ABA200127B97 /* BGETextureBase.cpp in Sources */,
 				B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */,
-				B525E3C01C89587000C691C0 /* BGERenderWindow.cpp in Sources */,
+				B525E3C01C89587000C691C0 /* RenderWindow.cpp in Sources */,
 				B525E3C51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp in Sources */,
 				B525E3CA1C89587000C691C0 /* BGETextureOpenGLES2.cpp in Sources */,
 				B525E3C11C89587000C691C0 /* Service.cpp in Sources */,
-				B525E3BF1C89587000C691C0 /* BGERenderView.cpp in Sources */,
+				B525E3BF1C89587000C691C0 /* RenderView.cpp in Sources */,
 				B525E3C71C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp in Sources */,
 				B52B76141CBADF5E00758249 /* MaterialService.cpp in Sources */,
 			);

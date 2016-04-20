@@ -13,8 +13,8 @@
 #include <memory>
 #include <vector>
 #include "Service.h"
-#include "BGERenderWindow.h"
-#include "BGERenderContext.h"
+#include "RenderWindow.h"
+#include "RenderContext.h"
 #include "BGEShaderService.h"
 #include "BGEMathTypes.h"
 
@@ -44,7 +44,7 @@ typedef struct {
 } BGEVertexColorTexNormal;
 
 namespace BGE {
-    enum class BGERender2DCoordinateSystem {
+    enum class Render2DCoordinateSystem {
         Traditional,            // Upper left (X-right, Y-down)
         TraditionalCentered,    // Center of screen (X-right, Y-down)
         OpenGL,                 // Lower left (X-right, Y-up)
@@ -56,23 +56,23 @@ namespace BGE {
     public:
         RenderService();
         
-        virtual void bindRenderWindow(std::shared_ptr<BGERenderContext> context, std::shared_ptr<BGERenderWindow> window);
+        virtual void bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window);
         virtual void resizeRenderWindow();
         virtual void createShaders();
         
         bool isReady() const { return ready_; }
         void setIsReady() { ready_ = true; }
         
-        BGERender2DCoordinateSystem getCoordinateSystem2D() const { return coordSystem2D_; }
+        Render2DCoordinateSystem getCoordinateSystem2D() const { return coordSystem2D_; }
         
         // Y-up is inverted, Y-down is normal
         bool hasInvertedYAxis() const { return invertedYAxis_; }
         
-        void setCoordinateSystem2D(BGERender2DCoordinateSystem coordSystem2D);
+        void setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D);
         
-        std::shared_ptr<BGERenderContext> getRenderContext() { return renderContext_; }
+        std::shared_ptr<RenderContext> getRenderContext() { return renderContext_; }
         
-        std::shared_ptr<BGERenderWindow> getRenderWindow() { return renderWindow_; }
+        std::shared_ptr<RenderWindow> getRenderWindow() { return renderWindow_; }
         
         std::shared_ptr<BGEShaderService> getShaderService() { return shaderService_; }
         
@@ -82,8 +82,8 @@ namespace BGE {
         virtual void render() =0;
         
     protected:
-        std::shared_ptr<BGERenderContext> renderContext_;
-        std::shared_ptr<BGERenderWindow> renderWindow_;
+        std::shared_ptr<RenderContext> renderContext_;
+        std::shared_ptr<RenderWindow> renderWindow_;
         std::shared_ptr<BGEShaderService> shaderService_;
         
         std::vector<std::shared_ptr<BGEShaderProgram>> shaderProgramStack_;
@@ -91,7 +91,7 @@ namespace BGE {
     private:
         bool ready_;
         bool invertedYAxis_;    // Y-up is inverted, Y-down is normal
-        BGERender2DCoordinateSystem coordSystem2D_;
+        Render2DCoordinateSystem coordSystem2D_;
     };
 }
 

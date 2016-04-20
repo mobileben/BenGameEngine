@@ -6,8 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#ifndef BGERenderServiceOpenGLES2_h
-#define BGERenderServiceOpenGLES2_h
+#ifndef RenderServiceOpenGLES2_h
+#define RenderServiceOpenGLES2_h
 
 #include <stdio.h>
 #include "RenderService.h"
@@ -38,9 +38,9 @@ namespace BGE {
         
         static int8_t MaxActiveMasks;
         
-        void setCoordinateSystem2D(BGERender2DCoordinateSystem coordSystem2D);
+        void setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D);
         
-        void bindRenderWindow(std::shared_ptr<BGERenderContext> context, std::shared_ptr<BGERenderWindow> window);
+        void bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window);
         void resizeRenderWindow();
         void createShaders();
         
@@ -84,4 +84,4 @@ namespace BGE {
     };
 }
 
-#endif /* BGERenderServiceOpenGLES2_h */
+#endif /* RenderServiceOpenGLES2_h */

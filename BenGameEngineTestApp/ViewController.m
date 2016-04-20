@@ -8,8 +8,8 @@
 
 #import "ViewController.h"
 #include "BenGameEngineTestApp.hpp"
-#include "BGERenderWindow.h"
-#include "BGERenderContextOpenGLES2.h"
+#include "RenderWindow.h"
+#include "RenderContextOpenGLES2.h"
 #include "RenderServiceOpenGLES2.h"
 #include "BGETextureServiceOpenGLES2.h"
 #include "BGEFontServiceOpenGLES2.h"
@@ -22,8 +22,8 @@
 
 @interface ViewController ()<GLKViewDelegate>
 
-@property (nonatomic, assign) std::shared_ptr<BGERenderContextOpenGLES2> renderContext;
-@property (nonatomic, assign) std::shared_ptr<BGERenderWindow> renderWindow;
+@property (nonatomic, assign) std::shared_ptr<BGE::RenderContextOpenGLES2> renderContext;
+@property (nonatomic, assign) std::shared_ptr<BGE::RenderWindow> renderWindow;
 @property (nonatomic, weak) GLKView *glView;
 @property (nonatomic, assign) BOOL once;
 
@@ -37,13 +37,13 @@
     // Do any additional setup after loading the view, typically from a nib.
     //    EAGLContext *context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     
-    self.renderContext = std::make_shared<BGERenderContextOpenGLES2>();
+    self.renderContext = std::make_shared<BGE::RenderContextOpenGLES2>();
     
     self.glView = (GLKView *) self.view;
     //    self.glView.context = self.renderContext->getContext();
     self.glView.delegate = self;
     
-    self.renderWindow = std::make_shared<BGERenderWindow>();
+    self.renderWindow = std::make_shared<BGE::RenderWindow>();
     self.renderWindow->setView((GLKView *) self.view);
     
     BGEGame::getInstance()->getRenderService()->bindRenderWindow(self.renderContext, self.renderWindow);

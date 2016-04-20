@@ -1,5 +1,5 @@
 //
-//  BGERenderContext.h
+//  RenderContext.h
 //  GamePlayground
 //
 //  Created by Benjamin Lee on 2/12/16.
@@ -11,10 +11,12 @@
 
 #include <stdio.h>
 
-class BGERenderContext
-{
-public:
-    virtual ~BGERenderContext() {}
-};
+namespace BGE {
+    class RenderContext
+    {
+    public:
+        virtual ~RenderContext() {}
+    };
+}
 
 #endif /* BGERenderContext_h */

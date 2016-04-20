@@ -7,10 +7,10 @@
 //
 
 #include "RenderServiceOpenGLES2.h"
-#include "BGERenderView.h"
+#include "RenderView.h"
 #include "BGEFontServiceOpenGLES2.h"
 #include "BGEShaderServiceOpenGLES2.h"
-#include "BGERenderContextOpenGLES2.h"
+#include "RenderContextOpenGLES2.h"
 #include "BGETextureOpenGLES2.h"
 #include "BGEMathTypes.h"
 #include "BGEGame.h"
@@ -76,34 +76,34 @@ void BGE::RenderServiceOpenGLES2::pause() {}
 void BGE::RenderServiceOpenGLES2::resume() {}
 void BGE::RenderServiceOpenGLES2::destroy() {}
 
-void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(BGERender2DCoordinateSystem coordSystem2D)
+void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D)
 {
     BGE::RenderService::setCoordinateSystem2D(coordSystem2D);
     
-    std::shared_ptr<BGERenderWindow> window = this->getRenderWindow();
+    std::shared_ptr<BGE::RenderWindow> window = this->getRenderWindow();
     
     switch (coordSystem2D) {
-        case BGERender2DCoordinateSystem::Traditional:
+        case Render2DCoordinateSystem::Traditional:
             BGEMatrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor(), window->getHeight() * this->getRenderWindow()->getContentScaleFactor(), 0, -1, 1);
             break;
-        case BGERender2DCoordinateSystem::TraditionalCentered:
+        case Render2DCoordinateSystem::TraditionalCentered:
             BGEMatrix4MakeOrthographic(projectionMatrix_, -window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -1, 1);
             break;
-        case BGERender2DCoordinateSystem::OpenGL:
+        case Render2DCoordinateSystem::OpenGL:
             BGEMatrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor(), 0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor(), -1, 1);
             break;
-        case BGERender2DCoordinateSystem::OpenGLCentered:
+        case Render2DCoordinateSystem::OpenGLCentered:
             BGEMatrix4MakeOrthographic(projectionMatrix_, -window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -1, 1);
             break;
     }
 }
 
-void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<BGERenderContext> context, std::shared_ptr<BGERenderWindow> window)
+void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<BGE::RenderContext> context, std::shared_ptr<BGE::RenderWindow> window)
 {
     RenderService::bindRenderWindow(context, window);
-    std::shared_ptr<BGERenderContextOpenGLES2> glContext;
+    std::shared_ptr<BGE::RenderContextOpenGLES2> glContext;
     
-    glContext = std::dynamic_pointer_cast<BGERenderContextOpenGLES2>(context);
+    glContext = std::dynamic_pointer_cast<BGE::RenderContextOpenGLES2>(context);
     
     if (glContext) {
         window->getView().context = glContext->getContext();
@@ -118,9 +118,9 @@ void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<BGERenderCont
 //    eaglLayer.contentsScale = window->getView().contentScaleFactor;
 
 #if 0
-    setCoordinateSystem2D(BGERender2DCoordinateSystem::OpenGL);
+    setCoordinateSystem2D(Render2DCoordinateSystem::OpenGL);
 #else
-    setCoordinateSystem2D(BGERender2DCoordinateSystem::Traditional);
+    setCoordinateSystem2D(Render2DCoordinateSystem::Traditional);
 #endif
 }
 
@@ -795,7 +795,7 @@ void BGE::RenderServiceOpenGLES2::queueRender() {
 
 void BGE::RenderServiceOpenGLES2::render()
 {
-    std::shared_ptr<BGERenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<BGERenderContextOpenGLES2>(getRenderContext());
+    std::shared_ptr<BGE::RenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<BGE::RenderContextOpenGLES2>(getRenderContext());
     glClearColor(1.0, 1.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
@@ -813,11 +813,11 @@ void BGE::RenderServiceOpenGLES2::render()
         // Reset render states
         shaderProgramStack_.clear();
         
-//        NSLog(@"%f %f", this->getRenderWindow()->getRenderView(BGERenderWindow::DefaultRenderViewName)->getWidth(), this->getRenderWindow()->getRenderView(BGERenderWindow::DefaultRenderViewName)->getHeight());
+//        NSLog(@"%f %f", this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight());
         
         // TODO: Content scale factor
-//        glViewport(0, 0, this->getRenderWindow()->getRenderView(BGERenderWindow::DefaultRenderViewName)->getWidth(), this->getRenderWindow()->getRenderView(BGERenderWindow::DefaultRenderViewName)->getHeight());
-        glViewport(0, 0, this->getRenderWindow()->getRenderView(BGERenderWindow::DefaultRenderViewName)->getWidth() * this->getRenderWindow()->getContentScaleFactor(), this->getRenderWindow()->getRenderView(BGERenderWindow::DefaultRenderViewName)->getHeight() * this->getRenderWindow()->getContentScaleFactor());
+//        glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight());
+        glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth() * this->getRenderWindow()->getContentScaleFactor(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight() * this->getRenderWindow()->getContentScaleFactor());
         
         std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Default"));
         
