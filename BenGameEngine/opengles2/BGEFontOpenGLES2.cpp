@@ -8,7 +8,7 @@
 
 #include "Game.h"
 #include "BGEFontOpenGLES2.h"
-#include "BGETextureOpenGLES2.h"
+#include "TextureOpenGLES2.h"
 #include "RenderServiceOpenGLES2.h"
 #include "BGEShaderServiceOpenGLES2.h"
 #include "ft2build.h"
@@ -190,7 +190,7 @@ BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::st
                     }
                 }
                 
-                BGE::Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer("font", atlasBuffer, BGETextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGETextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
+                BGE::Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer("font", atlasBuffer, BGE::TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGE::TextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
                     if (atlas) {
                         textureAtlas_ = atlas;
                         glyphs_.clear();
@@ -198,7 +198,7 @@ BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::st
                         // Our space is used whenever we don't have a match
                         uint16_t code;
                         std::string key = fontKeyBase + std::to_string(InitialSupportedCharacterOffset);
-                        std::shared_ptr<BGETexture> subTex = atlas->getSubTexture(key);
+                        std::shared_ptr<BGE::Texture> subTex = atlas->getSubTexture(key);
                         std::shared_ptr<BGEFontGlyph> space = std::make_shared<BGEFontGlyph>(this, subTex, glyphDefs[0].offsetX, glyphDefs[0].offsetY, glyphDefs[0].advance);
                         std::shared_ptr<BGEFontGlyph> glyph;
                         
@@ -253,7 +253,7 @@ void BGEFontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVect
         std::shared_ptr<BGEFontGlyph> glyph;
         uint16_t code;
         size_t length = str.length();
-        std::shared_ptr<BGETextureOpenGLES2> oglTex;
+        std::shared_ptr<BGE::TextureOpenGLES2> oglTex;
         
         std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(renderer->pushShaderProgram("Font"));
         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
@@ -295,7 +295,7 @@ void BGEFontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVect
 
                 y += glyph->getOffsetY();
                 
-                oglTex = std::dynamic_pointer_cast<BGETextureOpenGLES2>(glyph->getTexture());
+                oglTex = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(glyph->getTexture());
                 
                 if (oglTex && oglTex->isValid()) {
                     const BGEVector2 *xys = oglTex->getXYs();

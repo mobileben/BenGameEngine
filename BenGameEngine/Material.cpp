@@ -20,11 +20,11 @@ BGE::Material::Material(uint64_t matId, std::string name, BGEVector4& color) : B
     BGEMatrix4MakeIdentify(colorMatrix_);
 }
 
-BGE::Material::Material(uint64_t matId, std::string name, std::shared_ptr<BGETextureBase> texture) : BGE::Object(matId, name), colorDirty_(false), color_({ 0, 0, 0, 1 }), texture_(texture)  {
+BGE::Material::Material(uint64_t matId, std::string name, std::shared_ptr<TextureBase> texture) : BGE::Object(matId, name), colorDirty_(false), color_({ 0, 0, 0, 1 }), texture_(texture)  {
     BGEMatrix4MakeIdentify(colorMatrix_);
 }
 
-BGE::Material::Material(uint64_t matId, std::string name, BGEVector4& color, std::shared_ptr<BGETextureBase> texture) : BGE::Object(matId, name), colorDirty_(false), color_(color), texture_(texture)  {
+BGE::Material::Material(uint64_t matId, std::string name, BGEVector4& color, std::shared_ptr<TextureBase> texture) : BGE::Object(matId, name), colorDirty_(false), color_(color), texture_(texture)  {
     BGEMatrix4MakeIdentify(colorMatrix_);
 }
 

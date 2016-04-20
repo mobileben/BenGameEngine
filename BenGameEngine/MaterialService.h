@@ -16,7 +16,7 @@
 #include "Service.h"
 #include "BGEMathTypes.h"
 #include "Material.h"
-#include "BGETexture.h"
+#include "Texture.h"
 
 namespace BGE {
     class MaterialService : public BGE::Service
@@ -34,8 +34,8 @@ namespace BGE {
         void destroy();
         
         std::shared_ptr<Material> createMaterial(std::string name, BGEVector4& color);
-        std::shared_ptr<Material> createMaterial(std::string name, std::shared_ptr<BGETextureBase> texture);
-        std::shared_ptr<Material> createMaterial(std::string name, BGEVector4& color, std::shared_ptr<BGETextureBase> texture);
+        std::shared_ptr<Material> createMaterial(std::string name, std::shared_ptr<TextureBase> texture);
+        std::shared_ptr<Material> createMaterial(std::string name, BGEVector4& color, std::shared_ptr<TextureBase> texture);
         
         void removeMaterial(std::string name);
         

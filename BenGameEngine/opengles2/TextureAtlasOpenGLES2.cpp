@@ -1,22 +1,22 @@
 //
-//  BGETextureAtlasOpenGLES2.cpp
+//  TextureAtlasOpenGLES2.cpp
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 3/18/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGETextureAtlasOpenGLES2.h"
-#include "BGETextureOpenGLES2.h"
+#include "TextureAtlasOpenGLES2.h"
+#include "TextureOpenGLES2.h"
 #include "Game.h"
 
-BGETextureAtlasOpenGLES2::BGETextureAtlasOpenGLES2(uint64_t texId, std::string name) : BGETextureAtlas(texId ,name) {
+BGE::TextureAtlasOpenGLES2::TextureAtlasOpenGLES2(uint64_t texId, std::string name) : TextureAtlas(texId ,name) {
 }
 
-BGETextureAtlasOpenGLES2::~BGETextureAtlasOpenGLES2() {
+BGE::TextureAtlasOpenGLES2::~TextureAtlasOpenGLES2() {
 }
 
-uint32_t BGETextureAtlasOpenGLES2::getHWTextureId() const {
+uint32_t BGE::TextureAtlasOpenGLES2::getHWTextureId() const {
     if (texture_) {
         return texture_->getHWTextureId();
     } else {
@@ -24,8 +24,8 @@ uint32_t BGETextureAtlasOpenGLES2::getHWTextureId() const {
     }
 }
 
-GLenum BGETextureAtlasOpenGLES2::getTarget() const {
-    std::shared_ptr<BGETextureOpenGLES2> oglTexture = std::dynamic_pointer_cast<BGETextureOpenGLES2>(texture_);
+GLenum BGE::TextureAtlasOpenGLES2::getTarget() const {
+    std::shared_ptr<BGE::TextureOpenGLES2> oglTexture = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(texture_);
     
     if (oglTexture) {
         return oglTexture->getTarget();
@@ -34,17 +34,17 @@ GLenum BGETextureAtlasOpenGLES2::getTarget() const {
     }
 }
 
-void BGETextureAtlasOpenGLES2::createFromBuffer(void *buffer, BGETextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<BGETextureAtlas>, std::shared_ptr<BGE::Error>)> callback) {
+void BGE::TextureAtlasOpenGLES2::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<BGE::Error>)> callback) {
     releaseCurrentTexture();
 
-    BGE::Game::getInstance()->getTextureService()->namedTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<BGETextureBase> atlas, std::shared_ptr<BGE::Error> error) {
+    BGE::Game::getInstance()->getTextureService()->namedTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<BGE::TextureBase> atlas, std::shared_ptr<BGE::Error> error) {
         if (!error) {
-            std::shared_ptr<BGETextureAtlas> a = std::dynamic_pointer_cast<BGETextureAtlas>(shared_from_this());
-            std::shared_ptr<BGETexture> subTex;
+            std::shared_ptr<BGE::TextureAtlas> a = std::dynamic_pointer_cast<BGE::TextureAtlas>(shared_from_this());
+            std::shared_ptr<BGE::Texture> subTex;
             std::shared_ptr<BGE::Error> bgeError;
-            std::shared_ptr<BGETexture> texture;
+            std::shared_ptr<BGE::Texture> texture;
             
-            texture = std::dynamic_pointer_cast<BGETexture>(atlas);
+            texture = std::dynamic_pointer_cast<Texture>(atlas);
             
             if (texture) {
                 // Texture needs to be set before processing subTex
@@ -69,11 +69,11 @@ void BGETextureAtlasOpenGLES2::createFromBuffer(void *buffer, BGETextureFormat f
                     this->height_ = texture->getHeight();
                 } else {
                     a.reset();
-                    bgeError = std::make_shared<BGE::Error>(BGETextureBase::ErrorDomain, BGETextureErrorInvalidSubTexture);
+                    bgeError = std::make_shared<BGE::Error>(BGE::TextureBase::ErrorDomain, TextureErrorInvalidSubTexture);
                 }
             } else {
                 a.reset();
-                bgeError = std::make_shared<BGE::Error>(BGETextureBase::ErrorDomain, BGETextureErrorExistingTextureWrongType);
+                bgeError = std::make_shared<BGE::Error>(BGE::TextureBase::ErrorDomain, TextureErrorExistingTextureWrongType);
             }
             
             

@@ -32,7 +32,7 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
     assert(material);
     
     if (material) {
-        std::shared_ptr<BGETextureBase> texture = material->getTexture().lock();
+        std::shared_ptr<TextureBase> texture = material->getTexture().lock();
         
         assert(texture);
         

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B508CD891CA0ABA200127B97 /* BGETextureBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD871CA0ABA200127B97 /* BGETextureBase.cpp */; };
+		B508CD891CA0ABA200127B97 /* TextureBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD871CA0ABA200127B97 /* TextureBase.cpp */; };
 		B508CD8E1CA8ABA100127B97 /* Arial Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */; };
 		B508CD901CA901B700127B97 /* Avenir.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8F1CA901B700127B97 /* Avenir.ttc */; };
 		B508CD931CAE285000127B97 /* TransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD911CAE285000127B97 /* TransformComponent.cpp */; };
@@ -43,11 +43,11 @@
 		B525E3C51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp */; };
 		B525E3C61C89587000C691C0 /* BGEShaderService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A71C89587000C691C0 /* BGEShaderService.cpp */; };
 		B525E3C71C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A91C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp */; };
-		B525E3C81C89587000C691C0 /* BGETexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3AB1C89587000C691C0 /* BGETexture.cpp */; };
-		B525E3C91C89587000C691C0 /* BGETextureAtlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3AD1C89587000C691C0 /* BGETextureAtlas.cpp */; };
-		B525E3CA1C89587000C691C0 /* BGETextureOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3AF1C89587000C691C0 /* BGETextureOpenGLES2.cpp */; };
-		B525E3CB1C89587000C691C0 /* BGETextureService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3B11C89587000C691C0 /* BGETextureService.cpp */; };
-		B525E3CC1C89587000C691C0 /* BGETextureServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3B31C89587000C691C0 /* BGETextureServiceOpenGLES2.cpp */; };
+		B525E3C81C89587000C691C0 /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3AB1C89587000C691C0 /* Texture.cpp */; };
+		B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3AD1C89587000C691C0 /* TextureAtlas.cpp */; };
+		B525E3CA1C89587000C691C0 /* TextureOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3AF1C89587000C691C0 /* TextureOpenGLES2.cpp */; };
+		B525E3CB1C89587000C691C0 /* TextureService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3B11C89587000C691C0 /* TextureService.cpp */; };
+		B525E3CC1C89587000C691C0 /* TextureServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3B31C89587000C691C0 /* TextureServiceOpenGLES2.cpp */; };
 		B525E3DC1C895A1900C691C0 /* SimpleFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B525E3CE1C89588700C691C0 /* SimpleFragment.glsl */; };
 		B525E3DD1C895A1900C691C0 /* SimpleVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B525E3CF1C89588700C691C0 /* SimpleVertex.glsl */; };
 		B525E3DE1C895A1900C691C0 /* TextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B525E3D01C89588700C691C0 /* TextureFragment.glsl */; };
@@ -71,7 +71,7 @@
 		B571F18B1C992B3D007F5A90 /* lazy.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B571F18A1C992B3D007F5A90 /* lazy.ttf */; };
 		B571F18D1C992ECE007F5A90 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B571F18C1C992ECE007F5A90 /* libfreetype.a */; };
 		B571F1901C9D0A34007F5A90 /* BGEFontGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F18E1C9D0A34007F5A90 /* BGEFontGlyph.cpp */; };
-		B571F1931C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1911C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp */; };
+		B571F1931C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1911C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp */; };
 		B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1941C9E1B94007F5A90 /* FontVertex.glsl */; };
 		B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */; };
 		B5ACE88F1CBB08D5004B6871 /* TransformComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */; };
@@ -120,8 +120,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B508CD871CA0ABA200127B97 /* BGETextureBase.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGETextureBase.cpp; sourceTree = "<group>"; };
-		B508CD881CA0ABA200127B97 /* BGETextureBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGETextureBase.h; sourceTree = "<group>"; };
+		B508CD871CA0ABA200127B97 /* TextureBase.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = TextureBase.cpp; sourceTree = "<group>"; };
+		B508CD881CA0ABA200127B97 /* TextureBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureBase.h; sourceTree = "<group>"; };
 		B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Black.ttf"; sourceTree = "<group>"; };
 		B508CD8F1CA901B700127B97 /* Avenir.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Avenir.ttc; sourceTree = "<group>"; };
 		B508CD911CAE285000127B97 /* TransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransformComponent.cpp; path = components/TransformComponent.cpp; sourceTree = "<group>"; };
@@ -186,16 +186,16 @@
 		B525E3A81C89587000C691C0 /* BGEShaderService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEShaderService.h; sourceTree = "<group>"; };
 		B525E3A91C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEShaderServiceOpenGLES2.cpp; path = opengles2/BGEShaderServiceOpenGLES2.cpp; sourceTree = "<group>"; };
 		B525E3AA1C89587000C691C0 /* BGEShaderServiceOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEShaderServiceOpenGLES2.h; path = opengles2/BGEShaderServiceOpenGLES2.h; sourceTree = "<group>"; };
-		B525E3AB1C89587000C691C0 /* BGETexture.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGETexture.cpp; sourceTree = "<group>"; };
-		B525E3AC1C89587000C691C0 /* BGETexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGETexture.h; sourceTree = "<group>"; };
-		B525E3AD1C89587000C691C0 /* BGETextureAtlas.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGETextureAtlas.cpp; sourceTree = "<group>"; };
-		B525E3AE1C89587000C691C0 /* BGETextureAtlas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGETextureAtlas.h; sourceTree = "<group>"; };
-		B525E3AF1C89587000C691C0 /* BGETextureOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGETextureOpenGLES2.cpp; path = opengles2/BGETextureOpenGLES2.cpp; sourceTree = "<group>"; };
-		B525E3B01C89587000C691C0 /* BGETextureOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGETextureOpenGLES2.h; path = opengles2/BGETextureOpenGLES2.h; sourceTree = "<group>"; };
-		B525E3B11C89587000C691C0 /* BGETextureService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGETextureService.cpp; sourceTree = "<group>"; };
-		B525E3B21C89587000C691C0 /* BGETextureService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGETextureService.h; sourceTree = "<group>"; };
-		B525E3B31C89587000C691C0 /* BGETextureServiceOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGETextureServiceOpenGLES2.cpp; path = opengles2/BGETextureServiceOpenGLES2.cpp; sourceTree = "<group>"; };
-		B525E3B41C89587000C691C0 /* BGETextureServiceOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGETextureServiceOpenGLES2.h; path = opengles2/BGETextureServiceOpenGLES2.h; sourceTree = "<group>"; };
+		B525E3AB1C89587000C691C0 /* Texture.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Texture.cpp; sourceTree = "<group>"; };
+		B525E3AC1C89587000C691C0 /* Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
+		B525E3AD1C89587000C691C0 /* TextureAtlas.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = TextureAtlas.cpp; sourceTree = "<group>"; };
+		B525E3AE1C89587000C691C0 /* TextureAtlas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureAtlas.h; sourceTree = "<group>"; };
+		B525E3AF1C89587000C691C0 /* TextureOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TextureOpenGLES2.cpp; path = opengles2/TextureOpenGLES2.cpp; sourceTree = "<group>"; };
+		B525E3B01C89587000C691C0 /* TextureOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextureOpenGLES2.h; path = opengles2/TextureOpenGLES2.h; sourceTree = "<group>"; };
+		B525E3B11C89587000C691C0 /* TextureService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = TextureService.cpp; sourceTree = "<group>"; };
+		B525E3B21C89587000C691C0 /* TextureService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureService.h; sourceTree = "<group>"; };
+		B525E3B31C89587000C691C0 /* TextureServiceOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TextureServiceOpenGLES2.cpp; path = opengles2/TextureServiceOpenGLES2.cpp; sourceTree = "<group>"; };
+		B525E3B41C89587000C691C0 /* TextureServiceOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextureServiceOpenGLES2.h; path = opengles2/TextureServiceOpenGLES2.h; sourceTree = "<group>"; };
 		B525E3CE1C89588700C691C0 /* SimpleFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SimpleFragment.glsl; path = shaders/SimpleFragment.glsl; sourceTree = "<group>"; };
 		B525E3CF1C89588700C691C0 /* SimpleVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SimpleVertex.glsl; path = shaders/SimpleVertex.glsl; sourceTree = "<group>"; };
 		B525E3D01C89588700C691C0 /* TextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = TextureFragment.glsl; path = shaders/TextureFragment.glsl; sourceTree = "<group>"; };
@@ -230,8 +230,8 @@
 		B571F18C1C992ECE007F5A90 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = BenGameEngine/external/freetype/lib/libfreetype.a; sourceTree = "<group>"; };
 		B571F18E1C9D0A34007F5A90 /* BGEFontGlyph.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEFontGlyph.cpp; sourceTree = "<group>"; };
 		B571F18F1C9D0A34007F5A90 /* BGEFontGlyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEFontGlyph.h; sourceTree = "<group>"; };
-		B571F1911C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGETextureAtlasOpenGLES2.cpp; path = opengles2/BGETextureAtlasOpenGLES2.cpp; sourceTree = "<group>"; };
-		B571F1921C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGETextureAtlasOpenGLES2.h; path = opengles2/BGETextureAtlasOpenGLES2.h; sourceTree = "<group>"; };
+		B571F1911C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TextureAtlasOpenGLES2.cpp; path = opengles2/TextureAtlasOpenGLES2.cpp; sourceTree = "<group>"; };
+		B571F1921C9D24E0007F5A90 /* TextureAtlasOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextureAtlasOpenGLES2.h; path = opengles2/TextureAtlasOpenGLES2.h; sourceTree = "<group>"; };
 		B571F1941C9E1B94007F5A90 /* FontVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontVertex.glsl; path = shaders/FontVertex.glsl; sourceTree = "<group>"; };
 		B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontFragment.glsl; path = shaders/FontFragment.glsl; sourceTree = "<group>"; };
 		B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TransformComponentTests.m; path = BGEGameObjectAndComponentTests/TransformComponentTests.m; sourceTree = SOURCE_ROOT; };
@@ -384,14 +384,14 @@
 				B525E3A41C89587000C691C0 /* BGEShaderProgram.h */,
 				B525E3A71C89587000C691C0 /* BGEShaderService.cpp */,
 				B525E3A81C89587000C691C0 /* BGEShaderService.h */,
-				B525E3AB1C89587000C691C0 /* BGETexture.cpp */,
-				B525E3AC1C89587000C691C0 /* BGETexture.h */,
-				B525E3AD1C89587000C691C0 /* BGETextureAtlas.cpp */,
-				B525E3AE1C89587000C691C0 /* BGETextureAtlas.h */,
-				B508CD871CA0ABA200127B97 /* BGETextureBase.cpp */,
-				B508CD881CA0ABA200127B97 /* BGETextureBase.h */,
-				B525E3B11C89587000C691C0 /* BGETextureService.cpp */,
-				B525E3B21C89587000C691C0 /* BGETextureService.h */,
+				B525E3AB1C89587000C691C0 /* Texture.cpp */,
+				B525E3AC1C89587000C691C0 /* Texture.h */,
+				B525E3AD1C89587000C691C0 /* TextureAtlas.cpp */,
+				B525E3AE1C89587000C691C0 /* TextureAtlas.h */,
+				B508CD871CA0ABA200127B97 /* TextureBase.cpp */,
+				B508CD881CA0ABA200127B97 /* TextureBase.h */,
+				B525E3B11C89587000C691C0 /* TextureService.cpp */,
+				B525E3B21C89587000C691C0 /* TextureService.h */,
 				B508CDAF1CB8B2EA00127B97 /* components */,
 				B571F17C1C97CF42007F5A90 /* external */,
 				B52B760E1CBA1E7C00758249 /* game objects */,
@@ -501,12 +501,12 @@
 				B525E3A61C89587000C691C0 /* BGEShaderProgramOpenGLES2.h */,
 				B525E3A91C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp */,
 				B525E3AA1C89587000C691C0 /* BGEShaderServiceOpenGLES2.h */,
-				B571F1911C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp */,
-				B571F1921C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.h */,
-				B525E3AF1C89587000C691C0 /* BGETextureOpenGLES2.cpp */,
-				B525E3B01C89587000C691C0 /* BGETextureOpenGLES2.h */,
-				B525E3B31C89587000C691C0 /* BGETextureServiceOpenGLES2.cpp */,
-				B525E3B41C89587000C691C0 /* BGETextureServiceOpenGLES2.h */,
+				B571F1911C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp */,
+				B571F1921C9D24E0007F5A90 /* TextureAtlasOpenGLES2.h */,
+				B525E3AF1C89587000C691C0 /* TextureOpenGLES2.cpp */,
+				B525E3B01C89587000C691C0 /* TextureOpenGLES2.h */,
+				B525E3B31C89587000C691C0 /* TextureServiceOpenGLES2.cpp */,
+				B525E3B41C89587000C691C0 /* TextureServiceOpenGLES2.h */,
 			);
 			name = opengles2;
 			sourceTree = "<group>";
@@ -697,22 +697,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B525E3CB1C89587000C691C0 /* BGETextureService.cpp in Sources */,
+				B525E3CB1C89587000C691C0 /* TextureService.cpp in Sources */,
 				B571F1891C98C231007F5A90 /* BGEFontOpenGLES2.cpp in Sources */,
 				B571F1861C98C21C007F5A90 /* BGEFontServiceOpenGLES2.cpp in Sources */,
 				B525E3BE1C89587000C691C0 /* RenderServiceOpenGLES2.cpp in Sources */,
 				B525E3C61C89587000C691C0 /* BGEShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,
-				B571F1931C9D24E0007F5A90 /* BGETextureAtlasOpenGLES2.cpp in Sources */,
+				B571F1931C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp in Sources */,
 				B52B760D1CBA183900758249 /* Material.cpp in Sources */,
 				B525E3C41C89587000C691C0 /* BGEShaderProgram.cpp in Sources */,
 				B525E3BC1C89587000C691C0 /* RenderContextOpenGLES2.cpp in Sources */,
-				B525E3CC1C89587000C691C0 /* BGETextureServiceOpenGLES2.cpp in Sources */,
+				B525E3CC1C89587000C691C0 /* TextureServiceOpenGLES2.cpp in Sources */,
 				B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */,
 				B525E3BA1C89587000C691C0 /* BGEMathTypes.cpp in Sources */,
 				B5ACE8951CBF7B00004B6871 /* LineRenderComponent.cpp in Sources */,
 				B571F1901C9D0A34007F5A90 /* BGEFontGlyph.cpp in Sources */,
-				B525E3C91C89587000C691C0 /* BGETextureAtlas.cpp in Sources */,
+				B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* BGEShader.cpp in Sources */,
 				B571F1801C97D88E007F5A90 /* BGEFontService.cpp in Sources */,
@@ -720,7 +720,7 @@
 				B525E3C31C89587000C691C0 /* BGEShaderOpenGLES2.cpp in Sources */,
 				B525E3B71C89587000C691C0 /* BGEGLKView.m in Sources */,
 				B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */,
-				B525E3C81C89587000C691C0 /* BGETexture.cpp in Sources */,
+				B525E3C81C89587000C691C0 /* Texture.cpp in Sources */,
 				B571F1831C97D92E007F5A90 /* BGEFont.cpp in Sources */,
 				B5EE9D6C1CC4A4C8005D99CC /* SpriteRenderComponent.cpp in Sources */,
 				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
@@ -731,11 +731,11 @@
 				B508CDA51CB4DD5B00127B97 /* Component.cpp in Sources */,
 				B525E3B51C89587000C691C0 /* Error.cpp in Sources */,
 				B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */,
-				B508CD891CA0ABA200127B97 /* BGETextureBase.cpp in Sources */,
+				B508CD891CA0ABA200127B97 /* TextureBase.cpp in Sources */,
 				B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */,
 				B525E3C01C89587000C691C0 /* RenderWindow.cpp in Sources */,
 				B525E3C51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp in Sources */,
-				B525E3CA1C89587000C691C0 /* BGETextureOpenGLES2.cpp in Sources */,
+				B525E3CA1C89587000C691C0 /* TextureOpenGLES2.cpp in Sources */,
 				B525E3C11C89587000C691C0 /* Service.cpp in Sources */,
 				B525E3BF1C89587000C691C0 /* RenderView.cpp in Sources */,
 				B525E3C71C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp in Sources */,

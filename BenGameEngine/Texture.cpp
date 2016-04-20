@@ -1,31 +1,31 @@
 //
-//  BGETexture.cpp
+//  Texture.cpp
 //  GamePlayground
 //
 //  Created by Benjamin Lee on 2/17/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGETexture.h"
-#include "BGETextureAtlas.h"
+#include "Texture.h"
+#include "TextureAtlas.h"
 #include "Game.h"
 
-BGETexture::BGETexture(uint64_t texId, std::string name) : BGETextureBase(texId, name), x_(0), y_(0), isSubTexture_(false) {
+BGE::Texture::Texture(uint64_t texId, std::string name) : BGE::TextureBase(texId, name), x_(0), y_(0), isSubTexture_(false) {
 }
 
-void BGETexture::releaseCurrentTexture() {
-    BGETextureBase::releaseCurrentTexture();
+void BGE::Texture::releaseCurrentTexture() {
+    TextureBase::releaseCurrentTexture();
     
     atlas_ .reset();
     isSubTexture_ = false;
 }
 
 
-void BGETexture::updateUVs() {
+void BGE::Texture::updateUVs() {
     if (!isSubTexture_) {
-        BGETextureBase::updateUVs();
+        BGE::TextureBase::updateUVs();
     } else {
-        std::shared_ptr<BGETextureAtlas> atlas = atlas_.lock();
+        std::shared_ptr<BGE::TextureAtlas> atlas = atlas_.lock();
         
         if (atlas) {
             float x = x_;

@@ -13,7 +13,7 @@
 #include "RenderService.h"
 #include "BGEShaderServiceOpenGLES2.h"
 #include "BGEMathTypes.h"
-#include "BGETexture.h"
+#include "Texture.h"
 #include "Material.h"
 #include "GameObject.h"
 
@@ -51,7 +51,7 @@ namespace BGE {
         
         void drawRect(BGEVector2 &position, BGEVector2 &size, BGEVector4 &color);
         void drawShadedRect(BGEVector2 &position, BGEVector2 &size, BGEVector4 color[4]);
-        void drawTexture(BGEVector2 &position, std::shared_ptr<BGETextureBase> texture);
+        void drawTexture(BGEVector2 &position, std::shared_ptr<TextureBase> texture);
         
         // Using the more updated means
         void drawFlatRect(std::shared_ptr<BGE::GameObject> gameObject);
@@ -59,11 +59,11 @@ namespace BGE {
         void drawLines(const std::vector<BGEVector2>& points, float thickness, bool loop, std::shared_ptr<BGE::Material> material);
         void drawSprite(std::shared_ptr<BGE::GameObject> gameObject);
         
-        int8_t createMask(BGEVector2 &position, std::shared_ptr<BGETextureBase> mask);
+        int8_t createMask(BGEVector2 &position, std::shared_ptr<TextureBase> mask);
         void enableMask(int8_t maskId);
         void disableMask(int8_t maskId);
         
-        void drawFont(BGEVector2 &position, std::shared_ptr<BGETextureBase> texture);
+        void drawFont(BGEVector2 &position, std::shared_ptr<TextureBase> texture);
         void render();
         
         void setGLKTextureInfo(GLKTextureInfo *info) { textureInfo_ = info; }

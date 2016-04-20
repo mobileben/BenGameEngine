@@ -13,7 +13,7 @@
 #include <string>
 #include <map>
 #include "BGEFontGlyph.h"
-#include "BGETextureAtlas.h"
+#include "TextureAtlas.h"
 #include "BGEMathTypes.h"
 
 enum class BGEFontHorizontalAlignment {
@@ -58,7 +58,7 @@ protected:
     
     bool hasKerning_;
     
-    std::shared_ptr<BGETextureAtlas> textureAtlas_;
+    std::shared_ptr<BGE::TextureAtlas> textureAtlas_;
     std::map<uint16_t, std::shared_ptr<BGEFontGlyph>> glyphs_;
     std::map<std::pair<uint16_t, uint16_t>, int32_t> kerning_;
 };

@@ -25,7 +25,7 @@ void BGE::Game::provide(std::shared_ptr<BGE::RenderService> renderService) {
     renderService_ = renderService;
 }
 
-void BGE::Game::provide(std::shared_ptr<BGETextureService> textureService) {
+void BGE::Game::provide(std::shared_ptr<TextureService> textureService) {
     textureService_ = textureService;
 }
 

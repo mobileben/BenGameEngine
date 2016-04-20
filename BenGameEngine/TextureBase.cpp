@@ -1,25 +1,25 @@
 //
-//  BGETextureBase.cpp
+//  TextureBase.cpp
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 3/21/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGETextureBase.h"
+#include "TextureBase.h"
 #include "Game.h"
 
-const std::string BGETextureBase::ErrorDomain = "Texture";
+const std::string BGE::TextureBase::ErrorDomain = "Texture";
 
-BGETextureBase::BGETextureBase(uint64_t texId, std::string name) : BGE::Object(texId, name) ,valid_(false), format_(BGETextureFormat::Undefined), alphaState_(BGETextureAlphaState::None), width_(0), height_(0) {
+BGE::TextureBase::TextureBase(uint64_t texId, std::string name) : BGE::Object(texId, name) ,valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0) {
     updateUVs();
     updateXYs();
 }
 
-void BGETextureBase::releaseCurrentTexture() {
+void BGE::TextureBase::releaseCurrentTexture() {
     valid_ = false;
-    format_ = BGETextureFormat::Undefined;
-    alphaState_ = BGETextureAlphaState::None;
+    format_ = TextureFormat::Undefined;
+    alphaState_ = TextureAlphaState::None;
     x_ = 0;
     y_ = 0;
     width_ = 0;
@@ -32,7 +32,7 @@ void BGETextureBase::releaseCurrentTexture() {
         xys_[i].y = 0;
     }
 }
-void BGETextureBase::updateUVs() {
+void BGE::TextureBase::updateUVs() {
     /*
      Defaults to OpenGL setup
      
@@ -58,7 +58,7 @@ void BGETextureBase::updateUVs() {
 
 }
 
-void BGETextureBase::updateXYs() {
+void BGE::TextureBase::updateXYs() {
     if (BGE::Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
         /*
          

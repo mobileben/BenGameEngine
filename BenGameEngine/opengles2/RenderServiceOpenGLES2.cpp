@@ -11,7 +11,7 @@
 #include "BGEFontServiceOpenGLES2.h"
 #include "BGEShaderServiceOpenGLES2.h"
 #include "RenderContextOpenGLES2.h"
-#include "BGETextureOpenGLES2.h"
+#include "TextureOpenGLES2.h"
 #include "BGEMathTypes.h"
 #include "Game.h"
 #include "LineRenderComponent.h"
@@ -492,11 +492,11 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector
 #endif
 }
 
-void BGE::RenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr<BGETextureBase> texture) {
+void BGE::RenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr<TextureBase> texture) {
     if (texture) {
         BGEVertexTex vertices[4];
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
-        std::shared_ptr<BGETextureOpenGLES2> oglTex = std::dynamic_pointer_cast<BGETextureOpenGLES2>(texture);
+        std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
         
         if (oglTex && oglTex->isValid()) {
             const BGEVector2 *xys = oglTex->getXYs();
@@ -561,12 +561,12 @@ void BGE::RenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_ptr<BGETextureBase> texture)
+void BGE::RenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_ptr<TextureBase> texture)
 {
     if (texture) {
         BGEVertexTex vertices[4];
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
-        std::shared_ptr<BGETextureOpenGLES2> oglTex = std::dynamic_pointer_cast<BGETextureOpenGLES2>(texture);
+        std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
 
         if (oglTex && oglTex->isValid()) {
             const BGEVector2 *xys = oglTex->getXYs();
@@ -708,10 +708,10 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
             BGEVertexTex *const vertices = sprite->getVertices();
             std::shared_ptr<BGE::Material> material = sprite->getMaterial().lock();
             if (material) {
-                std::shared_ptr<BGETextureBase> texture = material->getTexture().lock();
+                std::shared_ptr<TextureBase> texture = material->getTexture().lock();
                 
                 if (texture) {
-                    std::shared_ptr<BGETextureOpenGLES2> oglTex = std::dynamic_pointer_cast<BGETextureOpenGLES2>(texture);
+                    std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
                     if (oglTex && oglTex->isValid()) {
                         std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
                         
@@ -750,7 +750,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
     }
 }
 
-int8_t BGE::RenderServiceOpenGLES2::createMask(BGEVector2 &position, std::shared_ptr<BGETextureBase> mask)
+int8_t BGE::RenderServiceOpenGLES2::createMask(BGEVector2 &position, std::shared_ptr<TextureBase> mask)
 {
     if (this->masksInUse_ < (RenderServiceOpenGLES2::MaxActiveMasks - 1)) {
         int8_t maskId = this->masksInUse_;
@@ -802,9 +802,9 @@ void BGE::RenderServiceOpenGLES2::render()
     this->masksInUse_ = 0;
     
     if (isReady()) {
-        std::shared_ptr<BGETextureBase> texture = Game::getInstance()->getTextureService()->textureWithName("sample");
-        std::shared_ptr<BGETextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("fish");
-        std::shared_ptr<BGETextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
+        std::shared_ptr<TextureBase> texture = Game::getInstance()->getTextureService()->textureWithName("sample");
+        std::shared_ptr<TextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("fish");
+        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
         std::shared_ptr<BGEFont> f = Game::getInstance()->getFontService()->getFont("default", 32);
         
         if (f) {

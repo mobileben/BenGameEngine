@@ -9,9 +9,9 @@
 #include "BGEFontGlyph.h"
 #include "BGEFont.h"
 #include "Game.h"
-#include "BGETexture.h"
+#include "Texture.h"
 
-BGEFontGlyph::BGEFontGlyph(BGEFont *font, std::shared_ptr<BGETexture> texture, int32_t offsetX, int32_t offsetY, int32_t advance) : texture_(texture), offsetX_(offsetX), offsetY_(0), offsetYInverted_(offsetY), advance_(advance) {
+BGEFontGlyph::BGEFontGlyph(BGEFont *font, std::shared_ptr<BGE::Texture> texture, int32_t offsetX, int32_t offsetY, int32_t advance) : texture_(texture), offsetX_(offsetX), offsetY_(0), offsetYInverted_(offsetY), advance_(advance) {
     if (texture) {
         offsetY_ = font->getGlyphH() - (texture->getHeight() + offsetY);
     }

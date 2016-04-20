@@ -31,7 +31,7 @@ std::shared_ptr<BGE::Material> BGE::MaterialService::createMaterial(std::string 
     return material;
 }
 
-std::shared_ptr<BGE::Material> BGE::MaterialService::createMaterial(std::string name, std::shared_ptr<BGETextureBase> texture) {
+std::shared_ptr<BGE::Material> BGE::MaterialService::createMaterial(std::string name, std::shared_ptr<TextureBase> texture) {
     uint64_t objId = getIdAndIncrement();
     std::shared_ptr<Material> material(new Material(objId, name, texture));
     
@@ -40,7 +40,7 @@ std::shared_ptr<BGE::Material> BGE::MaterialService::createMaterial(std::string 
     return material;
 }
 
-std::shared_ptr<BGE::Material> BGE::MaterialService::createMaterial(std::string name, BGEVector4& color, std::shared_ptr<BGETextureBase> texture) {
+std::shared_ptr<BGE::Material> BGE::MaterialService::createMaterial(std::string name, BGEVector4& color, std::shared_ptr<TextureBase> texture) {
     uint64_t objId = getIdAndIncrement();
     std::shared_ptr<Material> material(new Material(objId, name, color));
     

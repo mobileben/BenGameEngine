@@ -20,7 +20,7 @@ namespace BGE {
     class SpriteRenderComponent : public BGE::RenderComponent
     {
     public:
-        std::shared_ptr<BGETextureBase> getTexture();
+        std::shared_ptr<TextureBase> getTexture();
         
     protected:
         SpriteRenderComponent(uint32_t componentId);
