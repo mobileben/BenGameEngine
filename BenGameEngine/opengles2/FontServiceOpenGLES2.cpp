@@ -1,13 +1,13 @@
 //
-//  BGEFontServiceOpenGLES2.cpp
+//  FontServiceOpenGLES2.cpp
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 3/15/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGEFontServiceOpenGLES2.h"
-#include "BGEFontOpenGLES2.h"
+#include "FontServiceOpenGLES2.h"
+#include "FontOpenGLES2.h"
 #include "TextureAtlas.h"
 #include "Game.h"
 
@@ -15,22 +15,22 @@ static const float MetricScale = 1.0 / 64.0;
 static const int InitialSupportedCharacterOffset = 32;
 static const int NumSupportedCharacters = 256 - InitialSupportedCharacterOffset;   // Support extended ASCCI, ignore control characters (0-31)
 
-NSBundle *BGEFontServiceOpenGLES2::builtinBundle_ = nil;
-NSBundle *BGEFontServiceOpenGLES2::mainBundle_ = nil;
+NSBundle *BGE::FontServiceOpenGLES2::builtinBundle_ = nil;
+NSBundle *BGE::FontServiceOpenGLES2::mainBundle_ = nil;
 
-void BGEFontServiceOpenGLES2::mapBundles(std::string bundleName)
+void BGE::FontServiceOpenGLES2::mapBundles(std::string bundleName)
 {
-    if (!BGEFontServiceOpenGLES2::builtinBundle_) {
-        BGEFontServiceOpenGLES2::builtinBundle_ = [NSBundle bundleWithURL:[[NSBundle mainBundle] URLForResource:[[NSString alloc] initWithCString:bundleName.c_str() encoding:NSUTF8StringEncoding] withExtension:@"bundle"]];
-        BGEFontServiceOpenGLES2::mainBundle_ = [NSBundle mainBundle];
+    if (!FontServiceOpenGLES2::builtinBundle_) {
+        FontServiceOpenGLES2::builtinBundle_ = [NSBundle bundleWithURL:[[NSBundle mainBundle] URLForResource:[[NSString alloc] initWithCString:bundleName.c_str() encoding:NSUTF8StringEncoding] withExtension:@"bundle"]];
+        FontServiceOpenGLES2::mainBundle_ = [NSBundle mainBundle];
     }
 }
 
-BGEFontServiceOpenGLES2::BGEFontServiceOpenGLES2(std::map<std::string, std::string> resources) : BGEFontService(resources) {
+BGE::FontServiceOpenGLES2::FontServiceOpenGLES2(std::map<std::string, std::string> resources) : FontService(resources) {
 }
 
 
-std::shared_ptr<BGEFont> BGEFontServiceOpenGLES2::getFont(std::string name, uint32_t pixelSize) {
+std::shared_ptr<BGE::Font> BGE::FontServiceOpenGLES2::getFont(std::string name, uint32_t pixelSize) {
     std::string key = name + std::to_string(pixelSize);
     
     return fonts_[key];
@@ -38,10 +38,10 @@ std::shared_ptr<BGEFont> BGEFontServiceOpenGLES2::getFont(std::string name, uint
 
 #define FULLFONT    1
 
-void BGEFontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<BGEFont>, std::shared_ptr<BGE::Error> error)> callback)
+void BGE::FontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback)
 {
-    std::string fontKey = BGEFontService::fontAsKey(name, pixelSize);
-    std::shared_ptr<BGEFont> font = fonts_[fontKey];
+    std::string fontKey = BGE::FontService::fontAsKey(name, pixelSize);
+    std::shared_ptr<Font> font = fonts_[fontKey];
     
     if (font) {
         if (callback) {
@@ -73,7 +73,7 @@ void BGEFontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, std
             }
             
             if (cpath) {
-                std::shared_ptr<BGEFontOpenGLES2> oglFont = std::make_shared<BGEFontOpenGLES2>(name, pixelSize, cpath);
+                std::shared_ptr<BGE::FontOpenGLES2> oglFont = std::make_shared<BGE::FontOpenGLES2>(name, pixelSize, cpath);
                 
                 if (oglFont) {
                     fonts_[fontKey] = oglFont;
@@ -261,7 +261,7 @@ void BGEFontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, std
 }
 
 
-void BGEFontServiceOpenGLES2::unloadFont(std::string name, uint32_t pixelSize) {
+void BGE::FontServiceOpenGLES2::unloadFont(std::string name, uint32_t pixelSize) {
     
 }
 

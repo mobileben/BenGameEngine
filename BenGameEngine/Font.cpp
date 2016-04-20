@@ -1,27 +1,27 @@
 //
-//  BGEFont.cpp
+//  Font.cpp
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 3/14/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGEFont.h"
+#include "Font.h"
 #include "Game.h"
 
-BGEFont::BGEFont(std::string name, uint32_t pixelSize, std::string filename) : name_(name), pixelSize_(pixelSize), textureAtlas_(nullptr), hasKerning_(false) {
+BGE::Font::Font(std::string name, uint32_t pixelSize, std::string filename) : name_(name), pixelSize_(pixelSize), textureAtlas_(nullptr), hasKerning_(false) {
     
 }
 
-BGEFont::~BGEFont() {
+BGE::Font::~Font() {
     BGE::Game::getInstance()->getTextureService()->removeTexture(textureAtlas_);
 }
 
-std::shared_ptr<BGEFontGlyph> BGEFont::glyphForExtendedASCII(uint16_t code) {
+std::shared_ptr<BGE::FontGlyph> BGE::Font::glyphForExtendedASCII(uint16_t code) {
     return glyphs_[code];
 }
 
-int32_t BGEFont::kerningForPair(uint16_t prev, uint16_t curr) {
+int32_t BGE::Font::kerningForPair(uint16_t prev, uint16_t curr) {
     int32_t kerning = 0;
     
     if (prev && curr) {
@@ -35,10 +35,10 @@ int32_t BGEFont::kerningForPair(uint16_t prev, uint16_t curr) {
     return kerning;
 }
 
-uint32_t BGEFont::getStringWidth(std::string str, bool minimum) {
+uint32_t BGE::Font::getStringWidth(std::string str, bool minimum) {
     int32_t width = 0;
     const char *chars = str.c_str();
-    std::shared_ptr<BGEFontGlyph> glyph;
+    std::shared_ptr<BGE::FontGlyph> glyph;
     uint16_t code;
     size_t length = str.length();
     
@@ -89,6 +89,6 @@ uint32_t BGEFont::getStringWidth(std::string str, bool minimum) {
     return (uint32_t)width;
 }
 
-uint32_t BGEFont::getHeight() const {
+uint32_t BGE::Font::getHeight() const {
     return getGlyphH();
 }

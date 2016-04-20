@@ -16,7 +16,7 @@
 #include "MaterialService.h"
 #include "RenderService.h"
 #include "TextureService.h"
-#include "BGEFontService.h"
+#include "FontService.h"
 #include "HeartbeatService.h"
 #include "ComponentService.h"
 
@@ -34,8 +34,8 @@ namespace BGE {
         std::shared_ptr<TextureService> getTextureService() { return textureService_; }
         void provide(std::shared_ptr<TextureService> textureService);
         
-        std::shared_ptr<BGEFontService> getFontService() { return fontService_; }
-        void provide(std::shared_ptr<BGEFontService> fontService);
+        std::shared_ptr<FontService> getFontService() { return fontService_; }
+        void provide(std::shared_ptr<FontService> fontService);
         
         // Services which are implicitly built
         std::shared_ptr<BGE::GameObjectService> getGameObjectService() { return gameObjectService_; }
@@ -55,7 +55,7 @@ namespace BGE {
     protected:
         std::shared_ptr<BGE::RenderService> renderService_;
         std::shared_ptr<TextureService> textureService_;
-        std::shared_ptr<BGEFontService> fontService_;
+        std::shared_ptr<FontService> fontService_;
         std::shared_ptr<BGE::HeartbeatService> heartbeatService_;
         std::shared_ptr<BGE::MaterialService> materialService_;
         std::shared_ptr<BGE::GameObjectService> gameObjectService_;

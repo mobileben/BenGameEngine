@@ -29,7 +29,7 @@ void BGE::Game::provide(std::shared_ptr<TextureService> textureService) {
     textureService_ = textureService;
 }
 
-void BGE::Game::provide(std::shared_ptr<BGEFontService> fontService) {
+void BGE::Game::provide(std::shared_ptr<FontService> fontService) {
     fontService_ = fontService;
 }
 

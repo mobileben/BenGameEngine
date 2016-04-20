@@ -8,7 +8,7 @@
 
 #include "RenderServiceOpenGLES2.h"
 #include "RenderView.h"
-#include "BGEFontServiceOpenGLES2.h"
+#include "FontServiceOpenGLES2.h"
 #include "BGEShaderServiceOpenGLES2.h"
 #include "RenderContextOpenGLES2.h"
 #include "TextureOpenGLES2.h"
@@ -61,7 +61,7 @@ static uint8_t MaskIdToMaskValue[] = {
 BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : masksInUse_(0), activeMasks_(0) {
     shaderService_ = std::make_shared<BGEShaderServiceOpenGLES2>();
     BGEShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
-    BGEFontServiceOpenGLES2::mapBundles("BenGameEngineBundle");
+    FontServiceOpenGLES2::mapBundles("BenGameEngineBundle");
     
     BGEMatrix4MakeIdentify(projectionMatrix_);
     
@@ -805,7 +805,7 @@ void BGE::RenderServiceOpenGLES2::render()
         std::shared_ptr<TextureBase> texture = Game::getInstance()->getTextureService()->textureWithName("sample");
         std::shared_ptr<TextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("fish");
         std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
-        std::shared_ptr<BGEFont> f = Game::getInstance()->getFontService()->getFont("default", 32);
+        std::shared_ptr<Font> f = Game::getInstance()->getFontService()->getFont("default", 32);
         
         if (f) {
             NSLog(@"STRING LENGTH %d", f->getStringWidth("HELLO", false));

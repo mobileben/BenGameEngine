@@ -64,13 +64,13 @@
 		B571F1771C93B604007F5A90 /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = B571F1761C93B604007F5A90 /* sample.png */; };
 		B571F1791C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1781C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl */; };
 		B571F17B1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F17A1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl */; };
-		B571F1801C97D88E007F5A90 /* BGEFontService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F17E1C97D88E007F5A90 /* BGEFontService.cpp */; };
-		B571F1831C97D92E007F5A90 /* BGEFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1811C97D92E007F5A90 /* BGEFont.cpp */; };
-		B571F1861C98C21C007F5A90 /* BGEFontServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1841C98C21C007F5A90 /* BGEFontServiceOpenGLES2.cpp */; };
-		B571F1891C98C231007F5A90 /* BGEFontOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1871C98C231007F5A90 /* BGEFontOpenGLES2.cpp */; };
+		B571F1801C97D88E007F5A90 /* FontService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F17E1C97D88E007F5A90 /* FontService.cpp */; };
+		B571F1831C97D92E007F5A90 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1811C97D92E007F5A90 /* Font.cpp */; };
+		B571F1861C98C21C007F5A90 /* FontServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1841C98C21C007F5A90 /* FontServiceOpenGLES2.cpp */; };
+		B571F1891C98C231007F5A90 /* FontOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1871C98C231007F5A90 /* FontOpenGLES2.cpp */; };
 		B571F18B1C992B3D007F5A90 /* lazy.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B571F18A1C992B3D007F5A90 /* lazy.ttf */; };
 		B571F18D1C992ECE007F5A90 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B571F18C1C992ECE007F5A90 /* libfreetype.a */; };
-		B571F1901C9D0A34007F5A90 /* BGEFontGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F18E1C9D0A34007F5A90 /* BGEFontGlyph.cpp */; };
+		B571F1901C9D0A34007F5A90 /* FontGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */; };
 		B571F1931C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1911C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp */; };
 		B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1941C9E1B94007F5A90 /* FontVertex.glsl */; };
 		B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */; };
@@ -218,18 +218,18 @@
 		B571F1781C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MaskColorMatrixTextureVertex.glsl; path = shaders/MaskColorMatrixTextureVertex.glsl; sourceTree = "<group>"; };
 		B571F17A1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MaskColorMatrixTextureFragment.glsl; path = shaders/MaskColorMatrixTextureFragment.glsl; sourceTree = "<group>"; };
 		B571F17D1C97CFB3007F5A90 /* freetype */ = {isa = PBXFileReference; lastKnownFileType = folder; name = freetype; path = external/freetype; sourceTree = "<group>"; };
-		B571F17E1C97D88E007F5A90 /* BGEFontService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEFontService.cpp; sourceTree = "<group>"; };
-		B571F17F1C97D88E007F5A90 /* BGEFontService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEFontService.h; sourceTree = "<group>"; };
-		B571F1811C97D92E007F5A90 /* BGEFont.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEFont.cpp; sourceTree = "<group>"; };
-		B571F1821C97D92E007F5A90 /* BGEFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEFont.h; sourceTree = "<group>"; };
-		B571F1841C98C21C007F5A90 /* BGEFontServiceOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEFontServiceOpenGLES2.cpp; path = opengles2/BGEFontServiceOpenGLES2.cpp; sourceTree = "<group>"; };
-		B571F1851C98C21C007F5A90 /* BGEFontServiceOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEFontServiceOpenGLES2.h; path = opengles2/BGEFontServiceOpenGLES2.h; sourceTree = "<group>"; };
-		B571F1871C98C231007F5A90 /* BGEFontOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEFontOpenGLES2.cpp; path = opengles2/BGEFontOpenGLES2.cpp; sourceTree = "<group>"; };
-		B571F1881C98C231007F5A90 /* BGEFontOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEFontOpenGLES2.h; path = opengles2/BGEFontOpenGLES2.h; sourceTree = "<group>"; };
+		B571F17E1C97D88E007F5A90 /* FontService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = FontService.cpp; sourceTree = "<group>"; };
+		B571F17F1C97D88E007F5A90 /* FontService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontService.h; sourceTree = "<group>"; };
+		B571F1811C97D92E007F5A90 /* Font.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Font.cpp; sourceTree = "<group>"; };
+		B571F1821C97D92E007F5A90 /* Font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Font.h; sourceTree = "<group>"; };
+		B571F1841C98C21C007F5A90 /* FontServiceOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = FontServiceOpenGLES2.cpp; path = opengles2/FontServiceOpenGLES2.cpp; sourceTree = "<group>"; };
+		B571F1851C98C21C007F5A90 /* FontServiceOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FontServiceOpenGLES2.h; path = opengles2/FontServiceOpenGLES2.h; sourceTree = "<group>"; };
+		B571F1871C98C231007F5A90 /* FontOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = FontOpenGLES2.cpp; path = opengles2/FontOpenGLES2.cpp; sourceTree = "<group>"; };
+		B571F1881C98C231007F5A90 /* FontOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FontOpenGLES2.h; path = opengles2/FontOpenGLES2.h; sourceTree = "<group>"; };
 		B571F18A1C992B3D007F5A90 /* lazy.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = lazy.ttf; sourceTree = "<group>"; };
 		B571F18C1C992ECE007F5A90 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = BenGameEngine/external/freetype/lib/libfreetype.a; sourceTree = "<group>"; };
-		B571F18E1C9D0A34007F5A90 /* BGEFontGlyph.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEFontGlyph.cpp; sourceTree = "<group>"; };
-		B571F18F1C9D0A34007F5A90 /* BGEFontGlyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEFontGlyph.h; sourceTree = "<group>"; };
+		B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = FontGlyph.cpp; sourceTree = "<group>"; };
+		B571F18F1C9D0A34007F5A90 /* FontGlyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontGlyph.h; sourceTree = "<group>"; };
 		B571F1911C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TextureAtlasOpenGLES2.cpp; path = opengles2/TextureAtlasOpenGLES2.cpp; sourceTree = "<group>"; };
 		B571F1921C9D24E0007F5A90 /* TextureAtlasOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextureAtlasOpenGLES2.h; path = opengles2/TextureAtlasOpenGLES2.h; sourceTree = "<group>"; };
 		B571F1941C9E1B94007F5A90 /* FontVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontVertex.glsl; path = shaders/FontVertex.glsl; sourceTree = "<group>"; };
@@ -342,12 +342,12 @@
 				B5ACE8911CBB56CE004B6871 /* ComponentService.h */,
 				B525E3851C89587000C691C0 /* Error.cpp */,
 				B525E3861C89587000C691C0 /* Error.h */,
-				B571F1811C97D92E007F5A90 /* BGEFont.cpp */,
-				B571F1821C97D92E007F5A90 /* BGEFont.h */,
-				B571F18E1C9D0A34007F5A90 /* BGEFontGlyph.cpp */,
-				B571F18F1C9D0A34007F5A90 /* BGEFontGlyph.h */,
-				B571F17E1C97D88E007F5A90 /* BGEFontService.cpp */,
-				B571F17F1C97D88E007F5A90 /* BGEFontService.h */,
+				B571F1811C97D92E007F5A90 /* Font.cpp */,
+				B571F1821C97D92E007F5A90 /* Font.h */,
+				B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */,
+				B571F18F1C9D0A34007F5A90 /* FontGlyph.h */,
+				B571F17E1C97D88E007F5A90 /* FontService.cpp */,
+				B571F17F1C97D88E007F5A90 /* FontService.h */,
 				B525E3871C89587000C691C0 /* Game.cpp */,
 				B525E3881C89587000C691C0 /* Game.h */,
 				B508CDA61CB4DE6D00127B97 /* GameObject.cpp */,
@@ -487,10 +487,10 @@
 		B571F1741C928BA5007F5A90 /* opengles2 */ = {
 			isa = PBXGroup;
 			children = (
-				B571F1871C98C231007F5A90 /* BGEFontOpenGLES2.cpp */,
-				B571F1881C98C231007F5A90 /* BGEFontOpenGLES2.h */,
-				B571F1841C98C21C007F5A90 /* BGEFontServiceOpenGLES2.cpp */,
-				B571F1851C98C21C007F5A90 /* BGEFontServiceOpenGLES2.h */,
+				B571F1871C98C231007F5A90 /* FontOpenGLES2.cpp */,
+				B571F1881C98C231007F5A90 /* FontOpenGLES2.h */,
+				B571F1841C98C21C007F5A90 /* FontServiceOpenGLES2.cpp */,
+				B571F1851C98C21C007F5A90 /* FontServiceOpenGLES2.h */,
 				B525E3931C89587000C691C0 /* RenderContextOpenGLES2.cpp */,
 				B525E3941C89587000C691C0 /* RenderContextOpenGLES2.h */,
 				B525E3971C89587000C691C0 /* RenderServiceOpenGLES2.cpp */,
@@ -698,8 +698,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B525E3CB1C89587000C691C0 /* TextureService.cpp in Sources */,
-				B571F1891C98C231007F5A90 /* BGEFontOpenGLES2.cpp in Sources */,
-				B571F1861C98C21C007F5A90 /* BGEFontServiceOpenGLES2.cpp in Sources */,
+				B571F1891C98C231007F5A90 /* FontOpenGLES2.cpp in Sources */,
+				B571F1861C98C21C007F5A90 /* FontServiceOpenGLES2.cpp in Sources */,
 				B525E3BE1C89587000C691C0 /* RenderServiceOpenGLES2.cpp in Sources */,
 				B525E3C61C89587000C691C0 /* BGEShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,
@@ -711,17 +711,17 @@
 				B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */,
 				B525E3BA1C89587000C691C0 /* BGEMathTypes.cpp in Sources */,
 				B5ACE8951CBF7B00004B6871 /* LineRenderComponent.cpp in Sources */,
-				B571F1901C9D0A34007F5A90 /* BGEFontGlyph.cpp in Sources */,
+				B571F1901C9D0A34007F5A90 /* FontGlyph.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* BGEShader.cpp in Sources */,
-				B571F1801C97D88E007F5A90 /* BGEFontService.cpp in Sources */,
+				B571F1801C97D88E007F5A90 /* FontService.cpp in Sources */,
 				B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */,
 				B525E3C31C89587000C691C0 /* BGEShaderOpenGLES2.cpp in Sources */,
 				B525E3B71C89587000C691C0 /* BGEGLKView.m in Sources */,
 				B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */,
 				B525E3C81C89587000C691C0 /* Texture.cpp in Sources */,
-				B571F1831C97D92E007F5A90 /* BGEFont.cpp in Sources */,
+				B571F1831C97D92E007F5A90 /* Font.cpp in Sources */,
 				B5EE9D6C1CC4A4C8005D99CC /* SpriteRenderComponent.cpp in Sources */,
 				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
 				B525E3BB1C89587000C691C0 /* RenderContext.cpp in Sources */,

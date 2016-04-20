@@ -1,5 +1,5 @@
 //
-//  BGEFontOpenGLES2.cpp
+//  FontOpenGLES2.cpp
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 3/15/16.
@@ -7,7 +7,7 @@
 //
 
 #include "Game.h"
-#include "BGEFontOpenGLES2.h"
+#include "FontOpenGLES2.h"
 #include "TextureOpenGLES2.h"
 #include "RenderServiceOpenGLES2.h"
 #include "BGEShaderServiceOpenGLES2.h"
@@ -18,7 +18,7 @@
 static const int InitialSupportedCharacterOffset = 32;
 static const int NumSupportedCharacters = 256 - InitialSupportedCharacterOffset;   // Support extended ASCCI, ignore control characters (0-31)
 
-BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::string filename) : BGEFont(name, pixelSize, filename) {
+BGE::FontOpenGLES2::FontOpenGLES2(std::string name, uint32_t pixelSize, std::string filename) : BGE::Font(name, pixelSize, filename) {
     FT_Face face = NULL;
     FT_Error error = 0;
 
@@ -103,9 +103,9 @@ BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::st
                 unsigned char *dest;
                 unsigned char *currBuffer;
                 BGESubTextureDef subTexDef;
-                BGEFontGlyphDef glyphDefs[NumSupportedCharacters];
+                FontGlyphDef glyphDefs[NumSupportedCharacters];
                 std::map<std::string, BGESubTextureDef> subTexDefs;
-                std::string fontKeyBase = BGEFontService::fontAsKey(name, pixelSize) + "_";
+                std::string fontKeyBase = FontService::fontAsKey(name, pixelSize) + "_";
                 
                 memset(atlasBuffer, 0, atlasW * atlasH);
                 
@@ -199,8 +199,8 @@ BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::st
                         uint16_t code;
                         std::string key = fontKeyBase + std::to_string(InitialSupportedCharacterOffset);
                         std::shared_ptr<BGE::Texture> subTex = atlas->getSubTexture(key);
-                        std::shared_ptr<BGEFontGlyph> space = std::make_shared<BGEFontGlyph>(this, subTex, glyphDefs[0].offsetX, glyphDefs[0].offsetY, glyphDefs[0].advance);
-                        std::shared_ptr<BGEFontGlyph> glyph;
+                        std::shared_ptr<FontGlyph> space = std::make_shared<FontGlyph>(this, subTex, glyphDefs[0].offsetX, glyphDefs[0].offsetY, glyphDefs[0].advance);
+                        std::shared_ptr<FontGlyph> glyph;
                         
                         glyphs_[InitialSupportedCharacterOffset] = space;
                         
@@ -211,7 +211,7 @@ BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::st
                             subTex = atlas->getSubTexture(key);
                             
                             if (subTex) {
-                                glyph = std::make_shared<BGEFontGlyph>(this, subTex, glyphDefs[i].offsetX, glyphDefs[i].offsetY, glyphDefs[i].advance);
+                                glyph = std::make_shared<FontGlyph>(this, subTex, glyphDefs[i].offsetX, glyphDefs[i].offsetY, glyphDefs[i].advance);
                                 
                                 if (glyph) {
                                     glyphs_[code] = glyph;
@@ -239,7 +239,7 @@ BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::st
     }
 }
 
-void BGEFontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVector4 &color, BGEFontHorizontalAlignment horizAlignment, BGEFontVerticalAlignment vertAlignment, bool minimum) {
+void BGE::FontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVector4 &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     if (textureAtlas_ && textureAtlas_->isValid()) {
         BGEVertexTex vertices[4];
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
@@ -250,7 +250,7 @@ void BGEFontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVect
         std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGE::Game::getInstance()->getRenderService());
         
         const char *chars = str.c_str();
-        std::shared_ptr<BGEFontGlyph> glyph;
+        std::shared_ptr<FontGlyph> glyph;
         uint16_t code;
         size_t length = str.length();
         std::shared_ptr<BGE::TextureOpenGLES2> oglTex;

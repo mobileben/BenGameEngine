@@ -12,7 +12,7 @@
 #include "RenderContextOpenGLES2.h"
 #include "RenderServiceOpenGLES2.h"
 #include "TextureServiceOpenGLES2.h"
-#include "BGEFontServiceOpenGLES2.h"
+#include "FontServiceOpenGLES2.h"
 #include "TextureOpenGLES2.h"
 #include "BGEGLKView.h"
 #include "TransformComponent.h"
@@ -67,7 +67,7 @@
         self.once = YES;
         
         BGE::Game::getInstance()->provide(std::make_shared<BGE::TextureServiceOpenGLES2>(self.renderContext->getContext()));
-        BGE::Game::getInstance()->provide(std::make_shared<BGEFontServiceOpenGLES2>());
+        BGE::Game::getInstance()->provide(std::make_shared<BGE::FontServiceOpenGLES2>());
         BGE::Game::getInstance()->getFontService()->loadFont("default", 32, nullptr);
         
         NSString *path = [[NSBundle mainBundle] pathForResource:@"sample" ofType:@"png"];
