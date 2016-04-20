@@ -18,9 +18,7 @@
 #include "BGEShaderService.h"
 #include "BGEMathTypes.h"
 
-typedef struct {
-    BGEVector3 position;
-} BGEVertex;
+typedef BGEVector3 BGEVertex;
 
 typedef struct {
     BGEVector3 position;

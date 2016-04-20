@@ -14,15 +14,12 @@
 #include <memory>
 #include <vector>
 #include "BGEMathTypes.h"
+#include "BGEComponent.h"
 
-class BGETransformComponent : public std::enable_shared_from_this<BGETransformComponent>
+class BGETransformComponent : public BGEComponent
 {
 public:
-    BGETransformComponent(std::string name);
     virtual ~BGETransformComponent() {}
-    
-    std::string getName() const { return name_; }
-    void setName(std::string name) { name_ = name; }
     
     bool isVisible() const { return visible_; }
     void setVisibility(bool visible) { visible_ = visible; }
@@ -85,9 +82,12 @@ public:
     virtual bool inParentHierarchy(std::shared_ptr<BGETransformComponent> parent);
     
 protected:
-    // Identity
-    std::string     name_;
+    friend BGEComponentService;
     
+    BGETransformComponent(uint64_t componentId);
+    BGETransformComponent(uint64_t componentId, std::string name);
+
+    // Identity
     bool            visible_;
     bool            interactable_;
     bool            interactableWhenHidden_;

@@ -39,10 +39,11 @@ public:
         objects_[objId] = object;
         
         return object;
-
     }
     
     void removeObject(uint64_t objId);
+
+    const std::unordered_map<uint64_t, std::shared_ptr<BGEGameObject>>& getGameObjects() const { return objects_; }
     
     std::shared_ptr<BGEGameObject> find(uint64_t objId);
     std::shared_ptr<BGEGameObject> find(std::string name);

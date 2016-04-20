@@ -38,7 +38,7 @@ std::shared_ptr<BGEFont> BGEFontServiceOpenGLES2::getFont(std::string name, uint
 
 #define FULLFONT    1
 
-void BGEFontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<BGEFont>, std::shared_ptr<BGEError> error)> callback)
+void BGEFontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<BGEFont>, std::shared_ptr<BGE::Error> error)> callback)
 {
     std::string fontKey = BGEFontService::fontAsKey(name, pixelSize);
     std::shared_ptr<BGEFont> font = fonts_[fontKey];

@@ -22,19 +22,47 @@ void BGEMaterialService::pause() {}
 void BGEMaterialService::resume() {}
 void BGEMaterialService::destroy() {}
 
-void BGEMaterialService::addMaterial(std::string name, BGEVector4& color) {
+std::shared_ptr<BGEMaterial> BGEMaterialService::createMaterial(std::string name, BGEVector4& color) {
+    uint64_t objId = getIdAndIncrement();
+    std::shared_ptr<BGEMaterial> material(new BGEMaterial(objId, name, color));
+    
+    addMaterial(material);
+    
+    return material;
 }
 
-void BGEMaterialService::addMaterial(std::string name, std::shared_ptr<BGETexture> texture) {
+std::shared_ptr<BGEMaterial> BGEMaterialService::createMaterial(std::string name, std::shared_ptr<BGETextureBase> texture) {
+    uint64_t objId = getIdAndIncrement();
+    std::shared_ptr<BGEMaterial> material(new BGEMaterial(objId, name, texture));
     
+    addMaterial(material);
+    
+    return material;
 }
 
-void BGEMaterialService::addMaterial(std::string name, BGEVector4& color, std::shared_ptr<BGETexture> texture) {
+std::shared_ptr<BGEMaterial> BGEMaterialService::createMaterial(std::string name, BGEVector4& color, std::shared_ptr<BGETextureBase> texture) {
+    uint64_t objId = getIdAndIncrement();
+    std::shared_ptr<BGEMaterial> material(new BGEMaterial(objId, name, color));
     
+    addMaterial(material);
+    
+    return material;
+}
+
+void BGEMaterialService::addMaterial(std::shared_ptr<BGEMaterial> material) {
+    MaterialMapIterator it = materials_.find(material->getName());
+    
+    if (it != materials_.end()) {
+        // We already have the material
+        // TODO: Error, warning, override?
+    } else {
+        materials_[material->getName()] = material;
+    }
+
 }
 
 void BGEMaterialService::removeMaterial(std::string name) {
-    
+    materials_.erase(name);
 }
 
 std::shared_ptr<BGEMaterial> BGEMaterialService::materialWithName(std::string name) {

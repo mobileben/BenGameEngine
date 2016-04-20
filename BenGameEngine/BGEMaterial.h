@@ -14,28 +14,33 @@
 #include <string>
 #include "BGEObject.h"
 #include "BGEMathTypes.h"
-#include "BGETexture.h"
+#include "BGETextureBase.h"
+
+class BGEMaterialService;
 
 class BGEMaterial : public BGEObject {
 public:
-    BGEMaterial(uint64_t obj);
-    BGEMaterial(uint64_t obj, std::string name);
-    BGEMaterial(uint64_t obj, std::string name, BGEVector4& color);
-    BGEMaterial(uint64_t obj, std::string name, std::shared_ptr<BGETexture> texture);
-    BGEMaterial(uint64_t obj, std::string name, BGEVector4& color, std::shared_ptr<BGETexture> texture);
+    void getColor(BGEColor& color) const { color = color_; }
+    void setColor(BGEColor& color);
+    void getColorMatrix(BGEColor& colorMatrix) const;
+    std::weak_ptr<BGETextureBase> getTexture() const { return texture_; }
+    void setTexture(std::shared_ptr<BGETextureBase> texture) { texture_ = texture; }
     
-    void getColor(BGEVector4& color) const;
-    void setColor(BGEVector4& color);
-    void getColorMatrix(BGEMatrix4& colorMatrix) const;
-    std::weak_ptr<BGETexture> getTexture() const { return texture_; }
-    void setTexture(std::shared_ptr<BGETexture> texture) { texture_ = texture; }
+protected:
+    friend BGEMaterialService;
     
+    BGEMaterial(uint64_t matId);
+    BGEMaterial(uint64_t matId, std::string name);
+    BGEMaterial(uint64_t matId, std::string name, BGEColor& color);
+    BGEMaterial(uint64_t matId, std::string name, std::shared_ptr<BGETextureBase> texture);
+    BGEMaterial(uint64_t matId, std::string name, BGEColor& color, std::shared_ptr<BGETextureBase> texture);
+        
 private:
     bool                        colorDirty_;
     BGEVector4                  color_;
     BGEMatrix4                  colorMatrix_;
     
-    std::weak_ptr<BGETexture>   texture_;
+    std::weak_ptr<BGETextureBase>   texture_;
 };
 
 #endif /* BGEMaterial_h */

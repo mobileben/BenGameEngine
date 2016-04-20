@@ -7,8 +7,10 @@
 //
 
 #import <XCTest/XCTest.h>
+#include "BGEComponentService.h"
 #include "BGETransformComponent.h"
 
+static BGEComponentService componentService;
 
 @interface BGETransformComponentTests : XCTestCase
 
@@ -27,7 +29,7 @@
 }
 
 - (void)testConstructor {
-    auto transform = std::make_shared<BGETransformComponent>("test");
+    auto transform = componentService.createComponent<BGETransformComponent>("test");
     
     XCTAssertEqual(transform!=nullptr, true, @"transform not created");
     XCTAssertEqual(transform->getName(), "test", @"getName is incorrect");
@@ -68,8 +70,8 @@
     auto name2 = "test2";
     auto newname1 = "newtest1";
     auto newname2 = "newtest2";
-    auto transform1 = std::make_shared<BGETransformComponent>(name1);
-    auto transform2 = std::make_shared<BGETransformComponent>(name2);
+    auto transform1 = componentService.createComponent<BGETransformComponent>(name1);
+    auto transform2 = componentService.createComponent<BGETransformComponent>(name2);
     XCTAssertEqual(transform1!=nullptr, true, @"transform not created");
     XCTAssertEqual(transform1->getName(), name1, @"getName is incorrect");
     XCTAssertEqual(transform2!=nullptr, true, @"transform not created");
@@ -86,7 +88,7 @@
 
 - (void)testVisibilityAndInteractability {
     auto name = "test";
-    auto transform = std::make_shared<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGETransformComponent>(name);
 
     XCTAssertEqual(transform->isVisible(), true, @"isVisible is incorrect");
     XCTAssertEqual(transform->isInteractable(), true, @"isInteractable is incorrect");
@@ -110,7 +112,7 @@
 
 - (void)testPosition {
     auto name = "test";
-    auto transform = std::make_shared<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGETransformComponent>(name);
     
     BGERect rect;
     
@@ -158,7 +160,7 @@
 
 - (void)testScale {
     auto name = "test";
-    auto transform = std::make_shared<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGETransformComponent>(name);
     
     BGERect rect;
     
@@ -202,7 +204,7 @@
 
 - (void)testSkew {
     auto name = "test";
-    auto transform = std::make_shared<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGETransformComponent>(name);
     
     BGERect rect;
     
@@ -246,7 +248,7 @@
 
 - (void)testRotate {
     auto name = "test";
-    auto transform = std::make_shared<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGETransformComponent>(name);
     
     BGERect rect;
     
@@ -291,22 +293,22 @@
     std::string name020 = "name020";
     std::string name021 = "name021";
     
-    auto transform0 = std::make_shared<BGETransformComponent>(name0);
-    auto transform00 = std::make_shared<BGETransformComponent>(name00);
-    auto transform01 = std::make_shared<BGETransformComponent>(name01);
-    auto transform02 = std::make_shared<BGETransformComponent>(name02);
-    auto transform000 = std::make_shared<BGETransformComponent>(name000);
-    auto transform001 = std::make_shared<BGETransformComponent>(name001);
-    auto transform0000 = std::make_shared<BGETransformComponent>(name0000);
-    auto transform0001 = std::make_shared<BGETransformComponent>(name0001);
-    auto transform0010 = std::make_shared<BGETransformComponent>(name0010);
-    auto transform0011 = std::make_shared<BGETransformComponent>(name0011);
-    auto transform010 = std::make_shared<BGETransformComponent>(name010);
-    auto transform011 = std::make_shared<BGETransformComponent>(name011);
-    auto transform0100 = std::make_shared<BGETransformComponent>(name0100);
-    auto transform0110 = std::make_shared<BGETransformComponent>(name0110);
-    auto transform020 = std::make_shared<BGETransformComponent>(name020);
-    auto transform021 = std::make_shared<BGETransformComponent>(name021);
+    auto transform0 = componentService.createComponent<BGETransformComponent>(name0);
+    auto transform00 = componentService.createComponent<BGETransformComponent>(name00);
+    auto transform01 = componentService.createComponent<BGETransformComponent>(name01);
+    auto transform02 = componentService.createComponent<BGETransformComponent>(name02);
+    auto transform000 = componentService.createComponent<BGETransformComponent>(name000);
+    auto transform001 = componentService.createComponent<BGETransformComponent>(name001);
+    auto transform0000 = componentService.createComponent<BGETransformComponent>(name0000);
+    auto transform0001 = componentService.createComponent<BGETransformComponent>(name0001);
+    auto transform0010 = componentService.createComponent<BGETransformComponent>(name0010);
+    auto transform0011 = componentService.createComponent<BGETransformComponent>(name0011);
+    auto transform010 = componentService.createComponent<BGETransformComponent>(name010);
+    auto transform011 = componentService.createComponent<BGETransformComponent>(name011);
+    auto transform0100 = componentService.createComponent<BGETransformComponent>(name0100);
+    auto transform0110 = componentService.createComponent<BGETransformComponent>(name0110);
+    auto transform020 = componentService.createComponent<BGETransformComponent>(name020);
+    auto transform021 = componentService.createComponent<BGETransformComponent>(name021);
     
     std::shared_ptr<BGETransformComponent> parent;
     

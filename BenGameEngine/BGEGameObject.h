@@ -24,8 +24,22 @@ public:
     BGEGameObject(BGEGameObject const&) = delete;
     virtual ~BGEGameObject() {}
     
-    template <typename T> std::shared_ptr<T> getComponent();
-    template <typename T> void addComponent(std::shared_ptr<T> component);
+    template <typename T> std::shared_ptr<T> getComponent() {
+        std::type_index index(typeid(T));
+        
+        if(components_.count(index) != 0) {
+            return std::static_pointer_cast<T>(components_[index]);
+        } else {
+            return nullptr;
+        }
+    }
+    
+    template <typename T> void addComponent(std::shared_ptr<T> component) {
+        assert(!component->hasGameComponent());
+        components_[typeid(T)] = component;
+        component->setGameObject(derived_shared_from_this<BGEGameObject>());
+    }
+
     template <typename T> void removeComponent();
     void removeAllComponents();
     

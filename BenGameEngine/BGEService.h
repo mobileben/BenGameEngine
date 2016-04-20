@@ -15,7 +15,7 @@
 class BGEService
 {
 public:
-    BGEService() {}
+    BGEService() : identifier_(1) {}
     virtual ~BGEService() {}
     
     virtual void initialize() =0;

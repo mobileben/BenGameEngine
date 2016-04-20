@@ -190,7 +190,7 @@ BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::st
                     }
                 }
                 
-                BGEGame::getInstance()->getTextureService()->namedTextureAtlasFromBuffer("font", atlasBuffer, BGETextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGETextureAtlas> atlas, std::shared_ptr<BGEError> error) -> void {
+                BGEGame::getInstance()->getTextureService()->namedTextureAtlasFromBuffer("font", atlasBuffer, BGETextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGETextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
                     if (atlas) {
                         textureAtlas_ = atlas;
                         glyphs_.clear();

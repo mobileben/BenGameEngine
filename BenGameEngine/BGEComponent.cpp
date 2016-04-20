@@ -8,5 +8,11 @@
 
 #include "BGEComponent.h"
 
+BGEComponent::BGEComponent(uint64_t componentId) : BGEObject(componentId) {
+}
+
+BGEComponent::BGEComponent(uint64_t componentId, std::string name) : BGEObject(componentId, name) {
+}
+
 BGEComponent::BGEComponent(uint64_t componentId, std::string name, std::shared_ptr<BGEGameObject> gameObject) : BGEObject(componentId, name), gameObject_(gameObject) {
 }

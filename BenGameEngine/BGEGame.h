@@ -18,6 +18,7 @@
 #include "BGETextureService.h"
 #include "BGEFontService.h"
 #include "BGEHeartbeatService.h"
+#include "BGEComponentService.h"
 
 class BGEGame : public BGEService
 {
@@ -37,6 +38,7 @@ public:
     
     // Services which are implicitly built
     std::shared_ptr<BGEGameObjectService> getGameObjectService() { return gameObjectService_; }
+    std::shared_ptr<BGEComponentService> getComponentService() { return componentService_; }
     std::shared_ptr<BGEMaterialService> getMaterialService() { return materialService_; }
     std::shared_ptr<BGEHeartbeatService> getHeartbeatService() { return heartbeatService_; }
     
@@ -56,6 +58,7 @@ protected:
     std::shared_ptr<BGEHeartbeatService> heartbeatService_;
     std::shared_ptr<BGEMaterialService> materialService_;
     std::shared_ptr<BGEGameObjectService> gameObjectService_;
+    std::shared_ptr<BGEComponentService> componentService_;
 };
 
 #endif /* BGEGame_h */

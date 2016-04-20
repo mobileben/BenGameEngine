@@ -14,6 +14,9 @@
 #include "BGETextureOpenGLES2.h"
 #include "BGEMathTypes.h"
 #include "BGEGame.h"
+#include "BGELineRenderComponent.h"
+#include "BGEFlatRectRenderComponent.h"
+#include "BGESpriteRenderComponent.h"
 
 #if 0
 const BGEVertexColor Vertices[] = {
@@ -130,6 +133,10 @@ void BGERenderServiceOpenGLES2::createShaders()
     std::shared_ptr<BGEShader> vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "SimpleVertex");
     std::shared_ptr<BGEShader> fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "SimpleFragment");
     std::shared_ptr<BGEShaderProgram> program = this->getShaderService()->createShaderProgram("Default", {vShader,  fShader}, { "Position", "SourceColor" }, { "ModelView", "Projection" });
+
+    vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "LineVertex");
+    fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "LineFragment");
+    program = this->getShaderService()->createShaderProgram("Line", {vShader,  fShader}, { "Position" }, { "ModelView", "Projection", "Color" });
     
     vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "TextureVertex");
     fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "TextureFragment");
@@ -623,6 +630,126 @@ void BGERenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_pt
     }
 }
 
+void BGERenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGEGameObject> gameObject) {
+    if (gameObject) {
+        std::shared_ptr<BGEFlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<BGEFlatRectRenderComponent>(gameObject->getComponent<BGEFlatRectRenderComponent>());
+        
+        if (flatRect) {
+            BGEVertex *const vertices = flatRect->getVertices();
+            std::shared_ptr<BGEMaterial> material = flatRect->getMaterial().lock();
+            
+            if (material) {
+                std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+
+                GLint positionLocation = glShader->locationForAttribute("Position");
+                GLint projectionLocation = glShader->locationForUniform("Projection");
+                GLint modelLocation = glShader->locationForUniform("ModelView");
+                GLint colorLocation = glShader->locationForUniform("Color");
+                
+                glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                      sizeof(BGEVertex), &vertices[0]);
+                
+                BGEColor color;
+                
+                material->getColor(color);
+                glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+                glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
+                glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
+                               GL_UNSIGNED_BYTE, &Indices[0]);
+
+            }
+        }
+    }
+}
+
+void BGERenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& points, float thickness, bool loop, std::shared_ptr<BGEMaterial> material) {
+    BGEVector3 vertices[points.size()];
+    GLubyte indices[points.size()];
+    
+    uint32_t index = 0;
+    
+    for (auto pt : points) {
+        vertices[index].x = pt.x;
+        vertices[index].y = pt.y;
+        vertices[index].z = 0;
+        
+        indices[index] = index;
+        
+        index++;
+    }
+    std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+    
+    GLint positionLocation = glShader->locationForAttribute("Position");
+    GLint projectionLocation = glShader->locationForUniform("Projection");
+    GLint modelLocation = glShader->locationForUniform("ModelView");
+    GLint colorLocation = glShader->locationForUniform("Color");
+    
+    glEnableVertexAttribArray(positionLocation);
+    
+    BGEColor color;
+    
+    material->getColor(color);
+    glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+    glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
+    // 2
+    glVertexAttribPointer(positionLocation, points.size(), GL_FLOAT, GL_FALSE,
+                          sizeof(BGEVertex), &vertices[0]);
+    glLineWidth(12);
+    // 3
+    glDrawArrays(GL_LINE_LOOP, 0, points.size());
+}
+
+
+void BGERenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGEGameObject> gameObject) {
+    if (gameObject) {
+        std::shared_ptr<BGESpriteRenderComponent> sprite = std::dynamic_pointer_cast<BGESpriteRenderComponent>(gameObject->getComponent<BGESpriteRenderComponent>());
+        
+        if (sprite) {
+            BGEVertexTex *const vertices = sprite->getVertices();
+            std::shared_ptr<BGEMaterial> material = sprite->getMaterial().lock();
+            if (material) {
+                std::shared_ptr<BGETextureBase> texture = material->getTexture().lock();
+                
+                if (texture) {
+                    std::shared_ptr<BGETextureOpenGLES2> oglTex = std::dynamic_pointer_cast<BGETextureOpenGLES2>(texture);
+                    if (oglTex && oglTex->isValid()) {
+                        std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
+                        
+                        GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
+                        
+                        GLint positionLocation = glShader->locationForAttribute("Position");
+                        //            texCoordLocation = glShader->locationForAttribute("TexCoordIn");
+                        
+                        glEnableVertexAttribArray(positionLocation);
+                        glEnableVertexAttribArray(texCoordLocation);
+                        
+                        GLint textureUniform = glShader->locationForUniform("Texture");
+                        GLint projectionLocation = glShader->locationForUniform("Projection");
+                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+                        
+                        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                        glEnable(GL_BLEND);
+                        
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                        
+                        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                              sizeof(BGEVertexTex), &vertices[0]);
+                        glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                                              sizeof(BGEVertexTex), (GLvoid*) (&vertices[0].tex));
+                        
+                        glUniform1i(textureUniform, 0);
+                        
+                        glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
+                                       GL_UNSIGNED_BYTE, &Indices[0]);
+                    }
+                }
+            }
+        }
+    }
+}
+
 int8_t BGERenderServiceOpenGLES2::createMask(BGEVector2 &position, std::shared_ptr<BGETextureBase> mask)
 {
     if (this->masksInUse_ < (BGERenderServiceOpenGLES2::MaxActiveMasks - 1)) {
@@ -738,6 +865,19 @@ void BGERenderServiceOpenGLES2::render()
             
             position = { 200, 1200 };
             f->drawString("HELLO YOU SACK OF DIRT AV abcDefg1210312084pdsoinjm_-'\"#*$&%", position, colors[1]);
+        }
+        
+        
+        for (auto obj : BGEGame::getInstance()->getGameObjectService()->getGameObjects()) {
+            if (obj.second->getComponent<BGELineRenderComponent>()) {
+                std::shared_ptr<BGELineRenderComponent> line = obj.second->getComponent<BGELineRenderComponent>();
+                
+                drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial().lock());
+            } else if (obj.second->getComponent<BGEFlatRectRenderComponent>()) {
+                drawFlatRect(obj.second);
+            } else if (obj.second->getComponent<BGESpriteRenderComponent>()) {
+                drawSprite(obj.second);
+            }
         }
         
         [glContext->getContext() presentRenderbuffer:GL_RENDERBUFFER];

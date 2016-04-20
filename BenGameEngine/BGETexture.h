@@ -15,7 +15,7 @@
 #include <string>
 
 #include "BGETextureBase.h"
-#include "BGEError.h"
+#include "Error.h"
 
 class BGETextureAtlas;
 
@@ -30,8 +30,8 @@ public:
     virtual uint32_t getY() const { return y_; }
     virtual bool isSubTexture() const { return isSubTexture_; }
 
-    virtual void createFromBuffer(void *buffer, BGETextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<BGETexture>, std::shared_ptr<BGEError>)> callback) =0;
-    virtual std::shared_ptr<BGEError> createSubTexture(std::shared_ptr<BGETextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height) =0;
+    virtual void createFromBuffer(void *buffer, BGETextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<BGETexture>, std::shared_ptr<BGE::Error>)> callback) =0;
+    virtual std::shared_ptr<BGE::Error> createSubTexture(std::shared_ptr<BGETextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height) =0;
     
     std::weak_ptr<BGETextureAtlas> getTextureAtlas() { return atlas_; }
     

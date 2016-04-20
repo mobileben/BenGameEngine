@@ -32,16 +32,21 @@ public:
     void resume();
     void destroy();
 
-    void addMaterial(std::string name, BGEVector4& color);
-    void addMaterial(std::string name, std::shared_ptr<BGETexture> texture);
-    void addMaterial(std::string name, BGEVector4& color, std::shared_ptr<BGETexture> texture);
+    std::shared_ptr<BGEMaterial> createMaterial(std::string name, BGEVector4& color);
+    std::shared_ptr<BGEMaterial> createMaterial(std::string name, std::shared_ptr<BGETextureBase> texture);
+    std::shared_ptr<BGEMaterial> createMaterial(std::string name, BGEVector4& color, std::shared_ptr<BGETextureBase> texture);
     
     void removeMaterial(std::string name);
     
     std::shared_ptr<BGEMaterial> materialWithName(std::string name);
     
 private:
-    std::unordered_map<std::string, std::shared_ptr<BGEMaterial>> materials_;
+    typedef std::unordered_map<std::string, std::shared_ptr<BGEMaterial>> MaterialMap;
+    typedef std::unordered_map<std::string, std::shared_ptr<BGEMaterial>>::iterator MaterialMapIterator;
+
+    MaterialMap materials_;
+    
+    void addMaterial(std::shared_ptr<BGEMaterial> material);
 };
 
 #endif /* BGEMaterialService_h */

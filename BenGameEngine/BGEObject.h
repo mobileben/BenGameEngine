@@ -34,6 +34,13 @@ public:
     void setDomain(std::string domain) { domain_ = domain; }
     
     BGEObject& operator=(BGEObject const&) = delete;
+    
+public:
+    template <typename T>
+    std::shared_ptr<T> derived_shared_from_this()
+    {
+        return std::static_pointer_cast<T>(shared_from_this());
+    }
 
 private:
     friend BGEGameObjectService;

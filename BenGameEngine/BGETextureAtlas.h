@@ -37,7 +37,7 @@ public:
     std::shared_ptr<BGETexture> getTexture() const { return texture_; };
     std::shared_ptr<BGETexture> getSubTexture(std::string name);
     
-    virtual void createFromBuffer(void *buffer, BGETextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<BGETextureAtlas>, std::shared_ptr<BGEError>)> callback) =0;
+    virtual void createFromBuffer(void *buffer, BGETextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<BGETextureAtlas>, std::shared_ptr<BGE::Error>)> callback) =0;
 
     void releaseCurrentTexture();
 

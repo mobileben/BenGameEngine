@@ -30,7 +30,7 @@ public:
 
     std::shared_ptr<BGEFont> getFont(std::string name, uint32_t pixelSize);
     
-    void loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<BGEFont>, std::shared_ptr<BGEError> error)> callback);
+    void loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<BGEFont>, std::shared_ptr<BGE::Error> error)> callback);
     void unloadFont(std::string name, uint32_t pixelSize);
     
 private:

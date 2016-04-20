@@ -24,7 +24,7 @@
 		B525E37A1C8957A700C691C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B525E3791C8957A700C691C0 /* Assets.xcassets */; };
 		B525E37D1C8957A700C691C0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B525E37B1C8957A700C691C0 /* LaunchScreen.storyboard */; };
 		B525E3841C8957BD00C691C0 /* libBenGameEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */; };
-		B525E3B51C89587000C691C0 /* BGEError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3851C89587000C691C0 /* BGEError.cpp */; };
+		B525E3B51C89587000C691C0 /* Error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3851C89587000C691C0 /* Error.cpp */; };
 		B525E3B61C89587000C691C0 /* BGEGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3871C89587000C691C0 /* BGEGame.cpp */; };
 		B525E3B71C89587000C691C0 /* BGEGLKView.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E38A1C89587000C691C0 /* BGEGLKView.m */; };
 		B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */; };
@@ -76,6 +76,11 @@
 		B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */; };
 		B5ACE88F1CBB08D5004B6871 /* BGETransformComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE88D1CBB08D2004B6871 /* BGETransformComponentTests.m */; };
 		B5ACE8921CBB56CE004B6871 /* BGEComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* BGEComponentService.cpp */; };
+		B5ACE8951CBF7B00004B6871 /* BGELineRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8931CBF7AFF004B6871 /* BGELineRenderComponent.cpp */; };
+		B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5E7B9B51CC35B5000978F1A /* LineVertex.glsl */; };
+		B5E7B9B71CC35B5D00978F1A /* LineFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5E7B9B41CC35B5000978F1A /* LineFragment.glsl */; };
+		B5E7B9BA1CC46A7500978F1A /* BGEFlatRectRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5E7B9B81CC46A7500978F1A /* BGEFlatRectRenderComponent.cpp */; };
+		B5EE9D6C1CC4A4C8005D99CC /* BGESpriteRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5EE9D6A1CC4A4C8005D99CC /* BGESpriteRenderComponent.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,8 +148,8 @@
 		B525E3791C8957A700C691C0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B525E37C1C8957A700C691C0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B525E37E1C8957A700C691C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B525E3851C89587000C691C0 /* BGEError.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEError.cpp; sourceTree = "<group>"; };
-		B525E3861C89587000C691C0 /* BGEError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEError.h; sourceTree = "<group>"; };
+		B525E3851C89587000C691C0 /* Error.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Error.cpp; sourceTree = "<group>"; };
+		B525E3861C89587000C691C0 /* Error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Error.h; sourceTree = "<group>"; };
 		B525E3871C89587000C691C0 /* BGEGame.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEGame.cpp; sourceTree = "<group>"; };
 		B525E3881C89587000C691C0 /* BGEGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEGame.h; sourceTree = "<group>"; };
 		B525E3891C89587000C691C0 /* BGEGLKView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEGLKView.h; sourceTree = "<group>"; };
@@ -232,6 +237,14 @@
 		B5ACE88D1CBB08D2004B6871 /* BGETransformComponentTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGETransformComponentTests.m; path = BGEGameObjectAndComponentTests/BGETransformComponentTests.m; sourceTree = SOURCE_ROOT; };
 		B5ACE8901CBB56CE004B6871 /* BGEComponentService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BGEComponentService.cpp; sourceTree = "<group>"; };
 		B5ACE8911CBB56CE004B6871 /* BGEComponentService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEComponentService.h; sourceTree = "<group>"; };
+		B5ACE8931CBF7AFF004B6871 /* BGELineRenderComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BGELineRenderComponent.cpp; path = components/BGELineRenderComponent.cpp; sourceTree = "<group>"; };
+		B5ACE8941CBF7AFF004B6871 /* BGELineRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGELineRenderComponent.h; path = components/BGELineRenderComponent.h; sourceTree = "<group>"; };
+		B5E7B9B41CC35B5000978F1A /* LineFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LineFragment.glsl; path = shaders/LineFragment.glsl; sourceTree = "<group>"; };
+		B5E7B9B51CC35B5000978F1A /* LineVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LineVertex.glsl; path = shaders/LineVertex.glsl; sourceTree = "<group>"; };
+		B5E7B9B81CC46A7500978F1A /* BGEFlatRectRenderComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEFlatRectRenderComponent.cpp; path = components/BGEFlatRectRenderComponent.cpp; sourceTree = "<group>"; };
+		B5E7B9B91CC46A7500978F1A /* BGEFlatRectRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEFlatRectRenderComponent.h; path = components/BGEFlatRectRenderComponent.h; sourceTree = "<group>"; };
+		B5EE9D6A1CC4A4C8005D99CC /* BGESpriteRenderComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGESpriteRenderComponent.cpp; path = components/BGESpriteRenderComponent.cpp; sourceTree = "<group>"; };
+		B5EE9D6B1CC4A4C8005D99CC /* BGESpriteRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGESpriteRenderComponent.h; path = components/BGESpriteRenderComponent.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -283,8 +296,14 @@
 		B508CDAF1CB8B2EA00127B97 /* components */ = {
 			isa = PBXGroup;
 			children = (
+				B5E7B9B81CC46A7500978F1A /* BGEFlatRectRenderComponent.cpp */,
+				B5E7B9B91CC46A7500978F1A /* BGEFlatRectRenderComponent.h */,
+				B5ACE8931CBF7AFF004B6871 /* BGELineRenderComponent.cpp */,
+				B5ACE8941CBF7AFF004B6871 /* BGELineRenderComponent.h */,
 				B52B760F1CBA2C7F00758249 /* BGERenderComponent.cpp */,
 				B52B76101CBA2C7F00758249 /* BGERenderComponent.h */,
+				B5EE9D6A1CC4A4C8005D99CC /* BGESpriteRenderComponent.cpp */,
+				B5EE9D6B1CC4A4C8005D99CC /* BGESpriteRenderComponent.h */,
 				B508CD911CAE285000127B97 /* BGETransformComponent.cpp */,
 				B508CD921CAE285000127B97 /* BGETransformComponent.h */,
 			);
@@ -321,8 +340,8 @@
 				B508CDA41CB4DD5B00127B97 /* BGEComponent.h */,
 				B5ACE8901CBB56CE004B6871 /* BGEComponentService.cpp */,
 				B5ACE8911CBB56CE004B6871 /* BGEComponentService.h */,
-				B525E3851C89587000C691C0 /* BGEError.cpp */,
-				B525E3861C89587000C691C0 /* BGEError.h */,
+				B525E3851C89587000C691C0 /* Error.cpp */,
+				B525E3861C89587000C691C0 /* Error.h */,
 				B571F1811C97D92E007F5A90 /* BGEFont.cpp */,
 				B571F1821C97D92E007F5A90 /* BGEFont.h */,
 				B571F18E1C9D0A34007F5A90 /* BGEFontGlyph.cpp */,
@@ -417,6 +436,8 @@
 				B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */,
 				B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */,
 				B571F1941C9E1B94007F5A90 /* FontVertex.glsl */,
+				B5E7B9B41CC35B5000978F1A /* LineFragment.glsl */,
+				B5E7B9B51CC35B5000978F1A /* LineVertex.glsl */,
 				B571F17A1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl */,
 				B571F1781C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl */,
 				B525E3CE1C89588700C691C0 /* SimpleFragment.glsl */,
@@ -651,9 +672,11 @@
 				B525E3DE1C895A1900C691C0 /* TextureFragment.glsl in Resources */,
 				B525E3DF1C895A1900C691C0 /* TextureVertex.glsl in Resources */,
 				B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */,
+				B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */,
 				B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */,
 				B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */,
 				B571F1791C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl in Resources */,
+				B5E7B9B71CC35B5D00978F1A /* LineFragment.glsl in Resources */,
 				B508CD901CA901B700127B97 /* Avenir.ttc in Resources */,
 				B571F18B1C992B3D007F5A90 /* lazy.ttf in Resources */,
 			);
@@ -687,6 +710,7 @@
 				B525E3CC1C89587000C691C0 /* BGETextureServiceOpenGLES2.cpp in Sources */,
 				B508CDAB1CB4DE8E00127B97 /* BGEObject.cpp in Sources */,
 				B525E3BA1C89587000C691C0 /* BGEMathTypes.cpp in Sources */,
+				B5ACE8951CBF7B00004B6871 /* BGELineRenderComponent.cpp in Sources */,
 				B571F1901C9D0A34007F5A90 /* BGEFontGlyph.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* BGETextureAtlas.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* BGEHeartbeatService.cpp in Sources */,
@@ -698,12 +722,14 @@
 				B52B76111CBA2C7F00758249 /* BGERenderComponent.cpp in Sources */,
 				B525E3C81C89587000C691C0 /* BGETexture.cpp in Sources */,
 				B571F1831C97D92E007F5A90 /* BGEFont.cpp in Sources */,
+				B5EE9D6C1CC4A4C8005D99CC /* BGESpriteRenderComponent.cpp in Sources */,
 				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
 				B525E3BB1C89587000C691C0 /* BGERenderContext.cpp in Sources */,
 				B508CD931CAE285000127B97 /* BGETransformComponent.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* BGEGame.cpp in Sources */,
+				B5E7B9BA1CC46A7500978F1A /* BGEFlatRectRenderComponent.cpp in Sources */,
 				B508CDA51CB4DD5B00127B97 /* BGEComponent.cpp in Sources */,
-				B525E3B51C89587000C691C0 /* BGEError.cpp in Sources */,
+				B525E3B51C89587000C691C0 /* Error.cpp in Sources */,
 				B508CDAE1CB78DA100127B97 /* BGEGameObjectService.cpp in Sources */,
 				B508CD891CA0ABA200127B97 /* BGETextureBase.cpp in Sources */,
 				B508CDA81CB4DE6D00127B97 /* BGEGameObject.cpp in Sources */,

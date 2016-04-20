@@ -47,19 +47,6 @@ std::shared_ptr<T> BGEComponentService::getComponent(std::string name) {
 }
 
 template <typename T>
-void BGEComponentService::addComponent(std::shared_ptr<T> component) {
-    std::type_index index(typeid(T));
-    ComponentMapIterator it = components_.find(index);
-    
-    if (it != components_.end()) {
-        // We already have a vector of type T
-    } else {
-        ComponentVector components(component);
-        components_[index] = components;
-    }
-}
-
-template <typename T>
 void BGEComponentService::removeComponent(uint64_t componentId) {
     std::type_index index(typeid(T));
     ComponentMapIterator it = components_.find(index);

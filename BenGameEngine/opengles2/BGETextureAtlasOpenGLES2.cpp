@@ -34,14 +34,14 @@ GLenum BGETextureAtlasOpenGLES2::getTarget() const {
     }
 }
 
-void BGETextureAtlasOpenGLES2::createFromBuffer(void *buffer, BGETextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<BGETextureAtlas>, std::shared_ptr<BGEError>)> callback) {
+void BGETextureAtlasOpenGLES2::createFromBuffer(void *buffer, BGETextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<BGETextureAtlas>, std::shared_ptr<BGE::Error>)> callback) {
     releaseCurrentTexture();
 
-    BGEGame::getInstance()->getTextureService()->namedTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<BGETextureBase> atlas, std::shared_ptr<BGEError> error) {
+    BGEGame::getInstance()->getTextureService()->namedTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<BGETextureBase> atlas, std::shared_ptr<BGE::Error> error) {
         if (!error) {
             std::shared_ptr<BGETextureAtlas> a = std::dynamic_pointer_cast<BGETextureAtlas>(shared_from_this());
             std::shared_ptr<BGETexture> subTex;
-            std::shared_ptr<BGEError> bgeError;
+            std::shared_ptr<BGE::Error> bgeError;
             std::shared_ptr<BGETexture> texture;
             
             texture = std::dynamic_pointer_cast<BGETexture>(atlas);
@@ -69,11 +69,11 @@ void BGETextureAtlasOpenGLES2::createFromBuffer(void *buffer, BGETextureFormat f
                     this->height_ = texture->getHeight();
                 } else {
                     a.reset();
-                    bgeError = std::make_shared<BGEError>(BGETextureBase::ErrorDomain, BGETextureErrorInvalidSubTexture);
+                    bgeError = std::make_shared<BGE::Error>(BGETextureBase::ErrorDomain, BGETextureErrorInvalidSubTexture);
                 }
             } else {
                 a.reset();
-                bgeError = std::make_shared<BGEError>(BGETextureBase::ErrorDomain, BGETextureErrorExistingTextureWrongType);
+                bgeError = std::make_shared<BGE::Error>(BGETextureBase::ErrorDomain, BGETextureErrorExistingTextureWrongType);
             }
             
             

@@ -63,6 +63,8 @@ extern "C" {
         float v[4];
     } BGEVector4;
     
+    typedef BGEVector4 BGEColor;
+    
     typedef union  {
         struct {
             float x, y, z;
@@ -94,6 +96,11 @@ extern "C" {
         struct { float x, y, z, w; };
         float q[4];
     } BGEQuaternion;
+    
+    typedef struct {
+        BGEMatrix4 matrix;
+        BGEColor offset;
+    } BGEColorMatrix;
     
     extern float BGEMathDegreesToRadians(float degrees);
     extern float BGEMathRadiansToDegrees(float radians);

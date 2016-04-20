@@ -9,10 +9,17 @@
 #include "BGETransformComponent.h"
 #include <cassert>
 
-BGETransformComponent::BGETransformComponent(std::string name) :    name_(name), visible_(true), interactable_(true), interactableWhenHidden_(false),
+BGETransformComponent::BGETransformComponent(uint64_t componentId) :  BGEComponent(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
                                                     bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
                                                     z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
                                                     transformDirty_(false), speed_(1), paused_(false) {
+    BGEMatrix4MakeIdentify(matrix_);
+}
+
+BGETransformComponent::BGETransformComponent(uint64_t componentId, std::string name) :  BGEComponent(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
+bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
+z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
+transformDirty_(false), speed_(1), paused_(false) {
     BGEMatrix4MakeIdentify(matrix_);
 }
 
@@ -30,7 +37,7 @@ void BGETransformComponent::addChild(std::shared_ptr<BGETransformComponent> chil
     
     if (child) {
         children_.push_back(child);
-        child->parent_ = shared_from_this();
+        child->parent_ = derived_shared_from_this<BGETransformComponent>();
         
         // TODO: Update hierarchy
     }
@@ -50,7 +57,7 @@ void BGETransformComponent::removeFromParent() {
         std::shared_ptr<BGETransformComponent> parent = parent_.lock();
         std::vector<std::shared_ptr<BGETransformComponent>>::iterator it;
         
-        it = std::find(parent->children_.begin(), parent->children_.end(), shared_from_this());
+        it = std::find(parent->children_.begin(), parent->children_.end(), derived_shared_from_this<BGETransformComponent>());
         
         if (it != parent->children_.end()) {
             parent->children_.erase(it);
@@ -73,7 +80,7 @@ void BGETransformComponent::insertChild(std::shared_ptr<BGETransformComponent> c
             children_.push_back(child);
         }
         
-        child->parent_ = shared_from_this();
+        child->parent_ = derived_shared_from_this<BGETransformComponent>();
     }
 }
 
@@ -83,7 +90,7 @@ void BGETransformComponent::moveToParent(std::shared_ptr<BGETransformComponent> 
     if (parent) {
         removeFromParent();
         
-        parent->addChild(shared_from_this());
+        parent->addChild(derived_shared_from_this<BGETransformComponent>());
     }
 }
 
@@ -143,7 +150,7 @@ bool BGETransformComponent::inParentHierarchy(std::shared_ptr<BGETransformCompon
     assert(parent);
     
     if (parent) {
-        return parent->hasChild(shared_from_this(), true);
+        return parent->hasChild(derived_shared_from_this<BGETransformComponent>(), true);
     } else {
         return false;
     }

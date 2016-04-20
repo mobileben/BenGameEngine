@@ -16,7 +16,7 @@
 #include <functional>
 #include "BGEService.h"
 #include "BGEFont.h"
-#include "BGEError.h"
+#include "Error.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
 
@@ -31,7 +31,7 @@ public:
     FT_Library getFreetypeLibrary() const { return freetypeLibrary_; }
     virtual std::shared_ptr<BGEFont> getFont(std::string name, uint32_t pixelSize) =0;
 
-    virtual void loadFont(std::string name, uint32_t pxSize, std::function<void(std::shared_ptr<BGEFont>, std::shared_ptr<BGEError> error)> callback) =0;
+    virtual void loadFont(std::string name, uint32_t pxSize, std::function<void(std::shared_ptr<BGEFont>, std::shared_ptr<BGE::Error> error)> callback) =0;
     virtual void unloadFont(std::string name, uint32_t pixelSize) =0;
 
 protected:
