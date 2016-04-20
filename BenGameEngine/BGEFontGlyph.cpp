@@ -8,7 +8,7 @@
 
 #include "BGEFontGlyph.h"
 #include "BGEFont.h"
-#include "BGEGame.h"
+#include "Game.h"
 #include "BGETexture.h"
 
 BGEFontGlyph::BGEFontGlyph(BGEFont *font, std::shared_ptr<BGETexture> texture, int32_t offsetX, int32_t offsetY, int32_t advance) : texture_(texture), offsetX_(offsetX), offsetY_(0), offsetYInverted_(offsetY), advance_(advance) {
@@ -18,7 +18,7 @@ BGEFontGlyph::BGEFontGlyph(BGEFont *font, std::shared_ptr<BGETexture> texture, i
 }
 
 int32_t BGEFontGlyph::getOffsetY() const {
-    if (BGEGame::getInstance()->getRenderService()->hasInvertedYAxis()) {
+    if (BGE::Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
         return offsetY_;
     } else {
         return offsetYInverted_;

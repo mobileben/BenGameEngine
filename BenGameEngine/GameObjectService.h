@@ -6,8 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#ifndef BGEGameObjectService_h
-#define BGEGameObjectService_h
+#ifndef GameObjectService_h
+#define GameObjectService_h
 
 #include <stdio.h>
 #include <memory>
@@ -54,4 +54,4 @@ namespace BGE {
     };
 }
 
-#endif /* BGEGameObjectService_h */
+#endif /* GameObjectService_h */

@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <memory.h>
-#include "BGEGame.h"
+#include "Game.h"
 
 class BenGameEngineTestApp
 {

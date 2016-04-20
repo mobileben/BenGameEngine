@@ -6,8 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#ifndef BGEGameObject_hpp
-#define BGEGameObject_hpp
+#ifndef GameObject_hpp
+#define GameObject_hpp
 
 #include <stdio.h>
 #include "Object.h"
@@ -58,4 +58,4 @@ namespace BGE {
     };
 }
 
-#endif /* BGEGameObject_hpp */
+#endif /* GameObject_hpp */

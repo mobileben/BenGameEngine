@@ -8,7 +8,7 @@
 
 #include "BGETextureAtlasOpenGLES2.h"
 #include "BGETextureOpenGLES2.h"
-#include "BGEGame.h"
+#include "Game.h"
 
 BGETextureAtlasOpenGLES2::BGETextureAtlasOpenGLES2(uint64_t texId, std::string name) : BGETextureAtlas(texId ,name) {
 }
@@ -37,7 +37,7 @@ GLenum BGETextureAtlasOpenGLES2::getTarget() const {
 void BGETextureAtlasOpenGLES2::createFromBuffer(void *buffer, BGETextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<BGETextureAtlas>, std::shared_ptr<BGE::Error>)> callback) {
     releaseCurrentTexture();
 
-    BGEGame::getInstance()->getTextureService()->namedTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<BGETextureBase> atlas, std::shared_ptr<BGE::Error> error) {
+    BGE::Game::getInstance()->getTextureService()->namedTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<BGETextureBase> atlas, std::shared_ptr<BGE::Error> error) {
         if (!error) {
             std::shared_ptr<BGETextureAtlas> a = std::dynamic_pointer_cast<BGETextureAtlas>(shared_from_this());
             std::shared_ptr<BGETexture> subTex;
@@ -54,7 +54,7 @@ void BGETextureAtlasOpenGLES2::createFromBuffer(void *buffer, BGETextureFormat f
                 if (subTextures.size() > 0) {
                     for (auto& kv : subTextures) {
                         std::string key = kv.first;
-                        subTex = BGEGame::getInstance()->getTextureService()->namedSubTexture(kv.first, a, kv.second.x, kv.second.y, kv.second.width, kv.second.height);
+                        subTex = BGE::Game::getInstance()->getTextureService()->namedSubTexture(kv.first, a, kv.second.x, kv.second.y, kv.second.width, kv.second.height);
                         
                         if (subTex) {
                             subTextures_[key] = subTex;

@@ -7,7 +7,7 @@
 //
 
 #include "BGETextureAtlas.h"
-#include "BGEGame.h"
+#include "Game.h"
 
 BGETextureAtlas::BGETextureAtlas(uint64_t texId, std::string name) : BGETextureBase(texId, name){
 }
@@ -18,7 +18,7 @@ std::string BGETextureAtlas::atlasTextureKey() const {
 
 void BGETextureAtlas::releaseCurrentTexture() {
     if (texture_) {
-        BGEGame::getInstance()->getTextureService()->removeTexture(textureName_);
+        BGE::Game::getInstance()->getTextureService()->removeTexture(textureName_);
         texture_.reset();
     }
     
@@ -27,7 +27,7 @@ void BGETextureAtlas::releaseCurrentTexture() {
     BGETextureBase::releaseCurrentTexture();
     
     for (auto& kv : subTextures_) {
-        BGEGame::getInstance()->getTextureService()->removeTexture(kv.first);
+        BGE::Game::getInstance()->getTextureService()->removeTexture(kv.first);
     }
     
     subTextures_.clear();

@@ -6,7 +6,7 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGEGame.h"
+#include "Game.h"
 #include "BGEFontOpenGLES2.h"
 #include "BGETextureOpenGLES2.h"
 #include "RenderServiceOpenGLES2.h"
@@ -22,7 +22,7 @@ BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::st
     FT_Face face = NULL;
     FT_Error error = 0;
 
-    error = FT_New_Face(BGEGame::getInstance()->getFontService()->getFreetypeLibrary(), filename.c_str(), 0, &face);
+    error = FT_New_Face(BGE::Game::getInstance()->getFontService()->getFreetypeLibrary(), filename.c_str(), 0, &face);
     
     if (!error) {
         error = FT_Set_Pixel_Sizes(face, 0, pixelSize);
@@ -190,7 +190,7 @@ BGEFontOpenGLES2::BGEFontOpenGLES2(std::string name, uint32_t pixelSize, std::st
                     }
                 }
                 
-                BGEGame::getInstance()->getTextureService()->namedTextureAtlasFromBuffer("font", atlasBuffer, BGETextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGETextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
+                BGE::Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer("font", atlasBuffer, BGETextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGETextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
                     if (atlas) {
                         textureAtlas_ = atlas;
                         glyphs_.clear();
@@ -247,7 +247,7 @@ void BGEFontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVect
         float y = position.y;
         float gridX = x;
         float gridY = y;
-        std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGEGame::getInstance()->getRenderService());
+        std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGE::Game::getInstance()->getRenderService());
         
         const char *chars = str.c_str();
         std::shared_ptr<BGEFontGlyph> glyph;

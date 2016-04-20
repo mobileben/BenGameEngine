@@ -8,7 +8,7 @@
 
 #include "BGETexture.h"
 #include "BGETextureAtlas.h"
-#include "BGEGame.h"
+#include "Game.h"
 
 BGETexture::BGETexture(uint64_t texId, std::string name) : BGETextureBase(texId, name), x_(0), y_(0), isSubTexture_(false) {
 }

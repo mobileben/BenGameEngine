@@ -13,7 +13,7 @@
 #include "RenderContextOpenGLES2.h"
 #include "BGETextureOpenGLES2.h"
 #include "BGEMathTypes.h"
-#include "BGEGame.h"
+#include "Game.h"
 #include "LineRenderComponent.h"
 #include "FlatRectRenderComponent.h"
 #include "SpriteRenderComponent.h"
@@ -65,7 +65,7 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : masksInUse_(0), activeMa
     
     BGEMatrix4MakeIdentify(projectionMatrix_);
     
-    BGEGame::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this), 0);
+    Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this), 0);
 }
 
 void BGE::RenderServiceOpenGLES2::initialize() {}
@@ -802,10 +802,10 @@ void BGE::RenderServiceOpenGLES2::render()
     this->masksInUse_ = 0;
     
     if (isReady()) {
-        std::shared_ptr<BGETextureBase> texture = BGEGame::getInstance()->getTextureService()->textureWithName("sample");
-        std::shared_ptr<BGETextureBase> fish = BGEGame::getInstance()->getTextureService()->textureWithName("fish");
-        std::shared_ptr<BGETextureBase> font = BGEGame::getInstance()->getTextureService()->textureWithName("__font_texture");
-        std::shared_ptr<BGEFont> f = BGEGame::getInstance()->getFontService()->getFont("default", 32);
+        std::shared_ptr<BGETextureBase> texture = Game::getInstance()->getTextureService()->textureWithName("sample");
+        std::shared_ptr<BGETextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("fish");
+        std::shared_ptr<BGETextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
+        std::shared_ptr<BGEFont> f = Game::getInstance()->getFontService()->getFont("default", 32);
         
         if (f) {
             NSLog(@"STRING LENGTH %d", f->getStringWidth("HELLO", false));
@@ -868,7 +868,7 @@ void BGE::RenderServiceOpenGLES2::render()
         }
         
         
-        for (auto obj : BGEGame::getInstance()->getGameObjectService()->getGameObjects()) {
+        for (auto obj : Game::getInstance()->getGameObjectService()->getGameObjects()) {
             if (obj.second->getComponent<BGE::LineRenderComponent>()) {
                 std::shared_ptr<BGE::LineRenderComponent> line = obj.second->getComponent<BGE::LineRenderComponent>();
                 

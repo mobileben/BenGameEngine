@@ -7,14 +7,14 @@
 //
 
 #include "BGEFont.h"
-#include "BGEGame.h"
+#include "Game.h"
 
 BGEFont::BGEFont(std::string name, uint32_t pixelSize, std::string filename) : name_(name), pixelSize_(pixelSize), textureAtlas_(nullptr), hasKerning_(false) {
     
 }
 
 BGEFont::~BGEFont() {
-    BGEGame::getInstance()->getTextureService()->removeTexture(textureAtlas_);
+    BGE::Game::getInstance()->getTextureService()->removeTexture(textureAtlas_);
 }
 
 std::shared_ptr<BGEFontGlyph> BGEFont::glyphForExtendedASCII(uint16_t code) {

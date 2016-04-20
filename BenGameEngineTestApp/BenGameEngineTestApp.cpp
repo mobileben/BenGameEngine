@@ -13,9 +13,9 @@
 
 BenGameEngineTestApp::BenGameEngineTestApp()
 {
-    BGEGame::getInstance()->provide(std::make_shared<BGE::RenderServiceOpenGLES2>());
+    BGE::Game::getInstance()->provide(std::make_shared<BGE::RenderServiceOpenGLES2>());
 }
 
 void BenGameEngineTestApp::initialize() {
-    BGEGame::getInstance()->initialize();
+    BGE::Game::getInstance()->initialize();
 }

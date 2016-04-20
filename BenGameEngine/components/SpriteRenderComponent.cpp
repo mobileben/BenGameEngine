@@ -7,7 +7,7 @@
 //
 
 #include "SpriteRenderComponent.h"
-#include "BGEGame.h"
+#include "Game.h"
 
 BGE::SpriteRenderComponent::SpriteRenderComponent(uint32_t componentId) : BGE::RenderComponent(componentId) {
 }
@@ -59,7 +59,7 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
                     const BGEVector2 *xys = texture->getXYs();
                     const BGEVector2 *uvs = texture->getUVs();
                     
-                    if (BGEGame::getInstance()->getRenderService()->hasInvertedYAxis()) {
+                    if (Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
                         /*
                          
                          +Y down

@@ -46,7 +46,7 @@
     self.renderWindow = std::make_shared<BGE::RenderWindow>();
     self.renderWindow->setView((GLKView *) self.view);
     
-    BGEGame::getInstance()->getRenderService()->bindRenderWindow(self.renderContext, self.renderWindow);
+    BGE::Game::getInstance()->getRenderService()->bindRenderWindow(self.renderContext, self.renderWindow);
     
     NSLog(@"DIDLOAD view is %f %f %f %f", self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
     
@@ -62,13 +62,13 @@
     [super viewDidAppear:animated];
     
     if (!self.once) {
-        BGEGame::getInstance()->getRenderService()->createShaders();
-        BGEGame::getInstance()->getRenderService()->setIsReady();
+        BGE::Game::getInstance()->getRenderService()->createShaders();
+        BGE::Game::getInstance()->getRenderService()->setIsReady();
         self.once = YES;
         
-        BGEGame::getInstance()->provide(std::make_shared<BGETextureServiceOpenGLES2>(self.renderContext->getContext()));
-        BGEGame::getInstance()->provide(std::make_shared<BGEFontServiceOpenGLES2>());
-        BGEGame::getInstance()->getFontService()->loadFont("default", 32, nullptr);
+        BGE::Game::getInstance()->provide(std::make_shared<BGETextureServiceOpenGLES2>(self.renderContext->getContext()));
+        BGE::Game::getInstance()->provide(std::make_shared<BGEFontServiceOpenGLES2>());
+        BGE::Game::getInstance()->getFontService()->loadFont("default", 32, nullptr);
         
         NSString *path = [[NSBundle mainBundle] pathForResource:@"sample" ofType:@"png"];
         
@@ -76,7 +76,7 @@
             typedef void (*func)(id, SEL, std::shared_ptr<BGETextureBase>, std::shared_ptr<BGE::Error>);
             func impl = (func)[self methodForSelector:@selector(racer:error:)];
             std::function<void(std::shared_ptr<BGETextureBase>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
-            BGEGame::getInstance()->getTextureService()->namedTextureFromFile("sample", [path UTF8String], fnc);
+            BGE::Game::getInstance()->getTextureService()->namedTextureFromFile("sample", [path UTF8String], fnc);
         }
         
         path = [[NSBundle mainBundle] pathForResource:@"item_powerup_fish" ofType:@"png"];
@@ -85,7 +85,7 @@
             typedef void (*func)(id, SEL, std::shared_ptr<BGETextureBase>, std::shared_ptr<BGE::Error>);
             func impl = (func)[self methodForSelector:@selector(racer:error:)];
             std::function<void(std::shared_ptr<BGETextureBase>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
-            BGEGame::getInstance()->getTextureService()->namedTextureFromFile("fish", [path UTF8String], nullptr);
+            BGE::Game::getInstance()->getTextureService()->namedTextureFromFile("fish", [path UTF8String], nullptr);
         }
     }
     
@@ -93,26 +93,26 @@
 }
 
 - (void)racer:(std::shared_ptr<BGETextureBase>)texture error:(std::shared_ptr<BGE::Error>)error {
-    std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGEGame::getInstance()->getRenderService());
+    std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGE::Game::getInstance()->getRenderService());
     std::shared_ptr<BGETextureOpenGLES2> glTex = std::dynamic_pointer_cast<BGETextureOpenGLES2>(texture);
     renderer->setGLKTextureInfo(glTex->getTextureInfo());
-    BGEGame::getInstance()->getRenderService()->render();
+    BGE::Game::getInstance()->getRenderService()->render();
     
     // Let's create and add a game object
     std::string name = "hello";
-    auto gameObj0 = BGEGame::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
+    auto gameObj0 = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
 #if 1
-    auto gameObj1 = BGEGame::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
+    auto gameObj1 = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
 #endif
-    auto gameObj2 = BGEGame::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
+    auto gameObj2 = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
     
-    auto material = BGEGame::getInstance()->getMaterialService()->createMaterial("mat", texture);
-    auto transformComponent0 = BGEGame::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
-    auto transformComponent1 = BGEGame::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
-    auto transformComponent2 = BGEGame::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
-    auto lineRenderer = BGEGame::getInstance()->getComponentService()->createComponent<BGE::LineRenderComponent>("line");
-    auto flatRect = BGEGame::getInstance()->getComponentService()->createComponent<BGE::FlatRectRenderComponent>("rect");
-    auto sprite = BGEGame::getInstance()->getComponentService()->createComponent<BGE::SpriteRenderComponent>("sprite");
+    auto material = BGE::Game::getInstance()->getMaterialService()->createMaterial("mat", texture);
+    auto transformComponent0 = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
+    auto transformComponent1 = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
+    auto transformComponent2 = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
+    auto lineRenderer = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::LineRenderComponent>("line");
+    auto flatRect = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::FlatRectRenderComponent>("rect");
+    auto sprite = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::SpriteRenderComponent>("sprite");
     
     BGEColor color = { 1, 0, 0, 1 };
     
@@ -158,7 +158,7 @@
 
 - (void) glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    BGEGame::getInstance()->getRenderService()->render();
+    BGE::Game::getInstance()->getRenderService()->render();
 }
 
 void handled()

@@ -7,7 +7,7 @@
 //
 
 #include "FlatRectRenderComponent.h"
-#include "BGEGame.h"
+#include "Game.h"
 
 BGE::FlatRectRenderComponent::FlatRectRenderComponent(uint32_t componentId) : BGE::RenderComponent(componentId) {
 }
@@ -62,7 +62,7 @@ void BGE::FlatRectRenderComponent::updateLocalBoundsAndVertices(BGEVector2& wh) 
             setLocalBounds(bounds);
             
             // Setup vertices
-            if (BGEGame::getInstance()->getRenderService()->hasInvertedYAxis()) {
+            if (Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
                 /*
                  
                  +Y down

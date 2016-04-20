@@ -9,7 +9,7 @@
 #include "BGEFontServiceOpenGLES2.h"
 #include "BGEFontOpenGLES2.h"
 #include "BGETextureAtlas.h"
-#include "BGEGame.h"
+#include "Game.h"
 
 static const float MetricScale = 1.0 / 64.0;
 static const int InitialSupportedCharacterOffset = 32;
@@ -243,7 +243,7 @@ void BGEFontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, std
                                 }
                             }
                             
-                            BGEGame::getInstance()->getTextureService()->namedTextureFromBuffer("font", BGETextureFormat::Alpha, atlasW, atlasH, atlasBuffer, glyphSize, nullptr);
+                            Game::getInstance()->getTextureService()->namedTextureFromBuffer("font", BGETextureFormat::Alpha, atlasW, atlasH, atlasBuffer, glyphSize, nullptr);
                             
                             for (int i=0;i<NumSupportedCharacters;i++) {
                                 if (bitmaps[i].buffer) {

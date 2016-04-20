@@ -7,7 +7,7 @@
 //
 
 #include "BGETextureBase.h"
-#include "BGEGame.h"
+#include "Game.h"
 
 const std::string BGETextureBase::ErrorDomain = "Texture";
 
@@ -59,7 +59,7 @@ void BGETextureBase::updateUVs() {
 }
 
 void BGETextureBase::updateXYs() {
-    if (BGEGame::getInstance()->getRenderService()->hasInvertedYAxis()) {
+    if (BGE::Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
         /*
          
          +Y down
