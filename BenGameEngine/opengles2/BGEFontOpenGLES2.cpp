@@ -9,7 +9,7 @@
 #include "BGEGame.h"
 #include "BGEFontOpenGLES2.h"
 #include "BGETextureOpenGLES2.h"
-#include "BGERenderServiceOpenGLES2.h"
+#include "RenderServiceOpenGLES2.h"
 #include "BGEShaderServiceOpenGLES2.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
@@ -247,7 +247,7 @@ void BGEFontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVect
         float y = position.y;
         float gridX = x;
         float gridY = y;
-        std::shared_ptr<BGERenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGERenderServiceOpenGLES2>(BGEGame::getInstance()->getRenderService());
+        std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGEGame::getInstance()->getRenderService());
         
         const char *chars = str.c_str();
         std::shared_ptr<BGEFontGlyph> glyph;

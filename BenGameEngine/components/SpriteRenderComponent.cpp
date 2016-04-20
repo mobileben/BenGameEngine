@@ -1,31 +1,31 @@
 //
-//  BGESpriteRenderComponent.cpp
+//  SpriteRenderComponent.cpp
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 4/17/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGESpriteRenderComponent.h"
+#include "SpriteRenderComponent.h"
 #include "BGEGame.h"
 
-BGESpriteRenderComponent::BGESpriteRenderComponent(uint32_t componentId) : BGERenderComponent(componentId) {
+BGE::SpriteRenderComponent::SpriteRenderComponent(uint32_t componentId) : BGE::RenderComponent(componentId) {
 }
 
-BGESpriteRenderComponent::BGESpriteRenderComponent(uint32_t componentId, std::string name) : BGERenderComponent(componentId, name) {
+BGE::SpriteRenderComponent::SpriteRenderComponent(uint32_t componentId, std::string name) : BGE::RenderComponent(componentId, name) {
 }
 
-BGESpriteRenderComponent::BGESpriteRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject) : BGERenderComponent(componentId, name, gameObject) {
+BGE::SpriteRenderComponent::SpriteRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject) : BGE::RenderComponent(componentId, name, gameObject) {
 }
 
-void BGESpriteRenderComponent::materialsUpdated() {
+void BGE::SpriteRenderComponent::materialsUpdated() {
     
     // Build vertices
     updateLocalBoundsAndVertices();
 }
 
 
-void BGESpriteRenderComponent::updateLocalBoundsAndVertices() {
+void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
     // Right now we are only supporting one material
     std::shared_ptr<BGE::Material> material = getMaterial().lock();
     
@@ -45,7 +45,7 @@ void BGESpriteRenderComponent::updateLocalBoundsAndVertices() {
             float h = texture->getHeight();
             
             switch (getAnchor()) {
-                case BGERenderComponentAnchor::Center:
+                case BGE::RenderComponentAnchor::Center:
                     float w_2 = w / 2.0;
                     float h_2 = h / 2.0;
                     

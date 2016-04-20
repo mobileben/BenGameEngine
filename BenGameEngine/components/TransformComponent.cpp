@@ -1,29 +1,29 @@
 //
-//  BGETransformComponent.cpp
+//  TransformComponent.cpp
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 3/31/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGETransformComponent.h"
+#include "TransformComponent.h"
 #include <cassert>
 
-BGETransformComponent::BGETransformComponent(uint64_t componentId) :  Component(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
+BGE::TransformComponent::TransformComponent(uint64_t componentId) : Component(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
                                                     bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
                                                     z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
                                                     transformDirty_(false), speed_(1), paused_(false) {
     BGEMatrix4MakeIdentify(matrix_);
 }
 
-BGETransformComponent::BGETransformComponent(uint64_t componentId, std::string name) :  Component(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
+BGE::TransformComponent::TransformComponent(uint64_t componentId, std::string name) :  Component(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
 bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
 z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
 transformDirty_(false), speed_(1), paused_(false) {
     BGEMatrix4MakeIdentify(matrix_);
 }
 
-void BGETransformComponent::getMatrix(BGEMatrix4 &matrix) {
+void BGE::TransformComponent::getMatrix(BGEMatrix4 &matrix) {
     if (transformDirty_) {
         
     } else {
@@ -31,19 +31,19 @@ void BGETransformComponent::getMatrix(BGEMatrix4 &matrix) {
     }
 }
 
-void BGETransformComponent::addChild(std::shared_ptr<BGETransformComponent> child) {
+void BGE::TransformComponent::addChild(std::shared_ptr<TransformComponent> child) {
     assert(child);
     assert(child->getParent().expired());
     
     if (child) {
         children_.push_back(child);
-        child->parent_ = derived_shared_from_this<BGETransformComponent>();
+        child->parent_ = derived_shared_from_this<TransformComponent>();
         
         // TODO: Update hierarchy
     }
 }
 
-void BGETransformComponent::removeAllChildren() {
+void BGE::TransformComponent::removeAllChildren() {
     for (auto child : children_) {
         // Remove parent from all children
         child->parent_.reset();
@@ -52,12 +52,12 @@ void BGETransformComponent::removeAllChildren() {
     children_.clear();
 }
 
-void BGETransformComponent::removeFromParent() {
+void BGE::TransformComponent::removeFromParent() {
     if (!parent_.expired()) {
-        std::shared_ptr<BGETransformComponent> parent = parent_.lock();
-        std::vector<std::shared_ptr<BGETransformComponent>>::iterator it;
+        std::shared_ptr<TransformComponent> parent = parent_.lock();
+        std::vector<std::shared_ptr<TransformComponent>>::iterator it;
         
-        it = std::find(parent->children_.begin(), parent->children_.end(), derived_shared_from_this<BGETransformComponent>());
+        it = std::find(parent->children_.begin(), parent->children_.end(), derived_shared_from_this<TransformComponent>());
         
         if (it != parent->children_.end()) {
             parent->children_.erase(it);
@@ -69,7 +69,7 @@ void BGETransformComponent::removeFromParent() {
     }
 }
 
-void BGETransformComponent::insertChild(std::shared_ptr<BGETransformComponent> child, uint32_t index) {
+void BGE::TransformComponent::insertChild(std::shared_ptr<TransformComponent> child, uint32_t index) {
     assert(child);
     assert(child->getParent().expired());
 
@@ -80,21 +80,21 @@ void BGETransformComponent::insertChild(std::shared_ptr<BGETransformComponent> c
             children_.push_back(child);
         }
         
-        child->parent_ = derived_shared_from_this<BGETransformComponent>();
+        child->parent_ = derived_shared_from_this<TransformComponent>();
     }
 }
 
-void BGETransformComponent::moveToParent(std::shared_ptr<BGETransformComponent> parent) {
+void BGE::TransformComponent::moveToParent(std::shared_ptr<TransformComponent> parent) {
     assert(parent);
     
     if (parent) {
         removeFromParent();
         
-        parent->addChild(derived_shared_from_this<BGETransformComponent>());
+        parent->addChild(derived_shared_from_this<TransformComponent>());
     }
 }
 
-std::shared_ptr<BGETransformComponent> BGETransformComponent::childAtIndex(uint32_t index) {
+std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::childAtIndex(uint32_t index) {
     if (index < children_.size()) {
         return children_.at(index);
     } else {
@@ -102,7 +102,7 @@ std::shared_ptr<BGETransformComponent> BGETransformComponent::childAtIndex(uint3
     }
 }
 
-std::shared_ptr<BGETransformComponent> BGETransformComponent::childWithName(std::string name, bool descend) {
+std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::childWithName(std::string name, bool descend) {
     assert(name != "");
     
     for (auto transform : children_) {
@@ -120,7 +120,7 @@ std::shared_ptr<BGETransformComponent> BGETransformComponent::childWithName(std:
     return nullptr;
 }
 
-bool BGETransformComponent::hasChild(std::shared_ptr<BGETransformComponent> child, bool descend) {
+bool BGE::TransformComponent::hasChild(std::shared_ptr<BGE::TransformComponent> child, bool descend) {
     assert(child);
     
     if (child) {
@@ -146,11 +146,11 @@ bool BGETransformComponent::hasChild(std::shared_ptr<BGETransformComponent> chil
     }
 }
 
-bool BGETransformComponent::inParentHierarchy(std::shared_ptr<BGETransformComponent> parent) {
+bool BGE::TransformComponent::inParentHierarchy(std::shared_ptr<BGE::TransformComponent> parent) {
     assert(parent);
     
     if (parent) {
-        return parent->hasChild(derived_shared_from_this<BGETransformComponent>(), true);
+        return parent->hasChild(derived_shared_from_this<BGE::TransformComponent>(), true);
     } else {
         return false;
     }

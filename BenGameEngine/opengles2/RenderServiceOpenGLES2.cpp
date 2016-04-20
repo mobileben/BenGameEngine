@@ -1,12 +1,12 @@
 //
-//  BGERenderServiceOpenGLES2.cpp
+//  RenderServiceOpenGLES2.cpp
 //  GamePlayground
 //
 //  Created by Benjamin Lee on 2/9/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGERenderServiceOpenGLES2.h"
+#include "RenderServiceOpenGLES2.h"
 #include "BGERenderView.h"
 #include "BGEFontServiceOpenGLES2.h"
 #include "BGEShaderServiceOpenGLES2.h"
@@ -14,9 +14,9 @@
 #include "BGETextureOpenGLES2.h"
 #include "BGEMathTypes.h"
 #include "BGEGame.h"
-#include "BGELineRenderComponent.h"
-#include "BGEFlatRectRenderComponent.h"
-#include "BGESpriteRenderComponent.h"
+#include "LineRenderComponent.h"
+#include "FlatRectRenderComponent.h"
+#include "SpriteRenderComponent.h"
 
 #if 0
 const BGEVertexColor Vertices[] = {
@@ -46,7 +46,7 @@ const GLubyte Indices[] = {
     2, 3, 0
 };
 
-int8_t BGERenderServiceOpenGLES2::MaxActiveMasks = 8;
+int8_t BGE::RenderServiceOpenGLES2::MaxActiveMasks = 8;
 static uint8_t MaskIdToMaskValue[] = {
     1,
     2,
@@ -58,27 +58,27 @@ static uint8_t MaskIdToMaskValue[] = {
     128
 };
 
-BGERenderServiceOpenGLES2::BGERenderServiceOpenGLES2() : masksInUse_(0), activeMasks_(0) {
+BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : masksInUse_(0), activeMasks_(0) {
     shaderService_ = std::make_shared<BGEShaderServiceOpenGLES2>();
     BGEShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
     BGEFontServiceOpenGLES2::mapBundles("BenGameEngineBundle");
     
     BGEMatrix4MakeIdentify(projectionMatrix_);
     
-    BGEGame::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&BGERenderServiceOpenGLES2::queueRender, this), 0);
+    BGEGame::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this), 0);
 }
 
-void BGERenderServiceOpenGLES2::initialize() {}
-void BGERenderServiceOpenGLES2::reset() {}
-void BGERenderServiceOpenGLES2::enteringBackground() {}
-void BGERenderServiceOpenGLES2::enteringForeground() {}
-void BGERenderServiceOpenGLES2::pause() {}
-void BGERenderServiceOpenGLES2::resume() {}
-void BGERenderServiceOpenGLES2::destroy() {}
+void BGE::RenderServiceOpenGLES2::initialize() {}
+void BGE::RenderServiceOpenGLES2::reset() {}
+void BGE::RenderServiceOpenGLES2::enteringBackground() {}
+void BGE::RenderServiceOpenGLES2::enteringForeground() {}
+void BGE::RenderServiceOpenGLES2::pause() {}
+void BGE::RenderServiceOpenGLES2::resume() {}
+void BGE::RenderServiceOpenGLES2::destroy() {}
 
-void BGERenderServiceOpenGLES2::setCoordinateSystem2D(BGERender2DCoordinateSystem coordSystem2D)
+void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(BGERender2DCoordinateSystem coordSystem2D)
 {
-    BGERenderService::setCoordinateSystem2D(coordSystem2D);
+    BGE::RenderService::setCoordinateSystem2D(coordSystem2D);
     
     std::shared_ptr<BGERenderWindow> window = this->getRenderWindow();
     
@@ -98,9 +98,9 @@ void BGERenderServiceOpenGLES2::setCoordinateSystem2D(BGERender2DCoordinateSyste
     }
 }
 
-void BGERenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<BGERenderContext> context, std::shared_ptr<BGERenderWindow> window)
+void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<BGERenderContext> context, std::shared_ptr<BGERenderWindow> window)
 {
-    BGERenderService::bindRenderWindow(context, window);
+    RenderService::bindRenderWindow(context, window);
     std::shared_ptr<BGERenderContextOpenGLES2> glContext;
     
     glContext = std::dynamic_pointer_cast<BGERenderContextOpenGLES2>(context);
@@ -124,11 +124,11 @@ void BGERenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<BGERenderContex
 #endif
 }
 
-void BGERenderServiceOpenGLES2::resizeRenderWindow()
+void BGE::RenderServiceOpenGLES2::resizeRenderWindow()
 {
 }
 
-void BGERenderServiceOpenGLES2::createShaders()
+void BGE::RenderServiceOpenGLES2::createShaders()
 {
     std::shared_ptr<BGEShader> vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "SimpleVertex");
     std::shared_ptr<BGEShader> fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "SimpleFragment");
@@ -155,7 +155,7 @@ void BGERenderServiceOpenGLES2::createShaders()
     program = this->getShaderService()->createShaderProgram("Font", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "SourceColor" });
 }
 
-std::shared_ptr<BGEShaderProgram> BGERenderServiceOpenGLES2::pushShaderProgram(std::string program)
+std::shared_ptr<BGEShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram(std::string program)
 {
     std::string currShader;
     
@@ -181,7 +181,7 @@ std::shared_ptr<BGEShaderProgram> BGERenderServiceOpenGLES2::pushShaderProgram(s
     return shaderProgramStack_.back();
 }
 
-std::shared_ptr<BGEShaderProgram> BGERenderServiceOpenGLES2::popShaderProgram()
+std::shared_ptr<BGEShaderProgram> BGE::RenderServiceOpenGLES2::popShaderProgram()
 {
     if (!shaderProgramStack_.empty()) {
         std::string currShader = shaderProgramStack_.back()->getName();
@@ -201,7 +201,7 @@ std::shared_ptr<BGEShaderProgram> BGERenderServiceOpenGLES2::popShaderProgram()
     return shaderProgramStack_.back();
 }
 
-void BGERenderServiceOpenGLES2::drawRect(BGEVector2 &position, BGEVector2 &size, BGEVector4 &color)
+void BGE::RenderServiceOpenGLES2::drawRect(BGEVector2 &position, BGEVector2 &size, BGEVector4 &color)
 {
     BGEVertexColor vertices[4];
     GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };
@@ -299,7 +299,7 @@ void BGERenderServiceOpenGLES2::drawRect(BGEVector2 &position, BGEVector2 &size,
                    GL_UNSIGNED_BYTE, &indices[0]);
 }
 
-void BGERenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector2 &size, BGEVector4 color[4])
+void BGE::RenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector2 &size, BGEVector4 color[4])
 {
     BGEVertexColor vertices[4];
     GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };
@@ -492,7 +492,7 @@ void BGERenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector2 
 #endif
 }
 
-void BGERenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr<BGETextureBase> texture) {
+void BGE::RenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr<BGETextureBase> texture) {
     if (texture) {
         BGEVertexTex vertices[4];
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
@@ -561,7 +561,7 @@ void BGERenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr<B
     }
 }
 
-void BGERenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_ptr<BGETextureBase> texture)
+void BGE::RenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_ptr<BGETextureBase> texture)
 {
     if (texture) {
         BGEVertexTex vertices[4];
@@ -630,9 +630,9 @@ void BGERenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_pt
     }
 }
 
-void BGERenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> gameObject) {
+void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> gameObject) {
     if (gameObject) {
-        std::shared_ptr<BGEFlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<BGEFlatRectRenderComponent>(gameObject->getComponent<BGEFlatRectRenderComponent>());
+        std::shared_ptr<BGE::FlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<BGE::FlatRectRenderComponent>(gameObject->getComponent<BGE::FlatRectRenderComponent>());
         
         if (flatRect) {
             BGEVertex *const vertices = flatRect->getVertices();
@@ -662,7 +662,7 @@ void BGERenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> ga
     }
 }
 
-void BGERenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& points, float thickness, bool loop, std::shared_ptr<BGE::Material> material) {
+void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& points, float thickness, bool loop, std::shared_ptr<BGE::Material> material) {
     BGEVector3 vertices[points.size()];
     GLubyte indices[points.size()];
     
@@ -700,9 +700,9 @@ void BGERenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& points,
 }
 
 
-void BGERenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> gameObject) {
+void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> gameObject) {
     if (gameObject) {
-        std::shared_ptr<BGESpriteRenderComponent> sprite = std::dynamic_pointer_cast<BGESpriteRenderComponent>(gameObject->getComponent<BGESpriteRenderComponent>());
+        std::shared_ptr<BGE::SpriteRenderComponent> sprite = std::dynamic_pointer_cast<BGE::SpriteRenderComponent>(gameObject->getComponent<BGE::SpriteRenderComponent>());
         
         if (sprite) {
             BGEVertexTex *const vertices = sprite->getVertices();
@@ -750,9 +750,9 @@ void BGERenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> game
     }
 }
 
-int8_t BGERenderServiceOpenGLES2::createMask(BGEVector2 &position, std::shared_ptr<BGETextureBase> mask)
+int8_t BGE::RenderServiceOpenGLES2::createMask(BGEVector2 &position, std::shared_ptr<BGETextureBase> mask)
 {
-    if (this->masksInUse_ < (BGERenderServiceOpenGLES2::MaxActiveMasks - 1)) {
+    if (this->masksInUse_ < (RenderServiceOpenGLES2::MaxActiveMasks - 1)) {
         int8_t maskId = this->masksInUse_;
         uint8_t maskValue = MaskIdToMaskValue[this->masksInUse_];
         this->masksInUse_++;
@@ -775,25 +775,25 @@ int8_t BGERenderServiceOpenGLES2::createMask(BGEVector2 &position, std::shared_p
     }
 }
 
-void BGERenderServiceOpenGLES2::enableMask(int8_t maskId)
+void BGE::RenderServiceOpenGLES2::enableMask(int8_t maskId)
 {
     if (maskId >=0 && maskId < this->masksInUse_) {
         
     }
 }
 
-void BGERenderServiceOpenGLES2::disableMask(int8_t maskId)
+void BGE::RenderServiceOpenGLES2::disableMask(int8_t maskId)
 {
     if (maskId >=0 && maskId < this->masksInUse_) {
         
     }
 }
 
-void BGERenderServiceOpenGLES2::queueRender() {
+void BGE::RenderServiceOpenGLES2::queueRender() {
     [this->getRenderWindow()->getView() display];
 }
 
-void BGERenderServiceOpenGLES2::render()
+void BGE::RenderServiceOpenGLES2::render()
 {
     std::shared_ptr<BGERenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<BGERenderContextOpenGLES2>(getRenderContext());
     glClearColor(1.0, 1.0, 0.0, 1.0);
@@ -869,13 +869,13 @@ void BGERenderServiceOpenGLES2::render()
         
         
         for (auto obj : BGEGame::getInstance()->getGameObjectService()->getGameObjects()) {
-            if (obj.second->getComponent<BGELineRenderComponent>()) {
-                std::shared_ptr<BGELineRenderComponent> line = obj.second->getComponent<BGELineRenderComponent>();
+            if (obj.second->getComponent<BGE::LineRenderComponent>()) {
+                std::shared_ptr<BGE::LineRenderComponent> line = obj.second->getComponent<BGE::LineRenderComponent>();
                 
                 drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial().lock());
-            } else if (obj.second->getComponent<BGEFlatRectRenderComponent>()) {
+            } else if (obj.second->getComponent<BGE::FlatRectRenderComponent>()) {
                 drawFlatRect(obj.second);
-            } else if (obj.second->getComponent<BGESpriteRenderComponent>()) {
+            } else if (obj.second->getComponent<BGE::SpriteRenderComponent>()) {
                 drawSprite(obj.second);
             }
         }

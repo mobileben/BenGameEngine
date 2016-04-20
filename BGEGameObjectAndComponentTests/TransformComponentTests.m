@@ -1,6 +1,6 @@
 //
-//  BGETransformComponentTests.m
-//  BGETransformComponentTests
+//  TransformComponentTests.m
+//  TransformComponentTests
 //
 //  Created by Benjamin Lee on 4/1/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
@@ -8,15 +8,15 @@
 
 #import <XCTest/XCTest.h>
 #include "ComponentService.h"
-#include "BGETransformComponent.h"
+#include "TransformComponent.h"
 
-static ComponentService componentService;
+static BGE::ComponentService componentService;
 
-@interface BGETransformComponentTests : XCTestCase
+@interface TransformComponentTests : XCTestCase
 
 @end
 
-@implementation BGETransformComponentTests
+@implementation TransformComponentTests
 
 - (void)setUp {
     [super setUp];
@@ -29,7 +29,7 @@ static ComponentService componentService;
 }
 
 - (void)testConstructor {
-    auto transform = componentService.createComponent<BGETransformComponent>("test");
+    auto transform = componentService.createComponent<BGE::TransformComponent>("test");
     
     XCTAssertEqual(transform!=nullptr, true, @"transform not created");
     XCTAssertEqual(transform->getName(), "test", @"getName is incorrect");
@@ -70,8 +70,8 @@ static ComponentService componentService;
     auto name2 = "test2";
     auto newname1 = "newtest1";
     auto newname2 = "newtest2";
-    auto transform1 = componentService.createComponent<BGETransformComponent>(name1);
-    auto transform2 = componentService.createComponent<BGETransformComponent>(name2);
+    auto transform1 = componentService.createComponent<BGE::TransformComponent>(name1);
+    auto transform2 = componentService.createComponent<BGE::TransformComponent>(name2);
     XCTAssertEqual(transform1!=nullptr, true, @"transform not created");
     XCTAssertEqual(transform1->getName(), name1, @"getName is incorrect");
     XCTAssertEqual(transform2!=nullptr, true, @"transform not created");
@@ -88,7 +88,7 @@ static ComponentService componentService;
 
 - (void)testVisibilityAndInteractability {
     auto name = "test";
-    auto transform = componentService.createComponent<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGE::TransformComponent>(name);
 
     XCTAssertEqual(transform->isVisible(), true, @"isVisible is incorrect");
     XCTAssertEqual(transform->isInteractable(), true, @"isInteractable is incorrect");
@@ -112,7 +112,7 @@ static ComponentService componentService;
 
 - (void)testPosition {
     auto name = "test";
-    auto transform = componentService.createComponent<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGE::TransformComponent>(name);
     
     BGERect rect;
     
@@ -160,7 +160,7 @@ static ComponentService componentService;
 
 - (void)testScale {
     auto name = "test";
-    auto transform = componentService.createComponent<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGE::TransformComponent>(name);
     
     BGERect rect;
     
@@ -204,7 +204,7 @@ static ComponentService componentService;
 
 - (void)testSkew {
     auto name = "test";
-    auto transform = componentService.createComponent<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGE::TransformComponent>(name);
     
     BGERect rect;
     
@@ -248,7 +248,7 @@ static ComponentService componentService;
 
 - (void)testRotate {
     auto name = "test";
-    auto transform = componentService.createComponent<BGETransformComponent>(name);
+    auto transform = componentService.createComponent<BGE::TransformComponent>(name);
     
     BGERect rect;
     
@@ -293,24 +293,24 @@ static ComponentService componentService;
     std::string name020 = "name020";
     std::string name021 = "name021";
     
-    auto transform0 = componentService.createComponent<BGETransformComponent>(name0);
-    auto transform00 = componentService.createComponent<BGETransformComponent>(name00);
-    auto transform01 = componentService.createComponent<BGETransformComponent>(name01);
-    auto transform02 = componentService.createComponent<BGETransformComponent>(name02);
-    auto transform000 = componentService.createComponent<BGETransformComponent>(name000);
-    auto transform001 = componentService.createComponent<BGETransformComponent>(name001);
-    auto transform0000 = componentService.createComponent<BGETransformComponent>(name0000);
-    auto transform0001 = componentService.createComponent<BGETransformComponent>(name0001);
-    auto transform0010 = componentService.createComponent<BGETransformComponent>(name0010);
-    auto transform0011 = componentService.createComponent<BGETransformComponent>(name0011);
-    auto transform010 = componentService.createComponent<BGETransformComponent>(name010);
-    auto transform011 = componentService.createComponent<BGETransformComponent>(name011);
-    auto transform0100 = componentService.createComponent<BGETransformComponent>(name0100);
-    auto transform0110 = componentService.createComponent<BGETransformComponent>(name0110);
-    auto transform020 = componentService.createComponent<BGETransformComponent>(name020);
-    auto transform021 = componentService.createComponent<BGETransformComponent>(name021);
+    auto transform0 = componentService.createComponent<BGE::TransformComponent>(name0);
+    auto transform00 = componentService.createComponent<BGE::TransformComponent>(name00);
+    auto transform01 = componentService.createComponent<BGE::TransformComponent>(name01);
+    auto transform02 = componentService.createComponent<BGE::TransformComponent>(name02);
+    auto transform000 = componentService.createComponent<BGE::TransformComponent>(name000);
+    auto transform001 = componentService.createComponent<BGE::TransformComponent>(name001);
+    auto transform0000 = componentService.createComponent<BGE::TransformComponent>(name0000);
+    auto transform0001 = componentService.createComponent<BGE::TransformComponent>(name0001);
+    auto transform0010 = componentService.createComponent<BGE::TransformComponent>(name0010);
+    auto transform0011 = componentService.createComponent<BGE::TransformComponent>(name0011);
+    auto transform010 = componentService.createComponent<BGE::TransformComponent>(name010);
+    auto transform011 = componentService.createComponent<BGE::TransformComponent>(name011);
+    auto transform0100 = componentService.createComponent<BGE::TransformComponent>(name0100);
+    auto transform0110 = componentService.createComponent<BGE::TransformComponent>(name0110);
+    auto transform020 = componentService.createComponent<BGE::TransformComponent>(name020);
+    auto transform021 = componentService.createComponent<BGE::TransformComponent>(name021);
     
-    std::shared_ptr<BGETransformComponent> parent;
+    std::shared_ptr<BGE::TransformComponent> parent;
     
     // transform0 (root)
     XCTAssertEqual(transform0->getNumChildren(), 0, "wrong num children");

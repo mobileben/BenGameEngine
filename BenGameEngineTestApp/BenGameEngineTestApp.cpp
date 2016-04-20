@@ -7,13 +7,13 @@
 //
 
 #include "BenGameEngineTestApp.hpp"
-#include "BGERenderServiceOpenGLES2.h"
+#include "RenderServiceOpenGLES2.h"
 #include "BGEGLKView.h"
 
 
 BenGameEngineTestApp::BenGameEngineTestApp()
 {
-    BGEGame::getInstance()->provide(std::make_shared<BGERenderServiceOpenGLES2>());
+    BGEGame::getInstance()->provide(std::make_shared<BGE::RenderServiceOpenGLES2>());
 }
 
 void BenGameEngineTestApp::initialize() {

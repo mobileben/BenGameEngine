@@ -1,33 +1,33 @@
 //
-//  BGERenderService.cpp
+//  RenderService.cpp
 //  GamePlayground
 //
 //  Created by Benjamin Lee on 2/9/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGERenderService.h"
+#include "RenderService.h"
 
-BGERenderService::BGERenderService() : ready_(false)
+BGE::RenderService::RenderService() : ready_(false)
 {
 }
 
-void BGERenderService::bindRenderWindow(std::shared_ptr<BGERenderContext> context, std::shared_ptr<BGERenderWindow> window)
+void BGE::RenderService::bindRenderWindow(std::shared_ptr<BGERenderContext> context, std::shared_ptr<BGERenderWindow> window)
 {
     this->renderContext_ = context;
     this->renderWindow_ = window;
     window->setRenderContext(context);
 }
 
-void BGERenderService::resizeRenderWindow()
+void BGE::RenderService::resizeRenderWindow()
 {
 }
 
-void BGERenderService::createShaders()
+void BGE::RenderService::createShaders()
 {
 }
 
-void BGERenderService::setCoordinateSystem2D(BGERender2DCoordinateSystem coordSystem2D)
+void BGE::RenderService::setCoordinateSystem2D(BGERender2DCoordinateSystem coordSystem2D)
 {
     coordSystem2D_ = coordSystem2D;
     

@@ -1,24 +1,24 @@
 //
-//  BGEFlatRectRenderComponent.cpp
+//  FlatRectRenderComponent.cpp
 //  BenGameEngine
 //
 //  Created by Benjamin Lee on 4/17/16.
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include "BGEFlatRectRenderComponent.h"
+#include "FlatRectRenderComponent.h"
 #include "BGEGame.h"
 
-BGEFlatRectRenderComponent::BGEFlatRectRenderComponent(uint32_t componentId) : BGERenderComponent(componentId) {
+BGE::FlatRectRenderComponent::FlatRectRenderComponent(uint32_t componentId) : BGE::RenderComponent(componentId) {
 }
 
-BGEFlatRectRenderComponent::BGEFlatRectRenderComponent(uint32_t componentId, std::string name) : BGERenderComponent(componentId, name) {
+BGE::FlatRectRenderComponent::FlatRectRenderComponent(uint32_t componentId, std::string name) : BGE::RenderComponent(componentId, name) {
 }
 
-BGEFlatRectRenderComponent::BGEFlatRectRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject) : BGERenderComponent(componentId, name, gameObject) {
+BGE::FlatRectRenderComponent::FlatRectRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject) : BGE::RenderComponent(componentId, name, gameObject) {
 }
 
-void BGEFlatRectRenderComponent::setWidth(float width) {
+void BGE::FlatRectRenderComponent::setWidth(float width) {
     BGEVector2 wh;
     
     wh.w = width;
@@ -27,7 +27,7 @@ void BGEFlatRectRenderComponent::setWidth(float width) {
     setWidthHeight(wh);
 }
 
-void BGEFlatRectRenderComponent::setHeight(float height) {
+void BGE::FlatRectRenderComponent::setHeight(float height) {
     BGEVector2 wh;
 
     wh.w = getLocalWidth();
@@ -36,21 +36,21 @@ void BGEFlatRectRenderComponent::setHeight(float height) {
     setWidthHeight(wh);
 }
 
-void BGEFlatRectRenderComponent::setWidthHeight(BGEVector2 &wh) {
+void BGE::FlatRectRenderComponent::setWidthHeight(BGEVector2 &wh) {
     updateLocalBoundsAndVertices(wh);
 }
 
-void BGEFlatRectRenderComponent::materialsUpdated() {
+void BGE::FlatRectRenderComponent::materialsUpdated() {
 }
 
-void BGEFlatRectRenderComponent::updateLocalBoundsAndVertices(BGEVector2& wh) {
+void BGE::FlatRectRenderComponent::updateLocalBoundsAndVertices(BGEVector2& wh) {
     BGERect bounds;
     BGEVertex* const vertices = (BGEVertex* const) getVertices();
     float x = 0;
     float y = 0;
     
     switch (getAnchor()) {
-        case BGERenderComponentAnchor::Center:
+        case BGE::RenderComponentAnchor::Center:
             float w_2 = wh.w / 2.0;
             float h_2 = wh.h / 2.0;
             

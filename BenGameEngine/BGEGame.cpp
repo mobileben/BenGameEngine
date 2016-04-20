@@ -21,7 +21,7 @@ BGEGame::BGEGame()
     heartbeatService_ = std::make_shared<BGEHeartbeatService>();
 }
 
-void BGEGame::provide(std::shared_ptr<BGERenderService> renderService) {
+void BGEGame::provide(std::shared_ptr<BGE::RenderService> renderService) {
     renderService_ = renderService;
 }
 

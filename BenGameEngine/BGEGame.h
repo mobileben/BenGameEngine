@@ -14,7 +14,7 @@
 #include "Service.h"
 #include "GameObjectService.h"
 #include "MaterialService.h"
-#include "BGERenderService.h"
+#include "RenderService.h"
 #include "BGETextureService.h"
 #include "BGEFontService.h"
 #include "BGEHeartbeatService.h"
@@ -27,8 +27,8 @@ public:
     virtual ~BGEGame() {}
     
     static std::shared_ptr<BGEGame> getInstance();
-    std::shared_ptr<BGERenderService> getRenderService() { return renderService_; }
-    void provide(std::shared_ptr<BGERenderService> renderService);
+    std::shared_ptr<BGE::RenderService> getRenderService() { return renderService_; }
+    void provide(std::shared_ptr<BGE::RenderService> renderService);
 
     std::shared_ptr<BGETextureService> getTextureService() { return textureService_; }
     void provide(std::shared_ptr<BGETextureService> textureService);
@@ -52,7 +52,7 @@ public:
     void destroy();
 
 protected:
-    std::shared_ptr<BGERenderService> renderService_;
+    std::shared_ptr<BGE::RenderService> renderService_;
     std::shared_ptr<BGETextureService> textureService_;
     std::shared_ptr<BGEFontService> fontService_;
     std::shared_ptr<BGEHeartbeatService> heartbeatService_;

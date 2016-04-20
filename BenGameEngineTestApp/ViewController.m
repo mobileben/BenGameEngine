@@ -10,15 +10,15 @@
 #include "BenGameEngineTestApp.hpp"
 #include "BGERenderWindow.h"
 #include "BGERenderContextOpenGLES2.h"
-#include "BGERenderServiceOpenGLES2.h"
+#include "RenderServiceOpenGLES2.h"
 #include "BGETextureServiceOpenGLES2.h"
 #include "BGEFontServiceOpenGLES2.h"
 #include "BGETextureOpenGLES2.h"
 #include "BGEGLKView.h"
-#include "BGETransformComponent.h"
-#include "BGELineRenderComponent.h"
-#include "BGEFlatRectRenderComponent.h"
-#include "BGESpriteRenderComponent.h"
+#include "TransformComponent.h"
+#include "LineRenderComponent.h"
+#include "FlatRectRenderComponent.h"
+#include "SpriteRenderComponent.h"
 
 @interface ViewController ()<GLKViewDelegate>
 
@@ -93,7 +93,7 @@
 }
 
 - (void)racer:(std::shared_ptr<BGETextureBase>)texture error:(std::shared_ptr<BGE::Error>)error {
-    std::shared_ptr<BGERenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGERenderServiceOpenGLES2>(BGEGame::getInstance()->getRenderService());
+    std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGEGame::getInstance()->getRenderService());
     std::shared_ptr<BGETextureOpenGLES2> glTex = std::dynamic_pointer_cast<BGETextureOpenGLES2>(texture);
     renderer->setGLKTextureInfo(glTex->getTextureInfo());
     BGEGame::getInstance()->getRenderService()->render();
@@ -107,12 +107,12 @@
     auto gameObj2 = BGEGame::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
     
     auto material = BGEGame::getInstance()->getMaterialService()->createMaterial("mat", texture);
-    auto transformComponent0 = BGEGame::getInstance()->getComponentService()->createComponent<BGETransformComponent>();
-    auto transformComponent1 = BGEGame::getInstance()->getComponentService()->createComponent<BGETransformComponent>();
-    auto transformComponent2 = BGEGame::getInstance()->getComponentService()->createComponent<BGETransformComponent>();
-    auto lineRenderer = BGEGame::getInstance()->getComponentService()->createComponent<BGELineRenderComponent>("line");
-    auto flatRect = BGEGame::getInstance()->getComponentService()->createComponent<BGEFlatRectRenderComponent>("rect");
-    auto sprite = BGEGame::getInstance()->getComponentService()->createComponent<BGESpriteRenderComponent>("sprite");
+    auto transformComponent0 = BGEGame::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
+    auto transformComponent1 = BGEGame::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
+    auto transformComponent2 = BGEGame::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
+    auto lineRenderer = BGEGame::getInstance()->getComponentService()->createComponent<BGE::LineRenderComponent>("line");
+    auto flatRect = BGEGame::getInstance()->getComponentService()->createComponent<BGE::FlatRectRenderComponent>("rect");
+    auto sprite = BGEGame::getInstance()->getComponentService()->createComponent<BGE::SpriteRenderComponent>("sprite");
     
     BGEColor color = { 1, 0, 0, 1 };
     
