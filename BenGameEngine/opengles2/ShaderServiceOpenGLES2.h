@@ -1,0 +1,35 @@
+//
+//  ShaderServiceOpenGLES2.h
+//  GamePlayground
+//
+//  Created by Benjamin Lee on 2/12/16.
+//  Copyright © 2016 2n Productions. All rights reserved.
+//
+
+#ifndef BGEShaderServiceOpenGLES2_h
+#define BGEShaderServiceOpenGLES2_h
+
+#include <stdio.h>
+#include "ShaderService.h"
+#include "ShaderProgramOpenGLES2.h"
+#include <GLKit/GLKit.h>
+
+namespace BGE {    
+    class ShaderServiceOpenGLES2 : public ShaderService
+    {
+    public:
+        static void mapShaderBundle(std::string bundleName);
+        static NSBundle *getShaderBundle() { return ShaderServiceOpenGLES2::shaderBundle_; }
+        
+        ShaderServiceOpenGLES2();
+        
+        std::shared_ptr<Shader> createShader(ShaderType shaderType, std::string name);
+        std::shared_ptr<ShaderProgram> createShaderProgram(std::string name, std::vector<std::shared_ptr<Shader>> shaders);
+        std::shared_ptr<ShaderProgram> createShaderProgram(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms);
+        
+    private:
+        static NSBundle *shaderBundle_;    
+    };
+}
+
+#endif /* BGEShaderServiceOpenGLES2_h */

@@ -1,5 +1,5 @@
 //
-//  BGEShaderOpenGLES2.cpp
+//  ShaderOpenGLES2.cpp
 //  GamePlayground
 //
 //  Created by Benjamin Lee on 2/12/16.
@@ -7,12 +7,12 @@
 //
 
 #include <Foundation/Foundation.h>
-#include "BGEShaderOpenGLES2.h"
-#include "BGEShaderServiceOpenGLES2.h"
+#include "ShaderOpenGLES2.h"
+#include "ShaderServiceOpenGLES2.h"
 
-BGEShaderOpenGLES2::BGEShaderOpenGLES2(BGEShaderType shaderType, std::string name) : BGEShader(shaderType, name), shader_(0), error_(GL_NO_ERROR)
+BGE::ShaderOpenGLES2::ShaderOpenGLES2(ShaderType shaderType, std::string name) : BGE::Shader(shaderType, name), shader_(0), error_(GL_NO_ERROR)
 {
-    NSString *path = [BGEShaderServiceOpenGLES2::getShaderBundle() pathForResource:[[NSString alloc] initWithCString:name.c_str() encoding:NSUTF8StringEncoding] ofType:@"glsl"];
+    NSString *path = [BGE::ShaderServiceOpenGLES2::getShaderBundle() pathForResource:[[NSString alloc] initWithCString:name.c_str() encoding:NSUTF8StringEncoding] ofType:@"glsl"];
     NSError *error = nil;
     NSString *shaderString = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
     
@@ -24,10 +24,10 @@ BGEShaderOpenGLES2::BGEShaderOpenGLES2(BGEShaderType shaderType, std::string nam
         GLenum shader = 0;
         
         switch (shaderType) {
-            case BGEShaderType::Vertex:
+            case ShaderType::Vertex:
                 shader = GL_VERTEX_SHADER;
                 break;
-            case BGEShaderType::Fragment:
+            case ShaderType::Fragment:
                 shader = GL_FRAGMENT_SHADER;
                 break;
         }
@@ -45,7 +45,7 @@ BGEShaderOpenGLES2::BGEShaderOpenGLES2(BGEShaderType shaderType, std::string nam
                 glGetShaderiv(shader_, GL_COMPILE_STATUS, &compileSuccess);
                 
                 if (compileSuccess == GL_TRUE) {
-                    state_ = BGEShaderState::Ready;
+                    state_ = ShaderState::Ready;
                 } else {
                     GLchar message[256];
                     // Terminate, just in case
@@ -53,16 +53,16 @@ BGEShaderOpenGLES2::BGEShaderOpenGLES2(BGEShaderType shaderType, std::string nam
                     glGetShaderInfoLog(shader_, sizeof(message), 0, &message[0]);
                     
                     errorString_ = std::string(message);
-                    state_ = BGEShaderState::CompileError;
+                    state_ = ShaderState::CompileError;
                 }
             } else {
-                state_  = BGEShaderState::GLError;
+                state_  = ShaderState::GLError;
                 error_ = glGetError();
             }
         } else {
-            state_ = BGEShaderState::UnsupportedType;
+            state_ = ShaderState::UnsupportedType;
         }
     } else {
-        state_ = BGEShaderState::FileError;
+        state_ = ShaderState::FileError;
     }
 }

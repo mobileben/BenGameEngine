@@ -9,7 +9,7 @@
 #include "RenderServiceOpenGLES2.h"
 #include "RenderView.h"
 #include "FontServiceOpenGLES2.h"
-#include "BGEShaderServiceOpenGLES2.h"
+#include "ShaderServiceOpenGLES2.h"
 #include "RenderContextOpenGLES2.h"
 #include "TextureOpenGLES2.h"
 #include "BGEMathTypes.h"
@@ -59,8 +59,8 @@ static uint8_t MaskIdToMaskValue[] = {
 };
 
 BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : masksInUse_(0), activeMasks_(0) {
-    shaderService_ = std::make_shared<BGEShaderServiceOpenGLES2>();
-    BGEShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
+    shaderService_ = std::make_shared<ShaderServiceOpenGLES2>();
+    ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
     FontServiceOpenGLES2::mapBundles("BenGameEngineBundle");
     
     BGEMatrix4MakeIdentify(projectionMatrix_);
@@ -130,32 +130,32 @@ void BGE::RenderServiceOpenGLES2::resizeRenderWindow()
 
 void BGE::RenderServiceOpenGLES2::createShaders()
 {
-    std::shared_ptr<BGEShader> vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "SimpleVertex");
-    std::shared_ptr<BGEShader> fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "SimpleFragment");
-    std::shared_ptr<BGEShaderProgram> program = this->getShaderService()->createShaderProgram("Default", {vShader,  fShader}, { "Position", "SourceColor" }, { "ModelView", "Projection" });
+    std::shared_ptr<Shader> vShader = this->getShaderService()->createShader(ShaderType::Vertex, "SimpleVertex");
+    std::shared_ptr<Shader> fShader = this->getShaderService()->createShader(ShaderType::Fragment, "SimpleFragment");
+    std::shared_ptr<ShaderProgram> program = this->getShaderService()->createShaderProgram("Default", {vShader,  fShader}, { "Position", "SourceColor" }, { "ModelView", "Projection" });
 
-    vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "LineVertex");
-    fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "LineFragment");
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "LineVertex");
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "LineFragment");
     program = this->getShaderService()->createShaderProgram("Line", {vShader,  fShader}, { "Position" }, { "ModelView", "Projection", "Color" });
     
-    vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "TextureVertex");
-    fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "TextureFragment");
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "TextureVertex");
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "TextureFragment");
     program = this->getShaderService()->createShaderProgram("Texture", {vShader,  fShader}, { "Position", "SourceColor", "TexCoordIn" }, { "ModelView", "Projection", "Texture" });
     
-    vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "ColorMatrixTextureVertex");
-    fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "ColorMatrixTextureFragment");
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "ColorMatrixTextureVertex");
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "ColorMatrixTextureFragment");
     program = this->getShaderService()->createShaderProgram("ColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "colorMatrix", "colorOffset" });
     
-    vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "MaskColorMatrixTextureVertex");
-    fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "MaskColorMatrixTextureFragment");
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "MaskColorMatrixTextureVertex");
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "MaskColorMatrixTextureFragment");
     program = this->getShaderService()->createShaderProgram("MaskColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn", "MaskTexCoordIn" }, { "ModelView", "Projection", "Texture", "MaskTexture", "colorMatrix", "colorOffset" });
     
-    vShader = this->getShaderService()->createShader(BGEShaderType::Vertex, "FontVertex");
-    fShader = this->getShaderService()->createShader(BGEShaderType::Fragment, "FontFragment");
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "FontVertex");
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "FontFragment");
     program = this->getShaderService()->createShaderProgram("Font", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "SourceColor" });
 }
 
-std::shared_ptr<BGEShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram(std::string program)
+std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram(std::string program)
 {
     std::string currShader;
     
@@ -163,13 +163,13 @@ std::shared_ptr<BGEShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram
         currShader = shaderProgramStack_.back()->getName();
     }
     
-    std::shared_ptr<BGEShaderProgram> shaderProgram = shaderService_->getShaderProgram(program);
+    std::shared_ptr<ShaderProgram> shaderProgram = shaderService_->getShaderProgram(program);
     
     // TODO: Assert if shader does not exist
     shaderProgramStack_.push_back(shaderProgram);
     
     if (currShader != program) {
-        std::shared_ptr<BGEShaderProgramOpenGLES2> glProgram = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(shaderProgramStack_.back());
+        std::shared_ptr<ShaderProgramOpenGLES2> glProgram = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(shaderProgramStack_.back());
         
         glUseProgram(glProgram->getProgram());
         
@@ -181,7 +181,7 @@ std::shared_ptr<BGEShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram
     return shaderProgramStack_.back();
 }
 
-std::shared_ptr<BGEShaderProgram> BGE::RenderServiceOpenGLES2::popShaderProgram()
+std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::popShaderProgram()
 {
     if (!shaderProgramStack_.empty()) {
         std::string currShader = shaderProgramStack_.back()->getName();
@@ -189,7 +189,7 @@ std::shared_ptr<BGEShaderProgram> BGE::RenderServiceOpenGLES2::popShaderProgram(
         shaderProgramStack_.pop_back();
         
         if (!shaderProgramStack_.empty()) {
-            std::shared_ptr<BGEShaderProgramOpenGLES2> program = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(shaderProgramStack_.back());
+            std::shared_ptr<ShaderProgramOpenGLES2> program = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(shaderProgramStack_.back());
             
             if (currShader != program->getName()) {
                 // We have a different shader
@@ -285,7 +285,7 @@ void BGE::RenderServiceOpenGLES2::drawRect(BGEVector2 &position, BGEVector2 &siz
         vertices[3].color = color;
     }
     
-    std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Default"));
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Default"));
     
     GLint positionLocation = glShader->locationForAttribute("Position");
     GLint colorLocation = glShader->locationForAttribute("SourceColor");
@@ -382,7 +382,7 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector
         vertices[3].color = color[3];
     }
     
-    std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Default"));
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Default"));
     
     GLint positionLocation = glShader->locationForAttribute("Position");
     GLint colorLocation = glShader->locationForAttribute("SourceColor");
@@ -397,7 +397,7 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector
     
 #if 1
     if (textureInfo_) {
-        glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("ColorMatrixTexture"));
+        glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("ColorMatrixTexture"));
         
         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
         GLint colorMatrixLocation = glShader->locationForUniform("colorMatrix");
@@ -526,7 +526,7 @@ void BGE::RenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr
             vertices[3].tex.x = uvs[3].x;
             vertices[3].tex.y = uvs[3].y;
             
-            std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Font"));
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Font"));
             
             GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
             GLint positionLocation = glShader->locationForAttribute("Position");
@@ -596,7 +596,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_
             vertices[3].tex.x = uvs[3].x;
             vertices[3].tex.y = uvs[3].y;
 
-            std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
             
             GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
             
@@ -639,7 +639,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> 
             std::shared_ptr<BGE::Material> material = flatRect->getMaterial().lock();
             
             if (material) {
-                std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
 
                 GLint positionLocation = glShader->locationForAttribute("Position");
                 GLint projectionLocation = glShader->locationForUniform("Projection");
@@ -677,7 +677,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& point
         
         index++;
     }
-    std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
     
     GLint positionLocation = glShader->locationForAttribute("Position");
     GLint projectionLocation = glShader->locationForUniform("Projection");
@@ -713,7 +713,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
                 if (texture) {
                     std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
                     if (oglTex && oglTex->isValid()) {
-                        std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
                         
                         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
                         
@@ -819,7 +819,7 @@ void BGE::RenderServiceOpenGLES2::render()
 //        glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight());
         glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth() * this->getRenderWindow()->getContentScaleFactor(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight() * this->getRenderWindow()->getContentScaleFactor());
         
-        std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(pushShaderProgram("Default"));
+        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Default"));
         
         GLint positionLocation = glShader->locationForAttribute("Position");
         GLint colorLocation = glShader->locationForAttribute("SourceColor");

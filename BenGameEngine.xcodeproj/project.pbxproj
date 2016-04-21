@@ -36,12 +36,12 @@
 		B525E3BF1C89587000C691C0 /* RenderView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3991C89587000C691C0 /* RenderView.cpp */; };
 		B525E3C01C89587000C691C0 /* RenderWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39B1C89587000C691C0 /* RenderWindow.cpp */; };
 		B525E3C11C89587000C691C0 /* Service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39D1C89587000C691C0 /* Service.cpp */; };
-		B525E3C21C89587000C691C0 /* BGEShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39F1C89587000C691C0 /* BGEShader.cpp */; };
-		B525E3C31C89587000C691C0 /* BGEShaderOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A11C89587000C691C0 /* BGEShaderOpenGLES2.cpp */; };
-		B525E3C41C89587000C691C0 /* BGEShaderProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A31C89587000C691C0 /* BGEShaderProgram.cpp */; };
-		B525E3C51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp */; };
-		B525E3C61C89587000C691C0 /* BGEShaderService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A71C89587000C691C0 /* BGEShaderService.cpp */; };
-		B525E3C71C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A91C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp */; };
+		B525E3C21C89587000C691C0 /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E39F1C89587000C691C0 /* Shader.cpp */; };
+		B525E3C31C89587000C691C0 /* ShaderOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A11C89587000C691C0 /* ShaderOpenGLES2.cpp */; };
+		B525E3C41C89587000C691C0 /* ShaderProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A31C89587000C691C0 /* ShaderProgram.cpp */; };
+		B525E3C51C89587000C691C0 /* ShaderProgramOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A51C89587000C691C0 /* ShaderProgramOpenGLES2.cpp */; };
+		B525E3C61C89587000C691C0 /* ShaderService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A71C89587000C691C0 /* ShaderService.cpp */; };
+		B525E3C71C89587000C691C0 /* ShaderServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3A91C89587000C691C0 /* ShaderServiceOpenGLES2.cpp */; };
 		B525E3C81C89587000C691C0 /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3AB1C89587000C691C0 /* Texture.cpp */; };
 		B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3AD1C89587000C691C0 /* TextureAtlas.cpp */; };
 		B525E3CA1C89587000C691C0 /* TextureOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3AF1C89587000C691C0 /* TextureOpenGLES2.cpp */; };
@@ -171,18 +171,18 @@
 		B525E39C1C89587000C691C0 /* RenderWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderWindow.h; sourceTree = "<group>"; };
 		B525E39D1C89587000C691C0 /* Service.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Service.cpp; sourceTree = "<group>"; };
 		B525E39E1C89587000C691C0 /* Service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Service.h; sourceTree = "<group>"; };
-		B525E39F1C89587000C691C0 /* BGEShader.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEShader.cpp; sourceTree = "<group>"; };
-		B525E3A01C89587000C691C0 /* BGEShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEShader.h; sourceTree = "<group>"; };
-		B525E3A11C89587000C691C0 /* BGEShaderOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEShaderOpenGLES2.cpp; path = opengles2/BGEShaderOpenGLES2.cpp; sourceTree = "<group>"; };
-		B525E3A21C89587000C691C0 /* BGEShaderOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEShaderOpenGLES2.h; path = opengles2/BGEShaderOpenGLES2.h; sourceTree = "<group>"; };
-		B525E3A31C89587000C691C0 /* BGEShaderProgram.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEShaderProgram.cpp; sourceTree = "<group>"; };
-		B525E3A41C89587000C691C0 /* BGEShaderProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEShaderProgram.h; sourceTree = "<group>"; };
-		B525E3A51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEShaderProgramOpenGLES2.cpp; path = opengles2/BGEShaderProgramOpenGLES2.cpp; sourceTree = "<group>"; };
-		B525E3A61C89587000C691C0 /* BGEShaderProgramOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEShaderProgramOpenGLES2.h; path = opengles2/BGEShaderProgramOpenGLES2.h; sourceTree = "<group>"; };
-		B525E3A71C89587000C691C0 /* BGEShaderService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEShaderService.cpp; sourceTree = "<group>"; };
-		B525E3A81C89587000C691C0 /* BGEShaderService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEShaderService.h; sourceTree = "<group>"; };
-		B525E3A91C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEShaderServiceOpenGLES2.cpp; path = opengles2/BGEShaderServiceOpenGLES2.cpp; sourceTree = "<group>"; };
-		B525E3AA1C89587000C691C0 /* BGEShaderServiceOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEShaderServiceOpenGLES2.h; path = opengles2/BGEShaderServiceOpenGLES2.h; sourceTree = "<group>"; };
+		B525E39F1C89587000C691C0 /* Shader.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Shader.cpp; sourceTree = "<group>"; };
+		B525E3A01C89587000C691C0 /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
+		B525E3A11C89587000C691C0 /* ShaderOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = ShaderOpenGLES2.cpp; path = opengles2/ShaderOpenGLES2.cpp; sourceTree = "<group>"; };
+		B525E3A21C89587000C691C0 /* ShaderOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShaderOpenGLES2.h; path = opengles2/ShaderOpenGLES2.h; sourceTree = "<group>"; };
+		B525E3A31C89587000C691C0 /* ShaderProgram.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = ShaderProgram.cpp; sourceTree = "<group>"; };
+		B525E3A41C89587000C691C0 /* ShaderProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderProgram.h; sourceTree = "<group>"; };
+		B525E3A51C89587000C691C0 /* ShaderProgramOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = ShaderProgramOpenGLES2.cpp; path = opengles2/ShaderProgramOpenGLES2.cpp; sourceTree = "<group>"; };
+		B525E3A61C89587000C691C0 /* ShaderProgramOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShaderProgramOpenGLES2.h; path = opengles2/ShaderProgramOpenGLES2.h; sourceTree = "<group>"; };
+		B525E3A71C89587000C691C0 /* ShaderService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = ShaderService.cpp; sourceTree = "<group>"; };
+		B525E3A81C89587000C691C0 /* ShaderService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderService.h; sourceTree = "<group>"; };
+		B525E3A91C89587000C691C0 /* ShaderServiceOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = ShaderServiceOpenGLES2.cpp; path = opengles2/ShaderServiceOpenGLES2.cpp; sourceTree = "<group>"; };
+		B525E3AA1C89587000C691C0 /* ShaderServiceOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShaderServiceOpenGLES2.h; path = opengles2/ShaderServiceOpenGLES2.h; sourceTree = "<group>"; };
 		B525E3AB1C89587000C691C0 /* Texture.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Texture.cpp; sourceTree = "<group>"; };
 		B525E3AC1C89587000C691C0 /* Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
 		B525E3AD1C89587000C691C0 /* TextureAtlas.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = TextureAtlas.cpp; sourceTree = "<group>"; };
@@ -373,12 +373,12 @@
 				B525E39C1C89587000C691C0 /* RenderWindow.h */,
 				B525E39D1C89587000C691C0 /* Service.cpp */,
 				B525E39E1C89587000C691C0 /* Service.h */,
-				B525E39F1C89587000C691C0 /* BGEShader.cpp */,
-				B525E3A01C89587000C691C0 /* BGEShader.h */,
-				B525E3A31C89587000C691C0 /* BGEShaderProgram.cpp */,
-				B525E3A41C89587000C691C0 /* BGEShaderProgram.h */,
-				B525E3A71C89587000C691C0 /* BGEShaderService.cpp */,
-				B525E3A81C89587000C691C0 /* BGEShaderService.h */,
+				B525E39F1C89587000C691C0 /* Shader.cpp */,
+				B525E3A01C89587000C691C0 /* Shader.h */,
+				B525E3A31C89587000C691C0 /* ShaderProgram.cpp */,
+				B525E3A41C89587000C691C0 /* ShaderProgram.h */,
+				B525E3A71C89587000C691C0 /* ShaderService.cpp */,
+				B525E3A81C89587000C691C0 /* ShaderService.h */,
 				B525E3AB1C89587000C691C0 /* Texture.cpp */,
 				B525E3AC1C89587000C691C0 /* Texture.h */,
 				B525E3AD1C89587000C691C0 /* TextureAtlas.cpp */,
@@ -490,12 +490,12 @@
 				B525E3941C89587000C691C0 /* RenderContextOpenGLES2.h */,
 				B525E3971C89587000C691C0 /* RenderServiceOpenGLES2.cpp */,
 				B525E3981C89587000C691C0 /* RenderServiceOpenGLES2.h */,
-				B525E3A11C89587000C691C0 /* BGEShaderOpenGLES2.cpp */,
-				B525E3A21C89587000C691C0 /* BGEShaderOpenGLES2.h */,
-				B525E3A51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp */,
-				B525E3A61C89587000C691C0 /* BGEShaderProgramOpenGLES2.h */,
-				B525E3A91C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp */,
-				B525E3AA1C89587000C691C0 /* BGEShaderServiceOpenGLES2.h */,
+				B525E3A11C89587000C691C0 /* ShaderOpenGLES2.cpp */,
+				B525E3A21C89587000C691C0 /* ShaderOpenGLES2.h */,
+				B525E3A51C89587000C691C0 /* ShaderProgramOpenGLES2.cpp */,
+				B525E3A61C89587000C691C0 /* ShaderProgramOpenGLES2.h */,
+				B525E3A91C89587000C691C0 /* ShaderServiceOpenGLES2.cpp */,
+				B525E3AA1C89587000C691C0 /* ShaderServiceOpenGLES2.h */,
 				B571F1911C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp */,
 				B571F1921C9D24E0007F5A90 /* TextureAtlasOpenGLES2.h */,
 				B525E3AF1C89587000C691C0 /* TextureOpenGLES2.cpp */,
@@ -696,11 +696,11 @@
 				B571F1891C98C231007F5A90 /* FontOpenGLES2.cpp in Sources */,
 				B571F1861C98C21C007F5A90 /* FontServiceOpenGLES2.cpp in Sources */,
 				B525E3BE1C89587000C691C0 /* RenderServiceOpenGLES2.cpp in Sources */,
-				B525E3C61C89587000C691C0 /* BGEShaderService.cpp in Sources */,
+				B525E3C61C89587000C691C0 /* ShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,
 				B571F1931C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp in Sources */,
 				B52B760D1CBA183900758249 /* Material.cpp in Sources */,
-				B525E3C41C89587000C691C0 /* BGEShaderProgram.cpp in Sources */,
+				B525E3C41C89587000C691C0 /* ShaderProgram.cpp in Sources */,
 				B525E3BC1C89587000C691C0 /* RenderContextOpenGLES2.cpp in Sources */,
 				B525E3CC1C89587000C691C0 /* TextureServiceOpenGLES2.cpp in Sources */,
 				B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */,
@@ -709,10 +709,10 @@
 				B571F1901C9D0A34007F5A90 /* FontGlyph.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
-				B525E3C21C89587000C691C0 /* BGEShader.cpp in Sources */,
+				B525E3C21C89587000C691C0 /* Shader.cpp in Sources */,
 				B571F1801C97D88E007F5A90 /* FontService.cpp in Sources */,
 				B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */,
-				B525E3C31C89587000C691C0 /* BGEShaderOpenGLES2.cpp in Sources */,
+				B525E3C31C89587000C691C0 /* ShaderOpenGLES2.cpp in Sources */,
 				B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */,
 				B525E3C81C89587000C691C0 /* Texture.cpp in Sources */,
 				B571F1831C97D92E007F5A90 /* Font.cpp in Sources */,
@@ -728,11 +728,11 @@
 				B508CD891CA0ABA200127B97 /* TextureBase.cpp in Sources */,
 				B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */,
 				B525E3C01C89587000C691C0 /* RenderWindow.cpp in Sources */,
-				B525E3C51C89587000C691C0 /* BGEShaderProgramOpenGLES2.cpp in Sources */,
+				B525E3C51C89587000C691C0 /* ShaderProgramOpenGLES2.cpp in Sources */,
 				B525E3CA1C89587000C691C0 /* TextureOpenGLES2.cpp in Sources */,
 				B525E3C11C89587000C691C0 /* Service.cpp in Sources */,
 				B525E3BF1C89587000C691C0 /* RenderView.cpp in Sources */,
-				B525E3C71C89587000C691C0 /* BGEShaderServiceOpenGLES2.cpp in Sources */,
+				B525E3C71C89587000C691C0 /* ShaderServiceOpenGLES2.cpp in Sources */,
 				B52B76141CBADF5E00758249 /* MaterialService.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

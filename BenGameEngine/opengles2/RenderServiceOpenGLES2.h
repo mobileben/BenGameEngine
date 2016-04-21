@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include "RenderService.h"
-#include "BGEShaderServiceOpenGLES2.h"
+#include "ShaderServiceOpenGLES2.h"
 #include "BGEMathTypes.h"
 #include "Texture.h"
 #include "Material.h"
@@ -44,8 +44,8 @@ namespace BGE {
         void resizeRenderWindow();
         void createShaders();
         
-        std::shared_ptr<BGEShaderProgram> pushShaderProgram(std::string program);
-        std::shared_ptr<BGEShaderProgram> popShaderProgram();
+        std::shared_ptr<ShaderProgram> pushShaderProgram(std::string program);
+        std::shared_ptr<ShaderProgram> popShaderProgram();
         
         const BGEMatrix4 *getProjectionMatrix() { return &projectionMatrix_; }
         

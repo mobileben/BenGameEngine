@@ -15,7 +15,7 @@
 #include "Service.h"
 #include "RenderWindow.h"
 #include "RenderContext.h"
-#include "BGEShaderService.h"
+#include "ShaderService.h"
 #include "BGEMathTypes.h"
 
 typedef BGEVector3 BGEVertex;
@@ -74,19 +74,19 @@ namespace BGE {
         
         std::shared_ptr<RenderWindow> getRenderWindow() { return renderWindow_; }
         
-        std::shared_ptr<BGEShaderService> getShaderService() { return shaderService_; }
+        std::shared_ptr<BGE::ShaderService> getShaderService() { return shaderService_; }
         
-        virtual std::shared_ptr<BGEShaderProgram> pushShaderProgram(std::string program) =0;
-        virtual std::shared_ptr<BGEShaderProgram> popShaderProgram() =0;
+        virtual std::shared_ptr<BGE::ShaderProgram> pushShaderProgram(std::string program) =0;
+        virtual std::shared_ptr<BGE::ShaderProgram> popShaderProgram() =0;
         
         virtual void render() =0;
         
     protected:
         std::shared_ptr<RenderContext> renderContext_;
         std::shared_ptr<RenderWindow> renderWindow_;
-        std::shared_ptr<BGEShaderService> shaderService_;
+        std::shared_ptr<BGE::ShaderService> shaderService_;
         
-        std::vector<std::shared_ptr<BGEShaderProgram>> shaderProgramStack_;
+        std::vector<std::shared_ptr<BGE::ShaderProgram>> shaderProgramStack_;
         
     private:
         bool ready_;

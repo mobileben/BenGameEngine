@@ -10,7 +10,7 @@
 #include "FontOpenGLES2.h"
 #include "TextureOpenGLES2.h"
 #include "RenderServiceOpenGLES2.h"
-#include "BGEShaderServiceOpenGLES2.h"
+#include "ShaderServiceOpenGLES2.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
 
@@ -255,7 +255,7 @@ void BGE::FontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVe
         size_t length = str.length();
         std::shared_ptr<BGE::TextureOpenGLES2> oglTex;
         
-        std::shared_ptr<BGEShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<BGEShaderProgramOpenGLES2>(renderer->pushShaderProgram("Font"));
+        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(renderer->pushShaderProgram("Font"));
         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
         GLint positionLocation = glShader->locationForAttribute("Position");
         
