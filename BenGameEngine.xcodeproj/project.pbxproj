@@ -26,7 +26,6 @@
 		B525E3841C8957BD00C691C0 /* libBenGameEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */; };
 		B525E3B51C89587000C691C0 /* Error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3851C89587000C691C0 /* Error.cpp */; };
 		B525E3B61C89587000C691C0 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3871C89587000C691C0 /* Game.cpp */; };
-		B525E3B71C89587000C691C0 /* BGEGLKView.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E38A1C89587000C691C0 /* BGEGLKView.m */; };
 		B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */; };
 		B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E38D1C89587000C691C0 /* HeartbeatService.cpp */; };
 		B525E3BA1C89587000C691C0 /* BGEMathTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E38F1C89587000C691C0 /* BGEMathTypes.cpp */; };
@@ -152,8 +151,6 @@
 		B525E3861C89587000C691C0 /* Error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Error.h; sourceTree = "<group>"; };
 		B525E3871C89587000C691C0 /* Game.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Game.cpp; sourceTree = "<group>"; };
 		B525E3881C89587000C691C0 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
-		B525E3891C89587000C691C0 /* BGEGLKView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEGLKView.h; sourceTree = "<group>"; };
-		B525E38A1C89587000C691C0 /* BGEGLKView.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEGLKView.m; sourceTree = "<group>"; };
 		B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGEHeartbeatIOS.h; sourceTree = "<group>"; };
 		B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = BGEHeartbeatIOS.m; sourceTree = "<group>"; };
 		B525E38D1C89587000C691C0 /* HeartbeatService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = HeartbeatService.cpp; sourceTree = "<group>"; };
@@ -354,8 +351,6 @@
 				B508CDA71CB4DE6D00127B97 /* GameObject.h */,
 				B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */,
 				B508CDAD1CB78DA100127B97 /* GameObjectService.h */,
-				B525E3891C89587000C691C0 /* BGEGLKView.h */,
-				B525E38A1C89587000C691C0 /* BGEGLKView.m */,
 				B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */,
 				B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */,
 				B525E38D1C89587000C691C0 /* HeartbeatService.cpp */,
@@ -718,7 +713,6 @@
 				B571F1801C97D88E007F5A90 /* FontService.cpp in Sources */,
 				B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */,
 				B525E3C31C89587000C691C0 /* BGEShaderOpenGLES2.cpp in Sources */,
-				B525E3B71C89587000C691C0 /* BGEGLKView.m in Sources */,
 				B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */,
 				B525E3C81C89587000C691C0 /* Texture.cpp in Sources */,
 				B571F1831C97D92E007F5A90 /* Font.cpp in Sources */,

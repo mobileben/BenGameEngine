@@ -14,7 +14,6 @@
 #include "TextureServiceOpenGLES2.h"
 #include "FontServiceOpenGLES2.h"
 #include "TextureOpenGLES2.h"
-#include "BGEGLKView.h"
 #include "TransformComponent.h"
 #include "LineRenderComponent.h"
 #include "FlatRectRenderComponent.h"

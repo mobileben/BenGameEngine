@@ -8,7 +8,6 @@
 
 #include "BenGameEngineTestApp.hpp"
 #include "RenderServiceOpenGLES2.h"
-#include "BGEGLKView.h"
 
 
 BenGameEngineTestApp::BenGameEngineTestApp()
