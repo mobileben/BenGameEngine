@@ -9,13 +9,24 @@
 #include "FlatRectRenderComponent.h"
 #include "Game.h"
 
+std::shared_ptr<BGE::FlatRectRenderComponent> BGE::FlatRectRenderComponent::create(uint64_t componentId) {
+    return std::make_shared<FlatRectRenderComponent>(private_key{}, componentId);
+}
+
+std::shared_ptr<BGE::FlatRectRenderComponent> BGE::FlatRectRenderComponent::create(uint64_t componentId, std::string name) {
+    return std::make_shared<FlatRectRenderComponent>(private_key{}, componentId, name);
+}
+
+BGE::FlatRectRenderComponent::FlatRectRenderComponent(struct private_key const& key, uint64_t componentId) : BGE::RenderComponent(componentId) {
+}
+
+BGE::FlatRectRenderComponent::FlatRectRenderComponent(struct private_key const& key, uint64_t componentId, std::string name) : BGE::RenderComponent(componentId, name) {
+}
+
 BGE::FlatRectRenderComponent::FlatRectRenderComponent(uint32_t componentId) : BGE::RenderComponent(componentId) {
 }
 
 BGE::FlatRectRenderComponent::FlatRectRenderComponent(uint32_t componentId, std::string name) : BGE::RenderComponent(componentId, name) {
-}
-
-BGE::FlatRectRenderComponent::FlatRectRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject) : BGE::RenderComponent(componentId, name, gameObject) {
 }
 
 void BGE::FlatRectRenderComponent::setWidth(float width) {

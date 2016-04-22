@@ -20,7 +20,17 @@ namespace BGE {
     class MaterialService;
     
     class Material : public BGE::Object {
+    private:
+        struct private_key {};
+        
     public:
+        static std::shared_ptr<Material> create(uint64_t matId);
+        static std::shared_ptr<Material> create(uint64_t matId, std::string name);
+        
+        Material(struct private_key const& key, uint64_t matId);
+        Material(struct private_key const& key, uint64_t matId, std::string name);
+        virtual ~Material() {}
+        
         void getColor(BGEColor& color) const { color = color_; }
         void setColor(BGEColor& color);
         void getColorMatrix(BGEColor& colorMatrix) const;
@@ -32,9 +42,6 @@ namespace BGE {
         
         Material(uint64_t matId);
         Material(uint64_t matId, std::string name);
-        Material(uint64_t matId, std::string name, BGEColor& color);
-        Material(uint64_t matId, std::string name, std::shared_ptr<TextureBase> texture);
-        Material(uint64_t matId, std::string name, BGEColor& color, std::shared_ptr<TextureBase> texture);
         
     private:
         bool                        colorDirty_;

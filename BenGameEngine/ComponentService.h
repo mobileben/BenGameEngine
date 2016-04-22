@@ -40,7 +40,7 @@ namespace BGE {
         template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
             static_assert(std::is_base_of<Component, T>::value, "Not Component");
             uint64_t objId = getIdAndIncrement();
-            std::shared_ptr<T> component(new T(objId, std::forward<Args>(args)...));
+            std::shared_ptr<T> component = T::create(objId, std::forward<Args>(args)...);
             
             addComponent(component);
             

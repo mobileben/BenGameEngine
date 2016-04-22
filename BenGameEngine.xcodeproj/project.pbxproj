@@ -80,6 +80,8 @@
 		B5E7B9B71CC35B5D00978F1A /* LineFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5E7B9B41CC35B5000978F1A /* LineFragment.glsl */; };
 		B5E7B9BA1CC46A7500978F1A /* FlatRectRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5E7B9B81CC46A7500978F1A /* FlatRectRenderComponent.cpp */; };
 		B5EE9D6C1CC4A4C8005D99CC /* SpriteRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5EE9D6A1CC4A4C8005D99CC /* SpriteRenderComponent.cpp */; };
+		B5F6B16A1CC8AF7A00E1FD45 /* Space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */; };
+		B5F6B16D1CC8B06E00E1FD45 /* SpaceService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B16B1CC8B06E00E1FD45 /* SpaceService.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -242,6 +244,10 @@
 		B5E7B9B91CC46A7500978F1A /* FlatRectRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FlatRectRenderComponent.h; path = components/FlatRectRenderComponent.h; sourceTree = "<group>"; };
 		B5EE9D6A1CC4A4C8005D99CC /* SpriteRenderComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = SpriteRenderComponent.cpp; path = components/SpriteRenderComponent.cpp; sourceTree = "<group>"; };
 		B5EE9D6B1CC4A4C8005D99CC /* SpriteRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SpriteRenderComponent.h; path = components/SpriteRenderComponent.h; sourceTree = "<group>"; };
+		B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Space.cpp; sourceTree = "<group>"; };
+		B5F6B1691CC8AF7A00E1FD45 /* Space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Space.h; sourceTree = "<group>"; };
+		B5F6B16B1CC8B06E00E1FD45 /* SpaceService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = SpaceService.cpp; sourceTree = "<group>"; };
+		B5F6B16C1CC8B06E00E1FD45 /* SpaceService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpaceService.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -333,36 +339,40 @@
 		B525E35D1C8950DA00C691C0 /* BenGameEngine */ = {
 			isa = PBXGroup;
 			children = (
+				B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */,
+				B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */,
+				B525E38F1C89587000C691C0 /* BGEMathTypes.cpp */,
+				B525E3901C89587000C691C0 /* BGEMathTypes.h */,
 				B508CDA31CB4DD5B00127B97 /* Component.cpp */,
 				B508CDA41CB4DD5B00127B97 /* Component.h */,
+				B508CDAF1CB8B2EA00127B97 /* components */,
 				B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */,
 				B5ACE8911CBB56CE004B6871 /* ComponentService.h */,
 				B525E3851C89587000C691C0 /* Error.cpp */,
 				B525E3861C89587000C691C0 /* Error.h */,
+				B571F17C1C97CF42007F5A90 /* external */,
 				B571F1811C97D92E007F5A90 /* Font.cpp */,
 				B571F1821C97D92E007F5A90 /* Font.h */,
 				B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */,
 				B571F18F1C9D0A34007F5A90 /* FontGlyph.h */,
 				B571F17E1C97D88E007F5A90 /* FontService.cpp */,
 				B571F17F1C97D88E007F5A90 /* FontService.h */,
+				B52B760E1CBA1E7C00758249 /* game objects */,
 				B525E3871C89587000C691C0 /* Game.cpp */,
 				B525E3881C89587000C691C0 /* Game.h */,
 				B508CDA61CB4DE6D00127B97 /* GameObject.cpp */,
 				B508CDA71CB4DE6D00127B97 /* GameObject.h */,
 				B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */,
 				B508CDAD1CB78DA100127B97 /* GameObjectService.h */,
-				B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */,
-				B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */,
 				B525E38D1C89587000C691C0 /* HeartbeatService.cpp */,
 				B525E38E1C89587000C691C0 /* HeartbeatService.h */,
 				B52B760B1CBA183900758249 /* Material.cpp */,
 				B52B760C1CBA183900758249 /* Material.h */,
 				B52B76121CBADF5E00758249 /* MaterialService.cpp */,
 				B52B76131CBADF5E00758249 /* MaterialService.h */,
-				B525E38F1C89587000C691C0 /* BGEMathTypes.cpp */,
-				B525E3901C89587000C691C0 /* BGEMathTypes.h */,
 				B508CDA91CB4DE8E00127B97 /* Object.cpp */,
 				B508CDAA1CB4DE8E00127B97 /* Object.h */,
+				B571F1741C928BA5007F5A90 /* opengles2 */,
 				B525E3911C89587000C691C0 /* RenderContext.cpp */,
 				B525E3921C89587000C691C0 /* RenderContext.h */,
 				B525E3951C89587000C691C0 /* RenderService.cpp */,
@@ -377,8 +387,13 @@
 				B525E3A01C89587000C691C0 /* Shader.h */,
 				B525E3A31C89587000C691C0 /* ShaderProgram.cpp */,
 				B525E3A41C89587000C691C0 /* ShaderProgram.h */,
+				B525E3CD1C89587900C691C0 /* shaders */,
 				B525E3A71C89587000C691C0 /* ShaderService.cpp */,
 				B525E3A81C89587000C691C0 /* ShaderService.h */,
+				B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */,
+				B5F6B1691CC8AF7A00E1FD45 /* Space.h */,
+				B5F6B16B1CC8B06E00E1FD45 /* SpaceService.cpp */,
+				B5F6B16C1CC8B06E00E1FD45 /* SpaceService.h */,
 				B525E3AB1C89587000C691C0 /* Texture.cpp */,
 				B525E3AC1C89587000C691C0 /* Texture.h */,
 				B525E3AD1C89587000C691C0 /* TextureAtlas.cpp */,
@@ -387,11 +402,6 @@
 				B508CD881CA0ABA200127B97 /* TextureBase.h */,
 				B525E3B11C89587000C691C0 /* TextureService.cpp */,
 				B525E3B21C89587000C691C0 /* TextureService.h */,
-				B508CDAF1CB8B2EA00127B97 /* components */,
-				B571F17C1C97CF42007F5A90 /* external */,
-				B52B760E1CBA1E7C00758249 /* game objects */,
-				B571F1741C928BA5007F5A90 /* opengles2 */,
-				B525E3CD1C89587900C691C0 /* shaders */,
 			);
 			path = BenGameEngine;
 			sourceTree = "<group>";
@@ -710,9 +720,11 @@
 				B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* Shader.cpp in Sources */,
+				B5F6B16D1CC8B06E00E1FD45 /* SpaceService.cpp in Sources */,
 				B571F1801C97D88E007F5A90 /* FontService.cpp in Sources */,
 				B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */,
 				B525E3C31C89587000C691C0 /* ShaderOpenGLES2.cpp in Sources */,
+				B5F6B16A1CC8AF7A00E1FD45 /* Space.cpp in Sources */,
 				B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */,
 				B525E3C81C89587000C691C0 /* Texture.cpp in Sources */,
 				B571F1831C97D92E007F5A90 /* Font.cpp in Sources */,

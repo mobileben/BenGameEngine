@@ -15,7 +15,17 @@
 namespace BGE {
     class LineRenderComponent : public BGE::RenderComponent
     {
+    private:
+        struct private_key {};
+        
     public:
+        static std::shared_ptr<LineRenderComponent> create(uint64_t componentId);
+        static std::shared_ptr<LineRenderComponent> create(uint64_t componentId, std::string name);
+        
+        LineRenderComponent(struct private_key const& key, uint64_t componentId);
+        LineRenderComponent(struct private_key const& key, uint64_t componentId, std::string name);
+        virtual ~LineRenderComponent() {}
+        
         const std::vector<BGEVector2>& getPoints() const;
         void setPoints(const std::vector<BGEVector2>& points, bool lineLoop=false);
         bool isLineLoop() const { return closedLoop_; }
@@ -26,7 +36,6 @@ namespace BGE {
     protected:
         LineRenderComponent(uint32_t componentId);
         LineRenderComponent(uint32_t componentId, std::string name);
-        LineRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject);
         
         void materialsUpdated() {}
         

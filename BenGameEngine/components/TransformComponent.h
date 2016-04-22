@@ -19,7 +19,16 @@
 namespace BGE {
     class TransformComponent : public BGE::Component
     {
+    private:
+        struct private_key {};
+        
     public:
+        static std::shared_ptr<TransformComponent> create(uint64_t componentId);
+        static std::shared_ptr<TransformComponent> create(uint64_t componentId, std::string name);
+
+        TransformComponent(struct private_key const& key, uint64_t componentId);
+        TransformComponent(struct private_key const& key, uint64_t componentId, std::string name);
+
         virtual ~TransformComponent() {}
         
         bool isVisible() const { return visible_; }

@@ -17,12 +17,21 @@
 #include "Component.h"
 
 namespace BGE {
+    class Space;
     class GameObjectService;
     
     class GameObject : public BGE::Object
     {
+    private:
+        struct private_key {};
+        
     public:
-        GameObject(GameObject const&) = delete;
+        static std::shared_ptr<GameObject> create(uint64_t objId);
+        static std::shared_ptr<GameObject> create(uint64_t objId, std::string name);
+
+        GameObject(struct private_key const&, uint64_t objId);
+        GameObject(struct private_key const&, uint64_t objId, std::string name);
+        
         virtual ~GameObject() {}
         
         template <typename T> std::shared_ptr<T> getComponent() {
@@ -46,12 +55,16 @@ namespace BGE {
         
         bool isActive() const { return active_; }
         void setActive(bool active) { active_ = active; }
+
+    protected:
         
+        GameObject() = delete;
+        GameObject(GameObject const&) = delete;
+        GameObject(uint64_t objId) = delete;
+        GameObject(uint64_t objId, std::string name) = delete;
+
     private:
         friend GameObjectService;
-        
-        GameObject(uint64_t objId);
-        GameObject(uint64_t objId, std::string name);
         
         bool active_;
         std::unordered_map<std::type_index, std::shared_ptr<BGE::Component>> components_;

@@ -19,7 +19,17 @@ namespace BGE {
     
     class FlatRectRenderComponent : public BGE::RenderComponent
     {
+    private:
+        struct private_key {};
+        
     public:
+        static std::shared_ptr<FlatRectRenderComponent> create(uint64_t componentId);
+        static std::shared_ptr<FlatRectRenderComponent> create(uint64_t componentId, std::string name);
+        
+        FlatRectRenderComponent(struct private_key const& key, uint64_t componentId);
+        FlatRectRenderComponent(struct private_key const& key, uint64_t componentId, std::string name);
+        virtual ~FlatRectRenderComponent() {}
+
         void setWidth(float width);
         void setHeight(float height);
         void setWidthHeight(BGEVector2 &wh);
@@ -27,7 +37,6 @@ namespace BGE {
     protected:
         FlatRectRenderComponent(uint32_t componentId);
         FlatRectRenderComponent(uint32_t componentId, std::string name);
-        FlatRectRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject);
         
         BGEVertex* const getVertices() { return vertices_; }
         

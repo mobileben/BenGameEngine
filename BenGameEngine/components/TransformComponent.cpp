@@ -9,6 +9,28 @@
 #include "TransformComponent.h"
 #include <cassert>
 
+std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::create(uint64_t componentId) {
+    return std::make_shared<TransformComponent>(private_key{}, componentId);
+}
+
+std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::create(uint64_t componentId, std::string name) {
+    return std::make_shared<TransformComponent>(private_key{}, componentId, name);
+}
+
+BGE::TransformComponent::TransformComponent(struct private_key const& key, uint64_t componentId) :Component(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
+bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
+z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
+transformDirty_(false), speed_(1), paused_(false) {
+    BGEMatrix4MakeIdentify(matrix_);
+}
+
+BGE::TransformComponent::TransformComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
+bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
+z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
+transformDirty_(false), speed_(1), paused_(false) {
+    BGEMatrix4MakeIdentify(matrix_);
+}
+
 BGE::TransformComponent::TransformComponent(uint64_t componentId) : Component(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
                                                     bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
                                                     z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
@@ -16,7 +38,7 @@ BGE::TransformComponent::TransformComponent(uint64_t componentId) : Component(co
     BGEMatrix4MakeIdentify(matrix_);
 }
 
-BGE::TransformComponent::TransformComponent(uint64_t componentId, std::string name) :  Component(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
+BGE::TransformComponent::TransformComponent(uint64_t componentId, std::string name) : Component(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
 bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
 z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
 transformDirty_(false), speed_(1), paused_(false) {

@@ -16,6 +16,8 @@
 #include "GameObject.h"
 #include <type_traits>
 
+class Space;
+
 namespace BGE {
     class GameObjectService : public BGE::Service {
     public:
@@ -35,21 +37,26 @@ namespace BGE {
             static_assert(std::is_base_of<BGE::GameObject, T>::value, "Not GameObject");
             
             uint64_t objId = getIdAndIncrement();
-            std::shared_ptr<T> object(new T(objId, std::forward<Args>(args)...));
+            std::shared_ptr<T> object = GameObject::create(objId, std::forward<Args>(args)...);
             
             objects_[objId] = object;
             
             return object;
         }
         
+        void removeObject(std::shared_ptr<GameObject> object);
         void removeObject(uint64_t objId);
+        void removeObject(std::string name);
         
         const std::unordered_map<uint64_t, std::shared_ptr<BGE::GameObject>>& getGameObjects() const { return objects_; }
         
+        std::shared_ptr<BGE::GameObject> find(std::shared_ptr<GameObject> object);
         std::shared_ptr<BGE::GameObject> find(uint64_t objId);
         std::shared_ptr<BGE::GameObject> find(std::string name);
         
     private:
+        friend Space;
+        
         std::unordered_map<uint64_t, std::shared_ptr<BGE::GameObject>> objects_;
     };
 }

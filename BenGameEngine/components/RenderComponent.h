@@ -24,6 +24,8 @@ namespace BGE {
     
     class RenderComponent : public BGE::Component {
     public:
+        virtual ~RenderComponent() {}
+        
         float getLocalWidth() { return localBounds_.w; }
         float getLocalHeight() { return localBounds_.h; }
         float getGlobalWidth() { return globalBounds_.w; }
@@ -41,7 +43,6 @@ namespace BGE {
     protected:
         RenderComponent(uint64_t componentId);
         RenderComponent(uint64_t componentId, std::string name);
-        RenderComponent(uint64_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject);
         
         bool getGlobalBoundsDirty() const { return globalBoundsDirty_; }
         void setGlobalBoundsDirty(bool dirty) { globalBoundsDirty_ = dirty; }

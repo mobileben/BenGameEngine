@@ -19,13 +19,22 @@ namespace BGE {
     
     class SpriteRenderComponent : public BGE::RenderComponent
     {
+    private:
+        struct private_key {};
+        
     public:
+        static std::shared_ptr<SpriteRenderComponent> create(uint64_t componentId);
+        static std::shared_ptr<SpriteRenderComponent> create(uint64_t componentId, std::string name);
+        
+        SpriteRenderComponent(struct private_key const& key, uint64_t componentId);
+        SpriteRenderComponent(struct private_key const& key, uint64_t componentId, std::string name);
+        virtual ~SpriteRenderComponent() {}
+
         std::shared_ptr<TextureBase> getTexture();
         
     protected:
         SpriteRenderComponent(uint32_t componentId);
         SpriteRenderComponent(uint32_t componentId, std::string name);
-        SpriteRenderComponent(uint32_t componentId, std::string name, std::shared_ptr<BGE::GameObject> gameObject);
         
         void materialsUpdated();
         

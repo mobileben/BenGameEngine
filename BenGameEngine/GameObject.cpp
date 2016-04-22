@@ -8,10 +8,18 @@
 
 #include "GameObject.h"
 
-BGE::GameObject::GameObject(uint64_t objId) : BGE::Object(objId), active_(true) {
+std::shared_ptr<BGE::GameObject> BGE::GameObject::create(uint64_t objId) {
+    return std::make_shared<GameObject>(private_key{}, objId);
 }
 
-BGE::GameObject::GameObject(uint64_t objId, std::string name) : BGE::Object(objId, name), active_(true) {
+std::shared_ptr<BGE::GameObject> BGE::GameObject::create(uint64_t objId, std::string name) {
+    return std::make_shared<GameObject>(private_key{}, objId, name);
+}
+
+BGE::GameObject::GameObject(struct private_key const&, uint64_t objId) : BGE::Object(objId), active_(true) {
+}
+
+BGE::GameObject::GameObject(struct private_key const&, uint64_t objId, std::string name) : BGE::Object(objId, name), active_(true) {
 }
 
 template <typename T>

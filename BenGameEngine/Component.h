@@ -18,15 +18,22 @@ namespace BGE {
     
     class Component : public BGE::Object
     {
+    private:
+        struct private_key {};
+        
     public:
+        static std::shared_ptr<Component> create(uint64_t componentId);
+        static std::shared_ptr<Component> create(uint64_t componentId, std::string name);
+        
+        Component(struct private_key const& key, uint64_t componentId);
+        Component(struct private_key const& key, uint64_t componentId, std::string name);
+        virtual ~Component() {}
+
+    protected:
         Component() = delete;
         Component(Component const&) = delete;
-        virtual ~Component() {}
-        
-    protected:
         Component(uint64_t componentId);
         Component(uint64_t componentId, std::string name);
-        Component(uint64_t componentId, std::string name, std::shared_ptr<GameObject> gameObject);
         
         bool hasGameComponent() const { return !gameObject_.expired(); }
         std::weak_ptr<GameObject> getGameObject() const { return gameObject_; }
