@@ -36,6 +36,7 @@ namespace BGE {
             return gameObjectService_->createObject(std::forward<Args>(args)...);
         }
         
+        void moveObject(uint64_t objId);
         void removeObject(uint64_t objId) { gameObjectService_->removeObject(objId); }
         
         std::shared_ptr<BGE::GameObject> find(std::shared_ptr<GameObject> object) { return gameObjectService_->find(object); }
@@ -50,6 +51,7 @@ namespace BGE {
         friend SpaceService;
         
         std::shared_ptr<GameObjectService> gameObjectService_;
+        std::vector<GameObject> gameObjects_;
         
         bool        visible_;
         uint32_t    order_;

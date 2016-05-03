@@ -16,6 +16,8 @@
 		B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA61CB4DE6D00127B97 /* GameObject.cpp */; };
 		B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA91CB4DE8E00127B97 /* Object.cpp */; };
 		B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */; };
+		B50F5FFC1CD1E36D00A5D017 /* HandleObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B50F5FFA1CD1E36D00A5D017 /* HandleObject.cpp */; };
+		B50F60021CD343E400A5D017 /* HandleService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B50F60001CD343E400A5D017 /* HandleService.cpp */; };
 		B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */; };
 		B525E36F1C8957A700C691C0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E36E1C8957A700C691C0 /* main.m */; };
 		B525E3721C8957A700C691C0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E3711C8957A700C691C0 /* AppDelegate.m */; };
@@ -137,6 +139,11 @@
 		B508CDAA1CB4DE8E00127B97 /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
 		B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = GameObjectService.cpp; sourceTree = "<group>"; };
 		B508CDAD1CB78DA100127B97 /* GameObjectService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObjectService.h; sourceTree = "<group>"; };
+		B50F5FFA1CD1E36D00A5D017 /* HandleObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HandleObject.cpp; sourceTree = "<group>"; };
+		B50F5FFB1CD1E36D00A5D017 /* HandleObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandleObject.h; sourceTree = "<group>"; };
+		B50F5FFE1CD3418200A5D017 /* Handle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Handle.h; sourceTree = "<group>"; };
+		B50F60001CD343E400A5D017 /* HandleService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HandleService.cpp; sourceTree = "<group>"; };
+		B50F60011CD343E400A5D017 /* HandleService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandleService.h; sourceTree = "<group>"; };
 		B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleGothic.ttf; sourceTree = "<group>"; };
 		B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBenGameEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B525E36B1C8957A700C691C0 /* BenGameEngineTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BenGameEngineTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -364,6 +371,11 @@
 				B508CDA71CB4DE6D00127B97 /* GameObject.h */,
 				B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */,
 				B508CDAD1CB78DA100127B97 /* GameObjectService.h */,
+				B50F5FFE1CD3418200A5D017 /* Handle.h */,
+				B50F5FFA1CD1E36D00A5D017 /* HandleObject.cpp */,
+				B50F5FFB1CD1E36D00A5D017 /* HandleObject.h */,
+				B50F60001CD343E400A5D017 /* HandleService.cpp */,
+				B50F60011CD343E400A5D017 /* HandleService.h */,
 				B525E38D1C89587000C691C0 /* HeartbeatService.cpp */,
 				B525E38E1C89587000C691C0 /* HeartbeatService.h */,
 				B52B760B1CBA183900758249 /* Material.cpp */,
@@ -721,11 +733,13 @@
 				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* Shader.cpp in Sources */,
 				B5F6B16D1CC8B06E00E1FD45 /* SpaceService.cpp in Sources */,
+				B50F60021CD343E400A5D017 /* HandleService.cpp in Sources */,
 				B571F1801C97D88E007F5A90 /* FontService.cpp in Sources */,
 				B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */,
 				B525E3C31C89587000C691C0 /* ShaderOpenGLES2.cpp in Sources */,
 				B5F6B16A1CC8AF7A00E1FD45 /* Space.cpp in Sources */,
 				B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */,
+				B50F5FFC1CD1E36D00A5D017 /* HandleObject.cpp in Sources */,
 				B525E3C81C89587000C691C0 /* Texture.cpp in Sources */,
 				B571F1831C97D92E007F5A90 /* Font.cpp in Sources */,
 				B5EE9D6C1CC4A4C8005D99CC /* SpriteRenderComponent.cpp in Sources */,

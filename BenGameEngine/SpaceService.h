@@ -35,15 +35,13 @@ namespace BGE {
         void removeSpace(std::shared_ptr<Space> space);
         void removeSpace(uint64_t objId);
         void removeSpace(std::string name);
-      
+
         std::shared_ptr<Space> find(std::shared_ptr<Space> space);
         std::shared_ptr<Space> find(uint64_t spaceId);
         std::shared_ptr<Space> find(std::string name);
 
-
     private:
         std::unordered_map<uint64_t, std::shared_ptr<Space>> spaces_;
-
     };
 }
 

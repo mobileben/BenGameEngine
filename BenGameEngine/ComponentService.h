@@ -56,6 +56,9 @@ namespace BGE {
         typedef std::vector<std::shared_ptr<Component>>::iterator ComponentVectorIterator;
         typedef std::unordered_map<std::type_index, ComponentVector> ComponentMap;
         typedef std::unordered_map<std::type_index, ComponentVector>::iterator ComponentMapIterator;
+
+        typedef std::unordered_map<std::type_index, void *> ComponentPoolMap;
+        typedef std::unordered_map<std::type_index, size_t> ComponentPoolSize;
         
         ComponentMap components_;
         
