@@ -26,8 +26,8 @@ namespace BGE {
         LineRenderComponent(struct private_key const& key, uint64_t componentId, std::string name);
         virtual ~LineRenderComponent() {}
         
-        const std::vector<BGEVector2>& getPoints() const;
-        void setPoints(const std::vector<BGEVector2>& points, bool lineLoop=false);
+        const std::vector<Vector2>& getPoints() const;
+        void setPoints(const std::vector<Vector2>& points, bool lineLoop=false);
         bool isLineLoop() const { return closedLoop_; }
         void setLineLoop(bool looped) { closedLoop_ = looped; }
         float getThickness() const { return thickness_; }
@@ -43,7 +43,7 @@ namespace BGE {
         friend BGE::ComponentService;
         
         float thickness_;
-        std::vector<BGEVector2> points_;
+        std::vector<Vector2> points_;
         bool closedLoop_;
     };
 }

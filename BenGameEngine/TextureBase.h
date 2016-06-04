@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string>
 #include "Object.h"
-#include "BGEMathTypes.h"
+#include "MathTypes.h"
 
 typedef enum {
     TextureErrorNone = 0,
@@ -70,7 +70,7 @@ namespace BGE {
         virtual uint32_t getWidth() const { return width_; }
         virtual uint32_t getHeight() const { return height_; }
         
-        const BGEVector2 *getXYs() const { return &xys_[0]; }
+        const Vector2 *getXYs() const { return &xys_[0]; }
         
         float getX0() const { return xys_[0].x; }
         float getY0() const { return xys_[0].y; }
@@ -81,7 +81,7 @@ namespace BGE {
         float getX3() const { return xys_[3].x; }
         float getY4() const { return xys_[3].y; }
         
-        const BGEVector2 *getUVs() const { return &uvs_[0]; }
+        const Vector2 *getUVs() const { return &uvs_[0]; }
         
         float getU0() const { return uvs_[0].x; }
         float getV0() const { return uvs_[0].y; }
@@ -102,8 +102,8 @@ namespace BGE {
         uint32_t                width_;
         uint32_t                height_;
         
-        BGEVector2              xys_[4];
-        BGEVector2              uvs_[4];
+        Vector2              xys_[4];
+        Vector2              uvs_[4];
         
         virtual void releaseCurrentTexture();
         

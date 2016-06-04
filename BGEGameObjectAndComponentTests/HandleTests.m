@@ -9,6 +9,7 @@
 #import <XCTest/XCTest.h>
 #include "Handle.h"
 #include "HandleService.h"
+#include "Object.h"
 
 @interface HandleTests : XCTestCase
 
@@ -48,9 +49,11 @@
     struct tagHandle{};
     typedef BGE::Handle<tagHandle> HandleType;
     
-    struct Data {
+    struct Data : public BGE::Object {
         uint32_t val1;
         uint32_t val2;
+        Data(uint64_t id) : Object(id) {}
+        Data(uint32_t val1, uint32_t val2) : val1(val1), val2(val2) {}
     };
     
     // Reserve 0

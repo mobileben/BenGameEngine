@@ -21,31 +21,31 @@ BGE::TransformComponent::TransformComponent(struct private_key const& key, uint6
 bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
 z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
 transformDirty_(false), speed_(1), paused_(false) {
-    BGEMatrix4MakeIdentify(matrix_);
+    Matrix4MakeIdentify(matrix_);
 }
 
 BGE::TransformComponent::TransformComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
 bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
 z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
 transformDirty_(false), speed_(1), paused_(false) {
-    BGEMatrix4MakeIdentify(matrix_);
+    Matrix4MakeIdentify(matrix_);
 }
 
 BGE::TransformComponent::TransformComponent(uint64_t componentId) : Component(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
                                                     bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
                                                     z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
                                                     transformDirty_(false), speed_(1), paused_(false) {
-    BGEMatrix4MakeIdentify(matrix_);
+    Matrix4MakeIdentify(matrix_);
 }
 
 BGE::TransformComponent::TransformComponent(uint64_t componentId, std::string name) : Component(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
 bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
 z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
 transformDirty_(false), speed_(1), paused_(false) {
-    BGEMatrix4MakeIdentify(matrix_);
+    Matrix4MakeIdentify(matrix_);
 }
 
-void BGE::TransformComponent::getMatrix(BGEMatrix4 &matrix) {
+void BGE::TransformComponent::getMatrix(Matrix4 &matrix) {
     if (transformDirty_) {
         
     } else {

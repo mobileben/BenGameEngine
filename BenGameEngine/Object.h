@@ -22,11 +22,10 @@ namespace BGE {
         Object(uint64_t objId);
         Object(uint64_t objId, std::string name);
         Object(uint64_t objId, std::string name, std::string domain);
-        Object() = delete;
-        Object(Object const&) = delete;
         virtual ~Object() {}
         
         uint64_t getInstanceId() const { return id_; }
+        
         std::string getName() const { return name_; }
         void setName(std::string name) { name_ = name; }
         
@@ -34,18 +33,22 @@ namespace BGE {
         std::string getDomain() const { return domain_; }
         void setDomain(std::string domain) { domain_ = domain; }
         
-        Object& operator=(Object const&) = delete;
-        
     public:
         template <typename T>
         std::shared_ptr<T> derived_shared_from_this()
         {
             return std::static_pointer_cast<T>(shared_from_this());
         }
-        
+
+    protected:
+        Object();
+        Object(Object const& object);
+        Object& operator=(Object const&);
+                
     private:
         friend GameObjectService;
-        
+        template <typename DATA, typename HANDLE> friend class HandleService;
+
         uint64_t    id_;
         std::string name_;
         std::string domain_;

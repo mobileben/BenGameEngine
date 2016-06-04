@@ -15,10 +15,11 @@
 namespace BGE {
     class FontOpenGLES2 : public Font {
     public:
-        FontOpenGLES2(std::string name, uint32_t pixelSize, std::string filename);
+        FontOpenGLES2(std::string name, uint32_t pixelSize);
         ~FontOpenGLES2() {}
         
-        void drawString(std::string str, BGEVector2 &position, BGEVector4 &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        void load(std::string filename, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback);
+        void drawString(std::string str, Vector2 &position, Vector4 &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
     };
 }
 

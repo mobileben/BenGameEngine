@@ -21,6 +21,8 @@ namespace BGE {
     template <typename DATA, typename HANDLE>
     class HandleService : public Service {
     public:
+        static const uint32_t NoMaxLimit = 0;
+        
         HandleService(uint32_t reserve, uint32_t maxLimit) : maxLimit_(maxLimit) {
 #if UNIT_TESTING
             if (reserve == 0) {
@@ -61,7 +63,9 @@ namespace BGE {
                 index = (uint32_t) magic_.size();
                 handle.init(index);
                 
-                data_.push_back(DATA());
+                uint64_t objId = getIdAndIncrement();
+
+                data_.push_back(DATA(objId));
                 magic_.push_back(handle.getMagic());
             } else {
                 index = freeSlots_.back();

@@ -12,21 +12,21 @@
 #include "ShaderServiceOpenGLES2.h"
 #include "RenderContextOpenGLES2.h"
 #include "TextureOpenGLES2.h"
-#include "BGEMathTypes.h"
+#include "MathTypes.h"
 #include "Game.h"
 #include "LineRenderComponent.h"
 #include "FlatRectRenderComponent.h"
 #include "SpriteRenderComponent.h"
 
 #if 0
-const BGEVertexColor Vertices[] = {
+const BGE::VertexColor Vertices[] = {
     {{100, -100, 0}, {1, 0, 0, 1}},
     {{100, 100, 0}, {0, 1, 0, 1}},
     {{-100, 100, 0}, {0, 0, 1, 1}},
     {{-100, -100, 0}, {0, 0, 0, 1}}
 };
 #else
-const BGEVertexColor Vertices[] = {
+const BGE::VertexColor Vertices[] = {
     {{620, 0, 0}, {1, 0, 0, 1}},
     {{620, 200, 0}, {0, 1, 0, 1}},
     {{0, 200, 0}, {0, 0, 1, 1}},
@@ -34,7 +34,7 @@ const BGEVertexColor Vertices[] = {
 };
 #endif
 
-const BGEVertexColorTex TextureVertices[] = {
+const BGE::VertexColorTex TextureVertices[] = {
     {{750, 100, 0}, {1, 0, 0, 1}, { 1, 0 } },
     {{750, 200, 0}, {0, 1, 0, 1}, { 1, 1 } },
     {{50, 200, 0}, {0, 0, 1, 1}, { 0, 1 } },
@@ -63,7 +63,7 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : masksInUse_(0), activeMa
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
     FontServiceOpenGLES2::mapBundles("BenGameEngineBundle");
     
-    BGEMatrix4MakeIdentify(projectionMatrix_);
+    Matrix4MakeIdentify(projectionMatrix_);
     
     Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this), 0);
 }
@@ -84,16 +84,16 @@ void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(Render2DCoordinateSystem
     
     switch (coordSystem2D) {
         case Render2DCoordinateSystem::Traditional:
-            BGEMatrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor(), window->getHeight() * this->getRenderWindow()->getContentScaleFactor(), 0, -1, 1);
+            Matrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor(), window->getHeight() * this->getRenderWindow()->getContentScaleFactor(), 0, -1, 1);
             break;
         case Render2DCoordinateSystem::TraditionalCentered:
-            BGEMatrix4MakeOrthographic(projectionMatrix_, -window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -1, 1);
+            Matrix4MakeOrthographic(projectionMatrix_, -window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -1, 1);
             break;
         case Render2DCoordinateSystem::OpenGL:
-            BGEMatrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor(), 0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor(), -1, 1);
+            Matrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor(), 0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor(), -1, 1);
             break;
         case Render2DCoordinateSystem::OpenGLCentered:
-            BGEMatrix4MakeOrthographic(projectionMatrix_, -window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -1, 1);
+            Matrix4MakeOrthographic(projectionMatrix_, -window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -1, 1);
             break;
     }
 }
@@ -111,9 +111,9 @@ void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<BGE::RenderCo
     }
     
     // Create the ortho matrix
-//    BGEMatrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth(), window->getHeight(), 0, -1, 1);
-//    BGEMatrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth(), 0, window->getHeight(), -1, 1);
-//    BGEMatrix4Scale(projectionMatrix_, 1, -1, 1);
+//    Matrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth(), window->getHeight(), 0, -1, 1);
+//    Matrix4MakeOrthographic(projectionMatrix_, 0, window->getWidth(), 0, window->getHeight(), -1, 1);
+//    Matrix4Scale(projectionMatrix_, 1, -1, 1);
 //    CAEAGLLayer *eaglLayer = (CAEAGLLayer *)window->getView().layer;
 //    eaglLayer.contentsScale = window->getView().contentScaleFactor;
 
@@ -201,9 +201,9 @@ std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::popShaderProgra
     return shaderProgramStack_.back();
 }
 
-void BGE::RenderServiceOpenGLES2::drawRect(BGEVector2 &position, BGEVector2 &size, BGEVector4 &color)
+void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vector4 &color)
 {
-    BGEVertexColor vertices[4];
+    VertexColor vertices[4];
     GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };
     
     if (hasInvertedYAxis()) {
@@ -291,17 +291,17 @@ void BGE::RenderServiceOpenGLES2::drawRect(BGEVector2 &position, BGEVector2 &siz
     GLint colorLocation = glShader->locationForAttribute("SourceColor");
     
     glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(BGEVertexColor), &vertices[0]);
+                          sizeof(VertexColor), &vertices[0]);
     glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
-                          sizeof(BGEVertexColor), (GLvoid*) (&vertices[0].color));
+                          sizeof(VertexColor), (GLvoid*) (&vertices[0].color));
     
     glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
                    GL_UNSIGNED_BYTE, &indices[0]);
 }
 
-void BGE::RenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector2 &size, BGEVector4 color[4])
+void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &size, Vector4 color[4])
 {
-    BGEVertexColor vertices[4];
+    VertexColor vertices[4];
     GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };
     
     if (hasInvertedYAxis()) {
@@ -388,9 +388,9 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector
     GLint colorLocation = glShader->locationForAttribute("SourceColor");
     
     glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(BGEVertexColor), &vertices[0]);
+                          sizeof(VertexColor), &vertices[0]);
     glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
-                          sizeof(BGEVertexColor), (GLvoid*) (&vertices[0].color));
+                          sizeof(VertexColor), (GLvoid*) (&vertices[0].color));
     
     glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
                    GL_UNSIGNED_BYTE, &indices[0]);
@@ -415,10 +415,10 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector
         GLint projectionLocation = glShader->locationForUniform("Projection");
         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
 
-        BGEMatrix4 colorMatrix;
-        BGEVector4 colorOffset;
+        Matrix4 colorMatrix;
+        Vector4 colorOffset;
         
-        BGEMatrix4MakeIdentify(colorMatrix);
+        Matrix4MakeIdentify(colorMatrix);
         
 #if 1
         colorMatrix.m[0] = -35.48653030395508 / 255.0;
@@ -477,11 +477,11 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         
         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                              sizeof(BGEVertexColorTex), &TextureVertices[0]);
+                              sizeof(VertexColorTex), &TextureVertices[0]);
         glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
-                              sizeof(BGEVertexColorTex), (GLvoid*) (&TextureVertices[0].color));
+                              sizeof(VertexColorTex), (GLvoid*) (&TextureVertices[0].color));
         glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                              sizeof(BGEVertexColorTex), (GLvoid*) (&TextureVertices[0].tex));
+                              sizeof(VertexColorTex), (GLvoid*) (&TextureVertices[0].tex));
         
         glUniform1i(textureUniform, 0);
         
@@ -492,15 +492,15 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(BGEVector2 &position, BGEVector
 #endif
 }
 
-void BGE::RenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr<TextureBase> texture) {
+void BGE::RenderServiceOpenGLES2::drawFont(Vector2 &position, std::shared_ptr<TextureBase> texture) {
     if (texture) {
-        BGEVertexTex vertices[4];
+        VertexTex vertices[4];
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
         std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
         
         if (oglTex && oglTex->isValid()) {
-            const BGEVector2 *xys = oglTex->getXYs();
-            const BGEVector2 *uvs = oglTex->getUVs();
+            const Vector2 *xys = oglTex->getXYs();
+            const Vector2 *uvs = oglTex->getUVs();
             
             vertices[0].position.x = position.x + xys[0].x;
             vertices[0].position.y = position.y + xys[0].y;
@@ -548,9 +548,9 @@ void BGE::RenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr
 //            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                  sizeof(BGEVertexTex), &vertices[0]);
+                                  sizeof(VertexTex), &vertices[0]);
             glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                                  sizeof(BGEVertexTex), (GLvoid*) (&vertices[0].tex));
+                                  sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
             
             glUniform1i(textureUniform, 0);
             glUniform4f(colorUniform, 1, 0, 0, 1);
@@ -561,16 +561,16 @@ void BGE::RenderServiceOpenGLES2::drawFont(BGEVector2 &position, std::shared_ptr
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_ptr<TextureBase> texture)
+void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr<TextureBase> texture)
 {
     if (texture) {
-        BGEVertexTex vertices[4];
+        VertexTex vertices[4];
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
         std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
 
         if (oglTex && oglTex->isValid()) {
-            const BGEVector2 *xys = oglTex->getXYs();
-            const BGEVector2 *uvs = oglTex->getUVs();
+            const Vector2 *xys = oglTex->getXYs();
+            const Vector2 *uvs = oglTex->getUVs();
             
             vertices[0].position.x = position.x + xys[0].x;
             vertices[0].position.y = position.y + xys[0].y;
@@ -618,9 +618,9 @@ void BGE::RenderServiceOpenGLES2::drawTexture(BGEVector2 &position, std::shared_
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                  sizeof(BGEVertexTex), &vertices[0]);
+                                  sizeof(VertexTex), &vertices[0]);
             glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                                  sizeof(BGEVertexTex), (GLvoid*) (&vertices[0].tex));
+                                  sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
             
             glUniform1i(textureUniform, 0);
             
@@ -635,7 +635,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> 
         std::shared_ptr<BGE::FlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<BGE::FlatRectRenderComponent>(gameObject->getComponent<BGE::FlatRectRenderComponent>());
         
         if (flatRect) {
-            BGEVertex *const vertices = flatRect->getVertices();
+            Vertex *const vertices = flatRect->getVertices();
             std::shared_ptr<BGE::Material> material = flatRect->getMaterial().lock();
             
             if (material) {
@@ -647,9 +647,9 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> 
                 GLint colorLocation = glShader->locationForUniform("Color");
                 
                 glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                      sizeof(BGEVertex), &vertices[0]);
+                                      sizeof(Vertex), &vertices[0]);
                 
-                BGEColor color;
+                Color color;
                 
                 material->getColor(color);
                 glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
@@ -662,8 +662,8 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> 
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& points, float thickness, bool loop, std::shared_ptr<BGE::Material> material) {
-    BGEVector3 vertices[points.size()];
+void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, float thickness, bool loop, std::shared_ptr<BGE::Material> material) {
+    Vector3 vertices[points.size()];
     GLubyte indices[points.size()];
     
     uint32_t index = 0;
@@ -686,14 +686,14 @@ void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<BGEVector2>& point
     
     glEnableVertexAttribArray(positionLocation);
     
-    BGEColor color;
+    Color color;
     
     material->getColor(color);
     glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
     glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
     // 2
     glVertexAttribPointer(positionLocation, points.size(), GL_FLOAT, GL_FALSE,
-                          sizeof(BGEVertex), &vertices[0]);
+                          sizeof(Vertex), &vertices[0]);
     glLineWidth(12);
     // 3
     glDrawArrays(GL_LINE_LOOP, 0, points.size());
@@ -705,7 +705,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
         std::shared_ptr<BGE::SpriteRenderComponent> sprite = std::dynamic_pointer_cast<BGE::SpriteRenderComponent>(gameObject->getComponent<BGE::SpriteRenderComponent>());
         
         if (sprite) {
-            BGEVertexTex *const vertices = sprite->getVertices();
+            VertexTex *const vertices = sprite->getVertices();
             std::shared_ptr<BGE::Material> material = sprite->getMaterial().lock();
             if (material) {
                 std::shared_ptr<TextureBase> texture = material->getTexture().lock();
@@ -735,9 +735,9 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                         
                         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                              sizeof(BGEVertexTex), &vertices[0]);
+                                              sizeof(VertexTex), &vertices[0]);
                         glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                                              sizeof(BGEVertexTex), (GLvoid*) (&vertices[0].tex));
+                                              sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
                         
                         glUniform1i(textureUniform, 0);
                         
@@ -750,7 +750,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
     }
 }
 
-int8_t BGE::RenderServiceOpenGLES2::createMask(BGEVector2 &position, std::shared_ptr<TextureBase> mask)
+int8_t BGE::RenderServiceOpenGLES2::createMask(Vector2 &position, std::shared_ptr<TextureBase> mask)
 {
     if (this->masksInUse_ < (RenderServiceOpenGLES2::MaxActiveMasks - 1)) {
         int8_t maskId = this->masksInUse_;
@@ -803,7 +803,7 @@ void BGE::RenderServiceOpenGLES2::render()
     
     if (isReady()) {
         std::shared_ptr<TextureBase> texture = Game::getInstance()->getTextureService()->textureWithName("sample");
-        std::shared_ptr<TextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("fish");
+        std::shared_ptr<TextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("CoinIcon");
         std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
         std::shared_ptr<Font> f = Game::getInstance()->getFontService()->getFont("default", 32);
         
@@ -832,17 +832,17 @@ void BGE::RenderServiceOpenGLES2::render()
         
         // 2
         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                              sizeof(BGEVertexColor), &Vertices[0]);
+                              sizeof(VertexColor), &Vertices[0]);
         glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
-                              sizeof(BGEVertexColor), (GLvoid*) (&Vertices[0].color));
+                              sizeof(VertexColor), (GLvoid*) (&Vertices[0].color));
         
         // 3
         glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
                        GL_UNSIGNED_BYTE, &Indices[0]);
         
-        BGEVector2 position = { 0, 0 };
-        BGEVector2 size = { 150, 300 };
-        BGEVector4 colors[4] = {{ 1, 0, 0, 1 }, { 0, 0, 0, 1 }, { 0, 1, 0, 1 }, { 0, 0, 1, 1 }};
+        Vector2 position = { 0, 0 };
+        Vector2 size = { 150, 300 };
+        Vector4 colors[4] = {{ 1, 0, 0, 1 }, { 0, 0, 0, 1 }, { 0, 1, 0, 1 }, { 0, 0, 1, 1 }};
         
         drawShadedRect(position, size, colors);
         if (font) {
@@ -863,8 +863,10 @@ void BGE::RenderServiceOpenGLES2::render()
             glDisable(GL_STENCIL_TEST);
             NSLog(@"HERE");
             
-            position = { 200, 1200 };
-            f->drawString("HELLO YOU SACK OF DIRT AV abcDefg1210312084pdsoinjm_-'\"#*$&%", position, colors[1]);
+            if (f) {
+                position = { 200, 1200 };
+                f->drawString("HELLO YOU SACK OF DIRT AV abcDefg1210312084pdsoinjm_-'\"#*$&%", position, colors[1]);
+            }
         }
         
         

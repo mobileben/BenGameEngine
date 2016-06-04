@@ -14,9 +14,19 @@
 #include <map>
 #include "FontGlyph.h"
 #include "TextureAtlas.h"
-#include "BGEMathTypes.h"
+#include "MathTypes.h"
 
 namespace BGE {
+    typedef enum {
+        FontErrorNone = 0,
+        FontErrorOS,
+        FontErrorFreeType,
+        FontErrorAllocation,
+        FontErrorNoResourceFile,
+        FontErrorInvalidSubTexture,
+        FontErrorExistingTextureWrongType,
+    } FontError;
+
     enum class FontHorizontalAlignment {
         Left,
         Center,
@@ -30,10 +40,12 @@ namespace BGE {
         Baseline
     };
     
-    class Font
+    class Font: public std::enable_shared_from_this<Font>
     {
     public:
-        Font(std::string name, uint32_t pixelSize, std::string filename);
+        static const std::string ErrorDomain;
+        
+        Font(std::string name, uint32_t pixelSize);
         virtual ~Font();
         
         uint32_t getGlyphW() const { return glyphW_; }
@@ -42,16 +54,20 @@ namespace BGE {
         
         std::shared_ptr<FontGlyph> glyphForExtendedASCII(uint16_t code);
         
+        bool isValid(void) const { return valid_; }
         bool hasKerning() const { return hasKerning_; }
         int32_t kerningForPair(uint16_t prev, uint16_t curr);
         uint32_t getStringWidth(std::string str, bool minimum=true);
         uint32_t getHeight() const;
         
-        virtual void drawString(std::string str, BGEVector2 &position, BGEVector4 &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true) =0;
+        virtual void load(std::string filename, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback) =0;
+        virtual void drawString(std::string str, Vector2 &position, Vector4 &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true) =0;
         
     protected:
         std::string name_;
         uint32_t pixelSize_;
+        
+        bool valid_;
         
         uint32_t glyphW_;   // Max width of glyphs
         uint32_t glyphH_;   // Max height of glyphs
@@ -62,6 +78,15 @@ namespace BGE {
         std::shared_ptr<BGE::TextureAtlas> textureAtlas_;
         std::map<uint16_t, std::shared_ptr<FontGlyph>> glyphs_;
         std::map<std::pair<uint16_t, uint16_t>, int32_t> kerning_;
+        
+        template <typename T>
+        std::shared_ptr<T> derived_shared_from_this()
+        {
+            return std::static_pointer_cast<T>(shared_from_this());
+        }
+
+    private:
+        friend class FontService;
     };
 }
 

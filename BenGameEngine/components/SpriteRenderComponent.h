@@ -38,7 +38,7 @@ namespace BGE {
         
         void materialsUpdated();
         
-        BGEVertexTex* const getVertices() { return vertices_; }
+        VertexTex* const getVertices() { return vertices_; }
         
     private:
         friend BGE::ComponentService;
@@ -47,7 +47,7 @@ namespace BGE {
         
         static const uint32_t NumVertices = 4;
         
-        BGEVertexTex vertices_[NumVertices];
+        VertexTex vertices_[NumVertices];
         
         void updateLocalBoundsAndVertices();
     };

@@ -29,11 +29,11 @@ BGE::LineRenderComponent::LineRenderComponent(uint32_t componentId) : BGE::Rende
 BGE::LineRenderComponent::LineRenderComponent(uint32_t componentId, std::string name) : BGE::RenderComponent(componentId, name), closedLoop_(false) {
 }
 
-const std::vector<BGEVector2>& BGE::LineRenderComponent::getPoints() const {
+const std::vector<BGE::Vector2>& BGE::LineRenderComponent::getPoints() const {
     return points_;
 }
 
-void BGE::LineRenderComponent::setPoints(const std::vector<BGEVector2>& points, bool lineLoop) {
+void BGE::LineRenderComponent::setPoints(const std::vector<Vector2>& points, bool lineLoop) {
     points_ = points;
     closedLoop_ = lineLoop;
     

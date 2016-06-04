@@ -9,8 +9,9 @@
 #include "Font.h"
 #include "Game.h"
 
-BGE::Font::Font(std::string name, uint32_t pixelSize, std::string filename) : name_(name), pixelSize_(pixelSize), textureAtlas_(nullptr), hasKerning_(false) {
-    
+const std::string BGE::Font::ErrorDomain = "Font";
+
+BGE::Font::Font(std::string name, uint32_t pixelSize) : name_(name), pixelSize_(pixelSize), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
 }
 
 BGE::Font::~Font() {
@@ -37,58 +38,65 @@ int32_t BGE::Font::kerningForPair(uint16_t prev, uint16_t curr) {
 
 uint32_t BGE::Font::getStringWidth(std::string str, bool minimum) {
     int32_t width = 0;
-    const char *chars = str.c_str();
-    std::shared_ptr<BGE::FontGlyph> glyph;
-    uint16_t code;
-    size_t length = str.length();
     
-    if (length == 1) {
-        if (!minimum) {
-            width = glyph->getAdvance();
-        } else {
-            width = glyph->getTexture()->getWidth();
-        }
-    } else {
-        uint16_t prev = 0;
+    if (valid_) {
+        const char *chars = str.c_str();
+        std::shared_ptr<BGE::FontGlyph> glyph;
+        uint16_t code;
+        size_t length = str.length();
         
-        for (int i=0;i<length;i++) {
-            code = chars[i];
+        if (length == 1) {
+            if (!minimum) {
+                width = glyph->getAdvance();
+            } else {
+                width = glyph->getTexture()->getWidth();
+            }
+        } else {
+            uint16_t prev = 0;
             
-            glyph = glyphs_[code];
-            
-            if (glyph) {
-                if (i==0) {
-                    if (!minimum) {
-                        width += glyph->getAdvance();
+            for (int i=0;i<length;i++) {
+                code = chars[i];
+                
+                glyph = glyphs_[code];
+                
+                if (glyph) {
+                    if (i==0) {
+                        if (!minimum) {
+                            width += glyph->getAdvance();
+                        } else {
+                            width += glyph->getAdvance() - glyph->getOffsetX();
+                        }
+                    } else if (i==(length-1)) {
+                        if (!minimum) {
+                            width += glyph->getAdvance();
+                        } else {
+                            width += glyph->getOffsetX() + glyph->getTexture()->getWidth();
+                        }
                     } else {
-                        width += glyph->getAdvance() - glyph->getOffsetX();
-                    }
-                } else if (i==(length-1)) {
-                    if (!minimum) {
                         width += glyph->getAdvance();
-                    } else {
-                        width += glyph->getOffsetX() + glyph->getTexture()->getWidth();
                     }
-                } else {
-                    width += glyph->getAdvance();
                 }
+                
+                if (hasKerning() && prev) {
+                    width += kerningForPair(prev, code);
+                }
+                
+                prev = code;
             }
-            
-            if (hasKerning() && prev) {
-                width += kerningForPair(prev, code);
-            }
-            
-            prev = code;
         }
-    }
-    
-    if (width < 0) {
-        width = 0;
+        
+        if (width < 0) {
+            width = 0;
+        }
     }
     
     return (uint32_t)width;
 }
 
 uint32_t BGE::Font::getHeight() const {
-    return getGlyphH();
+    if (valid_) {
+        return getGlyphH();
+    } else {
+        return 0;
+    }
 }

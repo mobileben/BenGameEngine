@@ -30,7 +30,7 @@ BGE::FlatRectRenderComponent::FlatRectRenderComponent(uint32_t componentId, std:
 }
 
 void BGE::FlatRectRenderComponent::setWidth(float width) {
-    BGEVector2 wh;
+    Vector2 wh;
     
     wh.w = width;
     wh.h = getLocalHeight();
@@ -39,7 +39,7 @@ void BGE::FlatRectRenderComponent::setWidth(float width) {
 }
 
 void BGE::FlatRectRenderComponent::setHeight(float height) {
-    BGEVector2 wh;
+    Vector2 wh;
 
     wh.w = getLocalWidth();
     wh.h = height;
@@ -47,16 +47,16 @@ void BGE::FlatRectRenderComponent::setHeight(float height) {
     setWidthHeight(wh);
 }
 
-void BGE::FlatRectRenderComponent::setWidthHeight(BGEVector2 &wh) {
+void BGE::FlatRectRenderComponent::setWidthHeight(Vector2 &wh) {
     updateLocalBoundsAndVertices(wh);
 }
 
 void BGE::FlatRectRenderComponent::materialsUpdated() {
 }
 
-void BGE::FlatRectRenderComponent::updateLocalBoundsAndVertices(BGEVector2& wh) {
-    BGERect bounds;
-    BGEVertex* const vertices = (BGEVertex* const) getVertices();
+void BGE::FlatRectRenderComponent::updateLocalBoundsAndVertices(Vector2& wh) {
+    Rect bounds;
+    Vertex* const vertices = (Vertex* const) getVertices();
     float x = 0;
     float y = 0;
     

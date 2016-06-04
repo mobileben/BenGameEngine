@@ -34,7 +34,7 @@ BGE::RenderComponent::RenderComponent(uint64_t componentId, std::string name) : 
     
 }
 
-void BGE::RenderComponent::getGlobalBounds(BGERect& bounds) {
+void BGE::RenderComponent::getGlobalBounds(Rect& bounds) {
     
 }
 

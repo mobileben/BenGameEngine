@@ -11,71 +11,72 @@
 
 #include <stdio.h>
 #include <cstdint>
-#include "BGEMathTypes.h"
+#include "MathTypes.h"
+#include "Font.h"
 
 namespace BGE {
-    struct AnimationKeyFrameFormat {
+    struct AnimationKeyFrameDataFormat {
         uint32_t totalFrames;
-        BGEMatrix3 matrix;
-        BGEColorMatrix colorMatrix;
+        Matrix3 matrix;
+        ColorMatrix colorMatrix;
         uint32_t flags;
-        BGERect bounds;
+        Rect bounds;
     };
     
-    struct AnimationChannelFormat {
-        char *reference;
-        char *referenceType;
+    struct AnimationChannelDataFormat {
+        const char* const reference;
+        const char* const referenceType;
         uint32_t totalFrames;
-        AnimationKeyFrameFormat *keyframes;
+        AnimationKeyFrameDataFormat *keyframes;
     };
     
-    struct AnimationFormat {
+    struct AnimationDataFormat {
         char *name;
         uint32_t fps;
         uint32_t totalFrames;
         uint32_t numChannels;
-        AnimationChannelFormat *channels;
+        AnimationChannelDataFormat *channels;
     };
     
-    struct MaskFormat {
-        char *name = nullptr;
+    struct MaskDataFormat {
+        const char* const name = nullptr;
         float width = 0;
         float height = 0;
     };
     
-    struct ExternalReferenceFormat {
-        char *name;
-        char *externalPackage;
+    struct ExternalReferenceDataFormat {
+        const char* const name;
+        const char* const externalPackage;
     };
     
-    struct AutoDisplayListElementFormat {
-        char *name;
-        char *referenceType;
+    struct AutoDisplayListElementDataFormat {
+        const char* const name;
+        const char* const referenceType;
         uint32_t flags;
         uint32_t hidden;
-        BGERect bounds;
-        BGEVector2 xy;
-        BGEVector2 scale;
+        Rect bounds;
+        Vector2 xy;
+        Vector2 scale;
         float rotation;
-        char *reference;
+        const char* const reference;
     };
     
-    struct PlacementFormat {
-        char *name;
+    struct PlacementDataFormat {
+        const char* const name;
         float width;
         float height;
     };
     
-    struct TextFormat {
+    struct TextDataFormat {
         enum Alignment {
             Left = 0,
             Center = 1,
             Right = 2
         };
         
-        char *name = nullptr;
-        char *text = nullptr;
-        char *fontName = nullptr;
+        const char* const name = nullptr;
+        const char* const text = nullptr;
+        const char* const fontName = nullptr;
         Alignment alignment;
         uint32_t color = 0;
         float size = 0;
@@ -85,9 +86,9 @@ namespace BGE {
         float height = 0;
     };
     
-    struct SubTextureFormat {
-        char *name;
-        char *atlas;
+    struct SubTextureDataFormat {
+        const char* const name;
+        const char* const atlas;
         float rotation;
         float x;
         float y;
@@ -96,21 +97,127 @@ namespace BGE {
         
     };
     
-    struct TextureFormat {
-        char    *name = nullptr;
-        char    *filename = nullptr;
+    struct TextureDataFormat {
+        const char* const name = nullptr;
+        const char* const filename = nullptr;
         float   width = 0;
         float   height = 0;
-        TextureFormat(char *name, char *filename, float width, float height) : name(name), filename(filename), width(width), height(height) {
-        }
     };
 
-    struct ScenePackageFormat {
-        char *name;
+    class Texture;
+    
+    struct AnimationKeyFrameReference {
+        uint32_t startFrame;
+        uint32_t totalFrames;
+        uint32_t order;
+        uint32_t flags;
+        Vector2 position;
+        Vector2 scale;
+        float  rotation;
+        Matrix3 matrix;
+        ColorMatrix colorMatrix;
+        ColorTransform colorTransform;
+        Rect bounds;
+    };
+    
+    struct AnimationKeyFrameTemp {
+        uint32_t startFrame;
+        uint32_t totalFrames;
+        uint32_t order;
+        uint32_t flags;
+        uint32_t position;
+        uint32_t scale;
+        float rotation;
+        uint32_t matrix;
+        uint32_t colorMatrix;
+        uint32_t colorTransform;
+        uint32_t bounds;
+    };
+
+    struct BoundsReference {
+        uint32_t startFrame;
+        uint32_t totalFrames;
+        Rect bounds;
+    };
+    
+    struct BoundsReferenceBuilder {
+        uint32_t startFrame;
+        uint32_t totalFrames;
+        uint32_t bounds;
+    };
+    
+    typedef enum : uint32_t {
+        GfxReferenceTypeUnknown = 0,
+        GfxReferenceTypeButton,
+        GfxReferenceTypeExternalReference,
+        GfxReferenceTypeMask,
+        GfxReferenceTypePlacement,
+        GfxReferenceTypeSprite,
+        GfxReferenceTypeAnimationSequence,
+        GfxReferenceTypeKeyFrame,
+        GfxReferenceTypeText,
+        GfxReferenceTypeTextureMask
+    } GfxReferenceType;
+
+    struct AnimationChannelReference {
+        const char *name;
+        const char *reference;
+        GfxReferenceType referenceType;
+        uint32_t numKeyFrames;
+        AnimationKeyFrameReference *keyframes;
+    };
+
+    struct AnimationChannelReferenceBuilder {
+        const char *name;
+        const char *reference;
+        GfxReferenceType referenceType;
+        std::vector<AnimationKeyFrameReference> keyFrames;
+    };
+    
+    struct AnimationSequenceReference {
+        const char *name;
+        uint32_t frameRate;
+        uint32_t totalFrames;
+        uint32_t numChannels;
+        uint32_t numBounds;
+        AnimationChannelReference *channels;
+        BoundsReference *bounds;
+    };
+    
+    struct AnimationSequenceReferenceBuilder {
+        const char *name;
+        uint32_t frameRate;
+        uint32_t totalFrames;
+        uint32_t numChannels;
+        uint32_t numBounds;
+        std::vector<AnimationChannelReferenceBuilder> channels;
+        std::vector<BoundsReferenceBuilder> bounds;
+    };
+    
+    struct TextReference {
+        const char* name;
+        float width;
+        float height;
+        float leading;
+        Color color;
+        FontHorizontalAlignment alignment;
+        Font* font;
+    };
+    
+    struct TextureReference {
+        const char* name;
+        float   width;
+        float   height;
+        // TODO: Handle
+        TextureBase *texture;
+    };
+    struct ScenePackageDataFormat {
+        const char* const name;
         
-        char ** strings;
+        const char* const * const strings;
+        TextureDataFormat *textures;
+        SubTextureDataFormat *subTextures;
     };
-
 }
 
 #endif /* GraphicFormats_h */

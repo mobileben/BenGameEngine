@@ -19,6 +19,7 @@
 #include "FontService.h"
 #include "HeartbeatService.h"
 #include "ComponentService.h"
+#include "ScenePackageService.h"
 
 namespace BGE {
     class Game : public BGE::Service
@@ -42,6 +43,7 @@ namespace BGE {
         std::shared_ptr<BGE::ComponentService> getComponentService() { return componentService_; }
         std::shared_ptr<BGE::MaterialService> getMaterialService() { return materialService_; }
         std::shared_ptr<BGE::HeartbeatService> getHeartbeatService() { return heartbeatService_; }
+        std::shared_ptr<BGE::ScenePackageService> getScenePackageService() { return scenePackageService_; }
         
         // Service functions
         void initialize();
@@ -60,6 +62,7 @@ namespace BGE {
         std::shared_ptr<BGE::MaterialService> materialService_;
         std::shared_ptr<BGE::GameObjectService> gameObjectService_;
         std::shared_ptr<BGE::ComponentService> componentService_;
+        std::shared_ptr<BGE::ScenePackageService> scenePackageService_;
     };
 }
 

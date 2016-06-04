@@ -8,7 +8,7 @@
 
 #import "AppDelegate.h"
 #include "BenGameEngineTestApp.hpp"
-#include "BGEMathTypes.h"
+#include "MathTypes.h"
 
 std::shared_ptr<BenGameEngineTestApp> theGame = std::make_shared<BenGameEngineTestApp>();
 

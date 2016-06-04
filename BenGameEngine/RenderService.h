@@ -16,34 +16,34 @@
 #include "RenderWindow.h"
 #include "RenderContext.h"
 #include "ShaderService.h"
-#include "BGEMathTypes.h"
-
-typedef BGEVector3 BGEVertex;
-
-typedef struct {
-    BGEVector3 position;
-    BGEVector4 color;
-} BGEVertexColor;
-
-typedef struct {
-    BGEVector3 position;
-    BGEVector2 tex;
-} BGEVertexTex;
-
-typedef struct {
-    BGEVector3 position;
-    BGEVector4 color;
-    BGEVector2 tex;
-} BGEVertexColorTex;
-
-typedef struct {
-    BGEVector3 position;
-    BGEVector4 color;
-    BGEVector2 tex;
-    BGEVector2 normal;
-} BGEVertexColorTexNormal;
+#include "MathTypes.h"
 
 namespace BGE {
+    typedef Vector3 Vertex;
+    
+    typedef struct {
+        Vector3 position;
+        Vector4 color;
+    } VertexColor;
+    
+    typedef struct {
+        Vector3 position;
+        Vector2 tex;
+    } VertexTex;
+    
+    typedef struct {
+        Vector3 position;
+        Vector4 color;
+        Vector2 tex;
+    } VertexColorTex;
+    
+    typedef struct {
+        Vector3 position;
+        Vector4 color;
+        Vector2 tex;
+        Vector2 normal;
+    } VertexColorTexNormal;
+
     enum class Render2DCoordinateSystem {
         Traditional,            // Upper left (X-right, Y-down)
         TraditionalCentered,    // Center of screen (X-right, Y-down)

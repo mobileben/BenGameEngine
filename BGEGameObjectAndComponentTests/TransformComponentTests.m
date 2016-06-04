@@ -37,7 +37,7 @@ static BGE::ComponentService componentService;
     XCTAssertEqual(transform->isInteractable(), true, @"isInteractable is incorrect");
     XCTAssertEqual(transform->isInteractableWhenHidden(), false, @"isInteractableWhenHidden is incorrect");
     
-    BGERect rect;
+    Rect rect;
     
     transform->getBounds(rect);
     
@@ -58,11 +58,11 @@ static BGE::ComponentService componentService;
     
     XCTAssertEqual(transform->getRotation(), 0, @"getRotation() is incorrect");
     
-    BGEMatrix4 matrix;
+    Matrix4 matrix;
     
     transform->getMatrix(matrix);
     
-    XCTAssertEqual(BGEMatrix4IsIdentity(matrix), true, @"matrix is not identity");
+    XCTAssertEqual(Matrix4IsIdentity(matrix), true, @"matrix is not identity");
 }
 
 - (void)testName {
@@ -114,7 +114,7 @@ static BGE::ComponentService componentService;
     auto name = "test";
     auto transform = componentService.createComponent<BGE::TransformComponent>(name);
     
-    BGERect rect;
+    Rect rect;
     
     transform->getBounds(rect);
     
@@ -131,7 +131,7 @@ static BGE::ComponentService componentService;
     float y = 90;
     float z = 100;
     
-    BGEVector2 pos;
+    Vector2 pos;
     
     transform->setX(x);
     transform->setY(y);
@@ -144,7 +144,7 @@ static BGE::ComponentService componentService;
     XCTAssertEqual(pos.y, y, @"getPosition().y is incorrect");
     XCTAssertEqual(transform->getZ(), z, @"getZ() is incorrect");
 
-    BGEVector2 newPosition = { 10, 20 };
+    Vector2 newPosition = { 10, 20 };
     
     transform->setPosition(newPosition);
     pos = transform->getPosition();
@@ -162,7 +162,7 @@ static BGE::ComponentService componentService;
     auto name = "test";
     auto transform = componentService.createComponent<BGE::TransformComponent>(name);
     
-    BGERect rect;
+    Rect rect;
     
     transform->getBounds(rect);
     
@@ -174,7 +174,7 @@ static BGE::ComponentService componentService;
     XCTAssertEqual(transform->getScale().x, 1, @"getScale().x is incorrect");
     XCTAssertEqual(transform->getScale().y, 1, @"getScale().y is incorrect");
 
-    BGEVector2 scale;
+    Vector2 scale;
     
     float x = 3.1;
     float y = 4.8;
@@ -188,7 +188,7 @@ static BGE::ComponentService componentService;
     XCTAssertEqual(scale.x, x, @"getScale().x is incorrect");
     XCTAssertEqual(scale.y, y, @"getScale().y is incorrect");
 
-    BGEVector2 newScale = { 1.7, 2.9 };
+    Vector2 newScale = { 1.7, 2.9 };
     
     transform->setScale(newScale);
     scale = transform->getScale();
@@ -206,7 +206,7 @@ static BGE::ComponentService componentService;
     auto name = "test";
     auto transform = componentService.createComponent<BGE::TransformComponent>(name);
     
-    BGERect rect;
+    Rect rect;
     
     transform->getBounds(rect);
     
@@ -218,7 +218,7 @@ static BGE::ComponentService componentService;
     XCTAssertEqual(transform->getSkew().x, 0, @"getSkew().x is incorrect");
     XCTAssertEqual(transform->getSkew().y, 0, @"getSkew().y is incorrect");
     
-    BGEVector2 skew;
+    Vector2 skew;
     
     float x = 3.1;
     float y = 4.8;
@@ -232,7 +232,7 @@ static BGE::ComponentService componentService;
     XCTAssertEqual(skew.x, x, @"getSkew().x is incorrect");
     XCTAssertEqual(skew.y, y, @"getSkew().y is incorrect");
     
-    BGEVector2 newSkew = { 1.7, 2.9 };
+    Vector2 newSkew = { 1.7, 2.9 };
     
     transform->setSkew(newSkew);
     skew = transform->getSkew();
@@ -250,7 +250,7 @@ static BGE::ComponentService componentService;
     auto name = "test";
     auto transform = componentService.createComponent<BGE::TransformComponent>(name);
     
-    BGERect rect;
+    Rect rect;
     
     transform->getBounds(rect);
     

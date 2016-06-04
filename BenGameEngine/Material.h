@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 #include "Object.h"
-#include "BGEMathTypes.h"
+#include "MathTypes.h"
 #include "TextureBase.h"
 
 namespace BGE {
@@ -31,9 +31,9 @@ namespace BGE {
         Material(struct private_key const& key, uint64_t matId, std::string name);
         virtual ~Material() {}
         
-        void getColor(BGEColor& color) const { color = color_; }
-        void setColor(BGEColor& color);
-        void getColorMatrix(BGEColor& colorMatrix) const;
+        void getColor(Color& color) const { color = color_; }
+        void setColor(Color& color);
+        void getColorMatrix(Color& colorMatrix) const;
         std::weak_ptr<TextureBase> getTexture() const { return texture_; }
         void setTexture(std::shared_ptr<TextureBase> texture) { texture_ = texture; }
         
@@ -45,8 +45,8 @@ namespace BGE {
         
     private:
         bool                        colorDirty_;
-        BGEVector4                  color_;
-        BGEMatrix4                  colorMatrix_;
+        Vector4                     color_;
+        Matrix4                     colorMatrix_;
         
         std::weak_ptr<TextureBase>   texture_;
     };

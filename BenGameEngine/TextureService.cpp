@@ -14,11 +14,19 @@ BGE::TextureService::TextureService()
 }
 
 std::shared_ptr<BGE::TextureBase> BGE::TextureService::textureWithName(std::string name) {
-    return this->sTextures_[name];
+    if (this->sTextures_.find(name) != this->sTextures_.end()) {
+        return this->sTextures_[name];
+    } else {
+        return nullptr;
+    }
 }
 
 std::shared_ptr<BGE::TextureBase> BGE::TextureService::textureWithId(uint64_t texId) {
-    return this->iTextures_[texId];
+    if (this->iTextures_.find(texId) != this->iTextures_.end()) {
+        return this->iTextures_[texId];
+    } else {
+        return nullptr;
+    }
 }
 
 void BGE::TextureService::removeTexture(std::string name) {

@@ -20,6 +20,7 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) {
     
     if (!error) {
         fontResources_["default"] = "Avenir.ttc";
+        fontResources_["Avenir Black"] = "Avenir.ttc";
         fontResources_.insert(resources.begin(), resources.end());
     }
 }

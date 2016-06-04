@@ -40,6 +40,7 @@ namespace BGE {
         
         std::map<std::string, std::string> fontResources_;
         std::map<std::string, std::shared_ptr<Font>> fonts_;
+        std::map<std::string, std::shared_ptr<Font>> underlyingFonts_;
     };
 }
 

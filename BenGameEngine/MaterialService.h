@@ -14,7 +14,7 @@
 #include <string>
 #include <unordered_map>
 #include "Service.h"
-#include "BGEMathTypes.h"
+#include "MathTypes.h"
 #include "Material.h"
 #include "Texture.h"
 
@@ -33,9 +33,9 @@ namespace BGE {
         void resume();
         void destroy();
         
-        std::shared_ptr<Material> createMaterial(std::string name, BGEVector4& color);
+        std::shared_ptr<Material> createMaterial(std::string name, Vector4& color);
         std::shared_ptr<Material> createMaterial(std::string name, std::shared_ptr<TextureBase> texture);
-        std::shared_ptr<Material> createMaterial(std::string name, BGEVector4& color, std::shared_ptr<TextureBase> texture);
+        std::shared_ptr<Material> createMaterial(std::string name, Vector4& color, std::shared_ptr<TextureBase> texture);
         
         void removeMaterial(std::string name);
         

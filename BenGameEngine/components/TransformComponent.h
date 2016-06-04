@@ -13,7 +13,7 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "BGEMathTypes.h"
+#include "MathTypes.h"
 #include "Component.h"
 
 namespace BGE {
@@ -40,7 +40,7 @@ namespace BGE {
         bool isInteractableWhenHidden() const { return interactableWhenHidden_; }
         void setInteractabilityWhenHidden(bool interactableWhenHidden) { interactableWhenHidden_ = interactableWhenHidden; }
         
-        void getBounds(BGERect &bounds) { bounds = bounds_; }
+        void getBounds(Rect &bounds) { bounds = bounds_; }
         
         float getX() const { return position_.x; }
         float getY() const { return position_.y; }
@@ -50,29 +50,29 @@ namespace BGE {
         void setY(float y) { position_.y = y; transformDirty_ = true; }
         void setZ(float z) { z_ = z; transformDirty_ = true; }
         
-        BGEVector2 getPosition() const { return position_; }
-        void setPosition(BGEVector2 &position) { position_ = position; transformDirty_ = true; }
+        Vector2 getPosition() const { return position_; }
+        void setPosition(Vector2 &position) { position_ = position; transformDirty_ = true; }
         
         float getScaleX() const { return scale_.x; }
         float getScaleY() const { return scale_.y; }
         void setScaleX(float x) { scale_.x = x; transformDirty_ = true; }
         void setScaleY(float y) { scale_.y = y; transformDirty_ = true; }
         
-        BGEVector2 getScale() const { return scale_; }
-        void setScale(BGEVector2 &scale) { scale_ = scale; transformDirty_ = true; }
+        Vector2 getScale() const { return scale_; }
+        void setScale(Vector2 &scale) { scale_ = scale; transformDirty_ = true; }
         
         float getSkewX() const { return skew_.x; }
         float getSkewY() const { return skew_.y; }
         void setSkewX(float x) { skew_.x = x; transformDirty_ = true; }
         void setSkewY(float y) { skew_.y = y; transformDirty_ = true; }
         
-        BGEVector2 getSkew() const { return skew_; }
-        void setSkew(BGEVector2 &skew) { skew_ = skew; transformDirty_ = true; }
+        Vector2 getSkew() const { return skew_; }
+        void setSkew(Vector2 &skew) { skew_ = skew; transformDirty_ = true; }
         
         float getRotation() const { return rotation_; }
         void setRotation(float rotation) { rotation_ = rotation; transformDirty_ = true; }
         
-        void getMatrix(BGEMatrix4 &matrix);
+        void getMatrix(Matrix4 &matrix);
         
         std::weak_ptr<TransformComponent> getParent() { return parent_; }
         std::vector<std::shared_ptr<TransformComponent>> getChildren() { return children_; }
@@ -103,18 +103,18 @@ namespace BGE {
         bool            interactableWhenHidden_;
         
         // Bounds
-        BGERect         bounds_;
+        Rect         bounds_;
         
         // Transformation
-        BGEVector2      position_;
+        Vector2      position_;
         float           z_;
         
-        BGEVector2      scale_;
-        BGEVector2      skew_;
+        Vector2      scale_;
+        Vector2      skew_;
         
         float           rotation_;
         
-        BGEMatrix4      matrix_;
+        Matrix4      matrix_;
         
         bool            transformDirty_; // Indicates that components and matrix are out of sync
         

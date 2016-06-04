@@ -32,13 +32,13 @@ namespace BGE {
 
         void setWidth(float width);
         void setHeight(float height);
-        void setWidthHeight(BGEVector2 &wh);
+        void setWidthHeight(Vector2 &wh);
         
     protected:
         FlatRectRenderComponent(uint32_t componentId);
         FlatRectRenderComponent(uint32_t componentId, std::string name);
         
-        BGEVertex* const getVertices() { return vertices_; }
+        Vertex* const getVertices() { return vertices_; }
         
         void materialsUpdated();
         
@@ -49,9 +49,9 @@ namespace BGE {
         
         static const uint32_t NumVertices = 4;
         
-        BGEVertex vertices_[NumVertices];
+        Vertex vertices_[NumVertices];
         
-        void updateLocalBoundsAndVertices(BGEVector2& wh);
+        void updateLocalBoundsAndVertices(Vector2& wh);
     };
 }
 

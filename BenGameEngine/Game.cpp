@@ -19,6 +19,7 @@ BGE::Game::Game()
     componentService_ = std::make_shared<BGE::ComponentService>();
     materialService_ = std::make_shared<BGE::MaterialService>();
     heartbeatService_ = std::make_shared<BGE::HeartbeatService>();
+    scenePackageService_ = std::make_shared<BGE::ScenePackageService>();
 }
 
 void BGE::Game::provide(std::shared_ptr<BGE::RenderService> renderService) {

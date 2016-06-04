@@ -86,6 +86,14 @@
             std::function<void(std::shared_ptr<BGE::TextureBase>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
             BGE::Game::getInstance()->getTextureService()->namedTextureFromFile("fish", [path UTF8String], nullptr);
         }
+        
+        path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
+        
+        if (path) {
+            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "common", [](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                NSLog(@"Loaded scene package");
+            });
+        }
     }
     
     [self.glView display];
@@ -113,7 +121,7 @@
     auto flatRect = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::FlatRectRenderComponent>("rect");
     auto sprite = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::SpriteRenderComponent>("sprite");
     
-    BGEColor color = { 1, 0, 0, 1 };
+    BGE::Color color = { 1, 0, 0, 1 };
     
     material->setColor(color);
     gameObj0->setName("Object0");
@@ -129,7 +137,7 @@
     gameObj1->addComponent(transformComponent1);
     gameObj1->addComponent(flatRect);
 #endif
-    BGEVector2 wh = { 500, 700 };
+    BGE::Vector2 wh = { 500, 700 };
     
     flatRect->setMaterials({ material });
     flatRect->setWidthHeight(wh);

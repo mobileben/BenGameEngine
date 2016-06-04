@@ -18,14 +18,17 @@
 static const int InitialSupportedCharacterOffset = 32;
 static const int NumSupportedCharacters = 256 - InitialSupportedCharacterOffset;   // Support extended ASCCI, ignore control characters (0-31)
 
-BGE::FontOpenGLES2::FontOpenGLES2(std::string name, uint32_t pixelSize, std::string filename) : BGE::Font(name, pixelSize, filename) {
+BGE::FontOpenGLES2::FontOpenGLES2(std::string name, uint32_t pixelSize) : BGE::Font(name, pixelSize) {
+}
+
+void BGE::FontOpenGLES2::load(std::string filename, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback)  {
     FT_Face face = NULL;
     FT_Error error = 0;
-
+    
     error = FT_New_Face(BGE::Game::getInstance()->getFontService()->getFreetypeLibrary(), filename.c_str(), 0, &face);
     
     if (!error) {
-        error = FT_Set_Pixel_Sizes(face, 0, pixelSize);
+        error = FT_Set_Pixel_Sizes(face, 0, pixelSize_);
         
         if (!error) {
             FT_Glyph_Metrics metrics[NumSupportedCharacters];
@@ -55,9 +58,6 @@ BGE::FontOpenGLES2::FontOpenGLES2(std::string name, uint32_t pixelSize, std::str
                         bitmaps[i].buffer = newBuffer;
                     }
                     
-                    if ((i+InitialSupportedCharacterOffset) == 'H' || (i+InitialSupportedCharacterOffset) == 'a' || (i+InitialSupportedCharacterOffset) == 'j') {
-                        NSLog(@"WHY");
-                    }
                     width = currMetrics->width >> 6;
                     height = currMetrics->height >> 6;
                     top = currMetrics->horiBearingY >> 6;
@@ -87,7 +87,7 @@ BGE::FontOpenGLES2::FontOpenGLES2(std::string name, uint32_t pixelSize, std::str
             int atlasW = glyphW * maxCol;
             int atlasH = glyphH * maxRow;
             int atlasSpan = glyphW * maxCol;
-
+            
             glyphW_ = glyphW;
             glyphH_ = glyphH;
             baseline_ = (int) maxBearing;
@@ -105,7 +105,7 @@ BGE::FontOpenGLES2::FontOpenGLES2(std::string name, uint32_t pixelSize, std::str
                 BGESubTextureDef subTexDef;
                 FontGlyphDef glyphDefs[NumSupportedCharacters];
                 std::map<std::string, BGESubTextureDef> subTexDefs;
-                std::string fontKeyBase = FontService::fontAsKey(name, pixelSize) + "_";
+                std::string fontKeyBase = FontService::fontAsKey(name_, pixelSize_) + "_";
                 
                 memset(atlasBuffer, 0, atlasW * atlasH);
                 
@@ -125,12 +125,9 @@ BGE::FontOpenGLES2::FontOpenGLES2(std::string name, uint32_t pixelSize, std::str
                         subTexDef.x = x;
                         subTexDef.y = y;
                         
-                        if ((index+InitialSupportedCharacterOffset) == 'j') {
-                            NSLog(@"WHEE");
-                        }
-                        glyphDefs[index].offsetX = metrics[index].horiBearingX >> 6;
-                        glyphDefs[index].offsetY = maxBearing - (metrics[index].horiBearingY >> 6);
-                        glyphDefs[index].advance = metrics[index].horiAdvance >> 6;
+                        glyphDefs[index].offsetX = (int32_t) (metrics[index].horiBearingX >> 6);
+                        glyphDefs[index].offsetY = (int32_t) (maxBearing - (metrics[index].horiBearingY >> 6));
+                        glyphDefs[index].advance = (int32_t) (metrics[index].horiAdvance >> 6);
                         
                         if (currBuffer) {
                             subTexDef.width = currBitmap->width;
@@ -233,15 +230,26 @@ BGE::FontOpenGLES2::FontOpenGLES2(std::string name, uint32_t pixelSize, std::str
                     }
                     
                     free(atlasBuffer);
+                    
+                    if (callback) {
+                        valid_ = true;
+                        callback(derived_shared_from_this<FontOpenGLES2>(), nullptr);
+                    }
                 });
+            } else if (callback) {
+                callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorAllocation));
             }
+        } else if (callback) {
+            callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
         }
+    } else if (callback) {
+        callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
     }
 }
 
-void BGE::FontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVector4 &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Vector4 &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     if (textureAtlas_ && textureAtlas_->isValid()) {
-        BGEVertexTex vertices[4];
+        VertexTex vertices[4];
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
         float x = position.x;
         float y = position.y;
@@ -298,8 +306,8 @@ void BGE::FontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVe
                 oglTex = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(glyph->getTexture());
                 
                 if (oglTex && oglTex->isValid()) {
-                    const BGEVector2 *xys = oglTex->getXYs();
-                    const BGEVector2 *uvs = oglTex->getUVs();
+                    const Vector2 *xys = oglTex->getXYs();
+                    const Vector2 *uvs = oglTex->getUVs();
                     
                     vertices[0].position.x = x + xys[0].x;
                     vertices[0].position.y = y + xys[0].y;
@@ -329,9 +337,9 @@ void BGE::FontOpenGLES2::drawString(std::string str, BGEVector2 &position, BGEVe
                     //            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                     
                     glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                          sizeof(BGEVertexTex), &vertices[0]);
+                                          sizeof(VertexTex), &vertices[0]);
                     glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                                          sizeof(BGEVertexTex), (GLvoid*) (&vertices[0].tex));
+                                          sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
                     
                     glUniform1i(textureUniform, 0);
                     glUniform4f(colorUniform, 1, 0, 0, 1);

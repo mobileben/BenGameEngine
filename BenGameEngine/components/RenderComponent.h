@@ -13,7 +13,7 @@
 #include <memory>
 #include <vector>
 #include "Component.h"
-#include "BGEMathTypes.h"
+#include "MathTypes.h"
 #include "Material.h"
 
 namespace BGE {
@@ -31,8 +31,8 @@ namespace BGE {
         float getGlobalWidth() { return globalBounds_.w; }
         float getGlobalHeight() { return globalBounds_.h; }
         
-        void getLocalBounds(BGERect& bounds) { bounds = localBounds_; }
-        void getGlobalBounds(BGERect& bounds);
+        void getLocalBounds(Rect& bounds) { bounds = localBounds_; }
+        void getGlobalBounds(Rect& bounds);
         bool isEnabled() const { return enabled_; }
         void setEnabled(bool enabled) { enabled_ = enabled; }
         RenderComponentAnchor getAnchor() const { return anchor_; }
@@ -47,8 +47,8 @@ namespace BGE {
         bool getGlobalBoundsDirty() const { return globalBoundsDirty_; }
         void setGlobalBoundsDirty(bool dirty) { globalBoundsDirty_ = dirty; }
         
-        void setLocalBounds(BGERect& bounds) { localBounds_ = bounds; }
-        void setGlobalBounds(BGERect& bounds) { globalBounds_ = bounds; }
+        void setLocalBounds(Rect& bounds) { localBounds_ = bounds; }
+        void setGlobalBounds(Rect& bounds) { globalBounds_ = bounds; }
         
         virtual void materialsUpdated() =0;
         
@@ -57,8 +57,8 @@ namespace BGE {
         
         bool                    enabled_;
         bool                    globalBoundsDirty_;
-        BGERect                 localBounds_;   // Relative (local) to render component
-        BGERect                 globalBounds_;  // Global. This includes any transforms applied
+        Rect                 localBounds_;   // Relative (local) to render component
+        Rect                 globalBounds_;  // Global. This includes any transforms applied
         RenderComponentAnchor   anchor_;
         
         std::vector<std::weak_ptr<BGE::Material>> materials_;

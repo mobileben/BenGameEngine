@@ -48,8 +48,8 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
         assert(texture);
         
         if (texture) {
-            BGERect bounds;
-            BGEVertexTex* const vertices = (BGEVertexTex* const) getVertices();
+            Rect bounds;
+            VertexTex* const vertices = (VertexTex* const) getVertices();
             float x = 0;
             float y = 0;
             float w = texture->getWidth();
@@ -67,8 +67,8 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
                     
                     setLocalBounds(bounds);
                     
-                    const BGEVector2 *xys = texture->getXYs();
-                    const BGEVector2 *uvs = texture->getUVs();
+                    const Vector2 *xys = texture->getXYs();
+                    const Vector2 *uvs = texture->getUVs();
                     
                     if (Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
                         /*
