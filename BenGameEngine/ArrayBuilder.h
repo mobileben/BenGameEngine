@@ -23,7 +23,7 @@ namespace BGE {
     template <typename T, typename U>
     class ArrayBuilderIterator {
     public:
-        ArrayBuilderIterator(const ArrayBuilder<T, U> *aBuilder, size_t pos) : pos_(pos), aBuilder_(aBuilder) {
+        ArrayBuilderIterator(const ArrayBuilder<T, U> *aBuilder, int32_t pos) : pos_(pos), aBuilder_(aBuilder) {
         }
         
         bool operator !=(const ArrayBuilderIterator<T, U>& other) const {
@@ -41,7 +41,7 @@ namespace BGE {
         }
         
     private:
-        size_t pos_;
+        int32_t pos_;
         const ArrayBuilder<T, U> *aBuilder_;
     };
     
@@ -51,12 +51,12 @@ namespace BGE {
         ArrayBuilder() {}
         virtual ~ArrayBuilder() {}
         
-        virtual size_t add(const T& item) {
+        virtual int32_t add(const T& item) {
             if (!std::is_same<T, U>::value) {
                 assert(false);
             }
             
-            auto index = items_.size();
+            auto index = (int32_t) items_.size();
             // Since we know if we are here that they are the same type, do this to allow us to push the item on the stack properly
             U *uitem = (U *)&item;
             
@@ -65,49 +65,40 @@ namespace BGE {
             return index;
         }
         
-        virtual U *createRaw() {
-            auto size = items_.size();
-            
-            if (size == 0) {
-                return nullptr;
-            }
-            
-            U *raw = new U[size];
-            
-            if (raw) {
-                memcpy(raw, &items_[0], sizeof(U) * size);
-                return raw;
-            } else {
-                return nullptr;
-            }
-        }
-        
         FixedArray<U> createFixedArray() const {
-            return FixedArray<U>((U *)&items_[0], items_.size());
+            return FixedArray<U>((U *)&items_[0], (int32_t) items_.size());
         }
         
-        size_t size() const {
-            return items_.size();
+        int32_t size() const {
+            return (int32_t) items_.size();
         }
         
         void clear() {
             items_.clear();
         }
         
-        void resize(size_t size) {
+        void resize(int32_t size) {
             items_.resize(size);
         }
         
-        U& operator[](size_t index) {
+        U& operator[](int32_t index) {
             return items_[index];
         }
         
-        const U& operator[](size_t index) const {
+        const U& operator[](int32_t index) const {
             return items_[index];
         }
 
-        U *addressOf(size_t index) const {
+        U *addressOf(int32_t index) const {
             return (U *) &items_[index];
+        }
+
+        U *safeAddressOf(int32_t index) const {
+            if (index == NullPtrIndex || index >= items_.size()) {
+                return nullptr;
+            } else {
+                return addressOf(index);
+            }
         }
         
         ArrayBuilderIterator<T, U> begin() const {
@@ -115,7 +106,7 @@ namespace BGE {
         }
         
         ArrayBuilderIterator<T, U> end() const {
-            return ArrayBuilderIterator<T, U>(this, items_.size());
+            return ArrayBuilderIterator<T, U>(this, (int32_t) items_.size());
         }
         
     protected:

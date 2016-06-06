@@ -23,7 +23,7 @@ namespace BGE {
         UniqueArrayBuilder() {}
         virtual ~UniqueArrayBuilder() {}
         
-        virtual size_t add(const T& item) {
+        virtual int32_t add(const T& item) {
             if (!std::is_same<T, U>::value) {
                 assert(false);
             }
@@ -42,24 +42,7 @@ namespace BGE {
             return index;
         }
         
-        virtual U *createRaw() {
-            auto size = items_.size();
-            
-            if (size == 0) {
-                return nullptr;
-            }
-            
-            U *raw = new U[size];
-            
-            if (raw) {
-                memcpy(raw, &items_[0], sizeof(U) * size);
-                return raw;
-            } else {
-                return nullptr;
-            }
-        }
-        
-        size_t indexForItem(const T& item) {
+        int32_t indexForItem(const T& item) {
             auto it = indices_[item];
             
             if (it == indices_.end()) {
@@ -75,13 +58,37 @@ namespace BGE {
             return FixedArray<U>((U *)&items_[0], items_.size());
         }
         
-        size_t size() const {
-            return items_.size();
+        int32_t size() const {
+            return (int32_t) items_.size();
         }
         
+        void clear() {
+            items_.clear();
+        }
+        
+        U& operator[](int32_t index) {
+            return items_[index];
+        }
+        
+        const U& operator[](int32_t index) const {
+            return items_[index];
+        }
+        
+        U *addressOf(int32_t index) const {
+            return (U *) &items_[index];
+        }
+        
+        U *safeAddressOf(int32_t index) const {
+            if (index == NullPtrIndex || index >= items_.size()) {
+                return nullptr;
+            } else {
+                return addressOf(index);
+            }
+        }
+
     protected:
         std::vector<U> items_;
-        std::unordered_map<T, size_t> indices_;
+        std::unordered_map<T, int32_t> indices_;
     };
 }
 

@@ -11,6 +11,214 @@
 #include <math.h>
 
 namespace BGE {
+    bool operator==(const Rect& lhs, const Rect& rhs) {
+        if (lhs.x != rhs.x) {
+            return false;
+        }
+        
+        if (lhs.y != rhs.y) {
+            return false;
+        }
+        
+        if (lhs.w != rhs.w) {
+            return false;
+        }
+        
+        if (lhs.h != rhs.h) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    bool operator!=(const Rect& lhs, const Rect& rhs) {
+        if (lhs.x != rhs.x) {
+            return true;
+        }
+        
+        if (lhs.y != rhs.y) {
+            return true;
+        }
+        
+        if (lhs.w != rhs.w) {
+            return true;
+        }
+        
+        if (lhs.h != rhs.h) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    bool operator==(const Vector4& lhs, const Vector4& rhs) {
+        if (lhs.x != rhs.x) {
+            return false;
+        }
+        if (lhs.y != rhs.y) {
+            return false;
+        }
+        if (lhs.z != rhs.z) {
+            return false;
+        }
+        if (lhs.w != rhs.w) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    bool operator!=(const Vector4& lhs, const Vector4& rhs) {
+        if (lhs.x != rhs.x) {
+            return true;
+        }
+        if (lhs.y != rhs.y) {
+            return true;
+        }
+        if (lhs.z != rhs.z) {
+            return true;
+        }
+        if (lhs.w != rhs.w) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    bool operator==(const Vector3& lhs, const Vector3& rhs) {
+        if (lhs.x != rhs.x) {
+            return false;
+        }
+        if (lhs.y != rhs.y) {
+            return false;
+        }
+        if (lhs.z != rhs.z) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    bool operator!=(const Vector3& lhs, const Vector3& rhs) {
+        if (lhs.x != rhs.x) {
+            return true;
+        }
+        if (lhs.y != rhs.y) {
+            return true;
+        }
+        if (lhs.z != rhs.z) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    bool operator==(const Vector2& lhs, const Vector2& rhs) {
+        if (lhs.x != rhs.x) {
+            return false;
+        }
+        if (lhs.y != rhs.y) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    bool operator!=(const Vector2& lhs, const Vector2& rhs) {
+        if (lhs.x != rhs.x) {
+            return true;
+        }
+        if (lhs.y != rhs.y) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    bool operator==(const ColorMatrix& lhs, const ColorMatrix& rhs) {
+        for (auto i=0;i<20;i++) {
+            if (lhs.c[i] != rhs.c[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    bool operator!=(const ColorMatrix& lhs, const ColorMatrix& rhs) {
+        for (auto i=0;i<20;i++) {
+            if (lhs.c[i] != rhs.c[i]) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    bool operator==(const ColorTransform& lhs, const ColorTransform& rhs) {
+        if (lhs.c[0] != rhs.c[0]) {
+            return false;
+        }
+        if (lhs.c[1] != rhs.c[1]) {
+            return false;
+        }
+        if (lhs.c[2] != rhs.c[2]) {
+            return false;
+        }
+        if (lhs.c[3] != rhs.c[3]) {
+            return false;
+        }
+        if (lhs.c[4] != rhs.c[4]) {
+            return false;
+        }
+        if (lhs.c[5] != rhs.c[5]) {
+            return false;
+        }
+        if (lhs.c[6] != rhs.c[6]) {
+            return false;
+        }
+        if (lhs.c[7] != rhs.c[7]) {
+            return false;
+        }
+        if (lhs.c[8] != rhs.c[8]) {
+            return false;
+        }
+
+        return true;
+    }
+    
+    bool operator!=(const ColorTransform& lhs, const ColorTransform& rhs) {
+        if (lhs.c[0] != rhs.c[0]) {
+            return true;
+        }
+        if (lhs.c[1] != rhs.c[1]) {
+            return true;
+        }
+        if (lhs.c[2] != rhs.c[2]) {
+            return true;
+        }
+        if (lhs.c[3] != rhs.c[3]) {
+            return true;
+        }
+        if (lhs.c[4] != rhs.c[4]) {
+            return true;
+        }
+        if (lhs.c[5] != rhs.c[5]) {
+            return true;
+        }
+        if (lhs.c[6] != rhs.c[6]) {
+            return true;
+        }
+        if (lhs.c[7] != rhs.c[7]) {
+            return true;
+        }
+        if (lhs.c[8] != rhs.c[8]) {
+            return true;
+        }
+        
+        return false;
+    }
+
     float MathDegreesToRadians(float degrees)
     {
         return degrees * M_PI_2;

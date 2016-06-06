@@ -24,12 +24,12 @@ namespace BGE {
     class StringArrayBuilder : public ArrayBuilder<std::string, char> {
 #endif
     public:
-        size_t add(const std::string& item) {
+        int32_t add(const std::string& item) {
             return add(item.c_str());
         }
 
-        size_t add(const char *item) {
-            size_t start;
+        int32_t add(const char *item) {
+            int32_t start;
             
 #ifdef UNIQUE_STRING_ARRAY
             if (indices_.find(item) != indices_.end()) {
@@ -40,7 +40,7 @@ namespace BGE {
                 indices_[item] = start;
             }
 #else
-            start = items_.size();
+            start = (int32_t) items_.size();
             items_.insert(items_.end(), item, item + strlen(item) + 1);
 #endif
             

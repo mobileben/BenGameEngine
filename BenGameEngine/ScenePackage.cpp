@@ -1,4 +1,4 @@
-//
+ //
 //  ScenePackage.cpp
 //  BenGameEngine
 //
@@ -26,15 +26,9 @@ BGE::ScenePackage::~ScenePackage() {
 
 void BGE::ScenePackage::reset() {
     for (auto &tex : textures_) {
-        if (tex.texture) {
-            tex.texture = nullptr;
-        }
     }
     
     for (auto &text : text_) {
-        if (text.font) {
-            text.font = nullptr;
-        }
     }
     
     textures_.clear();
@@ -42,23 +36,50 @@ void BGE::ScenePackage::reset() {
     animationSequences_.clear();
 }
 
+void BGE::ScenePackage::prelink() {
+    // Fix all string pointers
+#if 0
+    for (auto& tex : textures_) {
+        long offset = (long) tex.name;
+        //        tex.name = strs_ + offset;
+        tex.name = strings_.addressOf(offset);
+        NSLog(@"Tex is %s", tex.name);
+    }
+    
+    for (auto& text : text_) {
+        long offset = (long) text.name;
+        text.name = strings_.addressOf(offset);
+        NSLog(@"Text is %s", text.name);
+    }
+    
+    for (auto& animSeq : animationSequences_) {
+        long offset = (long) animSeq.name;
+        animSeq.name = strings_.addressOf(offset);
+        NSLog(@"Anim Seq is %s", animSeq.name);
+    }
+#endif
+}
+
+void BGE::ScenePackage::link() {
+}
+
 void BGE::ScenePackage::load(NSDictionary *jsonDict) {
     reset();
     
     NSArray *textures = jsonDict[@"textures"];
-    StringArrayBuilder strAB;
-    ArrayBuilder<TextureReference, TextureReference> texAB;
-    ArrayBuilder<TextReference, TextReference> textAB;
-    ArrayBuilder<AnimationSequenceReferenceBuilder, AnimationSequenceReferenceBuilder> animSeqArrBuilder;
-    ArrayBuilder<AnimationKeyFrameTemp, AnimationKeyFrameTemp> keyFrameTempAB;
-    ArrayBuilder<AnimationKeyFrameReference, AnimationKeyFrameReference> keyFrameAB;
-    ArrayBuilder<AnimationChannelReference, AnimationChannelReference> animChannelRefAB;
-    ArrayBuilder<Rect, Rect> rectChannelRefArrBuilder;
-    ArrayBuilder<BoundsReferenceBuilder, BoundsReferenceBuilder> boundsRefArrBuilder;
+    StringArrayBuilder stringBuilder;
+    ArrayBuilder<TextureReferenceIntermediate, TextureReferenceIntermediate> texIntBuilder;
+    ArrayBuilder<TextReferenceIntermediate, TextReferenceIntermediate> textIntBuilder;
+    ArrayBuilder<AnimationSequenceReferenceIntermediate, AnimationSequenceReferenceIntermediate> animSeqIntBuilder;
     
-    NSLog(@"Textures are %@", textures);
-    NSLog(@"IS POD %d", std::is_pod<TextureReference>::value);
-    NSLog(@"IS POD %d", std::is_pod<TextReference>::value);
+    UniqueArrayBuilder<Rect, Rect> rectBuilder;
+    UniqueArrayBuilder<ColorTransform, ColorTransform> colorXformBuilder;
+    UniqueArrayBuilder<ColorMatrix, ColorMatrix> colorMtxBuilder;
+    UniqueArrayBuilder<Vector2, Vector2> vector2Builder;
+
+    ArrayBuilder<BoundsReferenceIntermediate, BoundsReferenceIntermediate> boundsRefIntBuilder;
+    ArrayBuilder<AnimationKeyFrameReferenceIntermediate, AnimationKeyFrameReferenceIntermediate> keyframeIntBuilder;
+    ArrayBuilder<AnimationChannelReferenceIntermediate, AnimationChannelReferenceIntermediate> channelRefIntBuilder;
     
     setName([jsonDict[@"name"] UTF8String]);
     width_ = [jsonDict[@"width"] floatValue];
@@ -68,21 +89,17 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
     position_.x = [jsonDict[@"position"][@"x"] floatValue];
     position_.y = [jsonDict[@"position"][@"y"] floatValue];
     
-    texAB.resize(textures.count);
+    texIntBuilder.resize(textures.count);
     
     for (NSInteger index=0;index<textures.count;index++) {
         NSDictionary *texDict = textures[index];
-        TextureReference *texRef = texAB.addressOf(index);
+        TextureReferenceIntermediate *texRef = texIntBuilder.addressOf(index);
         
         // Add name
         const char* name = [texDict[@"name"] UTF8String];
         
         if (name) {
-            size_t start;
-            
-            start = strAB.add(name);
-
-            texRef->name = (const char *)start;
+            texRef->name = stringBuilder.add(name);
             
             texRef->width = [texDict[@"width"] floatValue];
             texRef->height = [texDict[@"height"] floatValue];
@@ -91,10 +108,11 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
             NSString* filename = [[NSBundle mainBundle] pathForResource:texDict[@"filename"] ofType:nil];
             
             if (filename) {
+                textureQueue_.push_back(std::make_pair<std::string, std::string>(name, [filename UTF8String]));
                 Game::getInstance()->getTextureService()->namedTextureFromFile(name, [filename UTF8String], [texRef, name](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
                     NSLog(@"%s: texture %x", name, texture.get());
                     
-                    texRef->texture = texture.get();
+                    //texRef->texture = texture.get();
                 });
             }
         } else {
@@ -105,21 +123,18 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
     
     NSArray *text = jsonDict[@"text"];
     
-    textAB.resize(text.count);
+    textIntBuilder.resize(text.count);
     
     for (NSInteger index=0;index<text.count;index++) {
         NSDictionary *textDict = text[index];
-        TextReference *textRef = textAB.addressOf(index);
+        TextReferenceIntermediate *textRef = textIntBuilder.addressOf(index);
         
         const char *name = [textDict[@"name"] UTF8String];
         
         if (name) {
-            size_t start;
             NSDictionary *formatDict = textDict[@"format"];
             
-            start = strAB.add(name);
-            
-            textRef->name = (const char *)start;
+            textRef->name = stringBuilder.add(name);
             textRef->width = [textDict[@"width"] floatValue];
             textRef->height = [textDict[@"height"] floatValue];
             textRef->leading = [formatDict[@"leading"] floatValue];
@@ -135,10 +150,13 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
             }
             
             uint32_t size = [formatDict[@"fontSize"] unsignedIntValue];
-            std::string fontName = [formatDict[@"fontName"] UTF8String];
+            const char* fontName = [formatDict[@"fontName"] UTF8String];
+            
+            fontQueue_.push_back(std::make_pair<std::string, int32_t>(fontName, size));
+                           
             BGE::Game::getInstance()->getFontService()->loadFont(fontName, size, [fontName, name, size, textRef](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
-                NSLog(@"%s: font (%s:%d) %x", name, fontName.c_str(), size, font.get());
-                textRef->font = font.get();
+                NSLog(@"%s: font (%s:%d) %x", name, fontName, size, font.get());
+                //textRef->font = font.get();
             });
         } else {
             // TODO: How to handle non-named items
@@ -148,27 +166,26 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
     
     NSArray *symbols = jsonDict[@"symbols"];
     
-    animSeqArrBuilder.resize(symbols.count);
+    animSeqIntBuilder.resize(symbols.count);
     
     for (NSInteger index=0;index<symbols.count;index++) {
         NSDictionary *symbolDict = symbols[index];
-        AnimationSequenceReferenceBuilder *animSeq = animSeqArrBuilder.addressOf(index);
+        AnimationSequenceReferenceIntermediate *animSeq = animSeqIntBuilder.addressOf(index);
         
         const char *name = [symbolDict[@"name"] UTF8String];
         
         if (name) {
             size_t start;
             
-            start = strAB.add(name);
+            start = stringBuilder.add(name);
 
             animSeq->name = (const char *)start;
             animSeq->frameRate = frameRate_;
+            animSeq->bounds = (uint32_t) boundsRefIntBuilder.size();
+            animSeq->channels = (uint32_t) channelRefIntBuilder.size();
             
             NSArray *frames = symbolDict[@"frames"];
-            std::vector<AnimationChannelReferenceBuilder> channels;
-            std::vector<AnimationKeyFrameReference> keyFrames;
-            std::vector<BoundsReference> bounds;
-            std::map<std::string, unsigned long> channelIndex;
+            std::map<std::string, int32_t> channelIndex;
             
             BoundsReference currBounds;
             BoundsReference newBounds;
@@ -195,9 +212,8 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
                     
                     
                     if (newBounds.bounds.x != currBounds.bounds.x || newBounds.bounds.y != currBounds.bounds.y || newBounds.bounds.w != currBounds.bounds.w || newBounds.bounds.h != currBounds.bounds.h) {
-                        // This is truly new
-                        bounds.push_back(currBounds);
                         currBounds = newBounds;
+                        boundsRefIntBuilder.add({currBounds.startFrame, currBounds.totalFrames, rectBuilder.add(currBounds.bounds)});
                     } else {
                         currBounds.totalFrames++;
                     }
@@ -209,19 +225,19 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
                     
                     if (childName) {
                         auto channelIndexIt = channelIndex.find(childName);
-                        AnimationChannelReferenceBuilder *channel;
+                        AnimationChannelReferenceIntermediate *channel;
                         if (channelIndexIt != channelIndex.end()) {
-                            channel = &channels[channelIndexIt->second];
+                            channel = channelRefIntBuilder.addressOf(channelIndexIt->second);
                         } else {
                             size_t start;
-                            AnimationChannelReferenceBuilder newChannel;
+                            AnimationChannelReferenceIntermediate newChannel;
                             
-                            start = strAB.add(childName);
+                            start = stringBuilder.add(childName);
                             newChannel.name = (const char *)start;
                             
                             const char* reference = [childDict[@"reference"] UTF8String];
                             
-                            start = strAB.add(reference);
+                            start = stringBuilder.add(reference);
                             
                             newChannel.reference = (const char *)start;
                             
@@ -252,151 +268,216 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
                             
                             newChannel.referenceType = value;
                             
-                            unsigned long idx = channels.size();
+                            auto idx = channelRefIntBuilder.size();
                             channelIndex[childName] = idx;
-                            channels.push_back(newChannel);
-                            channel = &channels[idx];
+                            channelRefIntBuilder.add(newChannel);
+                            channel = channelRefIntBuilder.addressOf(idx);
                         }
                         
-                        // Handle keyframe
-                        if (channel->keyFrames.size() == 0) {
-                            AnimationKeyFrameReference keyFrame;
-                            keyFrame.startFrame = fi;
-                            keyFrame.totalFrames = 1;
-                            keyFrame.order = ci;
-                            keyFrame.flags = [childDict[@"flags"] unsignedIntValue];
+                        AnimationKeyFrameReferenceIntermediate keyFrame;
+                        Rect boundsBacking;
+                        Rect *bounds = &boundsBacking;
+                        ColorTransform colorTransformBacking;
+                        ColorTransform *colorTransform = &colorTransformBacking;
+                        ColorMatrix colorMatrixBacking;
+                        ColorMatrix *colorMatrix = &colorMatrixBacking;
+                        Vector2 scaleBacking;
+                        Vector2 *scale = &scaleBacking;
+                        Vector2 positionBacking;
+                        Vector2 *position = &positionBacking;
+
+                        keyFrame.startFrame = (uint32_t)fi;
+                        keyFrame.totalFrames = 1;
+                        keyFrame.order = (uint32_t)ci;
+                        keyFrame.flags = [childDict[@"flags"] unsignedIntValue];
+                        
+                        // Bounds
+                        
+                        boundsBacking.x = [childDict[@"bounds"][@"x"] floatValue];
+                        boundsBacking.y = [childDict[@"bounds"][@"y"] floatValue];
+                        boundsBacking.w = [childDict[@"bounds"][@"width"] floatValue];
+                        boundsBacking.h = [childDict[@"bounds"][@"height"] floatValue];
+                        
+                        // Color
+                        if (childDict[@"color"]) {
+                            colorTransformBacking.multiplier.r = [childDict[@"color"][@"redMultiplier"] floatValue];
+                            colorTransformBacking.multiplier.g = [childDict[@"color"][@"greenMultiplier"] floatValue];
+                            colorTransformBacking.multiplier.b = [childDict[@"color"][@"blueMultiplier"] floatValue];
+                            colorTransformBacking.multiplier.a = [childDict[@"color"][@"alphaMultiplier"] floatValue];
+                            colorTransformBacking.offset.r = [childDict[@"color"][@"redOffset"] floatValue];
+                            colorTransformBacking.offset.g = [childDict[@"color"][@"greenOffset"] floatValue];
+                            colorTransformBacking.offset.b = [childDict[@"color"][@"blueOffset"] floatValue];
+                            colorTransformBacking.offset.a = [childDict[@"color"][@"alphaOffset"] floatValue];
+                            colorTransformBacking.color = [childDict[@"color"][@"color"] floatValue];
+                        } else {
+                            colorTransform = nullptr;
+                        }
+                        
+                        // Filters
+                        colorMatrix = nullptr;
+                        
+                        
+                        if (childDict[@"filters"]) {
+                            NSArray *filters = childDict[@"filters"];
                             
-                            // Bounds
-                            keyFrame.bounds.x = [childDict[@"bounds"][@"x"] floatValue];
-                            keyFrame.bounds.y = [childDict[@"bounds"][@"y"] floatValue];
-                            keyFrame.bounds.w = [childDict[@"bounds"][@"width"] floatValue];
-                            keyFrame.bounds.h = [childDict[@"bounds"][@"height"] floatValue];
-
-                            // Color
-                            if (childDict[@"color"]) {
-                                keyFrame.colorTransform.multiplier.r = [childDict[@"color"][@"redMultiplier"] floatValue];
-                                keyFrame.colorTransform.multiplier.g = [childDict[@"color"][@"greenMultiplier"] floatValue];
-                                keyFrame.colorTransform.multiplier.b = [childDict[@"color"][@"blueMultiplier"] floatValue];
-                                keyFrame.colorTransform.multiplier.a = [childDict[@"color"][@"alphaMultiplier"] floatValue];
-                                keyFrame.colorTransform.offset.r = [childDict[@"color"][@"redOffset"] floatValue];
-                                keyFrame.colorTransform.offset.g = [childDict[@"color"][@"greenOffset"] floatValue];
-                                keyFrame.colorTransform.offset.b = [childDict[@"color"][@"blueOffset"] floatValue];
-                                keyFrame.colorTransform.offset.a = [childDict[@"color"][@"alphaOffset"] floatValue];
-                                keyFrame.colorTransform.color = [childDict[@"color"][@"color"] floatValue];
-                            } else {
-                                keyFrame.colorTransform.multiplier.r = 0;
-                                keyFrame.colorTransform.multiplier.g = 0;
-                                keyFrame.colorTransform.multiplier.b = 0;
-                                keyFrame.colorTransform.multiplier.a = 0;
-                                keyFrame.colorTransform.offset.r = 0;
-                                keyFrame.colorTransform.offset.g = 0;
-                                keyFrame.colorTransform.offset.b = 0;
-                                keyFrame.colorTransform.offset.a = 0;
-                                keyFrame.colorTransform.color = 0;
-                            }
-                            // Filters
-                            Matrix4MakeIdentify(keyFrame.colorMatrix.matrix);
-                            keyFrame.colorMatrix.offset = { 0, 0, 0, 0 };
-
-                            if (childDict[@"filters"]) {
-                                NSArray *filters = childDict[@"filters"];
+                            for (NSDictionary *filter in filters) {
+                                NSArray *rawMatrix = filter[@"ColorMatrixFilter"][@"matrix"];
                                 
-                                for (NSDictionary *filter in filters) {
-                                    NSArray *colorMatrix = filter[@"ColorMatrixFilter"][@"matrix"];
-                                    
-                                    if (colorMatrix) {
-                                        for (NSInteger cmi=0;cmi<colorMatrix.count;cmi++) {
-                                            keyFrame.colorMatrix.c[cmi] = [colorMatrix[cmi] floatValue];
-                                        }
+                                if (rawMatrix) {
+                                    for (NSInteger cmi=0;cmi<rawMatrix.count;cmi++) {
+                                        colorMatrixBacking.c[cmi] = [rawMatrix[cmi] floatValue];
                                     }
+                                    
+                                    colorMatrix = &colorMatrixBacking;
                                 }
                             }
-                            
-                            // Position
-                            if (childDict[@"position"]) {
-                                keyFrame.position.x = [childDict[@"position"][@"x"] floatValue];
-                                keyFrame.position.y = [childDict[@"position"][@"y"] floatValue];
-                            } else {
-                                keyFrame.position.x = 0;
-                                keyFrame.position.y = 0;
-                            }
-                            
-                            // Scale
-                            if (childDict[@"scale"]) {
-                                keyFrame.scale.x = [childDict[@"scale"][@"x"] floatValue];
-                                keyFrame.scale.y = [childDict[@"scale"][@"y"] floatValue];
-                            } else {
-                                keyFrame.scale.x = 1;
-                                keyFrame.scale.y = 1;
-                            }
-                            
-                            // Rotation
-                            if (childDict[@"rotation"]) {
-                                keyFrame.rotation = [childDict[@"rotation"] floatValue];
-                            } else {
-                                keyFrame.rotation = 0;
-                            }
-                            
-                            // Now build matrix
-                            
-                            channel->keyFrames.push_back(keyFrame);
-                        } else {
-                            
                         }
                         
-                        NSLog(@"%p", channel);
+                        // Position
+                        if (childDict[@"position"]) {
+                            
+                            positionBacking.x = [childDict[@"position"][@"x"] floatValue];
+                            positionBacking.y = [childDict[@"position"][@"y"] floatValue];
+                            
+                            keyFrame.position = (int32_t) vector2Builder.add(positionBacking);
+                        } else {
+                            position = nullptr;
+                        }
+                        
+                        // Scale
+                        if (childDict[@"scale"]) {
+                            scaleBacking.x = [childDict[@"scale"][@"x"] floatValue];
+                            scaleBacking.y = [childDict[@"scale"][@"y"] floatValue];
+                        } else {
+                            scale = nullptr;
+                        }
+                        
+                        // Rotation
+                        if (childDict[@"rotation"]) {
+                            keyFrame.rotation = [childDict[@"rotation"] floatValue];
+                        } else {
+                            keyFrame.rotation = 0;
+                        }
+                        
+                        // TODO: Now build matrix
+
+                        // Now determine if this keyframe is a new keyframe
+                        bool isNew = false;
+                        AnimationKeyFrameReferenceIntermediate *currKeyFrame = nullptr;
+                        int32_t keyFrameIndex;
+
+                        if (channel->keyFrames.size() == 0) {
+                            isNew = true;
+                        } else {
+                            keyFrameIndex = channel->keyFrames[channel->keyFrames.size() - 1];
+                            
+                            AnimationKeyFrameReferenceIntermediate *currKeyFrame = &keyframeIntBuilder[keyFrameIndex];
+                            
+                            // Now we need to determine if this is a new keyframe or existing
+                            if (currKeyFrame->order != keyFrame.order) {
+                                isNew = true;
+                            } else if (currKeyFrame->flags != keyFrame.flags) {
+                                isNew = true;
+                            } else {
+                                Rect *currBounds;
+                                ColorTransform *currColorTransform;
+                                ColorMatrix *currColorMatrix;
+                                Vector2 *currPosition;
+                                Vector2 *currScale;
+
+                                currBounds = rectBuilder.safeAddressOf(currKeyFrame->bounds);
+                                currColorTransform = colorXformBuilder.safeAddressOf(currKeyFrame->colorTransform);
+                                currColorMatrix = colorMtxBuilder.safeAddressOf(currKeyFrame->colorMatrix);
+                                currPosition = vector2Builder.safeAddressOf(currKeyFrame->position);
+                                currScale = vector2Builder.safeAddressOf(currKeyFrame->scale);
+                                
+                                // Bounds the same?
+                                if ((currBounds != bounds) || ((currBounds && bounds) && (*currBounds != *bounds))) {
+                                    isNew = true;
+                                } else if ((currPosition != position) || ((currPosition && position) && (*currPosition != *position))) {
+                                    isNew = true;
+                                } else if ((currScale != scale) || ((currScale && scale) && (*currScale != *scale))) {
+                                    isNew = true;
+                                } else if ((currColorTransform != colorTransform) || ((currColorTransform && colorTransform) && (*currColorTransform != *colorTransform))) {
+                                    isNew = true;
+                                } else if ((currColorMatrix != colorMatrix) || ((currColorMatrix && colorMatrix) && (*currColorMatrix != *colorMatrix))) {
+                                    isNew = true;
+                                }
+                            }
+                        }
+                        
+                        if (isNew) {
+                            // This is a new keyframe, key values already set, but if needed, we need to assign the offsets
+                            keyFrame.bounds = rectBuilder.add(boundsBacking);
+                            
+                            if (position) {
+                                keyFrame.position = vector2Builder.add(*position);
+                            } else {
+                                keyFrame.position = NullPtrIndex;
+                            }
+                            
+                            if (scale) {
+                                keyFrame.scale = vector2Builder.add(*scale);
+                            } else {
+                                keyFrame.scale = NullPtrIndex;
+                            }
+                            
+                            if (colorTransform) {
+                                keyFrame.colorTransform = colorXformBuilder.add(*colorTransform);
+                            } else {
+                                keyFrame.colorTransform = NullPtrIndex;
+                            }
+                            
+                            if (colorMatrix) {
+                                keyFrame.colorMatrix = colorMtxBuilder.add(*colorMatrix);
+                            } else {
+                                keyFrame.colorMatrix = NullPtrIndex;
+                            }
+                            
+                            keyFrameIndex = keyframeIntBuilder.add(keyFrame);
+
+                            channel->keyFrames.push_back(keyFrameIndex);
+                        } else if (currKeyFrame) {
+                            currKeyFrame->totalFrames++;
+                        } else {
+                            assert(false);
+                        }
                     } else {
                         // TODO: How to handle non-named items
                         assert(name);
                     }
-
                 }
             }
+           
+            boundsRefIntBuilder.add({currBounds.startFrame, currBounds.totalFrames, rectBuilder.add(currBounds.bounds)});
             
-            bounds.push_back(currBounds);
+            animSeq->numBounds = (uint32_t) boundsRefIntBuilder.size() - (uint32_t) animSeq->bounds;
+            animSeq->numChannels = (uint32_t) channelRefIntBuilder.size() - animSeq->channels;
         } else {
             // TODO: How to handle non-named items
             assert(name);
         }
     }
     
-    strings_ = strAB.createFixedArray();
-    textures_ = texAB.createFixedArray();
-    text_ = textAB.createFixedArray();
+    strings_ = stringBuilder.createFixedArray();
+    textures_ = texIntBuilder.createFixedArray();
+    text_ = textIntBuilder.createFixedArray();
+    animationSequences_ = animSeqIntBuilder.createFixedArray();
     
-    ArrayBuilder<AnimationSequenceReference, AnimationSequenceReference> animSeqRefBuilder;
     
-    animSeqRefBuilder.resize(animSeqArrBuilder.size());
+    rects_ = rectBuilder.createFixedArray();
+    colorTransforms_ = colorXformBuilder.createFixedArray();
+    colorMatrices_ = colorMtxBuilder.createFixedArray();
+    vector2s_ = vector2Builder.createFixedArray();
+    boundRefs_ = boundsRefIntBuilder.createFixedArray();
+    keyframes_ = keyframeIntBuilder.createFixedArray();
+    channels_ = channelRefIntBuilder.createFixedArray();
+
+    // TODO: This will be done later perhaps?
+    prelink();
     
-    auto index = 0;
+    NSLog(@"Size is %ld", stringBuilder.size());
     
-    for (auto& animSeq : animSeqArrBuilder) {
-        AnimationSequenceReference *animSeqRef = animSeqRefBuilder.addressOf(index);
-        index++;
-    }
-    animationSequences_ = animSeqRefBuilder.createFixedArray();
-    
-    NSLog(@"Size is %ld", strAB.size());
-    
-    // Fix all string pointers
-    for (auto& tex : textures_) {
-        long offset = (long) tex.name;
-//        tex.name = strs_ + offset;
-        tex.name = strings_.addressOf(offset);
-        NSLog(@"Tex is %s", tex.name);
-    }
-    
-    for (auto& text : text_) {
-        long offset = (long) text.name;
-        text.name = strings_.addressOf(offset);
-        NSLog(@"Text is %s", text.name);
-    }
-    
-    for (auto& animSeq : animationSequences_) {
-        long offset = (long) animSeq.name;
-        animSeq.name = strings_.addressOf(offset);
-        NSLog(@"Anim Seq is %s", animSeq.name);
-    }
     
     
     NSLog(@"DONE HERE BITCH");

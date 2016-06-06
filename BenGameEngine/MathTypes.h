@@ -10,6 +10,7 @@
 #define MathTypes_h
 
 #include <stdio.h>
+#include <functional>
 
 namespace BGE {
     typedef struct {
@@ -17,6 +18,9 @@ namespace BGE {
         float w, h;
     } Rect;
     
+    bool operator==(const Rect& lhs, const Rect& rhs);
+    bool operator!=(const Rect& lhs, const Rect& rhs);
+
     // Matrices are column major order
     // Convention for an element is m01, where 0 is the column and 1 is the row
     typedef union {
@@ -59,7 +63,10 @@ namespace BGE {
         };
         float v[4];
     } Vector4;
-    
+
+    bool operator==(const Vector4& lhs, const Vector4& rhs);
+    bool operator!=(const Vector4& lhs, const Vector4& rhs);
+
     typedef Vector4 Color;
     
     typedef union  {
@@ -75,6 +82,9 @@ namespace BGE {
         float v[3];
     } Vector3;
     
+    bool operator==(const Vector3& lhs, const Vector3& rhs);
+    bool operator!=(const Vector3& lhs, const Vector3& rhs);
+
     typedef union  {
         struct {
             float x, y;
@@ -88,6 +98,9 @@ namespace BGE {
         float v[2];
     } Vector2;
     
+    bool operator==(const Vector2& lhs, const Vector2& rhs);
+    bool operator!=(const Vector2& lhs, const Vector2& rhs);
+
     typedef union {
         struct { Vector3 v; float s; };
         struct { float x, y, z, w; };
@@ -102,6 +115,9 @@ namespace BGE {
         float c[20];
     } ColorMatrix;
     
+    bool operator==(const ColorMatrix& lhs, const ColorMatrix& rhs);
+    bool operator!=(const ColorMatrix& lhs, const ColorMatrix& rhs);
+
     typedef union {
         struct {
             Color multiplier;
@@ -111,6 +127,9 @@ namespace BGE {
         float c[9];
     } ColorTransform;
     
+    bool operator==(const ColorTransform& lhs, const ColorTransform& rhs);
+    bool operator!=(const ColorTransform& lhs, const ColorTransform& rhs);
+
     extern float MathDegreesToRadians(float degrees);
     extern float MathRadiansToDegrees(float radians);
     
@@ -146,6 +165,99 @@ namespace BGE {
     extern bool Matrix2IsIdentity(Matrix2& matrix);
     extern bool Matrix3IsIdentity(Matrix3& matrix);
     extern bool Matrix4IsIdentity(Matrix4& matrix);
+}
+
+namespace std {
+    template <>
+    struct hash<BGE::Rect> {
+        size_t operator()(const BGE::Rect &r) const {
+            size_t prime = 31;
+            size_t result = 1;
+            
+            result = prime * result + hash<float>()(r.x);
+            result = prime * result + hash<float>()(r.y);
+            result = prime * result + hash<float>()(r.w);
+            result = prime * result + hash<float>()(r.h);
+            
+            return result;
+        }
+    };
+
+    template <>
+    struct hash<BGE::Vector2> {
+        size_t operator()(const BGE::Vector2 &v) const {
+            size_t prime = 31;
+            size_t result = 1;
+            
+            result = prime * result + hash<float>()(v.x);
+            result = prime * result + hash<float>()(v.y);
+            
+            return result;
+        }
+    };
+    
+    template <>
+    struct hash<BGE::Vector3> {
+        size_t operator()(const BGE::Vector3 &v) const {
+            size_t prime = 31;
+            size_t result = 1;
+            
+            result = prime * result + hash<float>()(v.x);
+            result = prime * result + hash<float>()(v.y);
+            result = prime * result + hash<float>()(v.z);
+            
+            return result;
+        }
+    };
+    
+    template <>
+    struct hash<BGE::Vector4> {
+        size_t operator()(const BGE::Vector4 &v) const {
+            size_t prime = 31;
+            size_t result = 1;
+            
+            result = prime * result + hash<float>()(v.x);
+            result = prime * result + hash<float>()(v.y);
+            result = prime * result + hash<float>()(v.z);
+            result = prime * result + hash<float>()(v.w);
+            
+            return result;
+        }
+    };
+    
+    template <>
+    struct hash<BGE::ColorTransform> {
+        size_t operator()(const BGE::ColorTransform &c) const {
+            size_t prime = 31;
+            size_t result = 1;
+            
+            result = prime * result + hash<float>()(c.c[0]);
+            result = prime * result + hash<float>()(c.c[1]);
+            result = prime * result + hash<float>()(c.c[2]);
+            result = prime * result + hash<float>()(c.c[3]);
+            result = prime * result + hash<float>()(c.c[4]);
+            result = prime * result + hash<float>()(c.c[5]);
+            result = prime * result + hash<float>()(c.c[6]);
+            result = prime * result + hash<float>()(c.c[7]);
+            result = prime * result + hash<float>()(c.c[8]);
+            
+            return result;
+        }
+    };
+    
+    template <>
+    struct hash<BGE::ColorMatrix> {
+        size_t operator()(const BGE::ColorMatrix &c) const {
+            size_t prime = 31;
+            size_t result = 1;
+            
+            for (auto i=0;i<20;i++) {
+                result = prime * result + hash<float>()(c.c[i]);
+            }
+            
+            return result;
+        }
+    };
 }
 
 #endif /* MathTypes_h */

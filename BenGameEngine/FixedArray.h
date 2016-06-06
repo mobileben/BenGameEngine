@@ -16,16 +16,17 @@
 #include <vector>
 
 namespace BGE {
-
+    int32_t const NullPtrIndex = -1;
+    
     template <typename T>
     class FixedArray;
 
     template <typename T>
     class FixedArrayIterator {
     public:
-        FixedArrayIterator(const FixedArray<T> *array, size_t pos) : pos_(pos), array_(array) {
+        FixedArrayIterator(const FixedArray<T> *array, int32_t pos) : pos_(pos), array_(array) {
         }
-        
+
         bool operator !=(const FixedArrayIterator<T>& other) const {
             return pos_ != other.pos_;
         }
@@ -41,7 +42,7 @@ namespace BGE {
         }
         
     private:
-        size_t              pos_;
+        int32_t              pos_;
         const FixedArray<T> *array_;
     
     };
@@ -55,7 +56,12 @@ namespace BGE {
             if (arr.array_ && arr.size_) {
                 array_ = new T[arr.size_];
                 size_ = arr.size_;
-                memcpy(array_, arr.array_, sizeof(T) * size_);
+                
+                if (std::is_pod<T>::value) {
+                    memcpy(array_, arr.array_, sizeof(T) * size_);
+                } else {
+                    std::copy(&arr.array_[0], &arr.array_[size_], array_);
+                }
             }
         }
 
@@ -67,19 +73,69 @@ namespace BGE {
             arr.size_ = 0;
         }
 
-        FixedArray(const T *array, size_t size) : array_(nullptr), size_(0) {
+        FixedArray(const std::vector<T>& vec) : array_(nullptr), size_(0) {
+            if (vec.size()) {
+                array_ = new T[vec.size];
+                size_ = vec.size;
+                
+                if (std::is_pod<T>::value) {
+                    memcpy(array_, vec.begin(), sizeof(T) * size_);
+                } else {
+                    std::copy(vec.begin(), vec.end(), array_);
+                }
+            }
+        }
+        
+        FixedArray(const std::vector<const std::vector<T> *>& vec) : array_(nullptr), size_(0) {
+            int32_t total = 0;
+            
+            for (auto v : vec) {
+                total += v.size();
+            }
+            
+            if (total) {
+                array_ = new T[total];
+                size_ = total;
+                
+                if (std::is_pod<T>::value) {
+                    auto span = 0;
+                    
+                    for (auto v : vec) {
+                        memcpy(&array_[span], v.begin(), sizeof(T) * v.size());
+                        span += v.size();
+                    }
+                } else {
+                    auto span = 0;
+                    
+                    for (auto v : vec) {
+                        std::copy(v.begin(), v.end(), &array_[span]);
+                        span += v.size();
+                    }
+                }
+            }
+        }
+        
+        FixedArray(const T *array, int32_t size) : array_(nullptr), size_(0) {
             if (array && size > 0) {
                 array_ = new T[size];
                 size_ = size;
-                memcpy(array_, array, sizeof(T) * size);
+                if (std::is_pod<T>::value) {
+                    memcpy(array_, array, sizeof(T) * size);
+                } else {
+                    std::copy(&array[0], &array[size], array_);
+                }
             }
         }
 
-        FixedArray(T *array, size_t size) : array_(nullptr), size_(0) {
+        FixedArray(T *array, int32_t size) : array_(nullptr), size_(0) {
             if (array && size > 0) {
                 array_ = new T[size];
                 size_ = size;
-                memcpy(array_, array, sizeof(T) * size);
+                if (std::is_pod<T>::value) {
+                    memcpy(array_, array, sizeof(T) * size);
+                } else {
+                    std::copy(&array[0], &array[size], array_);
+                }
             }
         }
         
@@ -98,7 +154,7 @@ namespace BGE {
             size_ = 0;
         }
         
-        size_t size() const {
+        int32_t size() const {
             return size_;
         }
         
@@ -111,7 +167,11 @@ namespace BGE {
                 if (op.array_ && op.size_) {
                     array_ = new T[op.size_];
                     size_ = op.size_;
-                    memcpy(array_, op.array_, sizeof(T) * size_);
+                    if (std::is_pod<T>::value) {
+                        memcpy(array_, op.array_, sizeof(T) * size_);
+                    } else {
+                        std::copy(&op.array_[0], &op.array_[size_], array_);
+                    }
                 } else {
                     array_ = nullptr;
                     size_ = 0;
@@ -137,16 +197,24 @@ namespace BGE {
             return *this;
         }
         
-        T& operator[](size_t index) {
+        T& operator[](int32_t index) {
             return array_[index];
         }
         
-        const T& operator[](size_t index) const {
+        const T& operator[](int32_t index) const {
             return array_[index];
         }
         
-        T *addressOf(size_t index) const {
+        T *addressOf(int32_t index) const {
             return &array_[index];
+        }
+        
+        T *safeAddressOf(int32_t index) const {
+            if (index == NullPtrIndex || index >= size_) {
+                return nullptr;
+            } else {
+                return addressOf(index);
+            }
         }
         
         FixedArrayIterator<T> begin () const {
@@ -159,7 +227,7 @@ namespace BGE {
         
     protected:
         T       *array_;
-        size_t  size_;
+        int32_t  size_;
     };
 }
 

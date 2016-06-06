@@ -120,18 +120,18 @@ namespace BGE {
         Rect bounds;
     };
     
-    struct AnimationKeyFrameTemp {
+    struct AnimationKeyFrameReferenceIntermediate {
         uint32_t startFrame;
         uint32_t totalFrames;
         uint32_t order;
         uint32_t flags;
-        uint32_t position;
-        uint32_t scale;
+        int32_t position;
+        int32_t scale;
         float rotation;
-        uint32_t matrix;
-        uint32_t colorMatrix;
-        uint32_t colorTransform;
-        uint32_t bounds;
+        int32_t matrix;
+        int32_t colorMatrix;
+        int32_t colorTransform;
+        int32_t bounds;
     };
 
     struct BoundsReference {
@@ -140,10 +140,10 @@ namespace BGE {
         Rect bounds;
     };
     
-    struct BoundsReferenceBuilder {
-        uint32_t startFrame;
-        uint32_t totalFrames;
-        uint32_t bounds;
+    struct BoundsReferenceIntermediate {
+        uint32_t    startFrame;
+        uint32_t    totalFrames;
+        int32_t     bounds;
     };
     
     typedef enum : uint32_t {
@@ -164,14 +164,14 @@ namespace BGE {
         const char *reference;
         GfxReferenceType referenceType;
         uint32_t numKeyFrames;
-        AnimationKeyFrameReference *keyframes;
+        AnimationKeyFrameReference **keyframes;
     };
 
-    struct AnimationChannelReferenceBuilder {
+    struct AnimationChannelReferenceIntermediate {
         const char *name;
         const char *reference;
         GfxReferenceType referenceType;
-        std::vector<AnimationKeyFrameReference> keyFrames;
+        std::vector<int32_t> keyFrames;
     };
     
     struct AnimationSequenceReference {
@@ -184,14 +184,14 @@ namespace BGE {
         BoundsReference *bounds;
     };
     
-    struct AnimationSequenceReferenceBuilder {
+    struct AnimationSequenceReferenceIntermediate {
         const char *name;
         uint32_t frameRate;
         uint32_t totalFrames;
         uint32_t numChannels;
         uint32_t numBounds;
-        std::vector<AnimationChannelReferenceBuilder> channels;
-        std::vector<BoundsReferenceBuilder> bounds;
+        uint32_t channels;
+        uint32_t bounds;
     };
     
     struct TextReference {
@@ -203,7 +203,21 @@ namespace BGE {
         FontHorizontalAlignment alignment;
         Font* font;
     };
+
+    struct TextReferenceIntermediate {
+        int32_t name;
+        float width;
+        float height;
+        float leading;
+        Color color;
+        FontHorizontalAlignment alignment;
+    };
     
+    bool operator==(const TextReference& lhs, const TextReference& rhs);
+    bool operator!=(const TextReference& lhs, const TextReference& rhs);
+    bool operator==(const TextReferenceIntermediate& lhs, const TextReferenceIntermediate& rhs);
+    bool operator!=(const TextReferenceIntermediate& lhs, const TextReferenceIntermediate& rhs);
+
     struct TextureReference {
         const char* name;
         float   width;
@@ -211,13 +225,17 @@ namespace BGE {
         // TODO: Handle
         TextureBase *texture;
     };
-    struct ScenePackageDataFormat {
-        const char* const name;
-        
-        const char* const * const strings;
-        TextureDataFormat *textures;
-        SubTextureDataFormat *subTextures;
+    
+    struct TextureReferenceIntermediate {
+        int32_t name;
+        float   width;
+        float   height;
     };
+    
+    bool operator==(const TextureReference& lhs, const TextureReference& rhs);
+    bool operator!=(const TextureReference& lhs, const TextureReference& rhs);
+    bool operator==(const TextureReferenceIntermediate& lhs, const TextureReferenceIntermediate& rhs);
+    bool operator!=(const TextureReferenceIntermediate& lhs, const TextureReferenceIntermediate& rhs);
 }
 
 #endif /* GraphicFormats_h */

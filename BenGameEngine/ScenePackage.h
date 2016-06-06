@@ -16,6 +16,7 @@
 #include "Handle.h"
 #include "GraphicFormats.h"
 #include "FixedArray.h"
+#include "MathTypes.h"
 
 namespace BGE {
     struct ScenePackageTag {};
@@ -26,8 +27,11 @@ namespace BGE {
         ScenePackage(uint64_t sceneId);
         ~ScenePackage();
         
+        void link();
+        
     protected:
         void reset();
+        void prelink();
         void load(NSDictionary *jsonDict);
 
     private:
@@ -38,13 +42,22 @@ namespace BGE {
         float width_;
         float height_;
         Vector2 position_;
-        FixedArray<char>                strings_;
-        FixedArray<TextureReference>    textures_;
-//        std::vector<TextureReference>   textures_;
-        FixedArray<TextReference> text_;
-//        std::vector<TextReference>      text_;
-        FixedArray<AnimationSequenceReference> animationSequences_;
-//        std::vector<AnimationSequenceReference> animationSequences_;
+        FixedArray<char>                                    strings_;
+        FixedArray<TextureReferenceIntermediate>            textures_;
+        FixedArray<TextReferenceIntermediate>               text_;
+        FixedArray<AnimationSequenceReferenceIntermediate>  animationSequences_;
+        
+        FixedArray<Rect>                                    rects_;
+        FixedArray<ColorTransform>                          colorTransforms_;
+        FixedArray<ColorMatrix>                             colorMatrices_;
+        FixedArray<Vector2>                                 vector2s_;
+        
+        FixedArray<BoundsReferenceIntermediate>             boundRefs_;
+        FixedArray<AnimationKeyFrameReferenceIntermediate>  keyframes_;
+        FixedArray<AnimationChannelReferenceIntermediate>   channels_;
+        
+        std::vector<std::pair<std::string, std::string>>    textureQueue_;
+        std::vector<std::pair<std::string, uint32_t>>       fontQueue_;
     };
 }
 
