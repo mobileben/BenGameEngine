@@ -12,6 +12,8 @@
 #include <stdio.h>
 #import <Foundation/Foundation.h>
 #include <vector>
+#include <atomic>
+#include <functional>
 #include "Object.h"
 #include "Handle.h"
 #include "GraphicFormats.h"
@@ -29,10 +31,14 @@ namespace BGE {
         
         void link();
         
+        bool hasExternalReferences() const {
+            return hasExternal_;
+        }
+        
     protected:
         void reset();
         void prelink();
-        void load(NSDictionary *jsonDict);
+        void load(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback);
 
     private:
         friend class ScenePackageService;
@@ -42,6 +48,10 @@ namespace BGE {
         float width_;
         float height_;
         Vector2 position_;
+        bool fontsLoaded_;
+        bool texturesLoaded_;
+        bool hasExternal_;
+        
         FixedArray<char>                                    strings_;
         FixedArray<TextureReferenceIntermediate>            textures_;
         FixedArray<TextReferenceIntermediate>               text_;
@@ -56,8 +66,13 @@ namespace BGE {
         FixedArray<AnimationKeyFrameReferenceIntermediate>  keyframes_;
         FixedArray<AnimationChannelReferenceIntermediate>   channels_;
         
+        std::shared_ptr<std::atomic_int>                    textureCount_;
         std::vector<std::pair<std::string, std::string>>    textureQueue_;
+        std::shared_ptr<std::atomic_int>                    fontCount_;
         std::vector<std::pair<std::string, uint32_t>>       fontQueue_;
+        
+        void loadTextures(std::function<void()> callback);
+        void loadFonts(std::function<void()> callback);
     };
 }
 

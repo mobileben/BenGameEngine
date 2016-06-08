@@ -13,11 +13,15 @@
 #include "StringArrayBuilder.h"
 #include <type_traits>
 
-BGE::ScenePackage::ScenePackage(uint64_t sceneId) : Object(sceneId) {
+
+BGE::ScenePackage::ScenePackage(uint64_t sceneId) : Object(sceneId), fontCount_(nullptr) {
     ArrayBuilder<int, int> b;
     b.add(10);
     StringArrayBuilder c;
     c.add("Hello");
+    
+    textureCount_ = std::make_shared<std::atomic_int>(0);
+    fontCount_ = std::make_shared<std::atomic_int>(0);
 }
 
 BGE::ScenePackage::~ScenePackage() {
@@ -63,7 +67,7 @@ void BGE::ScenePackage::prelink() {
 void BGE::ScenePackage::link() {
 }
 
-void BGE::ScenePackage::load(NSDictionary *jsonDict) {
+void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback) {
     reset();
     
     NSArray *textures = jsonDict[@"textures"];
@@ -474,6 +478,14 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
     channels_ = channelRefIntBuilder.createFixedArray();
 
     // TODO: This will be done later perhaps?
+    loadTextures([this, callback]() {
+        loadFonts([this, callback]() {
+            if (callback) {
+                callback(this);
+            }
+        });
+    });
+    
     prelink();
     
     NSLog(@"Size is %ld", stringBuilder.size());
@@ -481,4 +493,37 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict) {
     
     
     NSLog(@"DONE HERE BITCH");
+}
+
+void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
+    textureCount_->store(0);
+    
+    for (auto &tex : textureQueue_) {
+        Game::getInstance()->getTextureService()->namedTextureFromFile(tex.first, tex.second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
+            int val = textureCount_->fetch_add(1) + 1;
+            
+            NSLog(@"Loaded %s (%d)", texture->getName().c_str(), (int)val);
+            if (val == textureQueue_.size()) {
+                if (callback) {
+                    callback();
+                }
+            }
+        });
+    }
+}
+
+void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
+    fontCount_->store(0);
+    
+    for (auto &font : fontQueue_) {
+        BGE::Game::getInstance()->getFontService()->loadFont(font.first, font.second, [this, callback](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
+            int val = fontCount_->fetch_add(1) + 1;
+            
+            if (val == fontQueue_.size()) {
+                if (callback) {
+                    callback();
+                }
+            }
+        });
+    }
 }

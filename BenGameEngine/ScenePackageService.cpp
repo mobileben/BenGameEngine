@@ -32,7 +32,11 @@ void BGE::ScenePackageService::packageFromJSONFile(std::string filename, std::st
                 NSError *err = nil;
                 NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
 
-                package->load(jsonDict);
+                package->load(jsonDict, [handle, callback](ScenePackage *) {
+                    if (callback) {
+                        callback(handle, nullptr);
+                    }
+                });
             }
             
             
