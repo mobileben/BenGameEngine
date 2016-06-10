@@ -9,7 +9,7 @@ attribute vec2 MaskTexCoordIn;
 varying vec2 MaskTexCoordOut;
 
 void main(void) {
-    gl_Position = Projection * Position;
+    gl_Position = Projection * ModelView * Position;
     TexCoordOut = TexCoordIn;
     MaskTexCoordOut = MaskTexCoordIn;
 }

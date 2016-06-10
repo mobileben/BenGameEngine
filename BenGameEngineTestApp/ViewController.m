@@ -101,7 +101,11 @@
                 auto sprite = BGE::Game::getInstance()->getScenePackageService()->createSpriteRenderComponent("SaleBkg");
                 auto transformComponent = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
                 BGE::Vector2 pos = { 700, 700 };
+                BGE::Vector2 scale = { 2, 1 };
                 transformComponent->setPosition(pos);
+                transformComponent->setScale(scale);
+                transformComponent->setRotation(M_PI/16);
+                
                 gameObj->setName("Object1");
                 gameObj->addComponent(transformComponent);
                 gameObj->addComponent(sprite);

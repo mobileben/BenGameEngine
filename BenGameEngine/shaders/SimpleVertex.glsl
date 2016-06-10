@@ -11,6 +11,6 @@ uniform mat4 ModelView;
 
 void main(void) {
     DestinationColor = SourceColor;
-    gl_Position = Projection * Position;
+    gl_Position = Projection * ModelView * Position;
     //TexCoordOut = TexCoordIn;
 }

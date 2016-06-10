@@ -465,6 +465,37 @@ namespace BGE {
         matrix.m[15] = left.m[3]*right.m[12] + left.m[7]*right.m[13] + left.m[11]*right.m[14] + left.m[15]*right.m[15];
     }
     
+    
+    Matrix4 operator*(Matrix4& left, Matrix4& right) {
+        Matrix4 matrix;
+
+        // First Column
+        matrix.m[0] = left.m[0]*right.m[0] + left.m[4]*right.m[1] + left.m[8]*right.m[2] + left.m[12]*right.m[3];
+        matrix.m[1] = left.m[1]*right.m[0] + left.m[5]*right.m[1] + left.m[9]*right.m[2] + left.m[13]*right.m[3];
+        matrix.m[2] = left.m[2]*right.m[0] + left.m[6]*right.m[1] + left.m[10]*right.m[2] + left.m[14]*right.m[3];
+        matrix.m[3] = left.m[3]*right.m[0] + left.m[7]*right.m[1] + left.m[11]*right.m[2] + left.m[15]*right.m[3];
+        
+        // Second Column
+        matrix.m[4] = left.m[0]*right.m[4] + left.m[4]*right.m[5] + left.m[8]*right.m[6] + left.m[12]*right.m[7];
+        matrix.m[5] = left.m[1]*right.m[4] + left.m[5]*right.m[5] + left.m[9]*right.m[6] + left.m[13]*right.m[7];
+        matrix.m[6] = left.m[2]*right.m[4] + left.m[6]*right.m[5] + left.m[10]*right.m[6] + left.m[14]*right.m[7];
+        matrix.m[7] = left.m[3]*right.m[4] + left.m[7]*right.m[5] + left.m[11]*right.m[6] + left.m[15]*right.m[7];
+        
+        // Third Column
+        matrix.m[8] = left.m[0]*right.m[8] + left.m[4]*right.m[9] + left.m[8]*right.m[10] + left.m[12]*right.m[11];
+        matrix.m[9] = left.m[1]*right.m[8] + left.m[5]*right.m[9] + left.m[9]*right.m[10] + left.m[13]*right.m[11];
+        matrix.m[10] = left.m[2]*right.m[8] + left.m[6]*right.m[9] + left.m[10]*right.m[10] + left.m[14]*right.m[11];
+        matrix.m[11] = left.m[3]*right.m[8] + left.m[7]*right.m[9] + left.m[11]*right.m[10] + left.m[15]*right.m[11];
+        
+        // Fourth Column
+        matrix.m[12] = left.m[0]*right.m[12] + left.m[4]*right.m[13] + left.m[8]*right.m[14] + left.m[12]*right.m[15];
+        matrix.m[13] = left.m[1]*right.m[12] + left.m[5]*right.m[13] + left.m[9]*right.m[14] + left.m[13]*right.m[15];
+        matrix.m[14] = left.m[2]*right.m[12] + left.m[6]*right.m[13] + left.m[10]*right.m[14] + left.m[14]*right.m[15];
+        matrix.m[15] = left.m[3]*right.m[12] + left.m[7]*right.m[13] + left.m[11]*right.m[14] + left.m[15]*right.m[15];
+
+        return matrix;
+    }
+
     void Matrix4Rotate(Matrix4& matrix, float radians, float x, float y, float z)
     {
         float c = cosf(radians);

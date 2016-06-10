@@ -66,10 +66,15 @@ namespace BGE {
         void drawFont(Vector2 &position, std::shared_ptr<TextureBase> texture);
         void render();
         
+        // TODO: This will get moved out
+        void updateTransforms();
+        
         void setGLKTextureInfo(GLKTextureInfo *info) { textureInfo_ = info; }
         
     private:
+        Matrix4 currentMatrix_;
         std::vector<Matrix4> matrixStack_;
+        ColorMatrix currentColorMatrix_;
         std::vector<ColorMatrix> colorMatrixStack_;
         
         bool texturingEnabled_[MaxTextureUnits];
@@ -81,6 +86,13 @@ namespace BGE {
         uint8_t activeMasks_;
         
         void queueRender();
+        
+        void renderGameObject(std::shared_ptr<GameObject> gameObj);
+        // TODO: This will get moved out
+        void transformGameObject(std::shared_ptr<GameObject> gameObj);
+
+        void pushMatrix();
+        void popMatrix();
     };
 }
 

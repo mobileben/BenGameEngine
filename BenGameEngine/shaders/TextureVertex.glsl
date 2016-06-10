@@ -7,6 +7,6 @@ attribute vec2 TexCoordIn;
 varying vec2 TexCoordOut;
 
 void main(void) {
-    gl_Position = Projection * Position;
+    gl_Position = Projection * ModelView * Position;
     TexCoordOut = TexCoordIn;
 }

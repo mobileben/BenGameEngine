@@ -17,6 +17,9 @@
 #include "Component.h"
 
 namespace BGE {
+    class RenderService;
+    class RenderServiceOpenGLES2;
+    
     class TransformComponent : public BGE::Component
     {
     private:
@@ -93,6 +96,8 @@ namespace BGE {
         
     protected:
         friend BGE::ComponentService;
+        friend BGE::RenderService;
+        friend BGE::RenderServiceOpenGLES2;
         
         TransformComponent(uint64_t componentId);
         TransformComponent(uint64_t componentId, std::string name);
@@ -103,18 +108,19 @@ namespace BGE {
         bool            interactableWhenHidden_;
         
         // Bounds
-        Rect         bounds_;
+        Rect            bounds_;
         
         // Transformation
-        Vector2      position_;
+        Vector2         position_;
         float           z_;
         
-        Vector2      scale_;
-        Vector2      skew_;
+        Vector2         scale_;
+        Vector2         skew_;
         
         float           rotation_;
         
-        Matrix4      matrix_;
+        Matrix4         matrix_;
+        Matrix4         localMatrix_;
         
         bool            transformDirty_; // Indicates that components and matrix are out of sync
         
@@ -126,7 +132,6 @@ namespace BGE {
         // TODO: Support?
         float           speed_;
         bool            paused_;
-        
     };
 }
 
