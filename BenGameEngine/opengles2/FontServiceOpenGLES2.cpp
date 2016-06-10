@@ -42,6 +42,7 @@ std::shared_ptr<BGE::Font> BGE::FontServiceOpenGLES2::getFont(std::string name, 
 
 void BGE::FontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback)
 {
+    
     std::string fontKey = BGE::FontService::fontAsKey(name, pixelSize);
 
     auto fontIt = fonts_.find(fontKey);
@@ -64,6 +65,10 @@ void BGE::FontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, s
                 auto underlyingFontIt = underlyingFonts_.find(underlyingName);
                 
                 if (underlyingFontIt != underlyingFonts_.end()) {
+                    if (underlyingFontIt->second) {
+                        fonts_[fontKey] = underlyingFontIt->second;
+                    }
+                    
                     if (callback) {
                         callback(underlyingFontIt->second, nullptr);
                     }

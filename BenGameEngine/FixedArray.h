@@ -52,6 +52,12 @@ namespace BGE {
     public:
         FixedArray() : array_(nullptr), size_(0) {}
         
+        FixedArray(size_t size) : array_(nullptr), size_(size) {
+            if (size > 0) {
+                array_ = new T[size_];
+            }
+        }
+        
         FixedArray(const FixedArray &arr) : array_(nullptr), size_(0) {
             if (arr.array_ && arr.size_) {
                 array_ = new T[arr.size_];
@@ -203,6 +209,18 @@ namespace BGE {
         
         const T& operator[](int32_t index) const {
             return array_[index];
+        }
+        
+        T *baseAddress() const {
+            return &array_[0];
+        }
+        
+        T *safeBaseAddress() const {
+            if (size_ > 0) {
+                return &array_[0];
+            } else {
+                return nullptr;
+            }
         }
         
         T *addressOf(int32_t index) const {

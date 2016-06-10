@@ -29,42 +29,59 @@ BGE::ScenePackage::~ScenePackage() {
 }
 
 void BGE::ScenePackage::reset() {
-    for (auto &tex : textures_) {
-    }
-    
-    for (auto &text : text_) {
-    }
-    
     textures_.clear();
     text_.clear();
     animationSequences_.clear();
 }
 
-void BGE::ScenePackage::prelink() {
-    // Fix all string pointers
-#if 0
-    for (auto& tex : textures_) {
-        long offset = (long) tex.name;
-        //        tex.name = strs_ + offset;
-        tex.name = strings_.addressOf(offset);
-        NSLog(@"Tex is %s", tex.name);
-    }
-    
-    for (auto& text : text_) {
-        long offset = (long) text.name;
-        text.name = strings_.addressOf(offset);
-        NSLog(@"Text is %s", text.name);
-    }
-    
-    for (auto& animSeq : animationSequences_) {
-        long offset = (long) animSeq.name;
-        animSeq.name = strings_.addressOf(offset);
-        NSLog(@"Anim Seq is %s", animSeq.name);
-    }
-#endif
-}
-
 void BGE::ScenePackage::link() {
+    std::shared_ptr<TextureService> textureService = BGE::Game::getInstance()->getTextureService();
+    textureNames_ = FixedArray<const char*>(textures_.size());
+    textureIndices_ = FixedArray<int32_t>(textures_.size());
+    textureRefs_ = FixedArray<TextureReference>(textures_.size());
+    
+    for (auto i=0;i<textures_.size();i++) {
+        TextureReferenceIntermediate *texRefInt = textures_.addressOf(i);
+        const char**name = textureNames_.addressOf(i);
+        int32_t *index = textureIndices_.addressOf(i);
+        TextureReference *texRef = textureRefs_.addressOf(i);
+        
+        // Fix name
+        const char* resolvedName = texRefInt->name + strings_.addressOf(0);
+        *name = resolvedName;
+        *index = i;
+        texRef->name = resolvedName;
+        texRef->texture = textureService->textureWithName(resolvedName);
+    }
+
+    std::shared_ptr<FontService> fontService = BGE::Game::getInstance()->getFontService();
+    textNames_ = FixedArray<const char*>(text_.size());
+    textIndices_ = FixedArray<int32_t>(text_.size());
+    textRefs_ = FixedArray<TextReference>(text_.size());
+    
+    for (auto i=0;i<text_.size();i++) {
+        TextReferenceIntermediate *textRefInt = text_.addressOf(i);
+        const char**name = textNames_.addressOf(i);
+        int32_t *index = textIndices_.addressOf(i);
+        TextReference *textRef = textRefs_.addressOf(i);
+        
+        // Fix name
+        const char* resolvedName = textRefInt->name + strings_.baseAddress();
+        const char* resolvedText = textRefInt->text + strings_.baseAddress();
+        const char* fontName = textRefInt->fontName + strings_.baseAddress();
+        
+        *name = resolvedName;
+        *index = i;
+        textRef->name = resolvedName;
+        textRef->text = resolvedText;
+        textRef->width = textRefInt->width;
+        textRef->height = textRefInt->height;
+        textRef->leading = textRefInt->leading;
+        textRef->color = textRefInt->color;
+        textRef->alignment = textRefInt->alignment;
+        
+        textRef->font = fontService->getFont(fontName, textRefInt->size);
+    }
 }
 
 void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback) {
@@ -134,11 +151,13 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
         TextReferenceIntermediate *textRef = textIntBuilder.addressOf(index);
         
         const char *name = [textDict[@"name"] UTF8String];
+        const char *text = [textDict[@"text"] UTF8String];
         
         if (name) {
             NSDictionary *formatDict = textDict[@"format"];
             
             textRef->name = stringBuilder.add(name);
+            textRef->text = stringBuilder.add(text);
             textRef->width = [textDict[@"width"] floatValue];
             textRef->height = [textDict[@"height"] floatValue];
             textRef->leading = [formatDict[@"leading"] floatValue];
@@ -154,14 +173,29 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             }
             
             uint32_t size = [formatDict[@"fontSize"] unsignedIntValue];
+            uint32_t color = [formatDict[@"fontColor"] unsignedIntValue];
+            uint32_t blue = color & 0xff;
+            uint32_t green = color >> 8 & 0xff;
+            uint32_t red = color >> 16 & 0xff;
+            uint32_t alpha = 255;
+            
+            textRef->size = size;
+            textRef->color.r = red / 255.;
+            textRef->color.g = green / 255.;
+            textRef->color.b = blue / 255.;
+            textRef->color.a = alpha / 255.;
+            
             const char* fontName = [formatDict[@"fontName"] UTF8String];
+            textRef->fontName = stringBuilder.add(fontName);
             
             fontQueue_.push_back(std::make_pair<std::string, int32_t>(fontName, size));
-                           
+            
+#if 0
             BGE::Game::getInstance()->getFontService()->loadFont(fontName, size, [fontName, name, size, textRef](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
                 NSLog(@"%s: font (%s:%d) %x", name, fontName, size, font.get());
                 //textRef->font = font.get();
             });
+#endif
         } else {
             // TODO: How to handle non-named items
             assert(name);
@@ -485,14 +519,6 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             }
         });
     });
-    
-    prelink();
-    
-    NSLog(@"Size is %ld", stringBuilder.size());
-    
-    
-    
-    NSLog(@"DONE HERE BITCH");
 }
 
 void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
@@ -527,3 +553,32 @@ void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
         });
     }
 }
+
+BGE::TextureReference *BGE::ScenePackage::getTextureReference(std::string name) {
+    const char *cstr = name.c_str();
+    
+    // TODO: We will sort the names, then binary search the names here later
+    const char **names = textureNames_.baseAddress();
+    
+    for (auto i=0;textureNames_.size();i++) {
+        if (!strcmp(names[i], cstr)) {
+            return textureRefs_.addressOf(*textureIndices_.addressOf(i));
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::TextReference *BGE::ScenePackage::getTextReference(std::string name) {
+    const char *cstr = name.c_str();
+    
+    // TODO: We will sort the names, then binary search the names here later
+    const char **names = textNames_.baseAddress();
+    
+    for (auto i=0;textNames_.size();i++) {
+        if (!strcmp(names[i], cstr)) {
+            return textRefs_.addressOf(*textIndices_.addressOf(i));
+        }
+    }
+    
+    return nullptr;}

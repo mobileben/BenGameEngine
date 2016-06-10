@@ -20,6 +20,13 @@
 #include "Service.h"
 #include "ScenePackage.h"
 
+// TODO: Remove?
+#include "TransformComponent.h"
+#include "LineRenderComponent.h"
+#include "FlatRectRenderComponent.h"
+#include "SpriteRenderComponent.h"
+#include "TextComponent.h"
+
 namespace BGE {
     class ScenePackageService : public Service {
     public:
@@ -36,9 +43,20 @@ namespace BGE {
         
         void packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<BGE::Error>)> callback);
         
-        void getPackage(std::string name);
+        ScenePackageHandle getPackage(std::string name);
+        ScenePackage *getDereferencedPackage(std::string name);
+        ScenePackage * getDereferencedPackage(ScenePackageHandle handle);
+
         void deletePackage(std::string name);
+        void deletePackage(ScenePackageHandle handle);
         void resetPackage(std::string name);
+        void resetPackage(ScenePackageHandle handle);
+
+        std::shared_ptr<SpriteRenderComponent> createSpriteRenderComponent(std::string name);
+        std::shared_ptr<TextComponent> createTextComponent(std::string name);
+        
+        void link();
+        void link(ScenePackageHandle handle);
         
     private:
         static const uint32_t InitialScenePackageReserve = 32;

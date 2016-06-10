@@ -9,6 +9,7 @@
 #include "Game.h"
 #include "FontOpenGLES2.h"
 #include "TextureOpenGLES2.h"
+#include "TextureAtlasOpenGLES2.h"
 #include "RenderServiceOpenGLES2.h"
 #include "ShaderServiceOpenGLES2.h"
 #include "ft2build.h"
@@ -24,8 +25,10 @@ BGE::FontOpenGLES2::FontOpenGLES2(std::string name, uint32_t pixelSize) : BGE::F
 void BGE::FontOpenGLES2::load(std::string filename, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback)  {
     FT_Face face = NULL;
     FT_Error error = 0;
-    
-    error = FT_New_Face(BGE::Game::getInstance()->getFontService()->getFreetypeLibrary(), filename.c_str(), 0, &face);
+    FT_Library library;
+    error = FT_Init_FreeType(&library);
+
+    error = FT_New_Face(library, filename.c_str(), 0, &face);
     
     if (!error) {
         error = FT_Set_Pixel_Sizes(face, 0, pixelSize_);
@@ -81,7 +84,6 @@ void BGE::FontOpenGLES2::load(std::string filename, std::function<void(std::shar
             
             int glyphW = (int) maxWidth;
             int glyphH = (int) (maxBearing - minHang);
-            int glyphSize = glyphW * glyphH;
             int maxCol = 16;
             int maxRow = NumSupportedCharacters / maxCol;
             int atlasW = glyphW * maxCol;
@@ -187,7 +189,7 @@ void BGE::FontOpenGLES2::load(std::string filename, std::function<void(std::shar
                     }
                 }
                 
-                BGE::Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer("font", atlasBuffer, BGE::TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGE::TextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
+                BGE::Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer(FontService::fontAsKey(name_, pixelSize_), atlasBuffer, BGE::TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGE::TextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
                     if (atlas) {
                         textureAtlas_ = atlas;
                         glyphs_.clear();
@@ -247,8 +249,8 @@ void BGE::FontOpenGLES2::load(std::string filename, std::function<void(std::shar
     }
 }
 
-void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Vector4 &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
-    if (textureAtlas_ && textureAtlas_->isValid()) {
+void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+    if (str.length() > 0 && textureAtlas_ && textureAtlas_->isValid()) {
         VertexTex vertices[4];
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
         float x = position.x;
@@ -274,6 +276,8 @@ void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Vector4 
         GLint projectionLocation = glShader->locationForUniform("Projection");
         GLint colorUniform = glShader->locationForUniform("SourceColor");
         
+        oglTex = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(textureAtlas_->getTexture());
+        
         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) renderer->getProjectionMatrix()->m);
         
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -283,6 +287,12 @@ void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Vector4 
 
         uint16_t prev = 0;
         
+        glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
+        //            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        
+        glUniform1i(textureUniform, 0);
+        glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
+
         for (int i=0;i<length;i++) {
             code = chars[i];
             
@@ -304,11 +314,11 @@ void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Vector4 
                 y += glyph->getOffsetY();
                 
                 oglTex = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(glyph->getTexture());
-                
-                if (oglTex && oglTex->isValid()) {
+
+                if (oglTex) {
                     const Vector2 *xys = oglTex->getXYs();
                     const Vector2 *uvs = oglTex->getUVs();
-                    
+
                     vertices[0].position.x = x + xys[0].x;
                     vertices[0].position.y = y + xys[0].y;
                     vertices[0].position.z = 0;
@@ -333,16 +343,13 @@ void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Vector4 
                     vertices[3].tex.x = uvs[3].x;
                     vertices[3].tex.y = uvs[3].y;
                     
-                    glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
-                    //            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                    
+                    // TODO texture stack here
+                    //glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
+
                     glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                           sizeof(VertexTex), &vertices[0]);
                     glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
                                           sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
-                    
-                    glUniform1i(textureUniform, 0);
-                    glUniform4f(colorUniform, 1, 0, 0, 1);
                     
                     glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
                                    GL_UNSIGNED_BYTE, &indices[0]);

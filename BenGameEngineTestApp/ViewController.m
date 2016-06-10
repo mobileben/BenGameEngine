@@ -91,7 +91,29 @@
         
         if (path) {
             BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "common", [](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                NSLog(@"Loaded scene package");
+                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getDereferencedPackage(packageHandle);
+                
+                if (package) {
+                    package->link();
+                }
+                
+                auto gameObj = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
+                auto sprite = BGE::Game::getInstance()->getScenePackageService()->createSpriteRenderComponent("SaleBkg");
+                auto transformComponent = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
+                BGE::Vector2 pos = { 700, 700 };
+                transformComponent->setPosition(pos);
+                gameObj->setName("Object1");
+                gameObj->addComponent(transformComponent);
+                gameObj->addComponent(sprite);
+                
+                gameObj = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
+                transformComponent = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
+                auto text =  BGE::Game::getInstance()->getScenePackageService()->createTextComponent("CashText");
+                
+                gameObj->setName("Object2");
+                gameObj->addComponent(transformComponent);
+                gameObj->addComponent(text);
+
             });
         }
     }
@@ -105,6 +127,7 @@
     renderer->setGLKTextureInfo(glTex->getTextureInfo());
     BGE::Game::getInstance()->getRenderService()->render();
     
+#if 0
     // Let's create and add a game object
     std::string name = "hello";
     auto gameObj0 = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
@@ -147,6 +170,7 @@
     gameObj2->addComponent(sprite);
     
     sprite->setMaterials({material});
+#endif
     
 }
 

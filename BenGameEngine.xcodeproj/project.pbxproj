@@ -16,6 +16,7 @@
 		B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA61CB4DE6D00127B97 /* GameObject.cpp */; };
 		B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA91CB4DE8E00127B97 /* Object.cpp */; };
 		B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */; };
+		B50A1F9E1D092A3C004B450E /* TextComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B50A1F9C1D092A3C004B450E /* TextComponent.cpp */; };
 		B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */; };
 		B525E36F1C8957A700C691C0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E36E1C8957A700C691C0 /* main.m */; };
 		B525E3721C8957A700C691C0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E3711C8957A700C691C0 /* AppDelegate.m */; };
@@ -165,6 +166,8 @@
 		B508CDAA1CB4DE8E00127B97 /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
 		B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = GameObjectService.cpp; sourceTree = "<group>"; };
 		B508CDAD1CB78DA100127B97 /* GameObjectService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObjectService.h; sourceTree = "<group>"; };
+		B50A1F9C1D092A3C004B450E /* TextComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TextComponent.cpp; path = components/TextComponent.cpp; sourceTree = "<group>"; };
+		B50A1F9D1D092A3C004B450E /* TextComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextComponent.h; path = components/TextComponent.h; sourceTree = "<group>"; };
 		B50F5FFE1CD3418200A5D017 /* Handle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Handle.h; sourceTree = "<group>"; };
 		B50F60011CD343E400A5D017 /* HandleService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandleService.h; sourceTree = "<group>"; };
 		B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleGothic.ttf; sourceTree = "<group>"; };
@@ -379,6 +382,8 @@
 				B52B76101CBA2C7F00758249 /* RenderComponent.h */,
 				B5EE9D6A1CC4A4C8005D99CC /* SpriteRenderComponent.cpp */,
 				B5EE9D6B1CC4A4C8005D99CC /* SpriteRenderComponent.h */,
+				B50A1F9C1D092A3C004B450E /* TextComponent.cpp */,
+				B50A1F9D1D092A3C004B450E /* TextComponent.h */,
 				B508CD911CAE285000127B97 /* TransformComponent.cpp */,
 				B508CD921CAE285000127B97 /* TransformComponent.h */,
 			);
@@ -887,6 +892,7 @@
 				B571F1831C97D92E007F5A90 /* Font.cpp in Sources */,
 				B5EE9D6C1CC4A4C8005D99CC /* SpriteRenderComponent.cpp in Sources */,
 				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
+				B50A1F9E1D092A3C004B450E /* TextComponent.cpp in Sources */,
 				B525E3BB1C89587000C691C0 /* RenderContext.cpp in Sources */,
 				B508CD931CAE285000127B97 /* TransformComponent.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* Game.cpp in Sources */,

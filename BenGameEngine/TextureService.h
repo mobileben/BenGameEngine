@@ -39,6 +39,7 @@ namespace BGE {
         void removeTexture(uint64_t texId);
         void removeTexture(std::shared_ptr<TextureBase>);
         
+        // These methods will only return existing textures and is a synchronous call. This is for use in linking of packages post resource loading
         std::shared_ptr<TextureBase> textureWithName(std::string name);
         std::shared_ptr<TextureBase> textureWithId(uint64_t texId);
         

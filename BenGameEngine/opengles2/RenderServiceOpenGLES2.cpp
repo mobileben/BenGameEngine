@@ -17,6 +17,7 @@
 #include "LineRenderComponent.h"
 #include "FlatRectRenderComponent.h"
 #include "SpriteRenderComponent.h"
+#include "TextComponent.h"
 
 #if 0
 const BGE::VertexColor Vertices[] = {
@@ -804,8 +805,9 @@ void BGE::RenderServiceOpenGLES2::render()
     if (isReady()) {
         std::shared_ptr<TextureBase> texture = Game::getInstance()->getTextureService()->textureWithName("sample");
         std::shared_ptr<TextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("CoinIcon");
-        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
+//        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
         std::shared_ptr<Font> f = Game::getInstance()->getFontService()->getFont("default", 32);
+        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__Avenir.ttc15_texture");
         
         if (f) {
             NSLog(@"STRING LENGTH %d", f->getStringWidth("HELLO", false));
@@ -861,7 +863,6 @@ void BGE::RenderServiceOpenGLES2::render()
             createMask(position, texture);
             drawTexture(position, fish);
             glDisable(GL_STENCIL_TEST);
-            NSLog(@"HERE");
             
             if (f) {
                 position = { 200, 1200 };
@@ -871,6 +872,13 @@ void BGE::RenderServiceOpenGLES2::render()
         
         
         for (auto obj : Game::getInstance()->getGameObjectService()->getGameObjects()) {
+            // TODO: Transform
+            auto transformComponent = obj.second->getComponent<BGE::TransformComponent>();
+            
+            if (transformComponent) {
+                
+            }
+            
             if (obj.second->getComponent<BGE::LineRenderComponent>()) {
                 std::shared_ptr<BGE::LineRenderComponent> line = obj.second->getComponent<BGE::LineRenderComponent>();
                 
@@ -879,6 +887,15 @@ void BGE::RenderServiceOpenGLES2::render()
                 drawFlatRect(obj.second);
             } else if (obj.second->getComponent<BGE::SpriteRenderComponent>()) {
                 drawSprite(obj.second);
+            } else if (obj.second->getComponent<BGE::TextComponent>()) {
+                std::shared_ptr<BGE::TextComponent> text = obj.second->getComponent<BGE::TextComponent>();
+                
+                position = { 200, 1200 };
+                text->getFont()->drawString(text->getText(), position, (Color&) text->getColor());
+            }
+            
+            if (transformComponent) {
+                
             }
         }
         

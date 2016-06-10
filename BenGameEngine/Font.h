@@ -61,7 +61,7 @@ namespace BGE {
         uint32_t getHeight() const;
         
         virtual void load(std::string filename, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback) =0;
-        virtual void drawString(std::string str, Vector2 &position, Vector4 &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true) =0;
+        virtual void drawString(std::string str, Vector2 &position, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true) =0;
         
     protected:
         std::string name_;

@@ -194,23 +194,28 @@ namespace BGE {
         uint32_t bounds;
     };
     
-    struct TextReference {
-        const char* name;
-        float width;
-        float height;
-        float leading;
-        Color color;
-        FontHorizontalAlignment alignment;
-        Font* font;
-    };
-
     struct TextReferenceIntermediate {
         int32_t name;
+        int32_t text;
+        int32_t fontName;
+        int32_t size;
         float width;
         float height;
         float leading;
         Color color;
         FontHorizontalAlignment alignment;
+    };
+    
+    struct TextReference {
+        const char *name;
+        const char *text;
+        float width;
+        float height;
+        float leading;
+        Color color;
+        FontHorizontalAlignment alignment;
+        // TODO: Change this to Handle later. Note with this it is not a POD
+        std::shared_ptr<Font> font;
     };
     
     bool operator==(const TextReference& lhs, const TextReference& rhs);
@@ -218,18 +223,17 @@ namespace BGE {
     bool operator==(const TextReferenceIntermediate& lhs, const TextReferenceIntermediate& rhs);
     bool operator!=(const TextReferenceIntermediate& lhs, const TextReferenceIntermediate& rhs);
 
-    struct TextureReference {
-        const char* name;
-        float   width;
-        float   height;
-        // TODO: Handle
-        TextureBase *texture;
-    };
-    
     struct TextureReferenceIntermediate {
         int32_t name;
         float   width;
         float   height;
+    };
+    
+    struct TextureReference {
+        const char* name;
+        
+        // TODO: Change this to Handle later. Note with this it is not a POD
+        std::shared_ptr<TextureBase> texture;
     };
     
     bool operator==(const TextureReference& lhs, const TextureReference& rhs);

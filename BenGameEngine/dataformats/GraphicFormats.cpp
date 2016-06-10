@@ -141,14 +141,6 @@ bool BGE::operator==(const TextureReference& lhs, const TextureReference& rhs) {
         }
     }
     
-    if (lhs.height != rhs.height) {
-        return false;
-    }
-    
-    if (lhs.height != rhs.height) {
-        return false;
-    }
-    
     if (lhs.texture != rhs.texture) {
         return false;
     }
@@ -167,14 +159,6 @@ bool BGE::operator!=(const TextureReference& lhs, const TextureReference& rhs) {
                 return true;
             }
         }
-    }
-    
-    if (lhs.height != rhs.height) {
-        return true;
-    }
-    
-    if (lhs.height != rhs.height) {
-        return true;
     }
     
     if (lhs.texture != rhs.texture) {

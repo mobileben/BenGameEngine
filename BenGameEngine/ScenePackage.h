@@ -35,9 +35,11 @@ namespace BGE {
             return hasExternal_;
         }
         
+        TextureReference *getTextureReference(std::string name);
+        TextReference *getTextReference(std::string name);
+        
     protected:
         void reset();
-        void prelink();
         void load(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback);
 
     private:
@@ -71,6 +73,15 @@ namespace BGE {
         std::shared_ptr<std::atomic_int>                    fontCount_;
         std::vector<std::pair<std::string, uint32_t>>       fontQueue_;
         
+        // Linked versions
+        FixedArray<const char*>                             textureNames_;
+        FixedArray<int32_t>                                 textureIndices_;
+        FixedArray<TextureReference>                        textureRefs_;
+
+        FixedArray<const char*>                             textNames_;
+        FixedArray<int32_t>                                 textIndices_;
+        FixedArray<TextReference>                           textRefs_;
+
         void loadTextures(std::function<void()> callback);
         void loadFonts(std::function<void()> callback);
     };
