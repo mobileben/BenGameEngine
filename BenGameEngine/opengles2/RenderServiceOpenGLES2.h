@@ -35,7 +35,8 @@ namespace BGE {
         virtual void pause();
         virtual void resume();
         virtual void destroy();
-        
+        void update(double deltaTime) {}
+
         static int8_t MaxActiveMasks;
         
         void setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D);
@@ -85,7 +86,7 @@ namespace BGE {
         int8_t masksInUse_;
         uint8_t activeMasks_;
         
-        void queueRender();
+        void queueRender(double deltaTime);
         
         void renderGameObject(std::shared_ptr<GameObject> gameObj);
         // TODO: This will get moved out

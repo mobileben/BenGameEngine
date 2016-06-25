@@ -95,10 +95,11 @@ namespace BGE {
         virtual bool inParentHierarchy(std::shared_ptr<TransformComponent> parent);
         
     protected:
-        friend BGE::ComponentService;
-        friend BGE::RenderService;
-        friend BGE::RenderServiceOpenGLES2;
-        
+        friend ComponentService;
+        friend RenderService;
+        friend RenderServiceOpenGLES2;
+        friend GameObject;
+
         TransformComponent(uint64_t componentId);
         TransformComponent(uint64_t componentId, std::string name);
         
@@ -132,6 +133,8 @@ namespace BGE {
         // TODO: Support?
         float           speed_;
         bool            paused_;
+        
+        void setGameObject(std::shared_ptr<GameObject> gameObject);
     };
 }
 

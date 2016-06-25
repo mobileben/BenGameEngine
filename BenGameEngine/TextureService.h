@@ -34,7 +34,8 @@ namespace BGE {
         virtual void namedTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextureDefs, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<BGE::Error>)> callback) =0;
         
         virtual std::shared_ptr<Texture> namedSubTexture(std::string name, std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height) =0;
-        
+        void update(double deltaTime) {}
+
         void removeTexture(std::string name);
         void removeTexture(uint64_t texId);
         void removeTexture(std::shared_ptr<TextureBase>);

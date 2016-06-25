@@ -66,7 +66,7 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : masksInUse_(0), activeMa
     
     Matrix4MakeIdentify(projectionMatrix_);
     
-    Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this), 0);
+    Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this, std::placeholders::_1), 1);
 }
 
 void BGE::RenderServiceOpenGLES2::initialize() {}
@@ -476,6 +476,7 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(textureInfo_.target, textureInfo_.name);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         
         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                               sizeof(VertexColorTex), &TextureVertices[0]);
@@ -553,7 +554,8 @@ void BGE::RenderServiceOpenGLES2::drawFont(Vector2 &position, std::shared_ptr<Te
             
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
-//            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), &vertices[0]);
@@ -633,6 +635,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), &vertices[0]);
@@ -763,6 +766,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                         
                         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                               sizeof(VertexTex), &vertices[0]);
@@ -819,7 +823,7 @@ void BGE::RenderServiceOpenGLES2::disableMask(int8_t maskId)
     }
 }
 
-void BGE::RenderServiceOpenGLES2::queueRender() {
+void BGE::RenderServiceOpenGLES2::queueRender(double time) {
     [this->getRenderWindow()->getView() display];
 }
 
@@ -840,7 +844,8 @@ void BGE::RenderServiceOpenGLES2::render()
         std::shared_ptr<TextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("CoinIcon");
 //        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
         std::shared_ptr<Font> f = Game::getInstance()->getFontService()->getFont("default", 32);
-        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__Avenir.ttc15_texture");
+//        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__Avenir.ttc32_texture");
+        std::shared_ptr<TextureBase> font;
         
         assert(matrixStack_.size() == 0);
         Matrix4MakeIdentify(currentMatrix_);
@@ -858,6 +863,7 @@ void BGE::RenderServiceOpenGLES2::render()
 //        glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight());
         glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth() * this->getRenderWindow()->getContentScaleFactor(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight() * this->getRenderWindow()->getContentScaleFactor());
         
+#if 1
         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Default"));
         
         GLint positionLocation = glShader->locationForAttribute("Position");
@@ -890,59 +896,39 @@ void BGE::RenderServiceOpenGLES2::render()
         Vector4 colors[4] = {{ 1, 0, 0, 1 }, { 0, 0, 0, 1 }, { 0, 1, 0, 1 }, { 0, 0, 1, 1 }};
         
         drawShadedRect(position, size, colors);
+#if 1
         if (font) {
             position = { 400, 400 };
             drawFont(position, font);
         }
-        
-        
-        if (textureInfo_) {
-            
-        }
+#endif   
         
         if (texture && fish) {
-            
+#if 1
             position = { 200, 400 };
             createMask(position, texture);
             drawTexture(position, fish);
             glDisable(GL_STENCIL_TEST);
-            
             if (f) {
                 position = { 200, 1200 };
                 f->drawString("HELLO YOU SACK OF DIRT AV abcDefg1210312084pdsoinjm_-'\"#*$&%", position, colors[1]);
             }
+#endif
         }
-        
+#endif
         
         for (auto obj : Game::getInstance()->getGameObjectService()->getGameObjects()) {
             renderGameObject(obj.second);
-#if 0
-            // TODO: Transform
-            auto transformComponent = obj.second->getComponent<BGE::TransformComponent>();
-            
-            if (transformComponent) {
-                
+        }
+        
+        std::vector<std::shared_ptr<Space>> spaces = Game::getInstance()->getSpaceService()->getSpaces();
+        
+        
+        for (auto space : spaces) {
+            for (auto obj : space->getGameObjects()) {
+                NSLog(@"obj %s", obj.second->getName().c_str());
+                renderGameObject(obj.second);
             }
-            
-            if (obj.second->getComponent<BGE::LineRenderComponent>()) {
-                std::shared_ptr<BGE::LineRenderComponent> line = obj.second->getComponent<BGE::LineRenderComponent>();
-                
-                drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial().lock());
-            } else if (obj.second->getComponent<BGE::FlatRectRenderComponent>()) {
-                drawFlatRect(obj.second);
-            } else if (obj.second->getComponent<BGE::SpriteRenderComponent>()) {
-                drawSprite(obj.second);
-            } else if (obj.second->getComponent<BGE::TextComponent>()) {
-                std::shared_ptr<BGE::TextComponent> text = obj.second->getComponent<BGE::TextComponent>();
-                
-                position = { 200, 1200 };
-                text->getFont()->drawString(text->getText(), position, (Color&) text->getColor());
-            }
-            
-            if (transformComponent) {
-                
-            }
-#endif
         }
         
         [glContext->getContext() presentRenderbuffer:GL_RENDERBUFFER];
@@ -961,9 +947,6 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
         Matrix4 scale;
         Matrix4 rotate;
         
-        if (transformComponent->position_.x == 700) {
-            NSLog(@"WHE");
-        }
         Matrix4MakeTranslation(xlate, transformComponent->position_.x, transformComponent->position_.y, 0);
         Matrix4MakeScale(scale, transformComponent->scale_.x, transformComponent->scale_.y, 1);
         Matrix4MakeRotationZ(rotate, transformComponent->rotation_);
@@ -999,7 +982,18 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
     
     if (transformComponent) {
         // Determine if we have children, if we do process them.
-        
+        for (auto i=0;i<transformComponent->getNumChildren();i++) {
+            auto childXform = transformComponent->childAtIndex(i);
+            if (childXform->hasGameObject()) {
+                auto childObj = childXform->getGameObject().lock();
+                
+                // TODO: Have some better means of identifying the right child. For now brute force it
+                if (childObj) {
+                    renderGameObject(childObj);
+                }
+            }
+        }
+
         // First sort
         
         // Now pop the transform

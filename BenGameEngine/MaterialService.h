@@ -32,7 +32,8 @@ namespace BGE {
         void pause();
         void resume();
         void destroy();
-        
+        void update(double deltaTime) {}
+
         std::shared_ptr<Material> createMaterial(std::string name, Vector4& color);
         std::shared_ptr<Material> createMaterial(std::string name, std::shared_ptr<TextureBase> texture);
         std::shared_ptr<Material> createMaterial(std::string name, Vector4& color, std::shared_ptr<TextureBase> texture);

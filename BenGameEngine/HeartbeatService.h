@@ -35,7 +35,8 @@ namespace BGE {
         virtual void pause();
         virtual void resume();
         virtual void destroy();
-        
+        void update(double deltaTime) {}
+
         bool isRunning() const { return running_; }
         void setRunning(bool running);
         

@@ -10,6 +10,7 @@
 #define GameObject_hpp
 
 #include <stdio.h>
+#include <cassert>
 #include "Object.h"
 #include <unordered_map>
 #include <typeindex>
@@ -32,7 +33,7 @@ namespace BGE {
         GameObject(struct private_key const&, uint64_t objId);
         GameObject(struct private_key const&, uint64_t objId, std::string name);
         
-        virtual ~GameObject() {}
+        ~GameObject();
         
         template <typename T> std::shared_ptr<T> getComponent() {
             std::type_index index(typeid(T));
@@ -45,7 +46,7 @@ namespace BGE {
         }
         
         template <typename T> void addComponent(std::shared_ptr<T> component) {
-            assert(!component->hasGameComponent());
+            assert(!component->hasGameObject());
             components_[typeid(T)] = component;
             component->setGameObject(derived_shared_from_this<GameObject>());
         }
@@ -56,6 +57,8 @@ namespace BGE {
         bool isActive() const { return active_; }
         void setActive(bool active) { active_ = active; }
 
+        std::weak_ptr<Space> getSpace() const { return space_; }
+
     protected:
         
         GameObject() = delete;
@@ -63,10 +66,13 @@ namespace BGE {
         GameObject(uint64_t objId) = delete;
         GameObject(uint64_t objId, std::string name) = delete;
 
+        void setSpace(std::shared_ptr<Space> space) { space_ = space; }
+
     private:
         friend GameObjectService;
         
-        bool active_;
+        bool                    active_;
+        std::shared_ptr<Space>  space_;
         std::unordered_map<std::type_index, std::shared_ptr<BGE::Component>> components_;
     };
 }

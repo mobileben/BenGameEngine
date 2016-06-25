@@ -14,7 +14,6 @@
 #include <unordered_map>
 #include "Service.h"
 #include "Space.h"
-#include "GameObjectService.h"
 #include <type_traits>
 
 namespace BGE {
@@ -30,6 +29,7 @@ namespace BGE {
         void pause() {}
         void resume() {}
         void destroy() {}
+        void update(double deltaTime) {}
 
         std::shared_ptr<Space> createSpace(std::string name);
         void removeSpace(std::shared_ptr<Space> space);
@@ -40,8 +40,12 @@ namespace BGE {
         std::shared_ptr<Space> find(uint64_t spaceId);
         std::shared_ptr<Space> find(std::string name);
 
+        std::vector<std::shared_ptr<Space>> getSpaces();
+        
     private:
         std::unordered_map<uint64_t, std::shared_ptr<Space>> spaces_;
+        
+        // TODO: Should just create sorted vector here each time space is removed or added, but also must think how to handle order change
     };
 }
 

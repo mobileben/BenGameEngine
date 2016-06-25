@@ -25,7 +25,7 @@
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderWindow> renderWindow;
 @property (nonatomic, weak) GLKView *glView;
 @property (nonatomic, assign) BOOL once;
-
+@property (nonatomic, assign) std::shared_ptr<BGE::Space> space;
 @end
 
 @implementation ViewController
@@ -46,6 +46,7 @@
     self.renderWindow->setView((GLKView *) self.view);
     
     BGE::Game::getInstance()->getRenderService()->bindRenderWindow(self.renderContext, self.renderWindow);
+    self.space = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
     
     NSLog(@"DIDLOAD view is %f %f %f %f", self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
     
@@ -90,7 +91,7 @@
         path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
         
         if (path) {
-            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "common", [](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "common", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                 BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getDereferencedPackage(packageHandle);
                 
                 if (package) {
@@ -110,6 +111,7 @@
                 gameObj->addComponent(transformComponent);
                 gameObj->addComponent(sprite);
                 
+#if 0
                 gameObj = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
                 transformComponent = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
                 auto text =  BGE::Game::getInstance()->getScenePackageService()->createTextComponent("CashText");
@@ -117,6 +119,26 @@
                 gameObj->setName("Object2");
                 gameObj->addComponent(transformComponent);
                 gameObj->addComponent(text);
+#endif
+                
+                gameObj = self.space->createObject<BGE::GameObject>();
+                // Animation game object requires: xform, animator, animation sequence
+                transformComponent = self.space->createComponent<BGE::TransformComponent>();
+                auto anim = self.space->createComponent<BGE::AnimationSequenceComponent>();
+                auto animSeqRef = BGE::Game::getInstance()->getScenePackageService()->getAnimationSequenceReference("CashMeter");
+                auto animator = self.space->createComponent<BGE::AnimatorComponent>();
+
+                transformComponent->setX(200);
+                transformComponent->setY(1000);
+                
+                anim->setAnimationSequenceReference(*animSeqRef);
+                
+                gameObj->setName("Object3");
+                gameObj->addComponent(transformComponent);
+                gameObj->addComponent(anim);
+                gameObj->addComponent(animator);
+                
+                animator->reset();
 
             });
         }

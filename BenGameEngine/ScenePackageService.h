@@ -18,6 +18,7 @@
 #include "Error.h"
 #include "GraphicFormats.h"
 #include "Service.h"
+#include "Space.h"
 #include "ScenePackage.h"
 
 // TODO: Remove?
@@ -26,6 +27,7 @@
 #include "FlatRectRenderComponent.h"
 #include "SpriteRenderComponent.h"
 #include "TextComponent.h"
+#include "AnimationSequenceComponent.h"
 
 namespace BGE {
     class ScenePackageService : public Service {
@@ -40,6 +42,7 @@ namespace BGE {
         void pause() {}
         void resume() {}
         void destroy() {}
+        void update(double deltaTime) {}
         
         void packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<BGE::Error>)> callback);
         
@@ -52,8 +55,13 @@ namespace BGE {
         void resetPackage(std::string name);
         void resetPackage(ScenePackageHandle handle);
 
+        TextureReference *getTextureReference(std::string name);
+        TextReference *getTextReference(std::string name);
+        AnimationSequenceReference *getAnimationSequenceReference(std::string name);
+
         std::shared_ptr<SpriteRenderComponent> createSpriteRenderComponent(std::string name);
         std::shared_ptr<TextComponent> createTextComponent(std::string name);
+        std::shared_ptr<AnimationSequenceComponent> createAnimationSequenceComponent(std::string name);
         
         void link();
         void link(ScenePackageHandle handle);

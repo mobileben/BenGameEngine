@@ -14,6 +14,7 @@
 
 namespace BGE {
     class GameObject;
+    class Space;
     class ComponentService;
     
     class Component : public BGE::Object
@@ -28,22 +29,29 @@ namespace BGE {
         Component(struct private_key const& key, uint64_t componentId);
         Component(struct private_key const& key, uint64_t componentId, std::string name);
         virtual ~Component() {}
-
+        
+        bool hasGameObject() const { return !gameObject_.expired(); }
+        std::weak_ptr<GameObject> getGameObject() const { return gameObject_; }
+        std::weak_ptr<Space> getSpace() const { return space_; }
+        
     protected:
         Component() = delete;
         Component(Component const&) = delete;
         Component(uint64_t componentId);
         Component(uint64_t componentId, std::string name);
-        
-        bool hasGameComponent() const { return !gameObject_.expired(); }
-        std::weak_ptr<GameObject> getGameObject() const { return gameObject_; }
+
         void setGameObject(std::shared_ptr<GameObject> gameObject) { gameObject_ = gameObject; }
+        void setSpace(std::shared_ptr<Space> space) { space_ = space; }
+
+        virtual void created() {}
         
     private:
         friend ComponentService;
         friend GameObject;
+        friend Space;
         
-        std::weak_ptr<GameObject> gameObject_;
+        std::weak_ptr<GameObject>   gameObject_;
+        std::weak_ptr<Space>        space_;
         
     };
 }

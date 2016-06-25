@@ -16,9 +16,9 @@
 #include "GameObject.h"
 #include <type_traits>
 
-class Space;
-
 namespace BGE {
+    class Space;
+    
     class GameObjectService : public BGE::Service {
     public:
         GameObjectService();
@@ -31,7 +31,11 @@ namespace BGE {
         void pause() {}
         void resume() {}
         void destroy() {}
-        
+        void update(double deltaTime) {}
+
+        void setSpace(std::shared_ptr<Space> space) { space_ = space; }
+        std::shared_ptr<Space> getSpace(void) const { return space_; }
+
         template < typename T, typename... Args >
         std::shared_ptr< T > createObject(Args&&... args) {
             static_assert(std::is_base_of<BGE::GameObject, T>::value, "Not GameObject");
@@ -39,6 +43,7 @@ namespace BGE {
             uint64_t objId = getIdAndIncrement();
             std::shared_ptr<T> object = GameObject::create(objId, std::forward<Args>(args)...);
             
+            object->setSpace(space_);
             objects_[objId] = object;
             
             return object;
@@ -57,6 +62,7 @@ namespace BGE {
     private:
         friend Space;
         
+        std::shared_ptr<Space>   space_;
         std::unordered_map<uint64_t, std::shared_ptr<BGE::GameObject>> objects_;
     };
 }

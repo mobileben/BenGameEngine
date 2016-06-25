@@ -15,7 +15,7 @@
 #include "Font.h"
 
 namespace BGE {
-    struct AnimationKeyFrameDataFormat {
+    struct AnimationKeyframeDataFormat {
         uint32_t totalFrames;
         Matrix3 matrix;
         ColorMatrix colorMatrix;
@@ -27,7 +27,7 @@ namespace BGE {
         const char* const reference;
         const char* const referenceType;
         uint32_t totalFrames;
-        AnimationKeyFrameDataFormat *keyframes;
+        AnimationKeyframeDataFormat *keyframes;
     };
     
     struct AnimationDataFormat {
@@ -106,94 +106,6 @@ namespace BGE {
 
     class Texture;
     
-    struct AnimationKeyFrameReference {
-        uint32_t startFrame;
-        uint32_t totalFrames;
-        uint32_t order;
-        uint32_t flags;
-        Vector2 position;
-        Vector2 scale;
-        float  rotation;
-        Matrix3 matrix;
-        ColorMatrix colorMatrix;
-        ColorTransform colorTransform;
-        Rect bounds;
-    };
-    
-    struct AnimationKeyFrameReferenceIntermediate {
-        uint32_t startFrame;
-        uint32_t totalFrames;
-        uint32_t order;
-        uint32_t flags;
-        int32_t position;
-        int32_t scale;
-        float rotation;
-        int32_t matrix;
-        int32_t colorMatrix;
-        int32_t colorTransform;
-        int32_t bounds;
-    };
-
-    struct BoundsReference {
-        uint32_t startFrame;
-        uint32_t totalFrames;
-        Rect bounds;
-    };
-    
-    struct BoundsReferenceIntermediate {
-        uint32_t    startFrame;
-        uint32_t    totalFrames;
-        int32_t     bounds;
-    };
-    
-    typedef enum : uint32_t {
-        GfxReferenceTypeUnknown = 0,
-        GfxReferenceTypeButton,
-        GfxReferenceTypeExternalReference,
-        GfxReferenceTypeMask,
-        GfxReferenceTypePlacement,
-        GfxReferenceTypeSprite,
-        GfxReferenceTypeAnimationSequence,
-        GfxReferenceTypeKeyFrame,
-        GfxReferenceTypeText,
-        GfxReferenceTypeTextureMask
-    } GfxReferenceType;
-
-    struct AnimationChannelReference {
-        const char *name;
-        const char *reference;
-        GfxReferenceType referenceType;
-        uint32_t numKeyFrames;
-        AnimationKeyFrameReference **keyframes;
-    };
-
-    struct AnimationChannelReferenceIntermediate {
-        const char *name;
-        const char *reference;
-        GfxReferenceType referenceType;
-        std::vector<int32_t> keyFrames;
-    };
-    
-    struct AnimationSequenceReference {
-        const char *name;
-        uint32_t frameRate;
-        uint32_t totalFrames;
-        uint32_t numChannels;
-        uint32_t numBounds;
-        AnimationChannelReference *channels;
-        BoundsReference *bounds;
-    };
-    
-    struct AnimationSequenceReferenceIntermediate {
-        const char *name;
-        uint32_t frameRate;
-        uint32_t totalFrames;
-        uint32_t numChannels;
-        uint32_t numBounds;
-        uint32_t channels;
-        uint32_t bounds;
-    };
-    
     struct TextReferenceIntermediate {
         int32_t name;
         int32_t text;
@@ -222,7 +134,7 @@ namespace BGE {
     bool operator!=(const TextReference& lhs, const TextReference& rhs);
     bool operator==(const TextReferenceIntermediate& lhs, const TextReferenceIntermediate& rhs);
     bool operator!=(const TextReferenceIntermediate& lhs, const TextReferenceIntermediate& rhs);
-
+    
     struct TextureReferenceIntermediate {
         int32_t name;
         float   width;
@@ -240,6 +152,106 @@ namespace BGE {
     bool operator!=(const TextureReference& lhs, const TextureReference& rhs);
     bool operator==(const TextureReferenceIntermediate& lhs, const TextureReferenceIntermediate& rhs);
     bool operator!=(const TextureReferenceIntermediate& lhs, const TextureReferenceIntermediate& rhs);
+
+    struct AnimationKeyframeReferenceIntermediate {
+        uint32_t startFrame;
+        uint32_t totalFrames;
+        uint32_t order;
+        uint32_t flags;
+        int32_t position;
+        int32_t scale;
+        float rotation;
+        int32_t matrix;
+        int32_t colorMatrix;
+        int32_t colorTransform;
+        int32_t bounds;
+    };
+    
+    struct AnimationKeyframeReference {
+        uint32_t startFrame;
+        uint32_t totalFrames;
+        uint32_t order;
+        uint32_t flags;
+        Vector2 *position;
+        Vector2 *scale;
+        float  rotation;
+        Matrix4 *matrix;
+        ColorMatrix *colorMatrix;
+        ColorTransform *colorTransform;
+        Rect *bounds;
+    };
+
+    struct BoundsReference {
+        uint32_t    startFrame;
+        uint32_t    totalFrames;
+        Rect        *bounds;
+    };
+    
+    struct BoundsReferenceIntermediate {
+        uint32_t    startFrame;
+        uint32_t    totalFrames;
+        int32_t     bounds;
+    };
+    
+    typedef enum : uint32_t {
+        GfxReferenceTypeUnknown = 0,
+        GfxReferenceTypeButton,
+        GfxReferenceTypeExternalReference,
+        GfxReferenceTypeMask,
+        GfxReferenceTypePlacement,
+        GfxReferenceTypeSprite,
+        GfxReferenceTypeAnimationSequence,
+        GfxReferenceTypeKeyframe,
+        GfxReferenceTypeText,
+        GfxReferenceTypeTextureMask
+    } GfxReferenceType;
+    
+    struct AnimationChannelReferenceIntermediate {
+        int32_t name;
+        int32_t reference;
+        GfxReferenceType referenceType;
+        uint32_t frame;
+        std::vector<int32_t> keyframes;
+    };
+
+    class AnimationSequenceReference;
+    
+    struct AnimationChannelReference {
+        const char *name;
+        const char *reference;
+        GfxReferenceType referenceType;
+        uint32_t numKeyframes;
+        AnimationKeyframeReference **keyframes;
+        union {
+            void *referenceData;
+            TextureReference *texture;
+            TextReference *text;
+            struct {
+                AnimationSequenceReference *sequence;
+                uint32_t                    frame;
+            } animation;
+        };
+    };
+    
+    struct AnimationSequenceReferenceIntermediate {
+        int32_t     name;
+        uint32_t    frameRate;
+        uint32_t    totalFrames;
+        uint32_t    numChannels;
+        uint32_t    numBounds;
+        int32_t     channels;
+        int32_t     bounds;
+    };
+    
+    struct AnimationSequenceReference {
+        const char *name;
+        uint32_t frameRate;
+        uint32_t totalFrames;
+        uint32_t numChannels;
+        uint32_t numBounds;
+        AnimationChannelReference *channels;
+        BoundsReference *bounds;
+    };
 }
 
 #endif /* GraphicFormats_h */

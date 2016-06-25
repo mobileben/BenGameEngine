@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "RenderService.h"
 #include "RenderComponent.h"
+#include "GraphicFormats.h"
 
 namespace BGE {
     class RenderService;
@@ -31,6 +32,7 @@ namespace BGE {
         virtual ~SpriteRenderComponent() {}
 
         std::shared_ptr<TextureBase> getTexture();
+        void setTextureRef(TextureReference *texRef);
         
     protected:
         SpriteRenderComponent(uint32_t componentId);

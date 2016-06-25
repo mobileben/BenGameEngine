@@ -20,6 +20,8 @@ BGE::Game::Game()
     materialService_ = std::make_shared<BGE::MaterialService>();
     heartbeatService_ = std::make_shared<BGE::HeartbeatService>();
     scenePackageService_ = std::make_shared<BGE::ScenePackageService>();
+    animationService_ = std::make_shared<AnimationService>();
+    spaceService_ = std::make_shared<SpaceService>();
 }
 
 void BGE::Game::provide(std::shared_ptr<BGE::RenderService> renderService) {
@@ -35,6 +37,8 @@ void BGE::Game::provide(std::shared_ptr<FontService> fontService) {
 }
 
 void BGE::Game::initialize() {
+    getHeartbeatService()->registerListener("Game", std::bind(&Game::update, this, std::placeholders::_1), 0);
+
 }
 
 void BGE::Game::reset() {
@@ -53,4 +57,9 @@ void BGE::Game::resume() {
 }
 
 void BGE::Game::destroy() {
+}
+
+void BGE::Game::update(double deltaTime) {
+    NSLog(@"delta time %f", deltaTime);
+    animationService_->update(deltaTime);
 }

@@ -29,6 +29,17 @@ BGE::SpriteRenderComponent::SpriteRenderComponent(uint32_t componentId) : BGE::R
 BGE::SpriteRenderComponent::SpriteRenderComponent(uint32_t componentId, std::string name) : BGE::RenderComponent(componentId, name) {
 }
 
+void BGE::SpriteRenderComponent::setTextureRef(TextureReference *texRef) {
+    std::string name = texRef->name;
+    auto material = Game::getInstance()->getMaterialService()->materialWithName(name);
+    
+    if (!material) {
+        material = Game::getInstance()->getMaterialService()->createMaterial(name, texRef->texture);
+    }
+    
+    this->setMaterials({material});
+}
+
 void BGE::SpriteRenderComponent::materialsUpdated() {
     
     // Build vertices

@@ -28,7 +28,8 @@ namespace BGE {
         virtual void pause() {}
         virtual void resume() {}
         virtual void destroy() {}
-        
+        void update(double deltaTime) {}
+
         virtual std::shared_ptr<Shader> createShader(ShaderType shaderType, std::string name) =0;
         virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::string name, std::vector<std::shared_ptr<Shader>> shaders) =0;
         virtual std::shared_ptr<ShaderProgram> createShaderProgram(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms) =0;

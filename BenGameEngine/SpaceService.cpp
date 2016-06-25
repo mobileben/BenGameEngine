@@ -7,6 +7,7 @@
 //
 
 #include "SpaceService.h"
+#include "Game.h"
 
 BGE::SpaceService::SpaceService() {
 }
@@ -17,7 +18,7 @@ BGE::SpaceService::~SpaceService() {
 std::shared_ptr<BGE::Space> BGE::SpaceService::createSpace(std::string name) {
     uint64_t spaceId = getIdAndIncrement();
     
-    std::shared_ptr<Space> space = Space::create(spaceId, Game::getInstance()->getGameObjectService());
+    std::shared_ptr<Space> space = Space::create(spaceId, std::make_shared<GameObjectService>(), std::make_shared<BGE::ComponentService>());
     
     spaces_[spaceId] = space;
     
@@ -73,4 +74,16 @@ std::shared_ptr<BGE::Space> BGE::SpaceService::find(std::string name) {
     }
     
     return found;
+}
+
+std::vector<std::shared_ptr<BGE::Space>> BGE::SpaceService::getSpaces() {
+    std::vector<std::shared_ptr<Space>> spaces;
+    
+    for(auto kv : spaces_) {
+        spaces.push_back(kv.second);
+    }
+
+    std::sort(spaces.begin(), spaces.end());
+    
+    return spaces;
 }

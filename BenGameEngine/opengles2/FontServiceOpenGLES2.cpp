@@ -42,6 +42,7 @@ std::shared_ptr<BGE::Font> BGE::FontServiceOpenGLES2::getFont(std::string name, 
 
 void BGE::FontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback)
 {
+    NSLog(@"XXXX %s %d", name.c_str(), pixelSize);
     
     std::string fontKey = BGE::FontService::fontAsKey(name, pixelSize);
 
@@ -50,6 +51,8 @@ void BGE::FontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, s
     if (fontIt != fonts_.end()) {
         std::shared_ptr<Font> font = fonts_[fontKey];
         
+        NSLog(@"XXXX Exists! %s %d", name.c_str(), pixelSize);
+
         if (callback) {
             callback(font, nullptr);
         }
@@ -97,7 +100,8 @@ void BGE::FontServiceOpenGLES2::loadFont(std::string name, uint32_t pixelSize, s
                         std::shared_ptr<BGE::FontOpenGLES2> oglFont = std::make_shared<BGE::FontOpenGLES2>(fontName, pixelSize);
                         
                         if (oglFont) {
-                            oglFont->load(cpath, [this, fontKey, underlyingName, callback](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
+                            oglFont->load(cpath, [this, fontKey, name, pixelSize, underlyingName, callback](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
+                                NSLog(@"XXXX Created! %s %d %s %s %d", name.c_str(), pixelSize, fontKey.c_str(), underlyingName.c_str(), [NSThread isMainThread]);
                                 if (font) {
                                     fonts_[fontKey] = font;
                                     underlyingFonts_[underlyingName] = font;

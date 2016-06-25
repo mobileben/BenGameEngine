@@ -37,6 +37,7 @@ namespace BGE {
         
         TextureReference *getTextureReference(std::string name);
         TextReference *getTextReference(std::string name);
+        AnimationSequenceReference *getAnimationSequenceReference(std::string name);
         
     protected:
         void reset();
@@ -54,6 +55,9 @@ namespace BGE {
         bool texturesLoaded_;
         bool hasExternal_;
         
+        int32_t defaultPositionIndex_;
+        int32_t defaultScaleIndex_;
+        
         FixedArray<char>                                    strings_;
         FixedArray<TextureReferenceIntermediate>            textures_;
         FixedArray<TextReferenceIntermediate>               text_;
@@ -64,8 +68,8 @@ namespace BGE {
         FixedArray<ColorMatrix>                             colorMatrices_;
         FixedArray<Vector2>                                 vector2s_;
         
-        FixedArray<BoundsReferenceIntermediate>             boundRefs_;
-        FixedArray<AnimationKeyFrameReferenceIntermediate>  keyframes_;
+        FixedArray<BoundsReferenceIntermediate>             bounds_;
+        FixedArray<AnimationKeyframeReferenceIntermediate>  keyframes_;
         FixedArray<AnimationChannelReferenceIntermediate>   channels_;
         
         std::shared_ptr<std::atomic_int>                    textureCount_;
@@ -81,7 +85,23 @@ namespace BGE {
         FixedArray<const char*>                             textNames_;
         FixedArray<int32_t>                                 textIndices_;
         FixedArray<TextReference>                           textRefs_;
+ 
+        FixedArray<BoundsReference>                         boundsRefs_;
 
+        FixedArray<const char*>                             animSeqNames_;
+        FixedArray<int32_t>                                 animSeqIndices_;
+        FixedArray<AnimationSequenceReference>              animSeqRefs_;
+        
+        FixedArray<const char*>                             animChannelNames_;
+        FixedArray<int32_t>                                 animChannelIndices_;
+        FixedArray<AnimationChannelReference>               animChannelRefs_;
+        
+        FixedArray<const char*>                             animKeyframeNames_;
+        FixedArray<int32_t>                                 animKeyframeIndices_;
+        FixedArray<AnimationKeyframeReference>              animKeyframeRefs_;
+
+        FixedArray<AnimationKeyframeReference *>            animChannelKeyframes_;
+        
         void loadTextures(std::function<void()> callback);
         void loadFonts(std::function<void()> callback);
     };

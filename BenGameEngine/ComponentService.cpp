@@ -11,6 +11,9 @@
 BGE::ComponentService::ComponentService() {
 }
 
+BGE::ComponentService::ComponentService(std::shared_ptr<Space> space) : space_(space) {
+}
+
 BGE::ComponentService::~ComponentService() {
 }
 
@@ -83,4 +86,34 @@ void BGE::ComponentService::removeComponent(std::string name) {
 template <typename T>
 void BGE::ComponentService::removeAllComponents() {
     components_.erase(typeid(T));
+}
+
+void BGE::ComponentService::removeComponent(std::type_index typeIndex, uint64_t componentId) {
+    ComponentMapIterator it = components_.find(typeIndex);
+    
+    if (it != components_.end()) {
+        ComponentVector vec = it->second;
+        
+        for (ComponentVectorIterator vit=vec.begin();vit != vec.end();vit++) {
+            if ((*vit)->getInstanceId() == componentId) {
+                vec.erase(vit);
+                return;
+            }
+        }
+    }
+}
+
+void BGE::ComponentService::removeComponent(std::type_index typeIndex, std::string name) {
+    ComponentMapIterator it = components_.find(typeIndex);
+    
+    if (it != components_.end()) {
+        ComponentVector vec = it->second;
+        
+        for (ComponentVectorIterator vit=vec.begin();vit != vec.end();vit++) {
+            if ((*vit)->getName() == name) {
+                vec.erase(vit);
+                return;
+            }
+        }
+    }
 }

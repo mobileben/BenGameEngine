@@ -107,8 +107,8 @@ std::shared_ptr<BGE::SpriteRenderComponent> BGE::ScenePackageService::createSpri
             TextureReference *texRef = package->getTextureReference(name);
             
             if (texRef && texRef->texture) {
-                auto material = BGE::Game::getInstance()->getMaterialService()->createMaterial("mat", texRef->texture);
-                auto sprite = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::SpriteRenderComponent>("sprite");
+                auto material = BGE::Game::getInstance()->getMaterialService()->createMaterial(name, texRef->texture);
+                auto sprite = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::SpriteRenderComponent>(name);
                 
                 sprite->setMaterials({material});
                 
@@ -130,7 +130,7 @@ std::shared_ptr<BGE::TextComponent> BGE::ScenePackageService::createTextComponen
             TextReference *textRef = package->getTextReference(name);
             
             if (textRef && textRef->font) {
-                auto text = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TextComponent>("text");
+                auto text = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TextComponent>(name);
                 
                 text->setTextReference(*textRef);
                 
@@ -141,4 +141,64 @@ std::shared_ptr<BGE::TextComponent> BGE::ScenePackageService::createTextComponen
     
     return nullptr;
 }
+
+std::shared_ptr<BGE::AnimationSequenceComponent> BGE::ScenePackageService::createAnimationSequenceComponent(std::string name) {
+    for (auto const &ent : scenePackages_) {
+        ScenePackageHandle handle = ent.second;
+        auto package = scenePackageHandleService_.dereference(handle);
+        
+        if (package) {
+            AnimationSequenceReference *animRef = package->getAnimationSequenceReference(name);
+            
+            if (animRef) {
+                auto anim = Game::getInstance()->getComponentService()->createComponent<AnimationSequenceComponent>();
+                anim->setAnimationSequenceReference(*animRef);
+                
+                return anim;
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::TextureReference *BGE::ScenePackageService::getTextureReference(std::string name) {
+    for (auto const &ent : scenePackages_) {
+        ScenePackageHandle handle = ent.second;
+        auto package = scenePackageHandleService_.dereference(handle);
+        
+        if (package) {
+            return package->getTextureReference(name);
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::TextReference *BGE::ScenePackageService::getTextReference(std::string name) {
+    for (auto const &ent : scenePackages_) {
+        ScenePackageHandle handle = ent.second;
+        auto package = scenePackageHandleService_.dereference(handle);
+        
+        if (package) {
+            return package->getTextReference(name);
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceReference(std::string name) {
+    for (auto const &ent : scenePackages_) {
+        ScenePackageHandle handle = ent.second;
+        auto package = scenePackageHandleService_.dereference(handle);
+        
+        if (package) {
+            return package->getAnimationSequenceReference(name);
+        }
+    }
+
+    return nullptr;
+}
+
 

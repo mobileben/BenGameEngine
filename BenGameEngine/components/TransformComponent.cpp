@@ -45,6 +45,10 @@ transformDirty_(false), speed_(1), paused_(false) {
     Matrix4MakeIdentify(matrix_);
 }
 
+void BGE::TransformComponent::setGameObject(std::shared_ptr<GameObject> gameObject) {
+    Component::setGameObject(gameObject);
+}
+
 void BGE::TransformComponent::getMatrix(Matrix4 &matrix) {
     if (transformDirty_) {
         

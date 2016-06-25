@@ -49,7 +49,8 @@ namespace BGE {
         void pause() {}
         void resume() {}
         void destroy() {}
-        
+        void update(double deltaTime) {}
+
         DATA* allocate(HANDLE& handle) {
             uint32_t index;
             

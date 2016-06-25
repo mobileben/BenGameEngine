@@ -20,10 +20,13 @@
 #include "Component.h"
 
 namespace BGE {
+    class Space;
+    
     class ComponentService : public BGE::Service
     {
     public:
         ComponentService();
+        ComponentService(std::shared_ptr<Space> space);
         ~ComponentService();
         
         void initialize() {}
@@ -33,23 +36,33 @@ namespace BGE {
         void pause() {}
         void resume() {}
         void destroy() {}
-        
-        template <typename T> std::shared_ptr<T> getComponent(uint64_t componentId);
-        template <typename T> std::shared_ptr<T> getComponent(std::string name);
+        void update(double deltaTime) {}
+
+        void setSpace(std::shared_ptr<Space> space) { space_ = space; }
+        std::shared_ptr<Space> getSpace(void) const { return space_; }
         
         template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
             static_assert(std::is_base_of<Component, T>::value, "Not Component");
             uint64_t objId = getIdAndIncrement();
             std::shared_ptr<T> component = T::create(objId, std::forward<Args>(args)...);
             
+            component->setSpace(space_);
             addComponent(component);
+            
+            component->created();
             
             return component;
         }
         
+        template <typename T> std::shared_ptr<T> getComponent(uint64_t componentId);
+        template <typename T> std::shared_ptr<T> getComponent(std::string name);
+        
         template <typename T> void removeComponent(uint64_t componentId);
         template <typename T> void removeComponent(std::string name);
         template <typename T> void removeAllComponents();
+        
+        void removeComponent(std::type_index typeIndex, uint64_t componentId);
+        void removeComponent(std::type_index typeIndex, std::string name);
         
     private:
         typedef std::vector<std::shared_ptr<Component>> ComponentVector;
@@ -60,6 +73,7 @@ namespace BGE {
         typedef std::unordered_map<std::type_index, void *> ComponentPoolMap;
         typedef std::unordered_map<std::type_index, size_t> ComponentPoolSize;
         
+        std::shared_ptr<Space> space_;
         ComponentMap components_;
         
         template <typename T> void addComponent(std::shared_ptr<T> component) {

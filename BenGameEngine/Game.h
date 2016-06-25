@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <memory>
 #include "Service.h"
+#include "AnimationService.h"
 #include "GameObjectService.h"
 #include "MaterialService.h"
 #include "RenderService.h"
@@ -20,9 +21,10 @@
 #include "HeartbeatService.h"
 #include "ComponentService.h"
 #include "ScenePackageService.h"
+#include "SpaceService.h"
 
 namespace BGE {
-    class Game : public BGE::Service
+    class Game : public Service
     {
     public:
         Game();
@@ -44,6 +46,8 @@ namespace BGE {
         std::shared_ptr<BGE::MaterialService> getMaterialService() { return materialService_; }
         std::shared_ptr<BGE::HeartbeatService> getHeartbeatService() { return heartbeatService_; }
         std::shared_ptr<BGE::ScenePackageService> getScenePackageService() { return scenePackageService_; }
+        std::shared_ptr<BGE::AnimationService> getAnimationService() { return animationService_; }
+        std::shared_ptr<BGE::SpaceService> getSpaceService() { return spaceService_; }
         
         // Service functions
         void initialize();
@@ -53,6 +57,7 @@ namespace BGE {
         void pause();
         void resume();
         void destroy();
+        void update(double deltaTime);
         
     protected:
         std::shared_ptr<BGE::RenderService> renderService_;
@@ -63,6 +68,8 @@ namespace BGE {
         std::shared_ptr<BGE::GameObjectService> gameObjectService_;
         std::shared_ptr<BGE::ComponentService> componentService_;
         std::shared_ptr<BGE::ScenePackageService> scenePackageService_;
+        std::shared_ptr<BGE::AnimationService> animationService_;
+        std::shared_ptr<BGE::SpaceService> spaceService_;
     };
 }
 

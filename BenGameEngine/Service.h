@@ -26,6 +26,7 @@ namespace BGE {
         virtual void pause() =0;
         virtual void resume() =0;
         virtual void destroy() =0;
+        virtual void update(double deltaTime) =0;
         
     protected:
         uint64_t getIdAndIncrement();

@@ -274,11 +274,16 @@ void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Color &c
         
         GLint textureUniform = glShader->locationForUniform("Texture");
         GLint projectionLocation = glShader->locationForUniform("Projection");
+        GLint modelLocation = glShader->locationForUniform("ModelView");
         GLint colorUniform = glShader->locationForUniform("SourceColor");
+        Matrix4 identity;
+        
+        Matrix4MakeIdentify(identity);
         
         oglTex = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(textureAtlas_->getTexture());
         
         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) renderer->getProjectionMatrix()->m);
+//        glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identity.m);
         
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
@@ -288,7 +293,8 @@ void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Color &c
         uint16_t prev = 0;
         
         glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
-        //            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         
         glUniform1i(textureUniform, 0);
         glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
@@ -344,7 +350,7 @@ void BGE::FontOpenGLES2::drawString(std::string str, Vector2 &position, Color &c
                     vertices[3].tex.y = uvs[3].y;
                     
                     // TODO texture stack here
-                    //glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
+//                    glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
 
                     glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                           sizeof(VertexTex), &vertices[0]);

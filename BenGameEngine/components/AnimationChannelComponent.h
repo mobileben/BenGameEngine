@@ -13,6 +13,7 @@
 #include <memory>
 #include <vector>
 #include "Component.h"
+#include "GraphicFormats.h"
 
 namespace BGE {
     class AnimationChannelComponent : public Component {
@@ -20,6 +21,8 @@ namespace BGE {
         struct private_key {};
         
     public:
+        const AnimationChannelReference *channel;
+
         static std::shared_ptr<AnimationChannelComponent> create(uint64_t componentId);
         static std::shared_ptr<AnimationChannelComponent> create(uint64_t componentId, std::string name);
         
@@ -28,19 +31,18 @@ namespace BGE {
         
         virtual ~AnimationChannelComponent() {}
         
+        void setAnimationChannelReference(const AnimationChannelReference *animChanRef);
+        
+        void updateReference();
+
     protected:
-        friend BGE::ComponentService;
+        friend ComponentService;
+        friend GameObject;
         
         AnimationChannelComponent(uint64_t componentId);
         AnimationChannelComponent(uint64_t componentId, std::string name);
         
-    private:
-        uint32_t    keyframe_;
-        uint32_t    totalKeyframes_;
-        uint32_t    iterations_;
-        float       frameRemainderTime_;
-
-        std::vector<std::shared_ptr<AnimationChannelComponent>> childrenChannels_;
+        void setGameObject(std::shared_ptr<GameObject> gameObject);
     };
 }
 

@@ -28,7 +28,8 @@ namespace BGE {
         virtual void pause() {}
         virtual void resume() {}
         virtual void destroy() {}
-        
+        void update(double deltaTime) {}
+
         std::shared_ptr<Font> getFont(std::string name, uint32_t pixelSize);
         
         void loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback);

@@ -13,13 +13,13 @@
 #include "StringArrayBuilder.h"
 #include <type_traits>
 
-
-BGE::ScenePackage::ScenePackage(uint64_t sceneId) : Object(sceneId), fontCount_(nullptr) {
+BGE::ScenePackage::ScenePackage(uint64_t sceneId) : Object(sceneId), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
     ArrayBuilder<int, int> b;
     b.add(10);
     StringArrayBuilder c;
     c.add("Hello");
     
+    position_ = Vector2{0, 0};
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
 }
@@ -35,6 +35,7 @@ void BGE::ScenePackage::reset() {
 }
 
 void BGE::ScenePackage::link() {
+    // Link Texture
     std::shared_ptr<TextureService> textureService = BGE::Game::getInstance()->getTextureService();
     textureNames_ = FixedArray<const char*>(textures_.size());
     textureIndices_ = FixedArray<int32_t>(textures_.size());
@@ -46,7 +47,7 @@ void BGE::ScenePackage::link() {
         int32_t *index = textureIndices_.addressOf(i);
         TextureReference *texRef = textureRefs_.addressOf(i);
         
-        // Fix name
+        // Fix names
         const char* resolvedName = texRefInt->name + strings_.addressOf(0);
         *name = resolvedName;
         *index = i;
@@ -54,6 +55,7 @@ void BGE::ScenePackage::link() {
         texRef->texture = textureService->textureWithName(resolvedName);
     }
 
+    // Link TextReference
     std::shared_ptr<FontService> fontService = BGE::Game::getInstance()->getFontService();
     textNames_ = FixedArray<const char*>(text_.size());
     textIndices_ = FixedArray<int32_t>(text_.size());
@@ -65,7 +67,7 @@ void BGE::ScenePackage::link() {
         int32_t *index = textIndices_.addressOf(i);
         TextReference *textRef = textRefs_.addressOf(i);
         
-        // Fix name
+        // Fix names
         const char* resolvedName = textRefInt->name + strings_.baseAddress();
         const char* resolvedText = textRefInt->text + strings_.baseAddress();
         const char* fontName = textRefInt->fontName + strings_.baseAddress();
@@ -82,13 +84,123 @@ void BGE::ScenePackage::link() {
         
         textRef->font = fontService->getFont(fontName, textRefInt->size);
     }
+    
+    // Link BoundsRefs
+    boundsRefs_ = FixedArray<BoundsReference>(bounds_.size());
+    
+    for (auto i=0;i<bounds_.size();i++) {
+        BoundsReferenceIntermediate *boundsRefInt = bounds_.addressOf(i);
+        BoundsReference *boundsRef = boundsRefs_.addressOf(i);
+        
+        Rect *rect = boundsRefInt->bounds + rects_.baseAddress();
+        boundsRef->startFrame = boundsRefInt->startFrame;
+        boundsRef->totalFrames = boundsRefInt->totalFrames;
+        boundsRef->bounds = rect;
+
+    }
+    
+    // Link AnimationKeyframeReference
+    animKeyframeRefs_ = FixedArray<AnimationKeyframeReference>(keyframes_.size());
+    
+    for (auto i=0;i<keyframes_.size();i++) {
+        AnimationKeyframeReferenceIntermediate *keyframeRefInt = keyframes_.addressOf(i);
+        AnimationKeyframeReference *keyframeRef = animKeyframeRefs_.addressOf(i);
+        
+        keyframeRef->startFrame = keyframeRefInt->startFrame;
+        keyframeRef->totalFrames = keyframeRefInt->totalFrames;
+        keyframeRef->order = keyframeRefInt->order;
+        keyframeRef->flags = keyframeRefInt->flags;
+        if (keyframeRefInt->position != NullPtrIndex) {
+            keyframeRef->position = keyframeRefInt->position + vector2s_.baseAddress();
+        } else {
+            keyframeRef->position = nullptr;
+        }
+        if (keyframeRefInt->scale != NullPtrIndex) {
+            keyframeRef->scale = keyframeRefInt->scale + vector2s_.baseAddress();
+        } else {
+            keyframeRef->scale = nullptr;
+        }
+        keyframeRef->rotation = keyframeRefInt->rotation;
+        keyframeRef->matrix = nullptr;  // TODO
+        if (keyframeRefInt->colorMatrix != NullPtrIndex) {
+            keyframeRef->colorMatrix = keyframeRefInt->colorMatrix + colorMatrices_.baseAddress();
+        } else {
+            keyframeRef->colorMatrix = nullptr;
+        }
+        if (keyframeRefInt->colorTransform != NullPtrIndex) {
+            keyframeRef->colorTransform = keyframeRefInt->colorTransform + colorTransforms_.baseAddress();
+        } else {
+            keyframeRef->colorTransform = nullptr;
+        }
+        if (keyframeRefInt->bounds != NullPtrIndex) {
+            keyframeRef->bounds = keyframeRefInt->bounds + rects_.baseAddress();
+        } else {
+            keyframeRef->bounds = nullptr;
+        }
+    }
+
+    // Build FixedArray for keyframe pointers
+    animChannelKeyframes_ = FixedArray<AnimationKeyframeReference *>(keyframes_.size());
+
+    // Link AnimationChannelReference
+    animChannelRefs_ = FixedArray<AnimationChannelReference>(channels_.size());
+    int32_t keyframeIndex = 0;
+    
+    for (auto i=0;i<channels_.size();i++) {
+        AnimationChannelReferenceIntermediate *animChannelIntRef = channels_.addressOf(i);
+        AnimationChannelReference *animChannelRef = animChannelRefs_.addressOf(i);
+
+        // Fix names
+        const char* resolvedName = animChannelIntRef->name + strings_.baseAddress();
+        const char* reference = animChannelIntRef->reference + strings_.baseAddress();
+
+        animChannelRef->name = resolvedName;
+        animChannelRef->reference = reference;
+        animChannelRef->referenceType = animChannelIntRef->referenceType;
+        animChannelRef->animation.frame = animChannelIntRef->frame;
+         // Build the links related to keyframes
+        animChannelRef->numKeyframes = (int32_t) animChannelIntRef->keyframes.size();
+        animChannelRef->keyframes = animChannelKeyframes_.addressOf(keyframeIndex);
+        
+        for (auto ki=0;ki<animChannelRef->numKeyframes;ki++) {
+            animChannelRef->keyframes[ki] = animKeyframeRefs_.addressOf(animChannelIntRef->keyframes[ki]);
+        }
+        
+        keyframeIndex += animChannelRef->numKeyframes;
+    }
+    
+    // Link AnimationSequenceReference
+    animSeqNames_ = FixedArray<const char*>(animationSequences_.size());
+    animSeqIndices_ = FixedArray<int32_t>(animationSequences_.size());
+    animSeqRefs_ = FixedArray<AnimationSequenceReference>(animationSequences_.size());
+
+    for (auto i=0;i<animationSequences_.size();i++) {
+        AnimationSequenceReferenceIntermediate *animSeqRefInt = animationSequences_.addressOf(i);
+        AnimationSequenceReference *animSeqRef = animSeqRefs_.addressOf(i);
+        const char**name = animSeqNames_.addressOf(i);
+        int32_t *index = animSeqIndices_.addressOf(i);
+
+        // Fix names
+        const char* resolvedName = animSeqRefInt->name + strings_.baseAddress();
+        
+        *name = resolvedName;
+        *index = i;
+        animSeqRef->name = resolvedName;
+        animSeqRef->frameRate = animSeqRefInt->frameRate;
+        animSeqRef->totalFrames = animSeqRefInt->totalFrames;
+        animSeqRef->numChannels = animSeqRefInt->numChannels;
+        animSeqRef->numBounds = animSeqRefInt->numBounds;
+        
+        animSeqRef->channels = animChannelRefs_.addressOf(animSeqRefInt->channels);
+        animSeqRef->bounds = boundsRefs_.addressOf(animSeqRefInt->bounds);
+    }
 }
 
 void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback) {
     reset();
-    
+    float platformScale = 2.0;
     NSArray *textures = jsonDict[@"textures"];
-    StringArrayBuilder stringBuilder;
+    StringArrayBuilder stringBuilder ;
     ArrayBuilder<TextureReferenceIntermediate, TextureReferenceIntermediate> texIntBuilder;
     ArrayBuilder<TextReferenceIntermediate, TextReferenceIntermediate> textIntBuilder;
     ArrayBuilder<AnimationSequenceReferenceIntermediate, AnimationSequenceReferenceIntermediate> animSeqIntBuilder;
@@ -99,16 +211,19 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
     UniqueArrayBuilder<Vector2, Vector2> vector2Builder;
 
     ArrayBuilder<BoundsReferenceIntermediate, BoundsReferenceIntermediate> boundsRefIntBuilder;
-    ArrayBuilder<AnimationKeyFrameReferenceIntermediate, AnimationKeyFrameReferenceIntermediate> keyframeIntBuilder;
+    ArrayBuilder<AnimationKeyframeReferenceIntermediate, AnimationKeyframeReferenceIntermediate> keyframeIntBuilder;
     ArrayBuilder<AnimationChannelReferenceIntermediate, AnimationChannelReferenceIntermediate> channelRefIntBuilder;
     
     setName([jsonDict[@"name"] UTF8String]);
-    width_ = [jsonDict[@"width"] floatValue];
-    height_ = [jsonDict[@"height"] floatValue];
+    width_ = [jsonDict[@"width"] floatValue] * platformScale;
+    height_ = [jsonDict[@"height"] floatValue] * platformScale;
     source_ = [jsonDict[@"source"] UTF8String];
     frameRate_ = [jsonDict[@"frameRate"] floatValue];
-    position_.x = [jsonDict[@"position"][@"x"] floatValue];
-    position_.y = [jsonDict[@"position"][@"y"] floatValue];
+    position_.x = [jsonDict[@"position"][@"x"] floatValue] * platformScale;
+    position_.y = [jsonDict[@"position"][@"y"] floatValue] * platformScale;
+    
+    defaultPositionIndex_ = vector2Builder.add(Vector2{0, 0});
+    defaultScaleIndex_ = vector2Builder.add(Vector2{1, 1});
     
     texIntBuilder.resize(textures.count);
     
@@ -122,8 +237,8 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
         if (name) {
             texRef->name = stringBuilder.add(name);
             
-            texRef->width = [texDict[@"width"] floatValue];
-            texRef->height = [texDict[@"height"] floatValue];
+            texRef->width = [texDict[@"width"] floatValue] * platformScale;
+            texRef->height = [texDict[@"height"] floatValue] * platformScale;
             
             // Now get the file information
             NSString* filename = [[NSBundle mainBundle] pathForResource:texDict[@"filename"] ofType:nil];
@@ -158,9 +273,9 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             
             textRef->name = stringBuilder.add(name);
             textRef->text = stringBuilder.add(text);
-            textRef->width = [textDict[@"width"] floatValue];
-            textRef->height = [textDict[@"height"] floatValue];
-            textRef->leading = [formatDict[@"leading"] floatValue];
+            textRef->width = [textDict[@"width"] floatValue] * platformScale;
+            textRef->height = [textDict[@"height"] floatValue] * platformScale;
+            textRef->leading = [formatDict[@"leading"] floatValue] * platformScale;
             
             std::string alignment = [formatDict[@"alignment"] UTF8String];
             
@@ -172,7 +287,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                 textRef->alignment = FontHorizontalAlignment::Center;
             }
             
-            uint32_t size = [formatDict[@"fontSize"] unsignedIntValue];
+            uint32_t size = [formatDict[@"fontSize"] unsignedIntValue] * 2;
             uint32_t color = [formatDict[@"fontColor"] unsignedIntValue];
             uint32_t blue = color & 0xff;
             uint32_t green = color >> 8 & 0xff;
@@ -188,7 +303,19 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             const char* fontName = [formatDict[@"fontName"] UTF8String];
             textRef->fontName = stringBuilder.add(fontName);
             
-            fontQueue_.push_back(std::make_pair<std::string, int32_t>(fontName, size));
+            // Make sure
+            bool found = false;
+            
+            for (auto f : fontQueue_) {
+                if (f.first == fontName && f.second == size) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                fontQueue_.push_back(std::make_pair<std::string, int32_t>(fontName, size));
+            }
             
 #if 0
             BGE::Game::getInstance()->getFontService()->loadFont(fontName, size, [fontName, name, size, textRef](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
@@ -213,11 +340,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
         const char *name = [symbolDict[@"name"] UTF8String];
         
         if (name) {
-            size_t start;
-            
-            start = stringBuilder.add(name);
-
-            animSeq->name = (const char *)start;
+            animSeq->name = stringBuilder.add(name);
             animSeq->frameRate = frameRate_;
             animSeq->bounds = (uint32_t) boundsRefIntBuilder.size();
             animSeq->channels = (uint32_t) channelRefIntBuilder.size();
@@ -227,31 +350,34 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             
             BoundsReference currBounds;
             BoundsReference newBounds;
+            Rect currRect;
+            Rect newRect;
             
             currBounds.startFrame = 0;
             currBounds.totalFrames = 1;
         
+            animSeq->totalFrames = (uint32_t) frames.count;
+            
             for (NSInteger fi=0;fi<frames.count;fi++) {
                 NSDictionary *frameDict = frames[fi];
                 NSArray *children = frameDict[@"children"];
                 
                 if (fi == 0) {
-                    currBounds.bounds.x = [frameDict[@"bounds"][@"x"] floatValue];
-                    currBounds.bounds.y = [frameDict[@"bounds"][@"y"] floatValue];
-                    currBounds.bounds.w = [frameDict[@"bounds"][@"width"] floatValue];
-                    currBounds.bounds.h = [frameDict[@"bounds"][@"height"] floatValue];
+                    currRect.x = [frameDict[@"bounds"][@"x"] floatValue] * platformScale;
+                    currRect.y = [frameDict[@"bounds"][@"y"] floatValue] * platformScale;
+                    currRect.w = [frameDict[@"bounds"][@"width"] floatValue] * platformScale;
+                    currRect.h = [frameDict[@"bounds"][@"height"] floatValue] * platformScale;
                 } else {
                     newBounds.startFrame = 0;
                     newBounds.totalFrames = 1;
-                    newBounds.bounds.x = [frameDict[@"bounds"][@"x"] floatValue];
-                    newBounds.bounds.y = [frameDict[@"bounds"][@"y"] floatValue];
-                    newBounds.bounds.w = [frameDict[@"bounds"][@"width"] floatValue];
-                    newBounds.bounds.h = [frameDict[@"bounds"][@"height"] floatValue];
+                    newRect.x = [frameDict[@"bounds"][@"x"] floatValue] * platformScale;
+                    newRect.y = [frameDict[@"bounds"][@"y"] floatValue] * platformScale;
+                    newRect.w = [frameDict[@"bounds"][@"width"] floatValue] * platformScale;
+                    newRect.h = [frameDict[@"bounds"][@"height"] floatValue] * platformScale;
                     
-                    
-                    if (newBounds.bounds.x != currBounds.bounds.x || newBounds.bounds.y != currBounds.bounds.y || newBounds.bounds.w != currBounds.bounds.w || newBounds.bounds.h != currBounds.bounds.h) {
-                        currBounds = newBounds;
-                        boundsRefIntBuilder.add({currBounds.startFrame, currBounds.totalFrames, rectBuilder.add(currBounds.bounds)});
+                    if (newRect.x != currRect.x || newRect.y != currRect.y || newRect.w != currRect.w || newRect.h != currRect.h) {
+                        currRect = newRect;
+                        boundsRefIntBuilder.add({currBounds.startFrame, currBounds.totalFrames, rectBuilder.add(currRect)});
                     } else {
                         currBounds.totalFrames++;
                     }
@@ -267,20 +393,16 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                         if (channelIndexIt != channelIndex.end()) {
                             channel = channelRefIntBuilder.addressOf(channelIndexIt->second);
                         } else {
-                            size_t start;
                             AnimationChannelReferenceIntermediate newChannel;
-                            
-                            start = stringBuilder.add(childName);
-                            newChannel.name = (const char *)start;
-                            
                             const char* reference = [childDict[@"reference"] UTF8String];
                             
-                            start = stringBuilder.add(reference);
-                            
-                            newChannel.reference = (const char *)start;
+                            newChannel.name = stringBuilder.add(childName);
+                            newChannel.reference = stringBuilder.add(reference);
                             
                             NSString *type = childDict[@"referenceType"];
                             GfxReferenceType value;
+                            
+                            newChannel.frame = 0;
                             
                             if ([type isEqualToString:@"button"]) {
                                 value = GfxReferenceTypeButton;
@@ -295,7 +417,9 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                             } else if ([type isEqualToString:@"symbol"]) {
                                 value = GfxReferenceTypeAnimationSequence;
                             } else if ([type isEqualToString:@"symbolFrame"]) {
-                                value = GfxReferenceTypeKeyFrame;
+                                value = GfxReferenceTypeKeyframe;
+                                
+                                newChannel.frame = [childDict[@"frame"] unsignedIntValue];
                             } else if ([type isEqualToString:@"text"]) {
                                 value = GfxReferenceTypeText;
                             } else if ([type isEqualToString:@"textureMask"]) {
@@ -312,7 +436,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                             channel = channelRefIntBuilder.addressOf(idx);
                         }
                         
-                        AnimationKeyFrameReferenceIntermediate keyFrame;
+                        AnimationKeyframeReferenceIntermediate keyframe;
                         Rect boundsBacking;
                         Rect *bounds = &boundsBacking;
                         ColorTransform colorTransformBacking;
@@ -324,17 +448,17 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                         Vector2 positionBacking;
                         Vector2 *position = &positionBacking;
 
-                        keyFrame.startFrame = (uint32_t)fi;
-                        keyFrame.totalFrames = 1;
-                        keyFrame.order = (uint32_t)ci;
-                        keyFrame.flags = [childDict[@"flags"] unsignedIntValue];
+                        keyframe.startFrame = (uint32_t)fi;
+                        keyframe.totalFrames = 1;
+                        keyframe.order = (uint32_t)ci;
+                        keyframe.flags = [childDict[@"flags"] unsignedIntValue];
                         
                         // Bounds
                         
-                        boundsBacking.x = [childDict[@"bounds"][@"x"] floatValue];
-                        boundsBacking.y = [childDict[@"bounds"][@"y"] floatValue];
-                        boundsBacking.w = [childDict[@"bounds"][@"width"] floatValue];
-                        boundsBacking.h = [childDict[@"bounds"][@"height"] floatValue];
+                        boundsBacking.x = [childDict[@"bounds"][@"x"] floatValue] * platformScale;
+                        boundsBacking.y = [childDict[@"bounds"][@"y"] floatValue] * platformScale;
+                        boundsBacking.w = [childDict[@"bounds"][@"width"] floatValue] * platformScale;
+                        boundsBacking.h = [childDict[@"bounds"][@"height"] floatValue] * platformScale;
                         
                         // Color
                         if (childDict[@"color"]) {
@@ -353,7 +477,6 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                         
                         // Filters
                         colorMatrix = nullptr;
-                        
                         
                         if (childDict[@"filters"]) {
                             NSArray *filters = childDict[@"filters"];
@@ -374,10 +497,10 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                         // Position
                         if (childDict[@"position"]) {
                             
-                            positionBacking.x = [childDict[@"position"][@"x"] floatValue];
-                            positionBacking.y = [childDict[@"position"][@"y"] floatValue];
+                            positionBacking.x = [childDict[@"position"][@"x"] floatValue] * platformScale;
+                            positionBacking.y = [childDict[@"position"][@"y"] floatValue] * platformScale;
                             
-                            keyFrame.position = (int32_t) vector2Builder.add(positionBacking);
+                            keyframe.position = (int32_t) vector2Builder.add(positionBacking);
                         } else {
                             position = nullptr;
                         }
@@ -392,29 +515,29 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                         
                         // Rotation
                         if (childDict[@"rotation"]) {
-                            keyFrame.rotation = [childDict[@"rotation"] floatValue];
+                            keyframe.rotation = [childDict[@"rotation"] floatValue];
                         } else {
-                            keyFrame.rotation = 0;
+                            keyframe.rotation = 0;
                         }
                         
                         // TODO: Now build matrix
 
-                        // Now determine if this keyframe is a new keyframe
+                        // Now determine if this Keyframe is a new Keyframe
                         bool isNew = false;
-                        AnimationKeyFrameReferenceIntermediate *currKeyFrame = nullptr;
-                        int32_t keyFrameIndex;
+                        AnimationKeyframeReferenceIntermediate *currKeyframe = nullptr;
+                        int32_t keyframeIndex;
 
-                        if (channel->keyFrames.size() == 0) {
+                        if (channel->keyframes.size() == 0) {
                             isNew = true;
                         } else {
-                            keyFrameIndex = channel->keyFrames[channel->keyFrames.size() - 1];
+                            keyframeIndex = channel->keyframes[channel->keyframes.size() - 1];
                             
-                            AnimationKeyFrameReferenceIntermediate *currKeyFrame = &keyframeIntBuilder[keyFrameIndex];
+                            AnimationKeyframeReferenceIntermediate *currKeyframe = &keyframeIntBuilder[keyframeIndex];
                             
-                            // Now we need to determine if this is a new keyframe or existing
-                            if (currKeyFrame->order != keyFrame.order) {
+                            // Now we need to determine if this is a new Keyframe or existing
+                            if (currKeyframe->order != keyframe.order) {
                                 isNew = true;
-                            } else if (currKeyFrame->flags != keyFrame.flags) {
+                            } else if (currKeyframe->flags != keyframe.flags) {
                                 isNew = true;
                             } else {
                                 Rect *currBounds;
@@ -423,11 +546,11 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                                 Vector2 *currPosition;
                                 Vector2 *currScale;
 
-                                currBounds = rectBuilder.safeAddressOf(currKeyFrame->bounds);
-                                currColorTransform = colorXformBuilder.safeAddressOf(currKeyFrame->colorTransform);
-                                currColorMatrix = colorMtxBuilder.safeAddressOf(currKeyFrame->colorMatrix);
-                                currPosition = vector2Builder.safeAddressOf(currKeyFrame->position);
-                                currScale = vector2Builder.safeAddressOf(currKeyFrame->scale);
+                                currBounds = rectBuilder.safeAddressOf(currKeyframe->bounds);
+                                currColorTransform = colorXformBuilder.safeAddressOf(currKeyframe->colorTransform);
+                                currColorMatrix = colorMtxBuilder.safeAddressOf(currKeyframe->colorMatrix);
+                                currPosition = vector2Builder.safeAddressOf(currKeyframe->position);
+                                currScale = vector2Builder.safeAddressOf(currKeyframe->scale);
                                 
                                 // Bounds the same?
                                 if ((currBounds != bounds) || ((currBounds && bounds) && (*currBounds != *bounds))) {
@@ -445,38 +568,38 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                         }
                         
                         if (isNew) {
-                            // This is a new keyframe, key values already set, but if needed, we need to assign the offsets
-                            keyFrame.bounds = rectBuilder.add(boundsBacking);
+                            // This is a new Keyframe, key values already set, but if needed, we need to assign the offsets
+                            keyframe.bounds = rectBuilder.add(boundsBacking);
                             
                             if (position) {
-                                keyFrame.position = vector2Builder.add(*position);
+                                keyframe.position = vector2Builder.add(*position);
                             } else {
-                                keyFrame.position = NullPtrIndex;
+                                keyframe.position = defaultPositionIndex_;
                             }
                             
                             if (scale) {
-                                keyFrame.scale = vector2Builder.add(*scale);
+                                keyframe.scale = vector2Builder.add(*scale);
                             } else {
-                                keyFrame.scale = NullPtrIndex;
+                                keyframe.scale = defaultScaleIndex_;
                             }
                             
                             if (colorTransform) {
-                                keyFrame.colorTransform = colorXformBuilder.add(*colorTransform);
+                                keyframe.colorTransform = colorXformBuilder.add(*colorTransform);
                             } else {
-                                keyFrame.colorTransform = NullPtrIndex;
+                                keyframe.colorTransform = NullPtrIndex;
                             }
                             
                             if (colorMatrix) {
-                                keyFrame.colorMatrix = colorMtxBuilder.add(*colorMatrix);
+                                keyframe.colorMatrix = colorMtxBuilder.add(*colorMatrix);
                             } else {
-                                keyFrame.colorMatrix = NullPtrIndex;
+                                keyframe.colorMatrix = NullPtrIndex;
                             }
                             
-                            keyFrameIndex = keyframeIntBuilder.add(keyFrame);
+                            keyframeIndex = keyframeIntBuilder.add(keyframe);
 
-                            channel->keyFrames.push_back(keyFrameIndex);
-                        } else if (currKeyFrame) {
-                            currKeyFrame->totalFrames++;
+                            channel->keyframes.push_back(keyframeIndex);
+                        } else if (currKeyframe) {
+                            currKeyframe->totalFrames++;
                         } else {
                             assert(false);
                         }
@@ -487,7 +610,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                 }
             }
            
-            boundsRefIntBuilder.add({currBounds.startFrame, currBounds.totalFrames, rectBuilder.add(currBounds.bounds)});
+            boundsRefIntBuilder.add({currBounds.startFrame, currBounds.totalFrames, rectBuilder.add(currRect)});
             
             animSeq->numBounds = (uint32_t) boundsRefIntBuilder.size() - (uint32_t) animSeq->bounds;
             animSeq->numChannels = (uint32_t) channelRefIntBuilder.size() - animSeq->channels;
@@ -507,7 +630,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
     colorTransforms_ = colorXformBuilder.createFixedArray();
     colorMatrices_ = colorMtxBuilder.createFixedArray();
     vector2s_ = vector2Builder.createFixedArray();
-    boundRefs_ = boundsRefIntBuilder.createFixedArray();
+    bounds_ = boundsRefIntBuilder.createFixedArray();
     keyframes_ = keyframeIntBuilder.createFixedArray();
     channels_ = channelRefIntBuilder.createFixedArray();
 
@@ -560,7 +683,7 @@ BGE::TextureReference *BGE::ScenePackage::getTextureReference(std::string name) 
     // TODO: We will sort the names, then binary search the names here later
     const char **names = textureNames_.baseAddress();
     
-    for (auto i=0;textureNames_.size();i++) {
+    for (auto i=0;i<textureNames_.size();i++) {
         if (!strcmp(names[i], cstr)) {
             return textureRefs_.addressOf(*textureIndices_.addressOf(i));
         }
@@ -575,10 +698,28 @@ BGE::TextReference *BGE::ScenePackage::getTextReference(std::string name) {
     // TODO: We will sort the names, then binary search the names here later
     const char **names = textNames_.baseAddress();
     
-    for (auto i=0;textNames_.size();i++) {
+    for (auto i=0;i<textNames_.size();i++) {
         if (!strcmp(names[i], cstr)) {
             return textRefs_.addressOf(*textIndices_.addressOf(i));
         }
     }
     
-    return nullptr;}
+    return nullptr;
+}
+
+BGE::AnimationSequenceReference *BGE::ScenePackage::getAnimationSequenceReference(std::string name) {
+    const char *cstr = name.c_str();
+    
+    // TODO: We will sort the names, then binary search the names here later
+    const char **names = animSeqNames_.baseAddress();
+    
+    for (auto i=0;i<animSeqNames_.size();i++) {
+        if (!strcmp(names[i], cstr)) {
+            return animSeqRefs_.addressOf(*animSeqIndices_.addressOf(i));
+        }
+    }
+    
+    
+    return nullptr;
+}
+

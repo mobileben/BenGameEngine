@@ -27,7 +27,8 @@ namespace BGE {
         virtual void pause();
         virtual void resume();
         virtual void destroy();
-        
+        void update(double deltaTime) {}
+
         void namedTextureFromFile(std::string name, std::string filename, std::function<void(std::shared_ptr<TextureBase>, std::shared_ptr<BGE::Error> error)> callback);
         void namedTextureFromURL(std::string name, std::string url, std::function<void(std::shared_ptr<TextureBase>, std::shared_ptr<BGE::Error>)> callback);
         void namedTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<TextureBase>, std::shared_ptr<BGE::Error>)> callback);
