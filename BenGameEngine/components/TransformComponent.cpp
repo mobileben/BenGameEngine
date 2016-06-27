@@ -57,6 +57,15 @@ void BGE::TransformComponent::getMatrix(Matrix4 &matrix) {
     }
 }
 
+const float *BGE::TransformComponent::getMatrixRaw() const {
+    if (transformDirty_) {
+        // TODO: Do what you need to do here
+        return matrix_.m;
+    } else {
+        return matrix_.m;
+    }
+}
+
 void BGE::TransformComponent::addChild(std::shared_ptr<TransformComponent> child) {
     assert(child);
     assert(child->getParent().expired());

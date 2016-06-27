@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B50326F51D20846500156217 /* FontInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B50326F41D20846500156217 /* FontInfo.cpp */; };
 		B508CD891CA0ABA200127B97 /* TextureBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD871CA0ABA200127B97 /* TextureBase.cpp */; };
 		B508CD8E1CA8ABA100127B97 /* Arial Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */; };
 		B508CD901CA901B700127B97 /* Avenir.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8F1CA901B700127B97 /* Avenir.ttc */; };
@@ -154,6 +155,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B50326F21D1F4BA100156217 /* FontInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontInfo.h; sourceTree = "<group>"; };
+		B50326F41D20846500156217 /* FontInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontInfo.cpp; sourceTree = "<group>"; };
 		B508CD871CA0ABA200127B97 /* TextureBase.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = TextureBase.cpp; sourceTree = "<group>"; };
 		B508CD881CA0ABA200127B97 /* TextureBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureBase.h; sourceTree = "<group>"; };
 		B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Black.ttf"; sourceTree = "<group>"; };
@@ -454,6 +457,8 @@
 				B571F1821C97D92E007F5A90 /* Font.h */,
 				B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */,
 				B571F18F1C9D0A34007F5A90 /* FontGlyph.h */,
+				B50326F41D20846500156217 /* FontInfo.cpp */,
+				B50326F21D1F4BA100156217 /* FontInfo.h */,
 				B571F17E1C97D88E007F5A90 /* FontService.cpp */,
 				B571F17F1C97D88E007F5A90 /* FontService.h */,
 				B52B760E1CBA1E7C00758249 /* game objects */,
@@ -879,6 +884,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B50326F51D20846500156217 /* FontInfo.cpp in Sources */,
 				B525E3CB1C89587000C691C0 /* TextureService.cpp in Sources */,
 				B571F1891C98C231007F5A90 /* FontOpenGLES2.cpp in Sources */,
 				B547F17A1D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp in Sources */,

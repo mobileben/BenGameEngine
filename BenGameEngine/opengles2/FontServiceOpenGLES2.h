@@ -11,14 +11,11 @@
 
 #include <stdio.h>
 #include "FontService.h"
-#include <Foundation/Foundation.h>
 
 namespace BGE {
     class FontServiceOpenGLES2 : public FontService
     {
     public:
-        static void mapBundles(std::string bundleName);
-        
         FontServiceOpenGLES2(std::map<std::string, std::string> resources = std::map<std::string, std::string>());
         
         virtual void initialize() {}
@@ -29,15 +26,8 @@ namespace BGE {
         virtual void resume() {}
         virtual void destroy() {}
         void update(double deltaTime) {}
-
-        std::shared_ptr<Font> getFont(std::string name, uint32_t pixelSize);
         
-        void loadFont(std::string name, uint32_t pixelSize, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback);
         void unloadFont(std::string name, uint32_t pixelSize);
-        
-    private:
-        static NSBundle *builtinBundle_;
-        static NSBundle *mainBundle_;
     };
 }
 

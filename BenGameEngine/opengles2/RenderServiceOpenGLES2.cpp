@@ -62,7 +62,6 @@ static uint8_t MaskIdToMaskValue[] = {
 BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : masksInUse_(0), activeMasks_(0) {
     shaderService_ = std::make_shared<ShaderServiceOpenGLES2>();
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
-    FontServiceOpenGLES2::mapBundles("BenGameEngineBundle");
     
     Matrix4MakeIdentify(projectionMatrix_);
     
@@ -975,9 +974,7 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
     } else if (gameObj->getComponent<BGE::TextComponent>()) {
         std::shared_ptr<BGE::TextComponent> text = gameObj->getComponent<BGE::TextComponent>();
         
-        // TODO: Get rid of position
-        Vector2 position = { 0, 0 };
-        text->getFont()->drawString(text->getText(), position, (Color&) text->getColor());
+        text->getFont()->drawString(text->getText(), transformComponent, (Color&) text->getColor());
     }
     
     if (transformComponent) {

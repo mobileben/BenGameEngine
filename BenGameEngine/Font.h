@@ -17,11 +17,14 @@
 #include "MathTypes.h"
 
 namespace BGE {
+    class TransformComponent;
+    
     typedef enum {
         FontErrorNone = 0,
         FontErrorOS,
         FontErrorFreeType,
         FontErrorAllocation,
+        FontErrorNotInTable,
         FontErrorNoResourceFile,
         FontErrorInvalidSubTexture,
         FontErrorExistingTextureWrongType,
@@ -38,6 +41,12 @@ namespace BGE {
         Center,
         Bottom,
         Baseline
+    };
+    
+    enum class FontStatus {
+        Invalid,
+        Loading,
+        Valid
     };
     
     class Font: public std::enable_shared_from_this<Font>
@@ -60,13 +69,19 @@ namespace BGE {
         uint32_t getStringWidth(std::string str, bool minimum=true);
         uint32_t getHeight() const;
         
-        virtual void load(std::string filename, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback) =0;
+        virtual void load(std::string filename, uint32_t faceIndex, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback) =0;
+        // TODO: Determine if font rendering should be done else where, like in the renderer versus the font.
+        // TODO: We will want to cache the width/height of the string. So this is probably not the best place for the drawString to exist
+        virtual void drawString(std::string str, std::shared_ptr<TransformComponent> transform, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true) =0;
         virtual void drawString(std::string str, Vector2 &position, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true) =0;
         
     protected:
         std::string name_;
         uint32_t pixelSize_;
+        std::string family_;
+        std::string style_;
         
+        FontStatus status_;
         bool valid_;
         
         uint32_t glyphW_;   // Max width of glyphs

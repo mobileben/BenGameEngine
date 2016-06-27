@@ -11,7 +11,7 @@
 
 const std::string BGE::Font::ErrorDomain = "Font";
 
-BGE::Font::Font(std::string name, uint32_t pixelSize) : name_(name), pixelSize_(pixelSize), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
+BGE::Font::Font(std::string name, uint32_t pixelSize) : name_(name), pixelSize_(pixelSize), status_(FontStatus::Invalid), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
 }
 
 BGE::Font::~Font() {
@@ -39,7 +39,7 @@ int32_t BGE::Font::kerningForPair(uint16_t prev, uint16_t curr) {
 uint32_t BGE::Font::getStringWidth(std::string str, bool minimum) {
     int32_t width = 0;
     
-    if (valid_) {
+    if (status_ == FontStatus::Valid) {
         const char *chars = str.c_str();
         std::shared_ptr<BGE::FontGlyph> glyph;
         uint16_t code;
@@ -94,7 +94,7 @@ uint32_t BGE::Font::getStringWidth(std::string str, bool minimum) {
 }
 
 uint32_t BGE::Font::getHeight() const {
-    if (valid_) {
+    if (status_ == FontStatus::Valid) {
         return getGlyphH();
     } else {
         return 0;

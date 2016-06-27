@@ -11,6 +11,7 @@
 #include "ArrayBuilder.h"
 #include "UniqueArrayBuilder.h"
 #include "StringArrayBuilder.h"
+#include "FontOpenGLES2.h"
 #include <type_traits>
 
 BGE::ScenePackage::ScenePackage(uint64_t sceneId) : Object(sceneId), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
@@ -665,7 +666,7 @@ void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
     fontCount_->store(0);
     
     for (auto &font : fontQueue_) {
-        BGE::Game::getInstance()->getFontService()->loadFont(font.first, font.second, [this, callback](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
+        BGE::Game::getInstance()->getFontService()->loadFont<FontOpenGLES2>(font.first, font.second, [this, callback](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
             int val = fontCount_->fetch_add(1) + 1;
             
             if (val == fontQueue_.size()) {

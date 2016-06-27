@@ -75,7 +75,9 @@ namespace BGE {
         float getRotation() const { return rotation_; }
         void setRotation(float rotation) { rotation_ = rotation; transformDirty_ = true; }
         
+        // TODO: This should be made so that matrices are exposed. This is to reduce overhead of copies
         void getMatrix(Matrix4 &matrix);
+        const float *getMatrixRaw() const;
         
         std::weak_ptr<TransformComponent> getParent() { return parent_; }
         std::vector<std::shared_ptr<TransformComponent>> getChildren() { return children_; }
