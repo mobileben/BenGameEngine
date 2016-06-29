@@ -22,6 +22,8 @@ std::string BGE::FontService::fontAsKey(std::string name, uint32_t pixelSize) {
 
 void BGE::FontService::mapBundles(std::string bundleName)
 {
+    // TODO: Create FileService for things like this bundle crap
+    
     if (!FontService::builtinBundle_) {
         FontService::builtinBundle_ = [NSBundle bundleWithURL:[[NSBundle mainBundle] URLForResource:[[NSString alloc] initWithCString:bundleName.c_str() encoding:NSUTF8StringEncoding] withExtension:@"bundle"]];
         FontService::mainBundle_ = [NSBundle mainBundle];
@@ -29,70 +31,57 @@ void BGE::FontService::mapBundles(std::string bundleName)
 }
 
 BGE::FontService::FontService(std::map<std::string, std::string> resources) {
-    FT_Error error = FT_Init_FreeType(&freetypeLibrary_);
+    FontService::mapBundles("BenGameEngineBundle");
+
+    std::vector<std::string> assets;
+    std::vector<std::string> names;
     
-    assert(!error);
+    fontResources_["default"] = "Arial Black.ttf";
+    fontResources_["Avenir"] = "Avenir.ttc";
+    fontResources_.insert(resources.begin(), resources.end());
     
-    if (!error) {
-        std::vector<std::string> assets;
-        std::vector<std::string> names;
+    // Build FontInfo for all font resources
+    for (auto f : fontResources_) {
+        names.push_back(f.first);
+        assets.push_back(f.second);
+    }
+    
+    std::unique(assets.begin(), assets.end());
+    
+    // Assets will be unique
+    for (auto f : assets) {
+        buildFontInfoForAsset(f);
+    }
+    
+    std::unique(fontInfo_.begin(), fontInfo_.end(), fontInfoIsEqual);
+    
+    // Build font table based on font names/aliases and
+    for (auto fi : fontInfo_) {
+        names.push_back(fi->name());
+    }
+    
+    std::unique(names.begin(), names.end());
+    
+    for (auto name : names) {
+        auto it = fontResources_.find(name);
+        bool found = false;
         
-        fontResources_["default"] = "Arial Black.ttf";
-        fontResources_["Avenir"] = "Avenir.ttc";
-        fontResources_.insert(resources.begin(), resources.end());
-        
-        // Build FontInfo for all font resources
-        for (auto f : fontResources_) {
-            names.push_back(f.first);
-            assets.push_back(f.second);
-        }
-        
-        std::unique(assets.begin(), assets.end());
-        
-        // Assets will be unique
-        for (auto f : assets) {
-            buildFontInfoForAsset(f);
-        }
-        
-        std::unique(fontInfo_.begin(), fontInfo_.end(), fontInfoIsEqual);
-        
-        // Build font table based on font names/aliases and
-        for (auto fi : fontInfo_) {
-            names.push_back(fi->name());
-        }
-        
-        std::unique(names.begin(), names.end());
-        
-        for (auto name : names) {
-            auto it = fontResources_.find(name);
-            bool found = false;
+        if (it != fontResources_.end()) {
+            // Find the font info with our name it will either an exact match,
             
-            if (it != fontResources_.end()) {
-                // Find the font info with our name it will either an exact match,
-                
-                for (auto fi : fontInfo_) {
-                    if (fi->name() == name) {
-                        // This is the right one
-                        fontTable_[name] = fi;
-                        found = true;
-                        break;
-                    }
+            for (auto fi : fontInfo_) {
+                if (fi->name() == name) {
+                    // This is the right one
+                    fontTable_[name] = fi;
+                    found = true;
+                    break;
                 }
-                
-                if (!found) {
-                    // This is probably an alias, so find the non-style version of the asset
-                    for (auto fi : fontInfo_) {
-                        if (fi->asset == it->second && fi->faceIndex == 0) {
-                            // This is the right one
-                            fontTable_[name] = fi;
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-            } else {
+            }
+            
+            if (!found) {
+                // This is probably an alias, so find the non-style version of the asset
                 for (auto fi : fontInfo_) {
-                    if (fi->name() == name) {
+                    if (fi->asset == it->second && fi->faceIndex == 0) {
                         // This is the right one
                         fontTable_[name] = fi;
                         found = true;
@@ -100,12 +89,22 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) {
                     }
                 }
             }
-            
-            assert(found);
+        } else {
+            for (auto fi : fontInfo_) {
+                if (fi->name() == name) {
+                    // This is the right one
+                    fontTable_[name] = fi;
+                    found = true;
+                    break;
+                }
+            }
         }
+        
+        assert(found);
     }
 }
 
+// TODO: Move to file service
 std::string BGE::FontService::pathForAsset(std::string asset) {
     // Find our fullpath
     NSString *str = [[NSString alloc] initWithCString:asset.c_str() encoding:NSUTF8StringEncoding];
@@ -205,4 +204,66 @@ std::shared_ptr<BGE::Font> BGE::FontService::getFont(std::string name, uint32_t 
     return nullptr;
 }
 
+void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function<void(std::shared_ptr<Font>, std::shared_ptr<Error> error)> callback) {
+    auto entry = fontTable_.find(name);
+    
+    if (entry != fontTable_.end()) {
+        auto info = entry->second;
+        auto font = info->fonts.find(pxSize);
+        
+        if (font != info->fonts.end()) {
+            // Our font exists
+            if (callback) {
+                callback(font->second, nullptr);
+            }
+        } else {
+            // Create a new font
+            std::string path = pathForAsset(info->asset);
+            
+            if (path.length() > 0) {
+                std::shared_ptr<Font> tFont = std::make_shared<Font>(name, pxSize);
+                
+                if (tFont) {
+                    tFont->status_ = FontStatus::Loading;
+                    
+                    info->fonts[pxSize] = tFont;
+                    
+                    tFont->load(path, info->faceIndex, [this, name, pxSize, callback](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
+                        if (font) {
+                            font->status_ = FontStatus::Valid;
+                        } else {
+                            auto entry = fontTable_.find(name);
+                            
+                            if (entry != fontTable_.end()) {
+                                auto info = entry->second;
+                                auto f = info->fonts.find(pxSize);
+                                
+                                if (f != info->fonts.end()) {
+                                    if (f->second->status_ == FontStatus::Loading) {
+                                        info->fonts.erase(pxSize);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (callback) {
+                            callback(font, error);
+                        }
+                    });
+                } else if (callback) {
+                    callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorOS));
+                }
+                
+            } else if (callback) {
+                callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorNoResourceFile));
+            }
+        }
+    } else if (callback) {
+        callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorNotInTable));
+    }
+}
+
+void BGE::FontService::unloadFont(std::string name, uint32_t pixelSize) {
+    
+}
 

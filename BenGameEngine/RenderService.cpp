@@ -11,7 +11,6 @@
 
 BGE::RenderService::RenderService() : ready_(false)
 {
-    FontService::mapBundles("BenGameEngineBundle");
 }
 
 void BGE::RenderService::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)

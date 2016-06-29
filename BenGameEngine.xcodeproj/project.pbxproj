@@ -74,8 +74,6 @@
 		B571F17B1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F17A1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl */; };
 		B571F1801C97D88E007F5A90 /* FontService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F17E1C97D88E007F5A90 /* FontService.cpp */; };
 		B571F1831C97D92E007F5A90 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1811C97D92E007F5A90 /* Font.cpp */; };
-		B571F1861C98C21C007F5A90 /* FontServiceOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1841C98C21C007F5A90 /* FontServiceOpenGLES2.cpp */; };
-		B571F1891C98C231007F5A90 /* FontOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F1871C98C231007F5A90 /* FontOpenGLES2.cpp */; };
 		B571F18B1C992B3D007F5A90 /* lazy.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B571F18A1C992B3D007F5A90 /* lazy.ttf */; };
 		B571F18D1C992ECE007F5A90 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B571F18C1C992ECE007F5A90 /* libfreetype.a */; };
 		B571F1901C9D0A34007F5A90 /* FontGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */; };
@@ -278,10 +276,6 @@
 		B571F17F1C97D88E007F5A90 /* FontService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontService.h; sourceTree = "<group>"; };
 		B571F1811C97D92E007F5A90 /* Font.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Font.cpp; sourceTree = "<group>"; };
 		B571F1821C97D92E007F5A90 /* Font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Font.h; sourceTree = "<group>"; };
-		B571F1841C98C21C007F5A90 /* FontServiceOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = FontServiceOpenGLES2.cpp; path = opengles2/FontServiceOpenGLES2.cpp; sourceTree = "<group>"; };
-		B571F1851C98C21C007F5A90 /* FontServiceOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FontServiceOpenGLES2.h; path = opengles2/FontServiceOpenGLES2.h; sourceTree = "<group>"; };
-		B571F1871C98C231007F5A90 /* FontOpenGLES2.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = FontOpenGLES2.cpp; path = opengles2/FontOpenGLES2.cpp; sourceTree = "<group>"; };
-		B571F1881C98C231007F5A90 /* FontOpenGLES2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FontOpenGLES2.h; path = opengles2/FontOpenGLES2.h; sourceTree = "<group>"; };
 		B571F18A1C992B3D007F5A90 /* lazy.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = lazy.ttf; sourceTree = "<group>"; };
 		B571F18C1C992ECE007F5A90 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = BenGameEngine/external/freetype/lib/libfreetype.a; sourceTree = "<group>"; };
 		B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = FontGlyph.cpp; sourceTree = "<group>"; };
@@ -615,10 +609,6 @@
 		B571F1741C928BA5007F5A90 /* opengles2 */ = {
 			isa = PBXGroup;
 			children = (
-				B571F1871C98C231007F5A90 /* FontOpenGLES2.cpp */,
-				B571F1881C98C231007F5A90 /* FontOpenGLES2.h */,
-				B571F1841C98C21C007F5A90 /* FontServiceOpenGLES2.cpp */,
-				B571F1851C98C21C007F5A90 /* FontServiceOpenGLES2.h */,
 				B525E3931C89587000C691C0 /* RenderContextOpenGLES2.cpp */,
 				B525E3941C89587000C691C0 /* RenderContextOpenGLES2.h */,
 				B525E3971C89587000C691C0 /* RenderServiceOpenGLES2.cpp */,
@@ -886,9 +876,7 @@
 			files = (
 				B50326F51D20846500156217 /* FontInfo.cpp in Sources */,
 				B525E3CB1C89587000C691C0 /* TextureService.cpp in Sources */,
-				B571F1891C98C231007F5A90 /* FontOpenGLES2.cpp in Sources */,
 				B547F17A1D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp in Sources */,
-				B571F1861C98C21C007F5A90 /* FontServiceOpenGLES2.cpp in Sources */,
 				B525E3BE1C89587000C691C0 /* RenderServiceOpenGLES2.cpp in Sources */,
 				B525E3C61C89587000C691C0 /* ShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,

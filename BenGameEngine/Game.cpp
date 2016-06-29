@@ -22,6 +22,7 @@ BGE::Game::Game()
     scenePackageService_ = std::make_shared<BGE::ScenePackageService>();
     animationService_ = std::make_shared<AnimationService>();
     spaceService_ = std::make_shared<SpaceService>();
+    fontService_ = std::make_shared<FontService>();
 }
 
 void BGE::Game::provide(std::shared_ptr<BGE::RenderService> renderService) {
@@ -30,10 +31,6 @@ void BGE::Game::provide(std::shared_ptr<BGE::RenderService> renderService) {
 
 void BGE::Game::provide(std::shared_ptr<TextureService> textureService) {
     textureService_ = textureService;
-}
-
-void BGE::Game::provide(std::shared_ptr<FontService> fontService) {
-    fontService_ = fontService;
 }
 
 void BGE::Game::initialize() {

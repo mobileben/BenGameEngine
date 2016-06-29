@@ -8,7 +8,6 @@
 
 #include "RenderServiceOpenGLES2.h"
 #include "RenderView.h"
-#include "FontServiceOpenGLES2.h"
 #include "ShaderServiceOpenGLES2.h"
 #include "RenderContextOpenGLES2.h"
 #include "TextureOpenGLES2.h"
