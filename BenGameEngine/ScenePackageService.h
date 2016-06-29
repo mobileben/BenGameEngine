@@ -48,7 +48,7 @@ namespace BGE {
         
         ScenePackageHandle getPackage(std::string name);
         ScenePackage *getDereferencedPackage(std::string name);
-        ScenePackage * getDereferencedPackage(ScenePackageHandle handle);
+        ScenePackage *getDereferencedPackage(ScenePackageHandle handle);
 
         void deletePackage(std::string name);
         void deletePackage(ScenePackageHandle handle);

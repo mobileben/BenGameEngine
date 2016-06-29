@@ -127,7 +127,7 @@ namespace BGE {
         Color color;
         FontHorizontalAlignment alignment;
         // TODO: Change this to Handle later. Note with this it is not a POD
-        std::shared_ptr<Font> font;
+        FontHandle fontHandle;
     };
     
     bool operator==(const TextReference& lhs, const TextReference& rhs);

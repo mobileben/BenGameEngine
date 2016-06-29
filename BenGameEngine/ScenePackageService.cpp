@@ -129,7 +129,7 @@ std::shared_ptr<BGE::TextComponent> BGE::ScenePackageService::createTextComponen
         if (package) {
             TextReference *textRef = package->getTextReference(name);
             
-            if (textRef && textRef->font) {
+            if (textRef && !textRef->fontHandle.isNull()) {
                 auto text = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TextComponent>(name);
                 
                 text->setTextReference(*textRef);

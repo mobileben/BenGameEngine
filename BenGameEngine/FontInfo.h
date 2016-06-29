@@ -12,9 +12,9 @@
 #include <stdio.h>
 #include <string>
 #include <map>
+#include "Font.h"
 
 namespace BGE {
-    class Font;
     
     struct FontInfo
     {
@@ -27,13 +27,8 @@ namespace BGE {
             return family + " " + style;
         }
         
-        std::map<uint32_t, std::shared_ptr<Font>> fonts;
+        std::map<uint32_t, FontHandle> fonts;
     };
-    
-    bool operator==(const std::string& lhs, const FontInfo& rhs);
-    bool operator!=(const std::string& lhs, const FontInfo& rhs);
-    bool operator==(const FontInfo& lhs, const std::string& rhs);
-    bool operator!=(const FontInfo& lhs, const std::string& rhs);
 }
 
 #endif /* FontInfo_h */

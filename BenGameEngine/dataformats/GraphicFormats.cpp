@@ -37,7 +37,7 @@ bool BGE::operator==(const TextReference& lhs, const TextReference& rhs) {
         return false;
     }
     
-    if (lhs.font != rhs.font) {
+    if (lhs.fontHandle != rhs.fontHandle) {
         return false;
     }
     
@@ -73,7 +73,7 @@ bool BGE::operator!=(const TextReference& lhs, const TextReference& rhs) {
         return true;
     }
     
-    if (lhs.font != rhs.font) {
+    if (lhs.fontHandle != rhs.fontHandle) {
         return true;
     }
     

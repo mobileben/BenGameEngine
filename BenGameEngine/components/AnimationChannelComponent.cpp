@@ -77,7 +77,7 @@ void BGE::AnimationChannelComponent::updateReference() {
             case GfxReferenceTypeText: {
                 TextReference *textRef = Game::getInstance()->getScenePackageService()->getTextReference(this->channel->reference);
                 
-                if (textRef && textRef->font) {
+                if (textRef && !textRef->fontHandle.isNull()) {
                     auto text = space->createComponent<TextComponent>();
                     
                     text->setTextReference(*textRef);

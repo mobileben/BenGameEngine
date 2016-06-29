@@ -7,6 +7,8 @@
 //
 
 #include "FontService.h"
+#include "ft2build.h"
+#include FT_FREETYPE_H
 #include <cassert>
 
 NSBundle *BGE::FontService::builtinBundle_ = nil;
@@ -30,7 +32,7 @@ void BGE::FontService::mapBundles(std::string bundleName)
     }
 }
 
-BGE::FontService::FontService(std::map<std::string, std::string> resources) {
+BGE::FontService::FontService(std::map<std::string, std::string> resources) : fontHandleService_(InitialFontReserve, FontHandleService::NoMaxLimit) {
     FontService::mapBundles("BenGameEngineBundle");
 
     std::vector<std::string> assets;
@@ -189,7 +191,26 @@ void BGE::FontService::buildFontInfoForAsset(std::string asset) {
     }
 }
 
-std::shared_ptr<BGE::Font> BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
+BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
+    auto f = fontTable_.find(name);
+    
+    if (f != fontTable_.end()) {
+        auto info = f->second;
+        auto font = info->fonts.find(pixelSize);
+        
+        if (font != info->fonts.end()) {
+            return getFont(font->second);
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::Font *BGE::FontService::getFont(FontHandle handle) {
+    return fontHandleService_.dereference(handle);
+}
+
+BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) {
     auto f = fontTable_.find(name);
     
     if (f != fontTable_.end()) {
@@ -201,10 +222,10 @@ std::shared_ptr<BGE::Font> BGE::FontService::getFont(std::string name, uint32_t 
         }
     }
     
-    return nullptr;
+    return FontHandle();
 }
 
-void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function<void(std::shared_ptr<Font>, std::shared_ptr<Error> error)> callback) {
+void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function<void(FontHandle, std::shared_ptr<Error>)> callback) {
     auto entry = fontTable_.find(name);
     
     if (entry != fontTable_.end()) {
@@ -221,17 +242,19 @@ void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function
             std::string path = pathForAsset(info->asset);
             
             if (path.length() > 0) {
-                std::shared_ptr<Font> tFont = std::make_shared<Font>(name, pxSize);
+                FontHandle handle;
+                Font *tFont = fontHandleService_.allocate(handle);
                 
                 if (tFont) {
+                    tFont->initialize(handle, name, pxSize);
                     tFont->status_ = FontStatus::Loading;
                     
-                    info->fonts[pxSize] = tFont;
+                    info->fonts[pxSize] = handle;
                     
-                    tFont->load(path, info->faceIndex, [this, name, pxSize, callback](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
-                        if (font) {
-                            font->status_ = FontStatus::Valid;
-                        } else {
+                    tFont->load(path, info->faceIndex, [this, name, pxSize, callback](FontHandle fontHandle, std::shared_ptr<Error> error) -> void {
+                        auto font = getFont(fontHandle);
+                        
+                        if (!font) {
                             auto entry = fontTable_.find(name);
                             
                             if (entry != fontTable_.end()) {
@@ -239,31 +262,39 @@ void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function
                                 auto f = info->fonts.find(pxSize);
                                 
                                 if (f != info->fonts.end()) {
-                                    if (f->second->status_ == FontStatus::Loading) {
-                                        info->fonts.erase(pxSize);
+                                    auto tFont = getFont(f->second);
+                                    
+                                    if (tFont) {
+                                        if (tFont->status_ == FontStatus::Loading) {
+                                            info->fonts.erase(pxSize);
+                                            fontHandleService_.release(f->second);
+                                        }
                                     }
                                 }
                             }
                         }
                         
                         if (callback) {
-                            callback(font, error);
+                            callback(fontHandle, error);
                         }
                     });
                 } else if (callback) {
-                    callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorOS));
+                    callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorOS));
                 }
                 
             } else if (callback) {
-                callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorNoResourceFile));
+                callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorNoResourceFile));
             }
         }
     } else if (callback) {
-        callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorNotInTable));
+        callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorNotInTable));
     }
 }
 
 void BGE::FontService::unloadFont(std::string name, uint32_t pixelSize) {
     
+}
+
+void BGE::FontService::unloadFont(FontHandle handle) {
 }
 

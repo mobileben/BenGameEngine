@@ -14,11 +14,6 @@
 #include <type_traits>
 
 BGE::ScenePackage::ScenePackage(uint64_t sceneId) : Object(sceneId), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
-    ArrayBuilder<int, int> b;
-    b.add(10);
-    StringArrayBuilder c;
-    c.add("Hello");
-    
     position_ = Vector2{0, 0};
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
@@ -82,7 +77,7 @@ void BGE::ScenePackage::link() {
         textRef->color = textRefInt->color;
         textRef->alignment = textRefInt->alignment;
         
-        textRef->font = fontService->getFont(fontName, textRefInt->size);
+        textRef->fontHandle = fontService->getFontHandle(fontName, textRefInt->size);
     }
     
     // Link BoundsRefs
@@ -317,12 +312,6 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                 fontQueue_.push_back(std::make_pair<std::string, int32_t>(fontName, size));
             }
             
-#if 0
-            BGE::Game::getInstance()->getFontService()->loadFont(fontName, size, [fontName, name, size, textRef](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
-                NSLog(@"%s: font (%s:%d) %x", name, fontName, size, font.get());
-                //textRef->font = font.get();
-            });
-#endif
         } else {
             // TODO: How to handle non-named items
             assert(name);
@@ -690,7 +679,7 @@ void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
     fontCount_->store(0);
     
     for (auto &font : fontQueue_) {
-        BGE::Game::getInstance()->getFontService()->loadFont(font.first, font.second, [this, callback](std::shared_ptr<Font> font, std::shared_ptr<Error> error) -> void {
+        BGE::Game::getInstance()->getFontService()->loadFont(font.first, font.second, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
             int val = fontCount_->fetch_add(1) + 1;
             
             if (val == fontQueue_.size()) {

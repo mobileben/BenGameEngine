@@ -23,11 +23,30 @@ static const int NumSupportedCharacters = 256 - InitialSupportedCharacterOffset;
 
 const std::string BGE::Font::ErrorDomain = "Font";
 
-BGE::Font::Font(std::string name, uint32_t pixelSize) : name_(name), pixelSize_(pixelSize), status_(FontStatus::Invalid), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
+BGE::Font::Font(uint64_t fontId) : Object(fontId), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
+}
+
+BGE::Font::Font(std::string name, uint32_t pixelSize) : Object(0, name), handle_(FontHandle()), pixelSize_(pixelSize), status_(FontStatus::Invalid), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
 }
 
 BGE::Font::~Font() {
     BGE::Game::getInstance()->getTextureService()->removeTexture(textureAtlas_);
+}
+
+void BGE::Font::initialize(FontHandle handle, std::string name, uint32_t pixelSize) {
+    setName(name);
+    handle_ = handle;
+    pixelSize_ = pixelSize;
+    status_ = FontStatus::Invalid;
+    valid_ = false;
+    
+    if (textureAtlas_) {
+        // TODO: this needs to support removing by reference
+        BGE::Game::getInstance()->getTextureService()->removeTexture(textureAtlas_);
+    }
+    
+    textureAtlas_ = nullptr;
+    hasKerning_ = false;
 }
 
 std::shared_ptr<BGE::FontGlyph> BGE::Font::glyphForExtendedASCII(uint16_t code) {
@@ -113,7 +132,7 @@ uint32_t BGE::Font::getHeight() const {
     }
 }
 
-void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<void(std::shared_ptr<Font>, std::shared_ptr<BGE::Error> error)> callback)  {
+void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<void(FontHandle, std::shared_ptr<BGE::Error>)> callback)  {
     FT_Face face = NULL;
     FT_Error error = 0;
     FT_Library library;
@@ -199,7 +218,7 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                     BGESubTextureDef subTexDef;
                     FontGlyphDef glyphDefs[NumSupportedCharacters];
                     std::map<std::string, BGESubTextureDef> subTexDefs;
-                    std::string fontKeyBase = FontService::fontAsKey(name_, pixelSize_) + "_";
+                    std::string fontKeyBase = FontService::fontAsKey(getName(), pixelSize_) + "_";
                     
                     memset(atlasBuffer, 0, atlasW * atlasH);
                     
@@ -281,7 +300,7 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                         }
                     }
                     
-                    BGE::Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer(FontService::fontAsKey(name_, pixelSize_), atlasBuffer, BGE::TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGE::TextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
+                    BGE::Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer(FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, BGE::TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGE::TextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
                         if (atlas) {
                             textureAtlas_ = atlas;
                             glyphs_.clear();
@@ -328,24 +347,24 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                         if (callback) {
                             valid_ = true;
                             status_ = FontStatus::Valid;
-                            callback(derived_shared_from_this<Font>(), nullptr);
+                            callback(handle_, nullptr);
                         }
                     });
                 } else if (callback) {
-                    callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorAllocation));
+                    callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorAllocation));
                 }
             } else if (callback) {
-                callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
+                callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
             }
             
             FT_Done_Face(face);
         } else if (callback) {
-            callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
+            callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
         }
         
         FT_Done_FreeType(library);
     } else if (callback) {
-        callback(nullptr, std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
+        callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
     }
 }
 

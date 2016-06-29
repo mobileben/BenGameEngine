@@ -18,34 +18,38 @@
 #include "FontInfo.h"
 #include "Font.h"
 #include "Error.h"
-#include "ft2build.h"
-#include FT_FREETYPE_H
+#include "Handle.h"
+#include "HandleService.h"
 #include <Foundation/Foundation.h>
 
 namespace BGE {
-    class FontService : public BGE::Service
+    class FontService : public Service
     {
     public:
+        
         static std::string fontAsKey(std::string name, uint32_t pixelSize);
         static void mapBundles(std::string bundleName);
         
         FontService(std::map<std::string, std::string> resources = std::map<std::string, std::string>());
-        virtual ~FontService() {}
+        ~FontService() {}
         
-        std::shared_ptr<Font> getFont(std::string name, uint32_t pixelSize);
+        Font *getFont(std::string name, uint32_t pixelSize);
+        Font *getFont(FontHandle handle);
+        FontHandle getFontHandle(std::string name, uint32_t pixelSize);
         
-        virtual void initialize() {}
-        virtual void reset() {}
-        virtual void enteringBackground() {}
-        virtual void enteringForeground() {}
-        virtual void pause() {}
-        virtual void resume() {}
-        virtual void destroy() {}
+        void initialize() {}
+        void reset() {}
+        void enteringBackground() {}
+        void enteringForeground() {}
+        void pause() {}
+        void resume() {}
+        void destroy() {}
         void update(double deltaTime) {}
 
-        void loadFont(std::string name, uint32_t pxSize, std::function<void(std::shared_ptr<Font>, std::shared_ptr<Error> error)> callback);
+        void loadFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+        void unloadFont(FontHandle handle);
         void unloadFont(std::string name, uint32_t pixelSize);
-        
+ 
     protected:
         // TODO: For now this is Mac/iOS specific
         static NSBundle *builtinBundle_;
@@ -58,8 +62,15 @@ namespace BGE {
         std::string pathForAsset(std::string asset);
         
     private:
+        static const uint32_t InitialFontReserve = 32;
+
+        using FontHandleService = HandleService<Font, FontHandle>;
+        
+        FontHandleService fontHandleService_;
+
         void buildFontInfoForAsset(std::string asset);
     };
 }
+
 
 #endif /* BGEFontService_h */

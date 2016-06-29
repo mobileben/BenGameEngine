@@ -40,12 +40,12 @@ namespace BGE {
             text_ = text;
         }
         
-        std::shared_ptr<Font> getFont() const {
-            return font_;
+        FontHandle getFontHandle() const {
+            return fontHandle_;
         }
         
-        void setFont(std::shared_ptr<Font> font) {
-            font_ = font;
+        void setFont(FontHandle fontHandle) {
+            fontHandle_ = fontHandle;
         }
         
         const Color& getColor() const {
@@ -61,7 +61,7 @@ namespace BGE {
             color_ = textRef.color;
             horizAlignment_ = textRef.alignment;
             vertAlignment_ = FontVerticalAlignment::Center;
-            font_ = textRef.font;
+            fontHandle_ = textRef.fontHandle;
         }
         
         float getWidth(bool minimum=true);
@@ -79,7 +79,7 @@ namespace BGE {
         
         std::string             text_;
         Color                   color_;
-        std::shared_ptr<Font>   font_;
+        FontHandle              fontHandle_;
         FontHorizontalAlignment horizAlignment_;
         FontVerticalAlignment   vertAlignment_;
         

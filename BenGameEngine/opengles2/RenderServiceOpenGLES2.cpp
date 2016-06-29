@@ -924,7 +924,7 @@ void BGE::RenderServiceOpenGLES2::render()
         std::shared_ptr<TextureBase> texture = Game::getInstance()->getTextureService()->textureWithName("sample");
         std::shared_ptr<TextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("CoinIcon");
 //        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
-        std::shared_ptr<Font> f = Game::getInstance()->getFontService()->getFont("default", 32);
+        Font *f = Game::getInstance()->getFontService()->getFont("default", 32);
 //        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__Avenir.ttc32_texture");
         std::shared_ptr<TextureBase> font;
         
@@ -1062,8 +1062,11 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
             drawSprite(gameObj);
         } else if (gameObj->getComponent<BGE::TextComponent>()) {
             std::shared_ptr<BGE::TextComponent> text = gameObj->getComponent<BGE::TextComponent>();
+            Font *font = Game::getInstance()->getFontService()->getFont(text->getFontHandle());
             
-            text->getFont()->drawString(text->getText(), transformComponent, (Color&) text->getColor());
+            if (font) {
+                font->drawString(text->getText(), transformComponent, (Color&) text->getColor());
+            }
         }
 
         // Determine if we have children, if we do process them.
