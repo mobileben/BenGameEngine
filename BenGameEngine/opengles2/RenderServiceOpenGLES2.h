@@ -88,7 +88,7 @@ namespace BGE {
         
         void queueRender(double deltaTime);
         
-        void renderGameObject(std::shared_ptr<GameObject> gameObj);
+        void renderGameObject(std::shared_ptr<GameObject> gameObj, bool root);
         // TODO: This will get moved out
         void transformGameObject(std::shared_ptr<GameObject> gameObj);
 

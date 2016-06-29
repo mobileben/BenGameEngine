@@ -111,6 +111,7 @@ void BGE::ScenePackage::link() {
         keyframeRef->totalFrames = keyframeRefInt->totalFrames;
         keyframeRef->order = keyframeRefInt->order;
         keyframeRef->flags = keyframeRefInt->flags;
+        keyframeRef->frame = keyframeRefInt->frame;
         if (keyframeRefInt->position != NullPtrIndex) {
             keyframeRef->position = keyframeRefInt->position + vector2s_.baseAddress();
         } else {
@@ -158,7 +159,6 @@ void BGE::ScenePackage::link() {
         animChannelRef->name = resolvedName;
         animChannelRef->reference = reference;
         animChannelRef->referenceType = animChannelIntRef->referenceType;
-        animChannelRef->animation.frame = animChannelIntRef->frame;
          // Build the links related to keyframes
         animChannelRef->numKeyframes = (int32_t) animChannelIntRef->keyframes.size();
         animChannelRef->keyframes = animChannelKeyframes_.addressOf(keyframeIndex);
@@ -403,8 +403,6 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                             NSString *type = childDict[@"referenceType"];
                             GfxReferenceType value;
                             
-                            newChannel.frame = 0;
-                            
                             if ([type isEqualToString:@"button"]) {
                                 value = GfxReferenceTypeButton;
                             } else if ([type isEqualToString:@"external"]) {
@@ -419,8 +417,6 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                                 value = GfxReferenceTypeAnimationSequence;
                             } else if ([type isEqualToString:@"symbolFrame"]) {
                                 value = GfxReferenceTypeKeyframe;
-                                
-                                newChannel.frame = [childDict[@"frame"] unsignedIntValue];
                             } else if ([type isEqualToString:@"text"]) {
                                 value = GfxReferenceTypeText;
                             } else if ([type isEqualToString:@"textureMask"]) {
@@ -453,6 +449,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                         keyframe.totalFrames = 1;
                         keyframe.order = (uint32_t)ci;
                         keyframe.flags = [childDict[@"flags"] unsignedIntValue];
+                        keyframe.frame = [childDict[@"frame"] unsignedIntValue] - 1;
                         
                         // Bounds
                         
@@ -486,10 +483,36 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                                 NSArray *rawMatrix = filter[@"ColorMatrixFilter"][@"matrix"];
                                 
                                 if (rawMatrix) {
+#if 0
                                     for (NSInteger cmi=0;cmi<rawMatrix.count;cmi++) {
                                         colorMatrixBacking.c[cmi] = [rawMatrix[cmi] floatValue];
                                     }
+#endif
                                     
+                                    float divisor = 1;
+                                    float divisor1 = 255.0;
+                                    
+                                    colorMatrixBacking.matrix.m[0] = [rawMatrix[0] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[4] = [rawMatrix[1] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[8] = [rawMatrix[2] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[12] = [rawMatrix[3] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[1] = [rawMatrix[5] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[5] = [rawMatrix[6] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[9] = [rawMatrix[7] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[13] = [rawMatrix[8] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[2] = [rawMatrix[10] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[6] = [rawMatrix[11] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[10] = [rawMatrix[12] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[14] = [rawMatrix[13] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[3] = [rawMatrix[15] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[7] = [rawMatrix[16] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[11] = [rawMatrix[17] floatValue] / divisor;
+                                    colorMatrixBacking.matrix.m[15] = [rawMatrix[18] floatValue] / divisor;
+                                    colorMatrixBacking.offset.v[0] = [rawMatrix[4] floatValue] / divisor1;
+                                    colorMatrixBacking.offset.v[1] = [rawMatrix[9] floatValue] / divisor1;
+                                    colorMatrixBacking.offset.v[2] = [rawMatrix[14] floatValue] / divisor1;
+                                    colorMatrixBacking.offset.v[3] = [rawMatrix[19] floatValue] / divisor1;
+
                                     colorMatrix = &colorMatrixBacking;
                                 }
                             }
@@ -539,6 +562,8 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                             if (currKeyframe->order != keyframe.order) {
                                 isNew = true;
                             } else if (currKeyframe->flags != keyframe.flags) {
+                                isNew = true;
+                            } else if (currKeyframe->frame != keyframe.frame) {
                                 isNew = true;
                             } else {
                                 Rect *currBounds;

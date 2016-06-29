@@ -31,9 +31,12 @@ namespace BGE {
         Material(struct private_key const& key, uint64_t matId, std::string name);
         virtual ~Material() {}
         
-        void getColor(Color& color) const { color = color_; }
-        void setColor(Color& color);
-        void getColorMatrix(Color& colorMatrix) const;
+        void getColor(Color& color) const { color = colorMatrix_.offset; }
+        void setColor(Color& color) { colorMatrix_.offset = color; }
+        void getColorMatrix(ColorMatrix& colorMatrix) const;
+        void setColorMatrix(ColorMatrix& colorMatrix);
+        
+        const ColorMatrix *getColorMatrixRaw() const { return &colorMatrix_; }
         std::weak_ptr<TextureBase> getTexture() const { return texture_; }
         void setTexture(std::shared_ptr<TextureBase> texture) { texture_ = texture; }
         
@@ -45,8 +48,7 @@ namespace BGE {
         
     private:
         bool                        colorDirty_;
-        Vector4                     color_;
-        Matrix4                     colorMatrix_;
+        ColorMatrix                 colorMatrix_;
         
         std::weak_ptr<TextureBase>   texture_;
     };

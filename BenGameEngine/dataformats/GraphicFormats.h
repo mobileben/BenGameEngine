@@ -158,6 +158,7 @@ namespace BGE {
         uint32_t totalFrames;
         uint32_t order;
         uint32_t flags;
+        uint32_t frame;
         int32_t position;
         int32_t scale;
         float rotation;
@@ -172,6 +173,7 @@ namespace BGE {
         uint32_t totalFrames;
         uint32_t order;
         uint32_t flags;
+        uint32_t frame;
         Vector2 *position;
         Vector2 *scale;
         float  rotation;
@@ -210,7 +212,6 @@ namespace BGE {
         int32_t name;
         int32_t reference;
         GfxReferenceType referenceType;
-        uint32_t frame;
         std::vector<int32_t> keyframes;
     };
 
@@ -226,10 +227,7 @@ namespace BGE {
             void *referenceData;
             TextureReference *texture;
             TextReference *text;
-            struct {
-                AnimationSequenceReference *sequence;
-                uint32_t                    frame;
-            } animation;
+            AnimationSequenceReference *sequence;
         };
     };
     

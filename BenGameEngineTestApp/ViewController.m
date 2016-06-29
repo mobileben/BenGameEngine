@@ -138,8 +138,9 @@
                 gameObj->addComponent(transformComponent);
                 gameObj->addComponent(anim);
                 gameObj->addComponent(animator);
-                
                 animator->reset();
+                
+                animator->play(BGE::AnimatorComponent::AnimPlayForever, true, 1 );
 
             });
         }

@@ -21,12 +21,26 @@ BGE::AnimationService::~AnimationService() {
 
 void BGE::AnimationService::update(double deltaTime) {
     float dt = (float)deltaTime;
+
+    // TODO: Remove this since all game objects are in spaces
     for (auto obj : Game::getInstance()->getGameObjectService()->getGameObjects()) {
         auto animSeq = obj.second->getComponent<AnimationSequenceComponent>();
         auto animator = obj.second->getComponent<AnimatorComponent>();
         
         if (animSeq && animator) {
             animateSequence(animSeq, animator, dt);
+        }
+    }
+    
+    // For all the spaces
+    for (auto space : Game::getInstance()->getSpaceService()->getSpaces()) {
+        for (auto obj : space->getGameObjectService()->getGameObjects()) {
+            auto animSeq = obj.second->getComponent<AnimationSequenceComponent>();
+            auto animator = obj.second->getComponent<AnimatorComponent>();
+            
+            if (animSeq && animator) {
+                animateSequence(animSeq, animator, dt);
+            }
         }
     }
 }
@@ -37,11 +51,14 @@ void BGE::AnimationService::animateSequence(std::shared_ptr<AnimationSequenceCom
             int32_t origFrame = animator->currentFrame;
             int32_t frame = origFrame;
             bool triggerEvent = false;
+            float adjustedDeltaTime = animator->speed * deltaTime;
             
+            NSLog(@"Adjust dt %f %f", adjustedDeltaTime, animator->frameRemainderTime);
             // Are we going to step past our current frame?
-            if (deltaTime >= animator->frameRemainderTime) {
+            if (adjustedDeltaTime >= animator->frameRemainderTime) {
+                NSLog(@"HERE 1");
                 // Trim off the time left in the frame
-                deltaTime -= animator->frameRemainderTime;
+                adjustedDeltaTime -= animator->frameRemainderTime;
 
                 // Update our frame
                 if (animator->forward) {
@@ -65,8 +82,9 @@ void BGE::AnimationService::animateSequence(std::shared_ptr<AnimationSequenceCom
                 // Make sure we're still playing
                 if (animator->state == AnimState::Playing) {
                     // Resolve our time by stepping over any frames we missed
-                    while (animator->state == AnimState::Playing && deltaTime >= animator->secPerFrame) {
+                    while (animator->state == AnimState::Playing && adjustedDeltaTime >= animator->secPerFrame) {
                         if (animator->forward) {
+                            NSLog(@"HERE 2");
                             frame++;
                             
                             if (frame >= seq->totalFrames) {
@@ -84,25 +102,27 @@ void BGE::AnimationService::animateSequence(std::shared_ptr<AnimationSequenceCom
                             }
                         }
                         
-                        deltaTime -= animator->secPerFrame;
+                        adjustedDeltaTime -= animator->secPerFrame;
                     }
 
-                    if (deltaTime < 0) {
-                        deltaTime = -deltaTime;
+                    if (adjustedDeltaTime < 0) {
+                        adjustedDeltaTime = -adjustedDeltaTime;
                     }
                     
-                    animator->frameRemainderTime = deltaTime;
+                    animator->frameRemainderTime = animator->secPerFrame - adjustedDeltaTime;
                 } else {
                     // We've really finished
                     animator->frameRemainderTime = 0;
                 }
             } else {
-                animator->frameRemainderTime -= deltaTime;
+                animator->frameRemainderTime -= adjustedDeltaTime;
             }
             
             if (origFrame != frame) {
                 // We need to update frames
                 animator->currentFrame = frame;
+                
+                NSLog(@"XXXXX Frame is %d", frame);
                 
                 for (auto child : seq->channels) {
                     animateChannel(child, frame);
@@ -123,6 +143,7 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
     int32_t origFrame = animator->currKeyframe;
     int32_t channelFrame = origFrame;
     AnimationKeyframeReference *keyframe = channel->channel->keyframes[channelFrame];
+    bool hide = false;
     
     if (frame < keyframe->startFrame) {
         // We need to start stepping back keyframes
@@ -137,6 +158,7 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
         if (channelFrame < 0) {
             channelFrame = 0;
             keyframe = channel->channel->keyframes[channelFrame];
+            hide = true;
         }
     } else if (frame > (keyframe->startFrame + keyframe->totalFrames) ) {
         // We need to start stepping forward keyframes
@@ -151,49 +173,85 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
         if (channelFrame >= channel->channel->numKeyframes) {
             channelFrame = channel->channel->numKeyframes - 1;
             keyframe = channel->channel->keyframes[channelFrame];
+            hide = true;
         }
     } else {
         // We have the correct keyframe
     }
     
-    if (origFrame != channelFrame) {
-        animator->currKeyframe = channelFrame;
+    NSLog(@"Channel frame %s %d %d", channel->channel->name, origFrame, channelFrame);
+    if (hide) {
+        xform->setVisibility(false);
+    } else {
+        xform->setVisibility(true);
         
-        // Update our transform
-        if (keyframe->position) {
-            xform->setPosition(*keyframe->position);
-        } else {
-            xform->setX(0);
-            xform->setY(0);
-        }
-        if (keyframe->scale) {
-            xform->setScale(*keyframe->scale);
-        } else {
-            xform->setScaleX(1);
-            xform->setScaleY(0);
-        }
-
-        // Update our render
-        //DOTHESTUFF HERE
-
-        xform->setRotation(keyframe->rotation);
-        
-        // If this is a Keyframe reference, update
-        if (channel->channel->referenceType == GfxReferenceTypeKeyframe) {
-            // Find the appropriate child
-            for (auto i=0;i<xform->getNumChildren();i++) {
-                auto childXform = xform->childAtIndex(i);
-                if (childXform->hasGameObject()) {
-                    auto childObj = childXform->getGameObject().lock();
-                    
-                    // TODO: Have some better means of identifying the right child. For now brute force it
-                    if (childObj) {
-                        auto childAnimator = childObj->getComponent<FrameAnimatorComponent>();
+        if (origFrame != channelFrame) {
+            std::shared_ptr<Material> material;
+            
+            if (obj->getComponent<BGE::LineRenderComponent>()) {
+                std::shared_ptr<BGE::LineRenderComponent> render = obj->getComponent<BGE::LineRenderComponent>();
+                material = render->getMaterial().lock();
+            } else if (obj->getComponent<BGE::FlatRectRenderComponent>()) {
+                std::shared_ptr<BGE::FlatRectRenderComponent> render = obj->getComponent<BGE::FlatRectRenderComponent>();
+                material = render->getMaterial().lock();
+            } else if (obj->getComponent<BGE::SpriteRenderComponent>()) {
+                std::shared_ptr<BGE::SpriteRenderComponent> render = obj->getComponent<BGE::SpriteRenderComponent>();
+                material = render->getMaterial().lock();
+            } else if (obj->getComponent<BGE::TextComponent>()) {
+                std::shared_ptr<BGE::TextComponent> render = obj->getComponent<BGE::TextComponent>();
+                material = render->getMaterial().lock();
+            }
+            
+            animator->currKeyframe = channelFrame;
+            
+            // Update our transform
+            if (keyframe->position) {
+                xform->setPosition(*keyframe->position);
+            } else {
+                xform->setX(0);
+                xform->setY(0);
+            }
+            if (keyframe->scale) {
+                xform->setScale(*keyframe->scale);
+            } else {
+                xform->setScaleX(1);
+                xform->setScaleY(1);
+            }
+            
+            if (keyframe->colorMatrix) {
+                if (material) {
+                    assert(material);
+                    material->setColorMatrix(*keyframe->colorMatrix);
+                    NSLog(@"Color is %f %f %f %f", keyframe->colorMatrix->offset.r, keyframe->colorMatrix->offset.g, keyframe->colorMatrix->offset.b, keyframe->colorMatrix->offset.a);
+                }
+            }
+            
+            if (keyframe->colorTransform) {
+                assert(material);
+            }
+            
+            // Update our render
+            //DOTHESTUFF HERE
+            
+            xform->setRotation(keyframe->rotation);
+            
+            // If this is a Keyframe reference, update
+            if (channel->channel->referenceType == GfxReferenceTypeKeyframe) {
+                // Find the appropriate child
+                for (auto i=0;i<xform->getNumChildren();i++) {
+                    auto childXform = xform->childAtIndex(i);
+                    if (childXform->hasGameObject()) {
+                        auto childObj = childXform->getGameObject().lock();
                         
-                        if (childAnimator) {
-                            auto childSeq = childObj->getComponent<AnimationSequenceComponent>();
-                            animateSequenceByFrame(childSeq, childAnimator, channel->channel->animation.frame);
-                            break;
+                        // TODO: Have some better means of identifying the right child. For now brute force it
+                        if (childObj) {
+                            auto childAnimator = childObj->getComponent<FrameAnimatorComponent>();
+                            
+                            if (childAnimator) {
+                                auto childSeq = childObj->getComponent<AnimationSequenceComponent>();
+                                animateSequenceByFrame(childSeq, childAnimator, keyframe->frame);
+                                break;
+                            }
                         }
                     }
                 }
@@ -203,6 +261,7 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
 }
 
 void BGE::AnimationService::animateSequenceByFrame(std::shared_ptr<AnimationSequenceComponent> seq, std::shared_ptr<FrameAnimatorComponent> animator, int32_t frame) {
+    NSLog(@"subframe %d %d", animator->currentFrame, frame);
     if (frame != animator->currentFrame) {
         animator->currentFrame = frame;
         

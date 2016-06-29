@@ -16,8 +16,8 @@ std::shared_ptr<BGE::ChannelFrameAnimatorComponent> BGE::ChannelFrameAnimatorCom
     return std::make_shared<ChannelFrameAnimatorComponent>(private_key{}, componentId, name);
 }
 
-BGE::ChannelFrameAnimatorComponent::ChannelFrameAnimatorComponent(struct private_key const& key, uint64_t componentId) : Component(componentId) {
+BGE::ChannelFrameAnimatorComponent::ChannelFrameAnimatorComponent(struct private_key const& key, uint64_t componentId) : Component(componentId), currKeyframe(0) {
 }
 
-BGE::ChannelFrameAnimatorComponent::ChannelFrameAnimatorComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name) {
+BGE::ChannelFrameAnimatorComponent::ChannelFrameAnimatorComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name), currKeyframe(0) {
 }

@@ -30,8 +30,18 @@ BGE::AnimatorComponent::AnimatorComponent(struct private_key const& key, uint64_
 void BGE::AnimatorComponent::reset() {
     setFrame(0, true);
     iterations = 1;
-    frameRemainderTime = 0;
     state = AnimState::Done;
+    
+    auto gameObj = getGameObject().lock();
+    auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+    
+    if (seq->frameRate != 0) {
+        secPerFrame = 1.0 / (float) seq->frameRate;
+    } else {
+        secPerFrame = 0;
+    }
+    
+    frameRemainderTime = secPerFrame;
 }
 
 void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
@@ -44,6 +54,9 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
             if (currentFrame == frame && !force) {
                 return;
             }
+            
+            currentFrame = frame;
+            frameRemainderTime = secPerFrame;
             
             // Traverse our seq and setup all transforms, references, colors, etc
             for (auto i=0;i<seq->numChannels;i++) {
@@ -59,6 +72,9 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
                 
                 if (chanGameObj && xform && channel && animator) {
                     assert(channel->channel->keyframes);
+                    
+                    animator->currKeyframe = 0;
+                    
                     if (channel->channel->keyframes) {
                         for (auto ki=0;ki<channel->channel->numKeyframes;ki++) {
                             auto keyframe = channel->channel->keyframes[ki];
@@ -66,6 +82,7 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
                             if (frame < keyframe->startFrame) {
                                 break;
                             } else if (frame >= keyframe->startFrame && frame < (keyframe->startFrame + keyframe->totalFrames)) {
+                                animator->currKeyframe = ki;
                                 xform->setPosition(*keyframe->position);
                                 xform->setScale(*keyframe->scale);
                                 xform->setRotation(keyframe->rotation);
@@ -82,7 +99,7 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
 
 void BGE::AnimatorComponent::play(int32_t iterations, bool forward, float speed) {
     this->state = AnimState::Playing;
-    this->iterations = 1;
+    this->iterations = iterations;
     this->forward = forward;
     this->speed = speed;
     

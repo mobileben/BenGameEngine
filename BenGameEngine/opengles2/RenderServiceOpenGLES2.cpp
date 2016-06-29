@@ -144,7 +144,7 @@ void BGE::RenderServiceOpenGLES2::createShaders()
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, "ColorMatrixTextureVertex");
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, "ColorMatrixTextureFragment");
-    program = this->getShaderService()->createShaderProgram("ColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "colorMatrix", "colorOffset" });
+    program = this->getShaderService()->createShaderProgram("ColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "ColorMatrix", "ColorOffset" });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, "MaskColorMatrixTextureVertex");
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, "MaskColorMatrixTextureFragment");
@@ -400,8 +400,8 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
         glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("ColorMatrixTexture"));
         
         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
-        GLint colorMatrixLocation = glShader->locationForUniform("colorMatrix");
-        GLint colorOffsetLocation = glShader->locationForUniform("colorOffset");
+        GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
+        GLint colorOffsetLocation = glShader->locationForUniform("ColorOffset");
         
         positionLocation = glShader->locationForAttribute("Position");
         colorLocation = glShader->locationForAttribute("SourceColor");
@@ -718,7 +718,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, 
     glDrawArrays(GL_LINE_LOOP, 0, points.size());
 }
 
-
+#if 0
 void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> gameObject) {
     if (gameObject) {
         std::shared_ptr<BGE::SpriteRenderComponent> sprite = std::dynamic_pointer_cast<BGE::SpriteRenderComponent>(gameObject->getComponent<BGE::SpriteRenderComponent>());
@@ -782,6 +782,88 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
         }
     }
 }
+#else
+void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> gameObject) {
+    if (gameObject) {
+        std::shared_ptr<BGE::SpriteRenderComponent> sprite = std::dynamic_pointer_cast<BGE::SpriteRenderComponent>(gameObject->getComponent<BGE::SpriteRenderComponent>());
+        
+        if (sprite) {
+            VertexTex *const vertices = sprite->getVertices();
+            std::shared_ptr<BGE::Material> material = sprite->getMaterial().lock();
+            if (material) {
+                std::shared_ptr<TextureBase> texture = material->getTexture().lock();
+                
+                if (texture) {
+                    NSLog(@"Rendering sprite %s", texture->getName().c_str());
+                    
+                    std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
+                    if (oglTex && oglTex->isValid()) {
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("ColorMatrixTexture"));
+                        
+                        GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
+                        
+                        GLint positionLocation = glShader->locationForAttribute("Position");
+                        //            texCoordLocation = glShader->locationForAttribute("TexCoordIn");
+                        
+                        glEnableVertexAttribArray(positionLocation);
+                        glEnableVertexAttribArray(texCoordLocation);
+                        
+                        GLint textureUniform = glShader->locationForUniform("Texture");
+                        GLint projectionLocation = glShader->locationForUniform("Projection");
+                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+                        auto transformComponent = gameObject->getComponent<BGE::TransformComponent>();
+                        GLint modelLocation = glShader->locationForUniform("ModelView");
+                        GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
+                        GLint colorOffsetLocation = glShader->locationForUniform("ColorOffset");
+                        
+                        if (transformComponent) {
+                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->matrix_.m);
+                        } else {
+                            // This is a hack for now
+                            Matrix4 mat;
+                            
+                            Matrix4MakeIdentify(mat);
+                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                        }
+                        
+                        Matrix4 t1;
+                        Vector4 t2;
+                        Matrix4MakeIdentify(t1);
+                        
+                        t2.r = 0;
+                        t2.g = 0;
+                        t2.b = 0;
+                        t2.a = 0;
+                        
+                        glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) t1.m);
+                        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) t2.v);
+                        glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) material->getColorMatrixRaw()->matrix.m);
+                        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) material->getColorMatrixRaw()->offset.v);
+                        
+                        NSLog(@"Render color %f %f %f %f", material->getColorMatrixRaw()->offset.r, material->getColorMatrixRaw()->offset.g, material->getColorMatrixRaw()->offset.b, material->getColorMatrixRaw()->offset.a);
+                        glDisable(GL_BLEND);
+                        
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                        
+                        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                              sizeof(VertexTex), &vertices[0]);
+                        glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                                              sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
+                        
+                        glUniform1i(textureUniform, 0);
+                        
+                        glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
+                                       GL_UNSIGNED_BYTE, &Indices[0]);
+                    }
+                }
+            }
+        }
+    }
+}
+#endif
 
 int8_t BGE::RenderServiceOpenGLES2::createMask(Vector2 &position, std::shared_ptr<TextureBase> mask)
 {
@@ -832,6 +914,7 @@ void BGE::RenderServiceOpenGLES2::updateTransforms() {
 
 void BGE::RenderServiceOpenGLES2::render()
 {
+    NSLog(@"RENDERING BITCHES");
     std::shared_ptr<BGE::RenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<BGE::RenderContextOpenGLES2>(getRenderContext());
     glClearColor(1.0, 1.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -850,9 +933,6 @@ void BGE::RenderServiceOpenGLES2::render()
         Matrix4MakeIdentify(currentMatrix_);
         matrixStack_.clear();
         
-        if (f) {
-            NSLog(@"STRING LENGTH %d", f->getStringWidth("HELLO", false));
-        }
         // Reset render states
         shaderProgramStack_.clear();
         
@@ -917,16 +997,17 @@ void BGE::RenderServiceOpenGLES2::render()
 #endif
         
         for (auto obj : Game::getInstance()->getGameObjectService()->getGameObjects()) {
-            renderGameObject(obj.second);
+            renderGameObject(obj.second, true);
         }
         
         std::vector<std::shared_ptr<Space>> spaces = Game::getInstance()->getSpaceService()->getSpaces();
         
         
         for (auto space : spaces) {
+            NSLog(@"SPACE %s", space->getName().c_str());
             for (auto obj : space->getGameObjects()) {
-                NSLog(@"obj %s", obj.second->getName().c_str());
-                renderGameObject(obj.second);
+                NSLog(@"renderGameObject %s", obj.second->getName().c_str());
+                renderGameObject(obj.second, true);
             }
         }
         
@@ -934,11 +1015,24 @@ void BGE::RenderServiceOpenGLES2::render()
     }
 }
 
-void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> gameObj) {
+void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> gameObj, bool root) {
+
     // TODO: Transform
     auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
     
     if (transformComponent) {
+        if (!transformComponent->isVisible()) {
+            return;
+        }
+
+        auto parent = transformComponent->getParent().lock();
+
+        if (root && parent) {
+            return;
+        } else if (!root && !parent) {
+            return;
+        }
+        
         // Since we have the transform, push our
         pushMatrix();
         
@@ -953,31 +1047,26 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
         transformComponent->localMatrix_ = rotate * scale;
         transformComponent->localMatrix_ = xlate * transformComponent->localMatrix_;
         
-        std::shared_ptr<TransformComponent> parent = transformComponent->getParent().lock();
-        
         if (parent) {
             transformComponent->matrix_ = parent->matrix_ * transformComponent->localMatrix_;
         } else {
             transformComponent->matrix_ = transformComponent->localMatrix_;
         }
+        
+        if (gameObj->getComponent<BGE::LineRenderComponent>()) {
+            std::shared_ptr<BGE::LineRenderComponent> line = gameObj->getComponent<BGE::LineRenderComponent>();
+            
+            drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial().lock());
+        } else if (gameObj->getComponent<BGE::FlatRectRenderComponent>()) {
+            drawFlatRect(gameObj);
+        } else if (gameObj->getComponent<BGE::SpriteRenderComponent>()) {
+            drawSprite(gameObj);
+        } else if (gameObj->getComponent<BGE::TextComponent>()) {
+            std::shared_ptr<BGE::TextComponent> text = gameObj->getComponent<BGE::TextComponent>();
+            
+            text->getFont()->drawString(text->getText(), transformComponent, (Color&) text->getColor());
+        }
 
-    }
-    
-    if (gameObj->getComponent<BGE::LineRenderComponent>()) {
-        std::shared_ptr<BGE::LineRenderComponent> line = gameObj->getComponent<BGE::LineRenderComponent>();
-        
-        drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial().lock());
-    } else if (gameObj->getComponent<BGE::FlatRectRenderComponent>()) {
-        drawFlatRect(gameObj);
-    } else if (gameObj->getComponent<BGE::SpriteRenderComponent>()) {
-        drawSprite(gameObj);
-    } else if (gameObj->getComponent<BGE::TextComponent>()) {
-        std::shared_ptr<BGE::TextComponent> text = gameObj->getComponent<BGE::TextComponent>();
-        
-        text->getFont()->drawString(text->getText(), transformComponent, (Color&) text->getColor());
-    }
-    
-    if (transformComponent) {
         // Determine if we have children, if we do process them.
         for (auto i=0;i<transformComponent->getNumChildren();i++) {
             auto childXform = transformComponent->childAtIndex(i);
@@ -986,11 +1075,11 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
                 
                 // TODO: Have some better means of identifying the right child. For now brute force it
                 if (childObj) {
-                    renderGameObject(childObj);
+                    renderGameObject(childObj, false);
                 }
             }
         }
-
+        
         // First sort
         
         // Now pop the transform
