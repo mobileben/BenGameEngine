@@ -13,7 +13,7 @@
 BGE::ScenePackageService::ScenePackageService() : scenePackageHandleService_(InitialScenePackageReserve, ScenePackageHandleService::NoMaxLimit) {
 }
 
-void BGE::ScenePackageService::packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<BGE::Error>)> callback) {
+void BGE::ScenePackageService::packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback) {
     ScenePackagesMapIterator it = scenePackages_.find(name);
     
     if (it != scenePackages_.end()) {
@@ -107,8 +107,8 @@ std::shared_ptr<BGE::SpriteRenderComponent> BGE::ScenePackageService::createSpri
             TextureReference *texRef = package->getTextureReference(name);
             
             if (texRef && texRef->texture) {
-                auto material = BGE::Game::getInstance()->getMaterialService()->createMaterial(name, texRef->texture);
-                auto sprite = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::SpriteRenderComponent>(name);
+                auto material = Game::getInstance()->getMaterialService()->createMaterial(texRef->texture);
+                auto sprite = Game::getInstance()->getComponentService()->createComponent<SpriteRenderComponent>();
                 
                 sprite->setMaterials({material});
                 
@@ -130,7 +130,7 @@ std::shared_ptr<BGE::TextComponent> BGE::ScenePackageService::createTextComponen
             TextReference *textRef = package->getTextReference(name);
             
             if (textRef && !textRef->fontHandle.isNull()) {
-                auto text = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TextComponent>(name);
+                auto text = Game::getInstance()->getComponentService()->createComponent<TextComponent>();
                 
                 text->setTextReference(*textRef);
                 

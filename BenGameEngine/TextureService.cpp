@@ -21,7 +21,7 @@ std::shared_ptr<BGE::TextureBase> BGE::TextureService::textureWithName(std::stri
     }
 }
 
-std::shared_ptr<BGE::TextureBase> BGE::TextureService::textureWithId(uint64_t texId) {
+std::shared_ptr<BGE::TextureBase> BGE::TextureService::textureWithId(ObjectId texId) {
     if (this->iTextures_.find(texId) != this->iTextures_.end()) {
         return this->iTextures_[texId];
     } else {
@@ -30,8 +30,8 @@ std::shared_ptr<BGE::TextureBase> BGE::TextureService::textureWithId(uint64_t te
 }
 
 void BGE::TextureService::removeTexture(std::string name) {
-    std::unordered_map<std::string, std::shared_ptr<BGE::TextureBase>>::iterator sIt;
-    std::unordered_map<uint64_t, std::shared_ptr<BGE::TextureBase>>::iterator iIt;
+    std::unordered_map<std::string, std::shared_ptr<TextureBase>>::iterator sIt;
+    std::unordered_map<ObjectId, std::shared_ptr<TextureBase>>::iterator iIt;
     
     sIt = sTextures_.find(name);
     
@@ -43,9 +43,9 @@ void BGE::TextureService::removeTexture(std::string name) {
     sTextures_.erase(sIt);
 }
 
-void BGE::TextureService::removeTexture(uint64_t texId) {
-    std::unordered_map<std::string, std::shared_ptr<BGE::TextureBase>>::iterator sIt;
-    std::unordered_map<uint64_t, std::shared_ptr<BGE::TextureBase>>::iterator iIt;
+void BGE::TextureService::removeTexture(ObjectId texId) {
+    std::unordered_map<std::string, std::shared_ptr<TextureBase>>::iterator sIt;
+    std::unordered_map<uint32_t, std::shared_ptr<TextureBase>>::iterator iIt;
     
     iIt = iTextures_.find(texId);
     
@@ -57,7 +57,7 @@ void BGE::TextureService::removeTexture(uint64_t texId) {
     iTextures_.erase(iIt);
 }
 
-void BGE::TextureService::removeTexture(std::shared_ptr<BGE::TextureBase> texture) {
+void BGE::TextureService::removeTexture(std::shared_ptr<TextureBase> texture) {
     if (texture) {
         removeTexture(texture->getInstanceId());
     }

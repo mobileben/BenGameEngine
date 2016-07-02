@@ -12,19 +12,11 @@
 #include "TransformComponent.h"
 #include "AnimationChannelComponent.h"
 
-std::shared_ptr<BGE::AnimationSequenceComponent> BGE::AnimationSequenceComponent::create(uint64_t componentId) {
+std::shared_ptr<BGE::AnimationSequenceComponent> BGE::AnimationSequenceComponent::create(ObjectId componentId) {
     return std::make_shared<AnimationSequenceComponent>(private_key{}, componentId);
 }
 
-std::shared_ptr<BGE::AnimationSequenceComponent> BGE::AnimationSequenceComponent::create(uint64_t componentId, std::string name) {
-    return std::make_shared<AnimationSequenceComponent>(private_key{}, componentId, name);
-}
-
-BGE::AnimationSequenceComponent::AnimationSequenceComponent(struct private_key const& key, uint64_t componentId) : Component(componentId), frameRate(0), totalFrames(0), numChannels(0), numBounds(0) {
-}
-
-BGE::AnimationSequenceComponent::AnimationSequenceComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name), frameRate(0), totalFrames(0), numChannels(0), numBounds(0) {
-    
+BGE::AnimationSequenceComponent::AnimationSequenceComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), frameRate(0), totalFrames(0), numChannels(0), numBounds(0) {
 }
 
 BGE::AnimationSequenceComponent::~AnimationSequenceComponent() {
@@ -118,7 +110,7 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(AnimationSeq
 
 void BGE::AnimationSequenceComponent::setGameObject(std::shared_ptr<GameObject> gameObject) {
     Component::setGameObject(gameObject);
-    auto transformComponent = gameObject->getComponent<BGE::TransformComponent>();
+    auto transformComponent = gameObject->getComponent<TransformComponent>();
 
     if (transformComponent) {
         // If there is a transformComponent, then add us to it, if we have

@@ -52,7 +52,7 @@
     struct Data : public BGE::Object {
         uint32_t val1;
         uint32_t val2;
-        Data(uint64_t id) : Object(id) {}
+        Data(uint32_t id) : Object(id) {}
         Data(uint32_t val1, uint32_t val2) : val1(val1), val2(val2) {}
     };
     

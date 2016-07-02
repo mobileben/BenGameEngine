@@ -9,33 +9,15 @@
 #include "SpriteRenderComponent.h"
 #include "Game.h"
 
-std::shared_ptr<BGE::SpriteRenderComponent> BGE::SpriteRenderComponent::create(uint64_t componentId) {
+std::shared_ptr<BGE::SpriteRenderComponent> BGE::SpriteRenderComponent::create(ObjectId componentId) {
     return std::make_shared<SpriteRenderComponent>(private_key{}, componentId);
 }
 
-std::shared_ptr<BGE::SpriteRenderComponent> BGE::SpriteRenderComponent::create(uint64_t componentId, std::string name) {
-    return std::make_shared<SpriteRenderComponent>(private_key{}, componentId, name);
-}
-
-BGE::SpriteRenderComponent::SpriteRenderComponent(struct private_key const& key, uint64_t componentId) : BGE::RenderComponent(componentId) {
-}
-
-BGE::SpriteRenderComponent::SpriteRenderComponent(struct private_key const& key, uint64_t componentId, std::string name) : BGE::RenderComponent(componentId, name) {
-}
-
-BGE::SpriteRenderComponent::SpriteRenderComponent(uint32_t componentId) : BGE::RenderComponent(componentId) {
-}
-
-BGE::SpriteRenderComponent::SpriteRenderComponent(uint32_t componentId, std::string name) : BGE::RenderComponent(componentId, name) {
+BGE::SpriteRenderComponent::SpriteRenderComponent(struct private_key const& key, ObjectId componentId) : RenderComponent(componentId) {
 }
 
 void BGE::SpriteRenderComponent::setTextureRef(TextureReference *texRef) {
-    std::string name = texRef->name;
-    auto material = Game::getInstance()->getMaterialService()->materialWithName(name);
-    
-    if (!material) {
-        material = Game::getInstance()->getMaterialService()->createMaterial(name, texRef->texture);
-    }
+    auto material = Game::getInstance()->getMaterialService()->createMaterial(texRef->texture);
     
     this->setMaterials({material});
 }
@@ -49,7 +31,7 @@ void BGE::SpriteRenderComponent::materialsUpdated() {
 
 void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
     // Right now we are only supporting one material
-    std::shared_ptr<BGE::Material> material = getMaterial().lock();
+    std::shared_ptr<Material> material = getMaterial().lock();
     
     assert(material);
     
@@ -67,7 +49,7 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
             float h = texture->getHeight();
             
             switch (getAnchor()) {
-                case BGE::RenderComponentAnchor::Center:
+                case RenderComponentAnchor::Center:
                     float w_2 = w / 2.0;
                     float h_2 = h / 2.0;
                     

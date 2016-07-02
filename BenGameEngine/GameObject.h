@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <cassert>
-#include "Object.h"
+#include "NamedObject.h"
 #include <unordered_map>
 #include <typeindex>
 #include <memory>
@@ -21,17 +21,17 @@ namespace BGE {
     class Space;
     class GameObjectService;
     
-    class GameObject : public BGE::Object
+    class GameObject : public NamedObject
     {
     private:
         struct private_key {};
         
     public:
-        static std::shared_ptr<GameObject> create(uint64_t objId);
-        static std::shared_ptr<GameObject> create(uint64_t objId, std::string name);
+        static std::shared_ptr<GameObject> create(ObjectId objId);
+        static std::shared_ptr<GameObject> create(ObjectId objId, std::string name);
 
-        GameObject(struct private_key const&, uint64_t objId);
-        GameObject(struct private_key const&, uint64_t objId, std::string name);
+        GameObject(struct private_key const&, ObjectId objId);
+        GameObject(struct private_key const&, ObjectId objId, std::string name);
         
         ~GameObject();
         
@@ -73,8 +73,8 @@ namespace BGE {
 #ifdef NOT_YET
         GameObject() = delete;
         GameObject(GameObject const&) = delete;
-        GameObject(uint64_t objId) = delete;
-        GameObject(uint64_t objId, std::string name) = delete;
+        GameObject(ObjectId objId) = delete;
+        GameObject(ObjectId objId, std::string name) = delete;
 #endif
         
         void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
@@ -84,7 +84,7 @@ namespace BGE {
         
         bool                    active_;
         SpaceHandle             spaceHandle_;
-        std::unordered_map<std::type_index, std::shared_ptr<BGE::Component>> components_;
+        std::unordered_map<std::type_index, std::shared_ptr<Component>> components_;
     };
 }
 

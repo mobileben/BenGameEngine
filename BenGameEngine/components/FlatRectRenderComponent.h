@@ -17,33 +17,28 @@ namespace BGE {
     class RenderService;
     class RenderServiceOpenGLES2;
     
-    class FlatRectRenderComponent : public BGE::RenderComponent
+    class FlatRectRenderComponent : public RenderComponent
     {
     private:
         struct private_key {};
         
     public:
-        static std::shared_ptr<FlatRectRenderComponent> create(uint64_t componentId);
-        static std::shared_ptr<FlatRectRenderComponent> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<FlatRectRenderComponent> create(ObjectId componentId);
         
-        FlatRectRenderComponent(struct private_key const& key, uint64_t componentId);
-        FlatRectRenderComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        virtual ~FlatRectRenderComponent() {}
+        FlatRectRenderComponent(struct private_key const& key, ObjectId componentId);
+        ~FlatRectRenderComponent() {}
 
         void setWidth(float width);
         void setHeight(float height);
         void setWidthHeight(Vector2 &wh);
         
     protected:
-        FlatRectRenderComponent(uint32_t componentId);
-        FlatRectRenderComponent(uint32_t componentId, std::string name);
-        
         Vertex* const getVertices() { return vertices_; }
         
         void materialsUpdated();
         
     private:
-        friend BGE::ComponentService;
+        friend ComponentService;
         friend RenderService;
         friend RenderServiceOpenGLES2;
         

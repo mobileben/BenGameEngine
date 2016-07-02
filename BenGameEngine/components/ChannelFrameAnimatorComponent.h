@@ -22,13 +22,10 @@ namespace BGE {
         struct private_key {};
         
     public:
-        static std::shared_ptr<ChannelFrameAnimatorComponent> create(uint64_t componentId);
-        static std::shared_ptr<ChannelFrameAnimatorComponent> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<ChannelFrameAnimatorComponent> create(ObjectId componentId);
         
-        ChannelFrameAnimatorComponent(struct private_key const& key, uint64_t componentId);
-        ChannelFrameAnimatorComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        
-        virtual ~ChannelFrameAnimatorComponent() {}
+        ChannelFrameAnimatorComponent(struct private_key const& key, ObjectId componentId);
+        ~ChannelFrameAnimatorComponent() {}
         
         // TODO: Move to controller
         int32_t     currKeyframe;

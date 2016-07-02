@@ -18,7 +18,7 @@ BGE::ComponentService::~ComponentService() {
 }
 
 template <typename T>
-std::shared_ptr<T> BGE::ComponentService::getComponent(uint64_t componentId) {
+std::shared_ptr<T> BGE::ComponentService::getComponent(ObjectId componentId) {
     std::type_index index(typeid(T));
     ComponentMapIterator it = components_.find(index);
     
@@ -34,23 +34,7 @@ std::shared_ptr<T> BGE::ComponentService::getComponent(uint64_t componentId) {
 }
 
 template <typename T>
-std::shared_ptr<T> BGE::ComponentService::getComponent(std::string name) {
-    std::type_index index(typeid(T));
-    ComponentMapIterator it = components_.find(index);
-    
-    if (it != components_.end()) {
-        for (auto component : it->second) {
-            if (component->getName() == name) {
-                return component;
-            }
-        }
-    }
-    
-    return nullptr;
-}
-
-template <typename T>
-void BGE::ComponentService::removeComponent(uint64_t componentId) {
+void BGE::ComponentService::removeComponent(ObjectId componentId) {
     std::type_index index(typeid(T));
     ComponentMapIterator it = components_.find(index);
     
@@ -59,23 +43,6 @@ void BGE::ComponentService::removeComponent(uint64_t componentId) {
         
         for (ComponentVectorIterator vit=vec.begin();vit != vec.end();vit++) {
             if ((*vit)->getInstanceId() == componentId) {
-                vec.erase(vit);
-                return;
-            }
-        }
-    }
-}
-
-template <typename T>
-void BGE::ComponentService::removeComponent(std::string name) {
-    std::type_index index(typeid(T));
-    ComponentMapIterator it = components_.find(index);
-    
-    if (it != components_.end()) {
-        ComponentVector vec = it->second;
-        
-        for (ComponentVectorIterator vit=vec.begin();vit != vec.end();vit++) {
-            if ((*vit)->getName() == name) {
                 vec.erase(vit);
                 return;
             }
@@ -88,7 +55,7 @@ void BGE::ComponentService::removeAllComponents() {
     components_.erase(typeid(T));
 }
 
-void BGE::ComponentService::removeComponent(std::type_index typeIndex, uint64_t componentId) {
+void BGE::ComponentService::removeComponent(std::type_index typeIndex, ObjectId componentId) {
     ComponentMapIterator it = components_.find(typeIndex);
     
     if (it != components_.end()) {
@@ -96,21 +63,6 @@ void BGE::ComponentService::removeComponent(std::type_index typeIndex, uint64_t 
         
         for (ComponentVectorIterator vit=vec.begin();vit != vec.end();vit++) {
             if ((*vit)->getInstanceId() == componentId) {
-                vec.erase(vit);
-                return;
-            }
-        }
-    }
-}
-
-void BGE::ComponentService::removeComponent(std::type_index typeIndex, std::string name) {
-    ComponentMapIterator it = components_.find(typeIndex);
-    
-    if (it != components_.end()) {
-        ComponentVector vec = it->second;
-        
-        for (ComponentVectorIterator vit=vec.begin();vit != vec.end();vit++) {
-            if ((*vit)->getName() == name) {
                 vec.erase(vit);
                 return;
             }

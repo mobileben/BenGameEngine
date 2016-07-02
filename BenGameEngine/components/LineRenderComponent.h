@@ -13,18 +13,16 @@
 #include "RenderComponent.h"
 
 namespace BGE {
-    class LineRenderComponent : public BGE::RenderComponent
+    class LineRenderComponent : public RenderComponent
     {
     private:
         struct private_key {};
         
     public:
-        static std::shared_ptr<LineRenderComponent> create(uint64_t componentId);
-        static std::shared_ptr<LineRenderComponent> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<LineRenderComponent> create(ObjectId componentId);
         
-        LineRenderComponent(struct private_key const& key, uint64_t componentId);
-        LineRenderComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        virtual ~LineRenderComponent() {}
+        LineRenderComponent(struct private_key const& key, ObjectId componentId);
+        ~LineRenderComponent() {}
         
         const std::vector<Vector2>& getPoints() const;
         void setPoints(const std::vector<Vector2>& points, bool lineLoop=false);
@@ -34,13 +32,10 @@ namespace BGE {
         void setThickness(float thickness) { thickness_ = thickness; }
         
     protected:
-        LineRenderComponent(uint32_t componentId);
-        LineRenderComponent(uint32_t componentId, std::string name);
-        
         void materialsUpdated() {}
         
     private:
-        friend BGE::ComponentService;
+        friend ComponentService;
         
         float thickness_;
         std::vector<Vector2> points_;

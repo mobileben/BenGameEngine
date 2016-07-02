@@ -19,13 +19,10 @@ namespace BGE {
         struct private_key {};
         
     public:
-        static std::shared_ptr<FrameAnimatorComponent> create(uint64_t componentId);
-        static std::shared_ptr<FrameAnimatorComponent> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<FrameAnimatorComponent> create(ObjectId componentId);
         
-        FrameAnimatorComponent(struct private_key const& key, uint64_t componentId);
-        FrameAnimatorComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        
-        virtual ~FrameAnimatorComponent() {}
+        FrameAnimatorComponent(struct private_key const& key, ObjectId componentId);
+        ~FrameAnimatorComponent() {}
         
         // TODO: Move to controller
         int32_t     currentFrame;

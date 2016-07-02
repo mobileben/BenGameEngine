@@ -8,25 +8,11 @@
 
 #include "LineRenderComponent.h"
 
-std::shared_ptr<BGE::LineRenderComponent> BGE::LineRenderComponent::create(uint64_t componentId) {
+std::shared_ptr<BGE::LineRenderComponent> BGE::LineRenderComponent::create(ObjectId componentId) {
     return std::make_shared<LineRenderComponent>(private_key{}, componentId);
 }
 
-std::shared_ptr<BGE::LineRenderComponent> BGE::LineRenderComponent::create(uint64_t componentId, std::string name) {
-    return std::make_shared<LineRenderComponent>(private_key{}, componentId, name);
-}
-
-BGE::LineRenderComponent::LineRenderComponent(struct private_key const& key, uint64_t componentId) : BGE::RenderComponent(componentId), closedLoop_(false) {
-}
-
-BGE::LineRenderComponent::LineRenderComponent(struct private_key const& key, uint64_t componentId, std::string name) : BGE::RenderComponent(componentId, name), closedLoop_(false) {
-}
-
-
-BGE::LineRenderComponent::LineRenderComponent(uint32_t componentId) : BGE::RenderComponent(componentId), closedLoop_(false) {
-}
-
-BGE::LineRenderComponent::LineRenderComponent(uint32_t componentId, std::string name) : BGE::RenderComponent(componentId, name), closedLoop_(false) {
+BGE::LineRenderComponent::LineRenderComponent(struct private_key const& key, ObjectId componentId) : RenderComponent(componentId), closedLoop_(false) {
 }
 
 const std::vector<BGE::Vector2>& BGE::LineRenderComponent::getPoints() const {

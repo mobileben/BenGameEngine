@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <atomic>
+#include "Object.h"
 
 namespace BGE {
     class Service
@@ -29,10 +30,10 @@ namespace BGE {
         virtual void update(double deltaTime) =0;
         
     protected:
-        uint64_t getIdAndIncrement();
+        ObjectId getIdAndIncrement();
         
     private:
-        std::atomic<uint64_t>   identifier_;
+        std::atomic<ObjectId>   identifier_;
     };
 }
 

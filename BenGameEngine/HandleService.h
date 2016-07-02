@@ -64,7 +64,7 @@ namespace BGE {
                 index = (uint32_t) magic_.size();
                 handle.init(index);
                 
-                uint64_t objId = getIdAndIncrement();
+                ObjectId objId = getIdAndIncrement();
 
                 data_.push_back(DATA(objId));
                 magic_.push_back(handle.getMagic());

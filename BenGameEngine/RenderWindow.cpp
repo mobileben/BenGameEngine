@@ -24,13 +24,13 @@ void BGE::RenderWindow::setView(GLKView *view) {
 
         if (this->view_) {
             // Create the default RenderView
-            this->renderViews_[DefaultRenderViewName] = std::make_shared<BGE::RenderView>(shared_from_this(), getX(), getY(), getWidth(), getHeight());
+            this->renderViews_[DefaultRenderViewName] = std::make_shared<RenderView>(shared_from_this(), getX(), getY(), getWidth(), getHeight());
             
         }
     }
 }
 
-void BGE::RenderWindow::setRenderContext(std::shared_ptr<BGE::RenderContext> renderContext)
+void BGE::RenderWindow::setRenderContext(std::shared_ptr<RenderContext> renderContext)
 {
     renderContext_ = renderContext;
 }

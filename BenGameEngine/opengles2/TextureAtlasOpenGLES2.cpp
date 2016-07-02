@@ -10,7 +10,7 @@
 #include "TextureOpenGLES2.h"
 #include "Game.h"
 
-BGE::TextureAtlasOpenGLES2::TextureAtlasOpenGLES2(uint64_t texId, std::string name) : TextureAtlas(texId ,name) {
+BGE::TextureAtlasOpenGLES2::TextureAtlasOpenGLES2(uint32_t texId, std::string name) : TextureAtlas(texId ,name) {
 }
 
 BGE::TextureAtlasOpenGLES2::~TextureAtlasOpenGLES2() {
@@ -25,7 +25,7 @@ uint32_t BGE::TextureAtlasOpenGLES2::getHWTextureId() const {
 }
 
 GLenum BGE::TextureAtlasOpenGLES2::getTarget() const {
-    std::shared_ptr<BGE::TextureOpenGLES2> oglTexture = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(texture_);
+    std::shared_ptr<TextureOpenGLES2> oglTexture = std::dynamic_pointer_cast<TextureOpenGLES2>(texture_);
     
     if (oglTexture) {
         return oglTexture->getTarget();
@@ -34,15 +34,15 @@ GLenum BGE::TextureAtlasOpenGLES2::getTarget() const {
     }
 }
 
-void BGE::TextureAtlasOpenGLES2::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<BGE::Error>)> callback) {
+void BGE::TextureAtlasOpenGLES2::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) {
     releaseCurrentTexture();
 
-    BGE::Game::getInstance()->getTextureService()->namedTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<BGE::TextureBase> atlas, std::shared_ptr<BGE::Error> error) {
+    Game::getInstance()->getTextureService()->namedTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<TextureBase> atlas, std::shared_ptr<Error> error) {
         if (!error) {
-            std::shared_ptr<BGE::TextureAtlas> a = std::dynamic_pointer_cast<BGE::TextureAtlas>(shared_from_this());
-            std::shared_ptr<BGE::Texture> subTex;
-            std::shared_ptr<BGE::Error> bgeError;
-            std::shared_ptr<BGE::Texture> texture;
+            std::shared_ptr<TextureAtlas> a = std::dynamic_pointer_cast<TextureAtlas>(shared_from_this());
+            std::shared_ptr<Texture> subTex;
+            std::shared_ptr<Error> bgeError;
+            std::shared_ptr<Texture> texture;
             
             texture = std::dynamic_pointer_cast<Texture>(atlas);
             
@@ -54,7 +54,7 @@ void BGE::TextureAtlasOpenGLES2::createFromBuffer(void *buffer, TextureFormat fo
                 if (subTextures.size() > 0) {
                     for (auto& kv : subTextures) {
                         std::string key = kv.first;
-                        subTex = BGE::Game::getInstance()->getTextureService()->namedSubTexture(kv.first, a, kv.second.x, kv.second.y, kv.second.width, kv.second.height);
+                        subTex = Game::getInstance()->getTextureService()->namedSubTexture(kv.first, a, kv.second.x, kv.second.y, kv.second.width, kv.second.height);
                         
                         if (subTex) {
                             subTextures_[key] = subTex;
@@ -69,11 +69,11 @@ void BGE::TextureAtlasOpenGLES2::createFromBuffer(void *buffer, TextureFormat fo
                     this->height_ = texture->getHeight();
                 } else {
                     a.reset();
-                    bgeError = std::make_shared<BGE::Error>(BGE::TextureBase::ErrorDomain, TextureErrorInvalidSubTexture);
+                    bgeError = std::make_shared<Error>(TextureBase::ErrorDomain, TextureErrorInvalidSubTexture);
                 }
             } else {
                 a.reset();
-                bgeError = std::make_shared<BGE::Error>(BGE::TextureBase::ErrorDomain, TextureErrorExistingTextureWrongType);
+                bgeError = std::make_shared<Error>(TextureBase::ErrorDomain, TextureErrorExistingTextureWrongType);
             }
             
             

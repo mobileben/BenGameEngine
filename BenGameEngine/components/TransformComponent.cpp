@@ -9,36 +9,11 @@
 #include "TransformComponent.h"
 #include <cassert>
 
-std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::create(uint64_t componentId) {
+std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::create(ObjectId componentId) {
     return std::make_shared<TransformComponent>(private_key{}, componentId);
 }
 
-std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::create(uint64_t componentId, std::string name) {
-    return std::make_shared<TransformComponent>(private_key{}, componentId, name);
-}
-
-BGE::TransformComponent::TransformComponent(struct private_key const& key, uint64_t componentId) :Component(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
-bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
-z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
-transformDirty_(false), speed_(1), paused_(false) {
-    Matrix4MakeIdentify(matrix_);
-}
-
-BGE::TransformComponent::TransformComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
-bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
-z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
-transformDirty_(false), speed_(1), paused_(false) {
-    Matrix4MakeIdentify(matrix_);
-}
-
-BGE::TransformComponent::TransformComponent(uint64_t componentId) : Component(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
-                                                    bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
-                                                    z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
-                                                    transformDirty_(false), speed_(1), paused_(false) {
-    Matrix4MakeIdentify(matrix_);
-}
-
-BGE::TransformComponent::TransformComponent(uint64_t componentId, std::string name) : Component(componentId, name), visible_(true), interactable_(true), interactableWhenHidden_(false),
+BGE::TransformComponent::TransformComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
 bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
 z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
 transformDirty_(false), speed_(1), paused_(false) {
@@ -137,25 +112,7 @@ std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::childAtIndex(u
     }
 }
 
-std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::childWithName(std::string name, bool descend) {
-    assert(name != "");
-    
-    for (auto transform : children_) {
-        if (transform->getName() == name) {
-            return transform;
-        } else if (descend) {
-            auto foundtransform = transform->childWithName(name, descend);
-            
-            if (foundtransform) {
-                return foundtransform;
-            }
-        }
-    }
-    
-    return nullptr;
-}
-
-bool BGE::TransformComponent::hasChild(std::shared_ptr<BGE::TransformComponent> child, bool descend) {
+bool BGE::TransformComponent::hasChild(std::shared_ptr<TransformComponent> child, bool descend) {
     assert(child);
     
     if (child) {
@@ -181,11 +138,11 @@ bool BGE::TransformComponent::hasChild(std::shared_ptr<BGE::TransformComponent> 
     }
 }
 
-bool BGE::TransformComponent::inParentHierarchy(std::shared_ptr<BGE::TransformComponent> parent) {
+bool BGE::TransformComponent::inParentHierarchy(std::shared_ptr<TransformComponent> parent) {
     assert(parent);
     
     if (parent) {
-        return parent->hasChild(derived_shared_from_this<BGE::TransformComponent>(), true);
+        return parent->hasChild(derived_shared_from_this<TransformComponent>(), true);
     } else {
         return false;
     }

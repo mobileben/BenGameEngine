@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B50326F51D20846500156217 /* FontInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B50326F41D20846500156217 /* FontInfo.cpp */; };
 		B508CD891CA0ABA200127B97 /* TextureBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD871CA0ABA200127B97 /* TextureBase.cpp */; };
 		B508CD8E1CA8ABA100127B97 /* Arial Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */; };
 		B508CD901CA901B700127B97 /* Avenir.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8F1CA901B700127B97 /* Avenir.ttc */; };
@@ -15,7 +14,6 @@
 		B508CD9D1CAF95A000127B97 /* libBenGameEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */; };
 		B508CDA51CB4DD5B00127B97 /* Component.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA31CB4DD5B00127B97 /* Component.cpp */; };
 		B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA61CB4DE6D00127B97 /* GameObject.cpp */; };
-		B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDA91CB4DE8E00127B97 /* Object.cpp */; };
 		B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */; };
 		B50A1F9E1D092A3C004B450E /* TextComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B50A1F9C1D092A3C004B450E /* TextComponent.cpp */; };
 		B50A1FA11D0E762F004B450E /* AnimatorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B50A1F9F1D0E762F004B450E /* AnimatorComponent.cpp */; };
@@ -156,7 +154,6 @@
 
 /* Begin PBXFileReference section */
 		B50326F21D1F4BA100156217 /* FontInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontInfo.h; sourceTree = "<group>"; };
-		B50326F41D20846500156217 /* FontInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontInfo.cpp; sourceTree = "<group>"; };
 		B508CD871CA0ABA200127B97 /* TextureBase.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = TextureBase.cpp; sourceTree = "<group>"; };
 		B508CD881CA0ABA200127B97 /* TextureBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureBase.h; sourceTree = "<group>"; };
 		B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Black.ttf"; sourceTree = "<group>"; };
@@ -169,7 +166,6 @@
 		B508CDA41CB4DD5B00127B97 /* Component.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Component.h; sourceTree = "<group>"; };
 		B508CDA61CB4DE6D00127B97 /* GameObject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = GameObject.cpp; sourceTree = "<group>"; };
 		B508CDA71CB4DE6D00127B97 /* GameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
-		B508CDA91CB4DE8E00127B97 /* Object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Object.cpp; sourceTree = "<group>"; };
 		B508CDAA1CB4DE8E00127B97 /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
 		B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = GameObjectService.cpp; sourceTree = "<group>"; };
 		B508CDAD1CB78DA100127B97 /* GameObjectService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObjectService.h; sourceTree = "<group>"; };
@@ -318,6 +314,7 @@
 		B5C388DE1D24D90500137CEC /* ColorMatrixComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorMatrixComponent.h; path = components/ColorMatrixComponent.h; sourceTree = "<group>"; };
 		B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformComponent.cpp; path = components/ColorTransformComponent.cpp; sourceTree = "<group>"; };
 		B5C388E11D24D91B00137CEC /* ColorTransformComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorTransformComponent.h; path = components/ColorTransformComponent.h; sourceTree = "<group>"; };
+		B5C388E41D28635500137CEC /* NamedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NamedObject.h; sourceTree = "<group>"; };
 		B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = HandleTests.m; path = BGEGameObjectAndComponentTests/HandleTests.m; sourceTree = SOURCE_ROOT; };
 		B5DCDA241CE59F7400CBF0A6 /* ScenePackageService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = ScenePackageService.cpp; sourceTree = "<group>"; };
 		B5DCDA251CE59F7400CBF0A6 /* ScenePackageService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenePackageService.h; sourceTree = "<group>"; };
@@ -461,7 +458,6 @@
 				B571F1821C97D92E007F5A90 /* Font.h */,
 				B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */,
 				B571F18F1C9D0A34007F5A90 /* FontGlyph.h */,
-				B50326F41D20846500156217 /* FontInfo.cpp */,
 				B50326F21D1F4BA100156217 /* FontInfo.h */,
 				B571F17E1C97D88E007F5A90 /* FontService.cpp */,
 				B571F17F1C97D88E007F5A90 /* FontService.h */,
@@ -482,7 +478,7 @@
 				B52B76131CBADF5E00758249 /* MaterialService.h */,
 				B525E38F1C89587000C691C0 /* MathTypes.cpp */,
 				B525E3901C89587000C691C0 /* MathTypes.h */,
-				B508CDA91CB4DE8E00127B97 /* Object.cpp */,
+				B5C388E41D28635500137CEC /* NamedObject.h */,
 				B508CDAA1CB4DE8E00127B97 /* Object.h */,
 				B571F1741C928BA5007F5A90 /* opengles2 */,
 				B525E3911C89587000C691C0 /* RenderContext.cpp */,
@@ -884,7 +880,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B50326F51D20846500156217 /* FontInfo.cpp in Sources */,
 				B525E3CB1C89587000C691C0 /* TextureService.cpp in Sources */,
 				B547F17A1D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp in Sources */,
 				B525E3BE1C89587000C691C0 /* RenderServiceOpenGLES2.cpp in Sources */,
@@ -900,7 +895,6 @@
 				B50A1FA11D0E762F004B450E /* AnimatorComponent.cpp in Sources */,
 				B52BFB081D000C650040A839 /* StringArrayBuilder.cpp in Sources */,
 				B5AE8C9A1CEC44E100FAA0DC /* ScenePackage.cpp in Sources */,
-				B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */,
 				B525E3BA1C89587000C691C0 /* MathTypes.cpp in Sources */,
 				B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */,
 				B5ACE8951CBF7B00004B6871 /* LineRenderComponent.cpp in Sources */,

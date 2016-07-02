@@ -26,14 +26,14 @@ namespace BGE {
     {
     public:
         // TODO: Determine if this should be a std::shared_ptr
-        FontGlyph(Font *font, std::shared_ptr<BGE::Texture> texture, int32_t offsetX, int32_t offsetY, int32_t advance);
+        FontGlyph(Font *font, std::shared_ptr<Texture> texture, int32_t offsetX, int32_t offsetY, int32_t advance);
         virtual ~FontGlyph() {}
         
         int32_t getOffsetX() const { return offsetX_; }
         int32_t getAdvance() const { return advance_; }
         int32_t getOffsetY() const;
         
-        std::shared_ptr<BGE::Texture> getTexture() const { return texture_; }
+        std::shared_ptr<Texture> getTexture() const { return texture_; }
         
     private:
         int32_t offsetX_;
@@ -42,7 +42,7 @@ namespace BGE {
         int32_t advance_;
         
         // TODO: Make weak?
-        std::shared_ptr<BGE::Texture> texture_;
+        std::shared_ptr<Texture> texture_;
     };
 }
 

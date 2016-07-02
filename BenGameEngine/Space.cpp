@@ -9,13 +9,13 @@
 #include "Space.h"
 #include "Game.h"
 
-BGE::Space::Space( uint64_t spaceId) : BGE::Object(spaceId) {
+BGE::Space::Space( ObjectId spaceId) : NamedObject(spaceId) {
 }
 
-BGE::Space::Space(uint64_t spaceId, std::string name) : BGE::Object(spaceId, name) {
+BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name) {
 }
 
-void BGE::Space::initialize(SpaceHandle handle, uint64_t spaceId, std::string name) {
+void BGE::Space::initialize(SpaceHandle handle, ObjectId spaceId, std::string name) {
     spaceHandle_ = handle;
     setInstanceId(spaceId);
     setName(name);

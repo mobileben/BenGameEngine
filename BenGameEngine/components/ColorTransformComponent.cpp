@@ -8,16 +8,9 @@
 
 #include "ColorTransformComponent.h"
 
-std::shared_ptr<BGE::ColorTransformComponent> BGE::ColorTransformComponent::create(uint64_t componentId) {
+std::shared_ptr<BGE::ColorTransformComponent> BGE::ColorTransformComponent::create(ObjectId componentId) {
     return std::make_shared<ColorTransformComponent>(private_key{}, componentId);
 }
 
-std::shared_ptr<BGE::ColorTransformComponent> BGE::ColorTransformComponent::create(uint64_t componentId, std::string name) {
-    return std::make_shared<ColorTransformComponent>(private_key{}, componentId, name);
-}
-
-BGE::ColorTransformComponent::ColorTransformComponent(struct private_key const& key, uint64_t componentId) : Component(componentId) {
-}
-
-BGE::ColorTransformComponent::ColorTransformComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name) {
+BGE::ColorTransformComponent::ColorTransformComponent(struct private_key const& key, ObjectId componentId) : Component(componentId) {
 }

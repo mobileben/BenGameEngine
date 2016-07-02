@@ -22,8 +22,8 @@ void BGE::GameObjectService::removeObject(std::shared_ptr<GameObject> object) {
     }
 }
 
-void BGE::GameObjectService::removeObject(uint64_t objId) {
-    std::unordered_map<uint64_t, std::shared_ptr<BGE::GameObject>>::iterator it = objects_.find(objId);
+void BGE::GameObjectService::removeObject(ObjectId objId) {
+    GameObjectMap::iterator it = objects_.find(objId);
     
     if (it != objects_.end()) {
         objects_.erase(objId);
@@ -47,8 +47,8 @@ std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(std::shared_ptr<Ga
     }
 }
 
-std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(uint64_t objId) {
-    std::unordered_map<uint64_t, std::shared_ptr<GameObject>>::iterator it = objects_.find(objId);
+std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(ObjectId objId) {
+    GameObjectMap::iterator it = objects_.find(objId);
     
     return it->second;
 }

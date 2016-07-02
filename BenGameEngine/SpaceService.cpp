@@ -20,7 +20,7 @@ BGE::SpaceHandle BGE::SpaceService::createSpace(std::string name) {
     Space *space = spaceHandleService_.allocate(handle);
     
     if (space) {
-        uint64_t spaceId = getIdAndIncrement();
+        ObjectId spaceId = getIdAndIncrement();
         
         space->initialize(handle, spaceId, name);
         spaces_[spaceId] = handle;
@@ -38,7 +38,7 @@ void BGE::SpaceService::removeSpace(SpaceHandle spaceHandle) {
     }
 }
 
-void BGE::SpaceService::removeSpace(uint64_t objId) {
+void BGE::SpaceService::removeSpace(ObjectId objId) {
     auto it = spaces_.find(objId);
     
     if (it != spaces_.end()) {
@@ -63,7 +63,7 @@ BGE::Space *BGE::SpaceService::getSpace(SpaceHandle spaceHandle) {
     return spaceHandleService_.dereference(spaceHandle);
 }
 
-BGE::Space *BGE::SpaceService::getSpace(uint64_t objId) {
+BGE::Space *BGE::SpaceService::getSpace(ObjectId objId) {
     auto it = spaces_.find(objId);
     
     if (it != spaces_.end()) {

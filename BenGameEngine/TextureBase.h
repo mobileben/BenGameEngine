@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <string>
-#include "Object.h"
+#include "NamedObject.h"
 #include "MathTypes.h"
 
 typedef enum {
@@ -50,12 +50,12 @@ namespace BGE {
     };
     
     
-    class TextureBase : public BGE::Object
+    class TextureBase : public NamedObject
     {
     public:
         static const std::string ErrorDomain;
         
-        TextureBase(uint64_t texId, std::string name);
+        TextureBase(ObjectId texId, std::string name);
         TextureBase() = delete;
         TextureBase(TextureBase &) = delete;
         virtual ~TextureBase() {}

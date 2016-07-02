@@ -20,17 +20,15 @@ namespace BGE {
     using SpaceHandle = Handle<SpaceTag>;
     class Space;
     
-    class Component : public BGE::Object
+    class Component : public Object
     {
     private:
         struct private_key {};
         
     public:
-        static std::shared_ptr<Component> create(uint64_t componentId);
-        static std::shared_ptr<Component> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<Component> create(ObjectId componentId);
         
-        Component(struct private_key const& key, uint64_t componentId);
-        Component(struct private_key const& key, uint64_t componentId, std::string name);
+        Component(struct private_key const& key, ObjectId componentId);
         virtual ~Component() {}
         
         bool hasGameObject() const { return !gameObject_.expired(); }
@@ -41,8 +39,7 @@ namespace BGE {
     protected:
         Component() = delete;
         Component(Component const&) = delete;
-        Component(uint64_t componentId);
-        Component(uint64_t componentId, std::string name);
+        Component(ObjectId componentId);
 
         void setGameObject(std::shared_ptr<GameObject> gameObject) { gameObject_ = gameObject; }
         void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }

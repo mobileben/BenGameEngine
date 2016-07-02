@@ -13,7 +13,7 @@
 #include "StringArrayBuilder.h"
 #include <type_traits>
 
-BGE::ScenePackage::ScenePackage(uint64_t sceneId) : Object(sceneId), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
+BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
     position_ = Vector2{0, 0};
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
@@ -31,7 +31,7 @@ void BGE::ScenePackage::reset() {
 
 void BGE::ScenePackage::link() {
     // Link Texture
-    std::shared_ptr<TextureService> textureService = BGE::Game::getInstance()->getTextureService();
+    std::shared_ptr<TextureService> textureService = Game::getInstance()->getTextureService();
     textureNames_ = FixedArray<const char*>(textures_.size());
     textureIndices_ = FixedArray<int32_t>(textures_.size());
     textureRefs_ = FixedArray<TextureReference>(textures_.size());
@@ -51,7 +51,7 @@ void BGE::ScenePackage::link() {
     }
 
     // Link TextReference
-    std::shared_ptr<FontService> fontService = BGE::Game::getInstance()->getFontService();
+    std::shared_ptr<FontService> fontService = Game::getInstance()->getFontService();
     textNames_ = FixedArray<const char*>(text_.size());
     textIndices_ = FixedArray<int32_t>(text_.size());
     textRefs_ = FixedArray<TextReference>(text_.size());
@@ -679,7 +679,7 @@ void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
     fontCount_->store(0);
     
     for (auto &font : fontQueue_) {
-        BGE::Game::getInstance()->getFontService()->loadFont(font.first, font.second, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
+        Game::getInstance()->getFontService()->loadFont(font.first, font.second, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
             int val = fontCount_->fetch_add(1) + 1;
             
             if (val == fontQueue_.size()) {

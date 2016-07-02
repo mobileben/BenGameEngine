@@ -19,8 +19,10 @@
 namespace BGE {
     class Space;
     
-    class GameObjectService : public BGE::Service {
+    class GameObjectService : public Service {
     public:
+        using GameObjectMap = std::unordered_map<ObjectId, std::shared_ptr<GameObject>>;
+        
         GameObjectService();
         ~GameObjectService();
         
@@ -39,9 +41,9 @@ namespace BGE {
 
         template < typename T, typename... Args >
         std::shared_ptr< T > createObject(Args&&... args) {
-            static_assert(std::is_base_of<BGE::GameObject, T>::value, "Not GameObject");
+            static_assert(std::is_base_of<GameObject, T>::value, "Not GameObject");
             
-            uint64_t objId = getIdAndIncrement();
+            ObjectId objId = getIdAndIncrement();
             std::shared_ptr<T> object = GameObject::create(objId, std::forward<Args>(args)...);
             
             object->setSpaceHandle(spaceHandle_);
@@ -51,20 +53,20 @@ namespace BGE {
         }
         
         void removeObject(std::shared_ptr<GameObject> object);
-        void removeObject(uint64_t objId);
+        void removeObject(ObjectId objId);
         void removeObject(std::string name);
         
-        const std::unordered_map<uint64_t, std::shared_ptr<BGE::GameObject>>& getGameObjects() const { return objects_; }
+        const GameObjectMap& getGameObjects() const { return objects_; }
         
-        std::shared_ptr<BGE::GameObject> find(std::shared_ptr<GameObject> object);
-        std::shared_ptr<BGE::GameObject> find(uint64_t objId);
-        std::shared_ptr<BGE::GameObject> find(std::string name);
+        std::shared_ptr<GameObject> find(std::shared_ptr<GameObject> object);
+        std::shared_ptr<GameObject> find(ObjectId objId);
+        std::shared_ptr<GameObject> find(std::string name);
         
     private:
         friend Space;
         
         SpaceHandle   spaceHandle_;
-        std::unordered_map<uint64_t, std::shared_ptr<BGE::GameObject>> objects_;
+        GameObjectMap objects_;
     };
 }
 

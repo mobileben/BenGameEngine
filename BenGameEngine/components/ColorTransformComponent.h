@@ -19,14 +19,9 @@ namespace BGE {
         struct private_key {};
         
     public:
-        static const int32_t AnimPlayForever = -1;
+        static std::shared_ptr<ColorTransformComponent> create(ObjectId componentId);
         
-        static std::shared_ptr<ColorTransformComponent> create(uint64_t componentId);
-        static std::shared_ptr<ColorTransformComponent> create(uint64_t componentId, std::string name);
-        
-        ColorTransformComponent(struct private_key const& key, uint64_t componentId);
-        ColorTransformComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        
+        ColorTransformComponent(struct private_key const& key, ObjectId componentId);
         ~ColorTransformComponent() {}
         
         ColorTransform transform;

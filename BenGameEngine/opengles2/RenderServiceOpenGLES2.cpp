@@ -79,9 +79,9 @@ void BGE::RenderServiceOpenGLES2::destroy() {}
 
 void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D)
 {
-    BGE::RenderService::setCoordinateSystem2D(coordSystem2D);
+    RenderService::setCoordinateSystem2D(coordSystem2D);
     
-    std::shared_ptr<BGE::RenderWindow> window = this->getRenderWindow();
+    std::shared_ptr<RenderWindow> window = this->getRenderWindow();
     
     switch (coordSystem2D) {
         case Render2DCoordinateSystem::Traditional:
@@ -99,12 +99,12 @@ void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(Render2DCoordinateSystem
     }
 }
 
-void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<BGE::RenderContext> context, std::shared_ptr<BGE::RenderWindow> window)
+void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)
 {
     RenderService::bindRenderWindow(context, window);
-    std::shared_ptr<BGE::RenderContextOpenGLES2> glContext;
+    std::shared_ptr<RenderContextOpenGLES2> glContext;
     
-    glContext = std::dynamic_pointer_cast<BGE::RenderContextOpenGLES2>(context);
+    glContext = std::dynamic_pointer_cast<RenderContextOpenGLES2>(context);
     
     if (glContext) {
         window->getView().context = glContext->getContext();
@@ -650,13 +650,13 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> gameObject) {
+void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<GameObject> gameObject) {
     if (gameObject) {
-        std::shared_ptr<BGE::FlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<BGE::FlatRectRenderComponent>(gameObject->getComponent<BGE::FlatRectRenderComponent>());
+        std::shared_ptr<FlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<FlatRectRenderComponent>(gameObject->getComponent<FlatRectRenderComponent>());
         
         if (flatRect) {
             Vertex *const vertices = flatRect->getVertices();
-            std::shared_ptr<BGE::Material> material = flatRect->getMaterial().lock();
+            std::shared_ptr<Material> material = flatRect->getMaterial().lock();
             
             if (material) {
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
@@ -682,7 +682,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<BGE::GameObject> 
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, float thickness, bool loop, std::shared_ptr<BGE::Material> material) {
+void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, float thickness, bool loop, std::shared_ptr<Material> material) {
     Vector3 vertices[points.size()];
     GLubyte indices[points.size()];
     
@@ -720,13 +720,13 @@ void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, 
 }
 
 #if 0
-void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> gameObject) {
+void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObject) {
     if (gameObject) {
-        std::shared_ptr<BGE::SpriteRenderComponent> sprite = std::dynamic_pointer_cast<BGE::SpriteRenderComponent>(gameObject->getComponent<BGE::SpriteRenderComponent>());
+        std::shared_ptr<SpriteRenderComponent> sprite = std::dynamic_pointer_cast<SpriteRenderComponent>(gameObject->getComponent<SpriteRenderComponent>());
         
         if (sprite) {
             VertexTex *const vertices = sprite->getVertices();
-            std::shared_ptr<BGE::Material> material = sprite->getMaterial().lock();
+            std::shared_ptr<Material> material = sprite->getMaterial().lock();
             if (material) {
                 std::shared_ptr<TextureBase> texture = material->getTexture().lock();
                 
@@ -746,7 +746,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
                         GLint textureUniform = glShader->locationForUniform("Texture");
                         GLint projectionLocation = glShader->locationForUniform("Projection");
                         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
-                        auto transformComponent = gameObject->getComponent<BGE::TransformComponent>();
+                        auto transformComponent = gameObject->getComponent<TransformComponent>();
                         GLint modelLocation = glShader->locationForUniform("ModelView");
                         
                         if (transformComponent) {
@@ -784,13 +784,13 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
     }
 }
 #else
-void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> gameObject) {
+void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObject) {
     if (gameObject) {
-        std::shared_ptr<BGE::SpriteRenderComponent> sprite = std::dynamic_pointer_cast<BGE::SpriteRenderComponent>(gameObject->getComponent<BGE::SpriteRenderComponent>());
+        std::shared_ptr<SpriteRenderComponent> sprite = std::dynamic_pointer_cast<SpriteRenderComponent>(gameObject->getComponent<SpriteRenderComponent>());
         
         if (sprite) {
             VertexTex *const vertices = sprite->getVertices();
-            std::shared_ptr<BGE::Material> material = sprite->getMaterial().lock();
+            std::shared_ptr<Material> material = sprite->getMaterial().lock();
             if (material) {
                 std::shared_ptr<TextureBase> texture = material->getTexture().lock();
                 
@@ -812,7 +812,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
                         GLint textureUniform = glShader->locationForUniform("Texture");
                         GLint projectionLocation = glShader->locationForUniform("Projection");
                         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
-                        auto transformComponent = gameObject->getComponent<BGE::TransformComponent>();
+                        auto transformComponent = gameObject->getComponent<TransformComponent>();
                         GLint modelLocation = glShader->locationForUniform("ModelView");
                         GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
                         GLint colorOffsetLocation = glShader->locationForUniform("ColorOffset");
@@ -922,7 +922,7 @@ void BGE::RenderServiceOpenGLES2::updateTransforms() {
 void BGE::RenderServiceOpenGLES2::render()
 {
     NSLog(@"RENDERING BITCHES");
-    std::shared_ptr<BGE::RenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<BGE::RenderContextOpenGLES2>(getRenderContext());
+    std::shared_ptr<RenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<RenderContextOpenGLES2>(getRenderContext());
     glClearColor(1.0, 1.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
@@ -1038,7 +1038,7 @@ void BGE::RenderServiceOpenGLES2::render()
 void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> gameObj, bool root) {
 
     // TODO: Transform
-    auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+    auto transformComponent = gameObj->getComponent<TransformComponent>();
     
     if (transformComponent) {
         if (!transformComponent->isVisible()) {
@@ -1087,16 +1087,16 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
             
         }
         
-        if (gameObj->getComponent<BGE::LineRenderComponent>()) {
-            std::shared_ptr<BGE::LineRenderComponent> line = gameObj->getComponent<BGE::LineRenderComponent>();
+        if (gameObj->getComponent<LineRenderComponent>()) {
+            std::shared_ptr<BGE::LineRenderComponent> line = gameObj->getComponent<LineRenderComponent>();
             
             drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial().lock());
-        } else if (gameObj->getComponent<BGE::FlatRectRenderComponent>()) {
+        } else if (gameObj->getComponent<FlatRectRenderComponent>()) {
             drawFlatRect(gameObj);
-        } else if (gameObj->getComponent<BGE::SpriteRenderComponent>()) {
+        } else if (gameObj->getComponent<SpriteRenderComponent>()) {
             drawSprite(gameObj);
-        } else if (gameObj->getComponent<BGE::TextComponent>()) {
-            std::shared_ptr<BGE::TextComponent> text = gameObj->getComponent<BGE::TextComponent>();
+        } else if (gameObj->getComponent<TextComponent>()) {
+            std::shared_ptr<TextComponent> text = gameObj->getComponent<TextComponent>();
             Font *font = Game::getInstance()->getFontService()->getFont(text->getFontHandle());
             
             if (font) {
@@ -1156,7 +1156,7 @@ void BGE::RenderServiceOpenGLES2::popColorTransform() {
 
 void BGE::RenderServiceOpenGLES2::transformGameObject(std::shared_ptr<GameObject> gameObj) {
     // TODO: Transform
-    auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+    auto transformComponent = gameObj->getComponent<TransformComponent>();
     
     if (transformComponent) {
         // Since we have the transform, push our

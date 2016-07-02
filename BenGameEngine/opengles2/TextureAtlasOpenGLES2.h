@@ -18,13 +18,13 @@ namespace BGE {
     class TextureAtlasOpenGLES2 : public TextureAtlas
     {
     public:
-        TextureAtlasOpenGLES2(uint64_t texId, std::string name);
+        TextureAtlasOpenGLES2(uint32_t texId, std::string name);
         ~TextureAtlasOpenGLES2();
         
         uint32_t getHWTextureId() const;
         GLenum getTarget() const;
         
-        void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<BGE::Error>)> callback);
+        void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback);
         
     private:
         friend class TextureService;

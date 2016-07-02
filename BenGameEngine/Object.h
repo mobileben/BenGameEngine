@@ -15,23 +15,17 @@
 
 namespace BGE {
     class GameObjectService;
+    class NamedObject;
+    
+    using ObjectId = uint32_t;
     
     class Object : public std::enable_shared_from_this<Object>
     {
     public:
-        Object(uint64_t objId);
-        Object(uint64_t objId, std::string name);
-        Object(uint64_t objId, std::string name, std::string domain);
+        Object(ObjectId objId) : id_(objId) {}
         virtual ~Object() {}
         
-        uint64_t getInstanceId() const { return id_; }
-        
-        std::string getName() const { return name_; }
-        void setName(std::string name) { name_ = name; }
-        
-        bool hasDomain() const { return !domain_.empty(); }
-        std::string getDomain() const { return domain_; }
-        void setDomain(std::string domain) { domain_ = domain; }
+        ObjectId getInstanceId() const { return id_; }
         
     public:
         template <typename T>
@@ -41,21 +35,19 @@ namespace BGE {
         }
 
     protected:
-        Object();
-        Object(Object const& object);
-        Object& operator=(Object const&);
+        Object() : id_(0) {}
         
-        void setInstanceId(uint64_t id) {
+        void setInstanceId(ObjectId id) {
             id_ = id;
         }
                 
     private:
         friend GameObjectService;
+        friend NamedObject;
+        
         template <typename DATA, typename HANDLE> friend class HandleService;
 
-        uint64_t    id_;
-        std::string name_;
-        std::string domain_;
+        ObjectId    id_;
     };    
 }
 

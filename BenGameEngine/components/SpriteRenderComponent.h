@@ -18,32 +18,27 @@ namespace BGE {
     class RenderService;
     class RenderServiceOpenGLES2;
     
-    class SpriteRenderComponent : public BGE::RenderComponent
+    class SpriteRenderComponent : public RenderComponent
     {
     private:
         struct private_key {};
         
     public:
-        static std::shared_ptr<SpriteRenderComponent> create(uint64_t componentId);
-        static std::shared_ptr<SpriteRenderComponent> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<SpriteRenderComponent> create(ObjectId componentId);
         
-        SpriteRenderComponent(struct private_key const& key, uint64_t componentId);
-        SpriteRenderComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        virtual ~SpriteRenderComponent() {}
+        SpriteRenderComponent(struct private_key const& key, ObjectId componentId);
+        ~SpriteRenderComponent() {}
 
         std::shared_ptr<TextureBase> getTexture();
         void setTextureRef(TextureReference *texRef);
         
     protected:
-        SpriteRenderComponent(uint32_t componentId);
-        SpriteRenderComponent(uint32_t componentId, std::string name);
-        
         void materialsUpdated();
         
         VertexTex* const getVertices() { return vertices_; }
         
     private:
-        friend BGE::ComponentService;
+        friend ComponentService;
         friend RenderService;
         friend RenderServiceOpenGLES2;
         

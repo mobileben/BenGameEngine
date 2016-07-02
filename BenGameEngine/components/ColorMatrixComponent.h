@@ -19,14 +19,9 @@ namespace BGE {
         struct private_key {};
         
     public:
-        static const int32_t AnimPlayForever = -1;
+        static std::shared_ptr<ColorMatrixComponent> create(ObjectId componentId);
         
-        static std::shared_ptr<ColorMatrixComponent> create(uint64_t componentId);
-        static std::shared_ptr<ColorMatrixComponent> create(uint64_t componentId, std::string name);
-        
-        ColorMatrixComponent(struct private_key const& key, uint64_t componentId);
-        ColorMatrixComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        
+        ColorMatrixComponent(struct private_key const& key, ObjectId componentId);
         ~ColorMatrixComponent() {}
 
         ColorMatrix matrix;

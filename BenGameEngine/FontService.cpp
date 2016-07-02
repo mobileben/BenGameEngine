@@ -246,7 +246,9 @@ void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function
                 Font *tFont = fontHandleService_.allocate(handle);
                 
                 if (tFont) {
-                    tFont->initialize(handle, name, pxSize);
+                    ObjectId fontId = getIdAndIncrement();
+                    
+                    tFont->initialize(handle, fontId, name, pxSize);
                     tFont->status_ = FontStatus::Loading;
                     
                     info->fonts[pxSize] = handle;

@@ -8,18 +8,10 @@
 
 #include "ColorMatrixComponent.h"
 
-std::shared_ptr<BGE::ColorMatrixComponent> BGE::ColorMatrixComponent::create(uint64_t componentId) {
+std::shared_ptr<BGE::ColorMatrixComponent> BGE::ColorMatrixComponent::create(ObjectId componentId) {
     return std::make_shared<ColorMatrixComponent>(private_key{}, componentId);
 }
 
-std::shared_ptr<BGE::ColorMatrixComponent> BGE::ColorMatrixComponent::create(uint64_t componentId, std::string name) {
-    return std::make_shared<ColorMatrixComponent>(private_key{}, componentId, name);
-}
-
-BGE::ColorMatrixComponent::ColorMatrixComponent(struct private_key const& key, uint64_t componentId) : Component(componentId) {
-    ColorMatrixMakeIdentify(matrix);
-}
-
-BGE::ColorMatrixComponent::ColorMatrixComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name) {
+BGE::ColorMatrixComponent::ColorMatrixComponent(struct private_key const& key, ObjectId componentId) : Component(componentId) {
     ColorMatrixMakeIdentify(matrix);
 }

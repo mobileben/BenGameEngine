@@ -19,18 +19,15 @@ namespace BGE {
     class RenderService;
     class RenderServiceOpenGLES2;
     
-    class TextComponent : public BGE::RenderComponent
+    class TextComponent : public RenderComponent
     {
     private:
         struct private_key {};
         
     public:
-        static std::shared_ptr<TextComponent> create(uint64_t componentId);
-        static std::shared_ptr<TextComponent> create(uint64_t componentId, std::string name);
-        
-        TextComponent(struct private_key const& key, uint64_t componentId);
-        TextComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        virtual ~TextComponent() {}
+        static std::shared_ptr<TextComponent> create(ObjectId componentId);
+        TextComponent(struct private_key const& key, ObjectId componentId);
+        ~TextComponent() {}
         
         const std::string& getText() const {
             return text_;
@@ -67,13 +64,10 @@ namespace BGE {
         float getWidth(bool minimum=true);
         
     protected:
-        TextComponent(uint32_t componentId);
-        TextComponent(uint32_t componentId, std::string name);
-
         void materialsUpdated();
 
     private:
-        friend BGE::ComponentService;
+        friend ComponentService;
         friend RenderService;
         friend RenderServiceOpenGLES2;
         

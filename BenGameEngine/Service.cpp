@@ -9,8 +9,8 @@
 #include "Service.h"
 #include <cassert>
 
-uint64_t BGE::Service::getIdAndIncrement() {
-    uint64_t id = std::atomic_fetch_add<uint64_t>(&identifier_, 1);
+BGE::ObjectId BGE::Service::getIdAndIncrement() {
+    ObjectId id = std::atomic_fetch_add<ObjectId>(&identifier_, 1);
     
     assert(id > 0);
     

@@ -35,11 +35,11 @@ namespace BGE {
         SpaceHandle createSpace(std::string name);
         
         void removeSpace(SpaceHandle spaceHandle);
-        void removeSpace(uint64_t objId);
+        void removeSpace(ObjectId objId);
         void removeSpace(std::string name);
 
         Space *getSpace(SpaceHandle spaceHandle);
-        Space *getSpace(uint64_t objId);
+        Space *getSpace(ObjectId objId);
         Space *getSpace(std::string name);
         
         std::vector<SpaceHandle> getSpaces();
@@ -48,7 +48,7 @@ namespace BGE {
         static const uint32_t InitialSpaceReserve = 32;
         
         using SpaceHandleService = HandleService<Space, SpaceHandle>;
-        using SpacesMap = std::unordered_map<uint64_t, SpaceHandle>;
+        using SpacesMap = std::unordered_map<uint32_t, SpaceHandle>;
         using SpacesMapIterator = SpacesMap::iterator;
 
         SpaceHandleService  spaceHandleService_;

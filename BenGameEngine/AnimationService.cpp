@@ -188,17 +188,17 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
         if (true || origFrame != channelFrame) {
             std::shared_ptr<Material> material;
             
-            if (obj->getComponent<BGE::LineRenderComponent>()) {
-                std::shared_ptr<BGE::LineRenderComponent> render = obj->getComponent<BGE::LineRenderComponent>();
+            if (obj->getComponent<LineRenderComponent>()) {
+                std::shared_ptr<LineRenderComponent> render = obj->getComponent<LineRenderComponent>();
                 material = render->getMaterial().lock();
-            } else if (obj->getComponent<BGE::FlatRectRenderComponent>()) {
-                std::shared_ptr<BGE::FlatRectRenderComponent> render = obj->getComponent<BGE::FlatRectRenderComponent>();
+            } else if (obj->getComponent<FlatRectRenderComponent>()) {
+                std::shared_ptr<FlatRectRenderComponent> render = obj->getComponent<FlatRectRenderComponent>();
                 material = render->getMaterial().lock();
-            } else if (obj->getComponent<BGE::SpriteRenderComponent>()) {
-                std::shared_ptr<BGE::SpriteRenderComponent> render = obj->getComponent<BGE::SpriteRenderComponent>();
+            } else if (obj->getComponent<SpriteRenderComponent>()) {
+                std::shared_ptr<SpriteRenderComponent> render = obj->getComponent<SpriteRenderComponent>();
                 material = render->getMaterial().lock();
-            } else if (obj->getComponent<BGE::TextComponent>()) {
-                std::shared_ptr<BGE::TextComponent> render = obj->getComponent<BGE::TextComponent>();
+            } else if (obj->getComponent<TextComponent>()) {
+                std::shared_ptr<TextComponent> render = obj->getComponent<TextComponent>();
                 material = render->getMaterial().lock();
             }
             

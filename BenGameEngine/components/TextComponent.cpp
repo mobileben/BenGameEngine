@@ -8,24 +8,11 @@
 
 #include "TextComponent.h"
 
-std::shared_ptr<BGE::TextComponent> BGE::TextComponent::create(uint64_t componentId) {
+std::shared_ptr<BGE::TextComponent> BGE::TextComponent::create(ObjectId componentId) {
     return std::make_shared<TextComponent>(private_key{}, componentId);
 }
 
-std::shared_ptr<BGE::TextComponent> BGE::TextComponent::create(uint64_t componentId, std::string name) {
-    return std::make_shared<TextComponent>(private_key{}, componentId, name);
-}
-
-BGE::TextComponent::TextComponent(struct private_key const& key, uint64_t componentId) : BGE::RenderComponent(componentId) {
-}
-
-BGE::TextComponent::TextComponent(struct private_key const& key, uint64_t componentId, std::string name) : BGE::RenderComponent(componentId, name) {
-}
-
-BGE::TextComponent::TextComponent(uint32_t componentId) : BGE::RenderComponent(componentId) {
-}
-
-BGE::TextComponent::TextComponent(uint32_t componentId, std::string name) : BGE::RenderComponent(componentId, name) {
+BGE::TextComponent::TextComponent(struct private_key const& key, ObjectId componentId) : RenderComponent(componentId) {
 }
 
 void BGE::TextComponent::materialsUpdated() {

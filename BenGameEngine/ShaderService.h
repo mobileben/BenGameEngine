@@ -17,7 +17,7 @@
 #include "ShaderProgram.h"
 
 namespace BGE {
-    class ShaderService : public BGE::Service
+    class ShaderService : public Service
     {
     public:
         

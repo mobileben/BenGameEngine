@@ -27,7 +27,7 @@ namespace BGE {
     class TextureAtlas : public TextureBase
     {
     public:
-        TextureAtlas(uint64_t objId, std::string name);
+        TextureAtlas(ObjectId objId, std::string name);
         
         virtual uint32_t getHWTextureId() const =0;
         
@@ -38,7 +38,7 @@ namespace BGE {
         std::shared_ptr<Texture> getTexture() const { return texture_; };
         std::shared_ptr<Texture> getSubTexture(std::string name);
         
-        virtual void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<BGE::Error>)> callback) =0;
+        virtual void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) =0;
         
         void releaseCurrentTexture();
         

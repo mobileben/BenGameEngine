@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <memory>
 #include <vector>
-#include "Object.h"
+#include "NamedObject.h"
 #include "GameObjectService.h"
 #include "ComponentService.h"
 #include "Handle.h"
@@ -23,15 +23,15 @@ namespace BGE {
     
     class SpaceService;
     
-    class Space : public Object
+    class Space : public NamedObject
     {
     public:
-        Space(uint64_t spaceId);
-        Space(uint64_t spaceId, std::string name);
+        Space(ObjectId spaceId);
+        Space(ObjectId spaceId, std::string name);
 
         virtual ~Space() {}
         
-        void initialize(SpaceHandle handle, uint64_t spaceId, std::string name);
+        void initialize(SpaceHandle handle, ObjectId spaceId, std::string name);
 
         std::shared_ptr<GameObjectService> getGameObjectService() const { return gameObjectService_; }
         void setGameObjectService(std::shared_ptr<GameObjectService> gameObjectService) {
@@ -48,14 +48,14 @@ namespace BGE {
             return gameObjectService_->createObject<T>(std::forward<Args>(args)...);
         }
         
-        void moveObject(uint64_t objId);
-        void removeObject(uint64_t objId) { gameObjectService_->removeObject(objId); }
+        void moveObject(ObjectId objId);
+        void removeObject(ObjectId objId) { gameObjectService_->removeObject(objId); }
         
-        const std::unordered_map<uint64_t, std::shared_ptr<BGE::GameObject>>& getGameObjects() const { return gameObjectService_->getGameObjects(); }
+        const std::unordered_map<ObjectId, std::shared_ptr<GameObject>>& getGameObjects() const { return gameObjectService_->getGameObjects(); }
 
-        std::shared_ptr<BGE::GameObject> find(std::shared_ptr<GameObject> object) { return gameObjectService_->find(object); }
-        std::shared_ptr<BGE::GameObject> find(uint64_t objId) { return gameObjectService_->find(objId); }
-        std::shared_ptr<BGE::GameObject> find(std::string name) { return gameObjectService_->find(name); }
+        std::shared_ptr<GameObject> find(std::shared_ptr<GameObject> object) { return gameObjectService_->find(object); }
+        std::shared_ptr<GameObject> find(ObjectId objId) { return gameObjectService_->find(objId); }
+        std::shared_ptr<GameObject> find(std::string name) { return gameObjectService_->find(name); }
         
         template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
             auto component = componentService_->createComponent<T>(std::forward<Args>(args)...);
@@ -67,32 +67,20 @@ namespace BGE {
             return component;
         }
         
-        template <typename T> std::shared_ptr<T> getComponent(uint64_t componentId) {
+        template <typename T> std::shared_ptr<T> getComponent(ObjectId componentId) {
             return componentService_->getComponent<T>(componentId);
         }
-        
-        template <typename T> std::shared_ptr<T> getComponent(std::string name) {
-            return componentService_->getComponent<T>(name);
-        }
 
-        template <typename T> void removeComponent(uint64_t componentId) {
+        template <typename T> void removeComponent(ObjectId componentId) {
             componentService_->removeComponent<T>(componentId);
-        }
-        
-        template <typename T> void removeComponent(std::string name) {
-            componentService_->removeComponent<T>(name);
         }
         
         template <typename T> void removeAllComponents()  {
             componentService_->removeAllComponents<T>();
         }
 
-        void removeComponent(std::type_index typeIndex, uint64_t componentId) {
+        void removeComponent(std::type_index typeIndex, ObjectId componentId) {
             componentService_->removeComponent(typeIndex, componentId);
-        }
-        
-        void removeComponent(std::type_index typeIndex, std::string name) {
-            componentService_->removeComponent(typeIndex, name);
         }
 
     protected:
@@ -102,7 +90,7 @@ namespace BGE {
         friend SpaceService;
         
         std::shared_ptr<GameObjectService> gameObjectService_;
-        std::shared_ptr<BGE::ComponentService> componentService_;
+        std::shared_ptr<ComponentService> componentService_;
         std::vector<GameObject> gameObjects_;
         
         bool        visible_;

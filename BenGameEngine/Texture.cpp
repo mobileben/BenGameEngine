@@ -10,7 +10,7 @@
 #include "TextureAtlas.h"
 #include "Game.h"
 
-BGE::Texture::Texture(uint64_t texId, std::string name) : BGE::TextureBase(texId, name), x_(0), y_(0), isSubTexture_(false) {
+BGE::Texture::Texture(ObjectId texId, std::string name) : TextureBase(texId, name), x_(0), y_(0), isSubTexture_(false) {
 }
 
 void BGE::Texture::releaseCurrentTexture() {
@@ -23,9 +23,9 @@ void BGE::Texture::releaseCurrentTexture() {
 
 void BGE::Texture::updateUVs() {
     if (!isSubTexture_) {
-        BGE::TextureBase::updateUVs();
+        TextureBase::updateUVs();
     } else {
-        std::shared_ptr<BGE::TextureAtlas> atlas = atlas_.lock();
+        std::shared_ptr<TextureAtlas> atlas = atlas_.lock();
         
         if (atlas) {
             float x = x_;

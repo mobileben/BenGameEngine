@@ -8,29 +8,7 @@
 
 #include "RenderComponent.h"
 
-#if 0
-std::shared_ptr<BGE::RenderComponent> BGE::RenderComponent::create(uint64_t componentId) {
-    return std::make_shared<RenderComponent>(private_key{}, componentId);
-}
-
-std::shared_ptr<BGE::RenderComponent> BGE::RenderComponent::create(uint64_t componentId, std::string name) {
-    return std::make_shared<RenderComponent>(private_key{}, componentId, name);
-}
-
-BGE::RenderComponent::RenderComponent(struct private_key const& key, uint64_t componentId) : Component(componentId), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
-    
-}
-
-BGE::RenderComponent::RenderComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
-    
-}
-#endif
-
-BGE::RenderComponent::RenderComponent(uint64_t componentId) : Component(componentId), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
-    
-}
-
-BGE::RenderComponent::RenderComponent(uint64_t componentId, std::string name) : Component(componentId, name), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
+BGE::RenderComponent::RenderComponent(ObjectId componentId) : Component(componentId), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
     
 }
 
@@ -46,7 +24,7 @@ std::weak_ptr<BGE::Material> BGE::RenderComponent::getMaterial(uint32_t index) {
     }
 }
 
-void BGE::RenderComponent::setMaterials(std::vector<std::shared_ptr<BGE::Material>> materials) {
+void BGE::RenderComponent::setMaterials(std::vector<std::shared_ptr<Material>> materials) {
     materials_.clear();
     
     for (auto material : materials) {

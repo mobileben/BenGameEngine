@@ -19,7 +19,7 @@
 #include "Texture.h"
 
 namespace BGE {
-    class MaterialService : public BGE::Service
+    class MaterialService : public Service
     {
     public:
         MaterialService();
@@ -34,17 +34,17 @@ namespace BGE {
         void destroy();
         void update(double deltaTime) {}
 
-        std::shared_ptr<Material> createMaterial(std::string name, Vector4& color);
-        std::shared_ptr<Material> createMaterial(std::string name, std::shared_ptr<TextureBase> texture);
-        std::shared_ptr<Material> createMaterial(std::string name, Vector4& color, std::shared_ptr<TextureBase> texture);
+        std::shared_ptr<Material> createMaterial(Vector4& color);
+        std::shared_ptr<Material> createMaterial(std::shared_ptr<TextureBase> texture);
+        std::shared_ptr<Material> createMaterial(Vector4& color, std::shared_ptr<TextureBase> texture);
         
-        void removeMaterial(std::string name);
+        void removeMaterial(ObjectId matId);
         
-        std::shared_ptr<Material> materialWithName(std::string name);
+        std::shared_ptr<Material> materialWithId(ObjectId matId);
         
     private:
-        typedef std::unordered_map<std::string, std::shared_ptr<Material>> MaterialMap;
-        typedef std::unordered_map<std::string, std::shared_ptr<Material>>::iterator MaterialMapIterator;
+        using MaterialMap = std::unordered_map<ObjectId, std::shared_ptr<Material>>;
+        using MaterialMapIterator = MaterialMap::iterator;
         
         MaterialMap materials_;
         

@@ -11,14 +11,14 @@
 #include "Game.h"
 #include "Texture.h"
 
-BGE::FontGlyph::FontGlyph(Font *font, std::shared_ptr<BGE::Texture> texture, int32_t offsetX, int32_t offsetY, int32_t advance) : texture_(texture), offsetX_(offsetX), offsetY_(0), offsetYInverted_(offsetY), advance_(advance) {
+BGE::FontGlyph::FontGlyph(Font *font, std::shared_ptr<Texture> texture, int32_t offsetX, int32_t offsetY, int32_t advance) : texture_(texture), offsetX_(offsetX), offsetY_(0), offsetYInverted_(offsetY), advance_(advance) {
     if (texture) {
         offsetY_ = font->getGlyphH() - (texture->getHeight() + offsetY);
     }
 }
 
 int32_t BGE::FontGlyph::getOffsetY() const {
-    if (BGE::Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
+    if (Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
         return offsetY_;
     } else {
         return offsetYInverted_;

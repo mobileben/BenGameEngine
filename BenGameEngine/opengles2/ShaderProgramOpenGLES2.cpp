@@ -9,11 +9,11 @@
 #include <Foundation/Foundation.h>
 #include "ShaderProgramOpenGLES2.h"
 
-BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders) : BGE::ShaderProgram(name, shaders) {
+BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders) : ShaderProgram(name, shaders) {
     state_ = createShaderProgram(name, shaders);
 }
 
-BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms) : BGE::ShaderProgram(name, shaders)
+BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms) : ShaderProgram(name, shaders)
 {
     state_ = createShaderProgram(name, shaders);
     

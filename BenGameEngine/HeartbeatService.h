@@ -23,7 +23,7 @@
 #include "Service.h"
 
 namespace BGE {
-    class HeartbeatService : public BGE::Service {
+    class HeartbeatService : public Service {
     public:
         HeartbeatService();
         virtual ~HeartbeatService() {}

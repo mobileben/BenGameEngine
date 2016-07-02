@@ -31,20 +31,20 @@ namespace BGE {
         virtual ~Game() {}
         
         static std::shared_ptr<Game> getInstance();
-        std::shared_ptr<BGE::RenderService> getRenderService() { return renderService_; }
-        void provide(std::shared_ptr<BGE::RenderService> renderService);
+        std::shared_ptr<RenderService> getRenderService() { return renderService_; }
+        void provide(std::shared_ptr<RenderService> renderService);
         
         std::shared_ptr<TextureService> getTextureService() { return textureService_; }
         void provide(std::shared_ptr<TextureService> textureService);
         
         // Services which are implicitly built
-        std::shared_ptr<BGE::GameObjectService> getGameObjectService() { return gameObjectService_; }
-        std::shared_ptr<BGE::ComponentService> getComponentService() { return componentService_; }
-        std::shared_ptr<BGE::MaterialService> getMaterialService() { return materialService_; }
-        std::shared_ptr<BGE::HeartbeatService> getHeartbeatService() { return heartbeatService_; }
-        std::shared_ptr<BGE::ScenePackageService> getScenePackageService() { return scenePackageService_; }
-        std::shared_ptr<BGE::AnimationService> getAnimationService() { return animationService_; }
-        std::shared_ptr<BGE::SpaceService> getSpaceService() { return spaceService_; }
+        std::shared_ptr<GameObjectService> getGameObjectService() { return gameObjectService_; }
+        std::shared_ptr<ComponentService> getComponentService() { return componentService_; }
+        std::shared_ptr<MaterialService> getMaterialService() { return materialService_; }
+        std::shared_ptr<HeartbeatService> getHeartbeatService() { return heartbeatService_; }
+        std::shared_ptr<ScenePackageService> getScenePackageService() { return scenePackageService_; }
+        std::shared_ptr<AnimationService> getAnimationService() { return animationService_; }
+        std::shared_ptr<SpaceService> getSpaceService() { return spaceService_; }
         std::shared_ptr<FontService> getFontService() { return fontService_; }
         
         // Service functions
@@ -58,16 +58,16 @@ namespace BGE {
         void update(double deltaTime);
         
     protected:
-        std::shared_ptr<BGE::RenderService> renderService_;
+        std::shared_ptr<RenderService> renderService_;
         std::shared_ptr<TextureService> textureService_;
         std::shared_ptr<FontService> fontService_;
-        std::shared_ptr<BGE::HeartbeatService> heartbeatService_;
-        std::shared_ptr<BGE::MaterialService> materialService_;
-        std::shared_ptr<BGE::GameObjectService> gameObjectService_;
-        std::shared_ptr<BGE::ComponentService> componentService_;
-        std::shared_ptr<BGE::ScenePackageService> scenePackageService_;
-        std::shared_ptr<BGE::AnimationService> animationService_;
-        std::shared_ptr<BGE::SpaceService> spaceService_;
+        std::shared_ptr<HeartbeatService> heartbeatService_;
+        std::shared_ptr<MaterialService> materialService_;
+        std::shared_ptr<GameObjectService> gameObjectService_;
+        std::shared_ptr<ComponentService> componentService_;
+        std::shared_ptr<ScenePackageService> scenePackageService_;
+        std::shared_ptr<AnimationService> animationService_;
+        std::shared_ptr<SpaceService> spaceService_;
     };
 }
 

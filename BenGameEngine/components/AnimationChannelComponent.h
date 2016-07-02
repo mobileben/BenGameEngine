@@ -23,13 +23,10 @@ namespace BGE {
     public:
         const AnimationChannelReference *channel;
 
-        static std::shared_ptr<AnimationChannelComponent> create(uint64_t componentId);
-        static std::shared_ptr<AnimationChannelComponent> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<AnimationChannelComponent> create(ObjectId componentId);
         
-        AnimationChannelComponent(struct private_key const& key, uint64_t componentId);
-        AnimationChannelComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        
-        virtual ~AnimationChannelComponent() {}
+        AnimationChannelComponent(struct private_key const& key, ObjectId componentId);
+        ~AnimationChannelComponent() {}
         
         void setAnimationChannelReference(const AnimationChannelReference *animChanRef);
         
@@ -38,9 +35,6 @@ namespace BGE {
     protected:
         friend ComponentService;
         friend GameObject;
-        
-        AnimationChannelComponent(uint64_t componentId);
-        AnimationChannelComponent(uint64_t componentId, std::string name);
         
         void setGameObject(std::shared_ptr<GameObject> gameObject);
     };

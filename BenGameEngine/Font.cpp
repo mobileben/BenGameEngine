@@ -23,18 +23,19 @@ static const int NumSupportedCharacters = 256 - InitialSupportedCharacterOffset;
 
 const std::string BGE::Font::ErrorDomain = "Font";
 
-BGE::Font::Font(uint64_t fontId) : Object(fontId), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
+BGE::Font::Font(ObjectId fontId) : NamedObject(fontId), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
 }
 
-BGE::Font::Font(std::string name, uint32_t pixelSize) : Object(0, name), handle_(FontHandle()), pixelSize_(pixelSize), status_(FontStatus::Invalid), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
+BGE::Font::Font(std::string name, uint32_t pixelSize) : NamedObject(0, name), handle_(FontHandle()), pixelSize_(pixelSize), status_(FontStatus::Invalid), valid_(false), textureAtlas_(nullptr), hasKerning_(false) {
 }
 
 BGE::Font::~Font() {
-    BGE::Game::getInstance()->getTextureService()->removeTexture(textureAtlas_);
+    Game::getInstance()->getTextureService()->removeTexture(textureAtlas_);
 }
 
-void BGE::Font::initialize(FontHandle handle, std::string name, uint32_t pixelSize) {
+void BGE::Font::initialize(FontHandle handle, ObjectId fontId, std::string name, uint32_t pixelSize) {
     setName(name);
+    setInstanceId(fontId);
     handle_ = handle;
     pixelSize_ = pixelSize;
     status_ = FontStatus::Invalid;
@@ -42,7 +43,7 @@ void BGE::Font::initialize(FontHandle handle, std::string name, uint32_t pixelSi
     
     if (textureAtlas_) {
         // TODO: this needs to support removing by reference
-        BGE::Game::getInstance()->getTextureService()->removeTexture(textureAtlas_);
+        Game::getInstance()->getTextureService()->removeTexture(textureAtlas_);
     }
     
     textureAtlas_ = nullptr;
@@ -72,7 +73,7 @@ uint32_t BGE::Font::getStringWidth(std::string str, bool minimum) {
     
     if (status_ == FontStatus::Valid) {
         const char *chars = str.c_str();
-        std::shared_ptr<BGE::FontGlyph> glyph;
+        std::shared_ptr<FontGlyph> glyph;
         uint16_t code;
         size_t length = str.length();
         
@@ -132,7 +133,7 @@ uint32_t BGE::Font::getHeight() const {
     }
 }
 
-void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<void(FontHandle, std::shared_ptr<BGE::Error>)> callback)  {
+void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<void(FontHandle, std::shared_ptr<Error>)> callback)  {
     FT_Face face = NULL;
     FT_Error error = 0;
     FT_Library library;
@@ -300,7 +301,7 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                         }
                     }
                     
-                    BGE::Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer(FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, BGE::TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<BGE::TextureAtlas> atlas, std::shared_ptr<BGE::Error> error) -> void {
+                    Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer(FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<TextureAtlas> atlas, std::shared_ptr<Error> error) -> void {
                         if (atlas) {
                             textureAtlas_ = atlas;
                             glyphs_.clear();
@@ -308,7 +309,7 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                             // Our space is used whenever we don't have a match
                             uint16_t code;
                             std::string key = fontKeyBase + std::to_string(InitialSupportedCharacterOffset);
-                            std::shared_ptr<BGE::Texture> subTex = atlas->getSubTexture(key);
+                            std::shared_ptr<Texture> subTex = atlas->getSubTexture(key);
                             std::shared_ptr<FontGlyph> space = std::make_shared<FontGlyph>(this, subTex, glyphDefs[0].offsetX, glyphDefs[0].offsetY, glyphDefs[0].advance);
                             std::shared_ptr<FontGlyph> glyph;
                             
@@ -390,13 +391,13 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, Color &color
         // TODO: Adjustment based on alignment to be done here
         float x = 0;
         float y = 0;
-        std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGE::Game::getInstance()->getRenderService());
+        std::shared_ptr<RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<RenderServiceOpenGLES2>(Game::getInstance()->getRenderService());
         
         const char *chars = str.c_str();
         std::shared_ptr<FontGlyph> glyph;
         uint16_t code;
         size_t length = str.length();
-        std::shared_ptr<BGE::TextureOpenGLES2> oglTex;
+        std::shared_ptr<TextureOpenGLES2> oglTex;
         
         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(renderer->pushShaderProgram("Font"));
         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
@@ -410,7 +411,7 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, Color &color
         GLint modelLocation = glShader->locationForUniform("ModelView");
         GLint colorUniform = glShader->locationForUniform("SourceColor");
         
-        oglTex = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(textureAtlas_->getTexture());
+        oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(textureAtlas_->getTexture());
         
         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) renderer->getProjectionMatrix()->m);
         glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
@@ -492,7 +493,7 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, Color &color
                 
                 y += glyph->getOffsetY();
                 
-                oglTex = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(glyph->getTexture());
+                oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(glyph->getTexture());
                 
                 if (oglTex) {
                     const Vector2 *xys = oglTex->getXYs();

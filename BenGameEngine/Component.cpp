@@ -10,24 +10,14 @@
 #include "Space.h"
 #include "Game.h"
 
-std::shared_ptr<BGE::Component> BGE::Component::create(uint64_t componentId) {
+std::shared_ptr<BGE::Component> BGE::Component::create(ObjectId componentId) {
     return std::make_shared<Component>(private_key(), componentId);
 }
 
-std::shared_ptr<BGE::Component> BGE::Component::create(uint64_t componentId, std::string name) {
-    return std::make_shared<Component>(private_key(), componentId, name);
+BGE::Component::Component(struct private_key const& key, ObjectId componentId) : Object(componentId) {
 }
 
-BGE::Component::Component(struct private_key const& key, uint64_t componentId) : BGE::Object(componentId) {
-}
-
-BGE::Component::Component(struct private_key const& key, uint64_t componentId, std::string name) : BGE::Object(componentId, name) {
-}
-
-BGE::Component::Component(uint64_t componentId) : BGE::Object(componentId) {
-}
-
-BGE::Component::Component(uint64_t componentId, std::string name) : BGE::Object(componentId, name) {
+BGE::Component::Component(ObjectId componentId) : Object(componentId) {
 }
 
 BGE::Space *BGE::Component::getSpace() const {

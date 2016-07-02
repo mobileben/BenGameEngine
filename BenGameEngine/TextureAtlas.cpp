@@ -9,7 +9,7 @@
 #include "TextureAtlas.h"
 #include "Game.h"
 
-BGE::TextureAtlas::TextureAtlas(uint64_t texId, std::string name) : BGE::TextureBase(texId, name){
+BGE::TextureAtlas::TextureAtlas(ObjectId texId, std::string name) : TextureBase(texId, name){
 }
 
 std::string BGE::TextureAtlas::atlasTextureKey() const {
@@ -18,16 +18,16 @@ std::string BGE::TextureAtlas::atlasTextureKey() const {
 
 void BGE::TextureAtlas::releaseCurrentTexture() {
     if (texture_) {
-        BGE::Game::getInstance()->getTextureService()->removeTexture(textureName_);
+        Game::getInstance()->getTextureService()->removeTexture(textureName_);
         texture_.reset();
     }
     
     textureName_.clear();
     
-    BGE::TextureBase::releaseCurrentTexture();
+    TextureBase::releaseCurrentTexture();
     
     for (auto& kv : subTextures_) {
-        BGE::Game::getInstance()->getTextureService()->removeTexture(kv.first);
+        Game::getInstance()->getTextureService()->removeTexture(kv.first);
     }
     
     subTextures_.clear();

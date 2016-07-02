@@ -30,13 +30,10 @@ namespace BGE {
     public:
         static const int32_t AnimPlayForever = -1;
         
-        static std::shared_ptr<AnimatorComponent> create(uint64_t componentId);
-        static std::shared_ptr<AnimatorComponent> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<AnimatorComponent> create(ObjectId componentId);
         
-        AnimatorComponent(struct private_key const& key, uint64_t componentId);
-        AnimatorComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        
-        virtual ~AnimatorComponent() {}
+        AnimatorComponent(struct private_key const& key, ObjectId componentId);
+        ~AnimatorComponent() {}
         
         AnimState   state;
         int32_t     currentFrame;

@@ -11,7 +11,7 @@
 
 const std::string BGE::TextureBase::ErrorDomain = "Texture";
 
-BGE::TextureBase::TextureBase(uint64_t texId, std::string name) : BGE::Object(texId, name) ,valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0) {
+BGE::TextureBase::TextureBase(ObjectId texId, std::string name) : NamedObject(texId, name) ,valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0) {
     updateUVs();
     updateXYs();
 }
@@ -59,7 +59,7 @@ void BGE::TextureBase::updateUVs() {
 }
 
 void BGE::TextureBase::updateXYs() {
-    if (BGE::Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
+    if (Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
         /*
          
          +Y down

@@ -14,7 +14,7 @@
 #include <vector>
 #include <atomic>
 #include <functional>
-#include "Object.h"
+#include "NamedObject.h"
 #include "Handle.h"
 #include "GraphicFormats.h"
 #include "FixedArray.h"
@@ -24,9 +24,9 @@ namespace BGE {
     struct ScenePackageTag {};
     typedef Handle<ScenePackageTag> ScenePackageHandle;
     
-    class ScenePackage : public Object {
+    class ScenePackage : public NamedObject {
     public:
-        ScenePackage(uint64_t sceneId);
+        ScenePackage(ObjectId sceneId);
         ~ScenePackage();
         
         void link();

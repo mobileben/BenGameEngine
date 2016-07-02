@@ -43,7 +43,7 @@ namespace BGE {
         
         template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
             static_assert(std::is_base_of<Component, T>::value, "Not Component");
-            uint64_t objId = getIdAndIncrement();
+            ObjectId objId = getIdAndIncrement();
             std::shared_ptr<T> component = T::create(objId, std::forward<Args>(args)...);
             
             component->setSpaceHandle(spaceHandle_);
@@ -54,15 +54,12 @@ namespace BGE {
             return component;
         }
         
-        template <typename T> std::shared_ptr<T> getComponent(uint64_t componentId);
-        template <typename T> std::shared_ptr<T> getComponent(std::string name);
+        template <typename T> std::shared_ptr<T> getComponent(ObjectId componentId);
         
-        template <typename T> void removeComponent(uint64_t componentId);
-        template <typename T> void removeComponent(std::string name);
+        template <typename T> void removeComponent(ObjectId componentId);
         template <typename T> void removeAllComponents();
         
-        void removeComponent(std::type_index typeIndex, uint64_t componentId);
-        void removeComponent(std::type_index typeIndex, std::string name);
+        void removeComponent(std::type_index typeIndex, ObjectId componentId);
         
     private:
         typedef std::vector<std::shared_ptr<Component>> ComponentVector;

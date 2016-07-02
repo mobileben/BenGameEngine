@@ -20,19 +20,16 @@ namespace BGE {
     class RenderService;
     class RenderServiceOpenGLES2;
     
-    class TransformComponent : public BGE::Component
+    class TransformComponent : public Component
     {
     private:
         struct private_key {};
         
     public:
-        static std::shared_ptr<TransformComponent> create(uint64_t componentId);
-        static std::shared_ptr<TransformComponent> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<TransformComponent> create(ObjectId componentId);
 
-        TransformComponent(struct private_key const& key, uint64_t componentId);
-        TransformComponent(struct private_key const& key, uint64_t componentId, std::string name);
-
-        virtual ~TransformComponent() {}
+        TransformComponent(struct private_key const& key, ObjectId componentId);
+        ~TransformComponent() {}
         
         bool isVisible() const { return visible_; }
         void setVisibility(bool visible) { visible_ = visible; }
@@ -91,7 +88,6 @@ namespace BGE {
         virtual void moveToParent(std::shared_ptr<TransformComponent> parent);
         
         virtual std::shared_ptr<TransformComponent> childAtIndex(uint32_t index);
-        virtual std::shared_ptr<TransformComponent> childWithName(std::string name, bool descned=false);
         
         virtual bool hasChild(std::shared_ptr<TransformComponent> child, bool descend=false);
         virtual bool inParentHierarchy(std::shared_ptr<TransformComponent> parent);
@@ -101,9 +97,6 @@ namespace BGE {
         friend RenderService;
         friend RenderServiceOpenGLES2;
         friend GameObject;
-
-        TransformComponent(uint64_t componentId);
-        TransformComponent(uint64_t componentId, std::string name);
         
         // Identity
         bool            visible_;

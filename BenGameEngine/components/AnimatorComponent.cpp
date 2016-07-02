@@ -16,18 +16,11 @@
 #include "ColorTransformComponent.h"
 #include "Space.h"
 
-std::shared_ptr<BGE::AnimatorComponent> BGE::AnimatorComponent::create(uint64_t componentId) {
+std::shared_ptr<BGE::AnimatorComponent> BGE::AnimatorComponent::create(ObjectId componentId) {
     return std::make_shared<AnimatorComponent>(private_key{}, componentId);
 }
 
-std::shared_ptr<BGE::AnimatorComponent> BGE::AnimatorComponent::create(uint64_t componentId, std::string name) {
-    return std::make_shared<AnimatorComponent>(private_key{}, componentId, name);
-}
-
-BGE::AnimatorComponent::AnimatorComponent(struct private_key const& key, uint64_t componentId) : Component(componentId), state(AnimState::Done), currentFrame(0), iterations(1), frameRemainderTime(0), secPerFrame(1.0/30.0), speed(1), forward(true) {
-}
-
-BGE::AnimatorComponent::AnimatorComponent(struct private_key const& key, uint64_t componentId, std::string name) : Component(componentId, name), state(AnimState::Done), currentFrame(0), iterations(1), frameRemainderTime(0), secPerFrame(1.0/30.0), speed(1), forward(true) {
+BGE::AnimatorComponent::AnimatorComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), state(AnimState::Done), currentFrame(0), iterations(1), frameRemainderTime(0), secPerFrame(1.0/30.0), speed(1), forward(true) {
 }
 
 void BGE::AnimatorComponent::reset() {

@@ -10,10 +10,10 @@
 #include "TextureAtlas.h"
 #include "TextureAtlasOpenGLES2.h"
 
-BGE::TextureOpenGLES2::TextureOpenGLES2(uint64_t texId, std::string name) : Texture(texId, name), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
+BGE::TextureOpenGLES2::TextureOpenGLES2(uint32_t texId, std::string name) : Texture(texId, name), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
 }
 
-BGE::TextureOpenGLES2::TextureOpenGLES2(uint64_t texId, std::string name, GLKTextureInfo *textureInfo) : Texture(texId, name), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(textureInfo) {
+BGE::TextureOpenGLES2::TextureOpenGLES2(uint32_t texId, std::string name, GLKTextureInfo *textureInfo) : Texture(texId, name), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(textureInfo) {
     format_ = TextureFormat::RGBA8888;
     
     if (textureInfo) {
@@ -56,8 +56,8 @@ GLenum BGE::TextureOpenGLES2::getTarget() const {
     }
 }
 
-void BGE::TextureOpenGLES2::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Texture>, std::shared_ptr<BGE::Error>)> callback) {
-    std::function<void(std::shared_ptr<BGE::Error>)> handler = [this, format, width, height, &callback](std::shared_ptr<BGE::Error> error) -> void {
+void BGE::TextureOpenGLES2::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Texture>, std::shared_ptr<Error>)> callback) {
+    std::function<void(std::shared_ptr<Error>)> handler = [this, format, width, height, &callback](std::shared_ptr<Error> error) -> void {
         std::shared_ptr<Texture> texture;
         
         if (!error) {
@@ -109,7 +109,7 @@ void BGE::TextureOpenGLES2::createFromBuffer(void *buffer, TextureFormat format,
 std::shared_ptr<BGE::Error> BGE::TextureOpenGLES2::createSubTexture(std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
     releaseCurrentTexture();
     
-    std::shared_ptr<BGE::Error> error;
+    std::shared_ptr<Error> error;
     
     if (atlas && width != 0 && height != 0) {
         std::shared_ptr<TextureAtlasOpenGLES2> oglAtlas = std::dynamic_pointer_cast<TextureAtlasOpenGLES2>(atlas);
@@ -135,14 +135,14 @@ std::shared_ptr<BGE::Error> BGE::TextureOpenGLES2::createSubTexture(std::shared_
             NSLog(@"Created Subtexture %s", getName().c_str());
         }
     } else {
-        error = std::make_shared<BGE::Error>(TextureBase::ErrorDomain, TextureErrorInvalidSubTexture);
+        error = std::make_shared<Error>(TextureBase::ErrorDomain, TextureErrorInvalidSubTexture);
     }
     
     return error;
 }
 
-void BGE::TextureOpenGLES2::createTextureFromAlphaBuffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<BGE::Error>)> callback) {
-    std::shared_ptr<BGE::Error> error;
+void BGE::TextureOpenGLES2::createTextureFromAlphaBuffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback) {
+    std::shared_ptr<Error> error;
 
     if (buffer) {
         GLuint tex;
@@ -165,10 +165,10 @@ void BGE::TextureOpenGLES2::createTextureFromAlphaBuffer(unsigned char *buffer, 
             valid_ = true;
             hwId_ = tex;
         } else {
-            error = std::make_shared<BGE::Error>(BGE::TextureBase::ErrorDomain, TextureErrorAllocation);
+            error = std::make_shared<Error>(TextureBase::ErrorDomain, TextureErrorAllocation);
         }
     } else {
-        error = std::make_shared<BGE::Error>(TextureBase::ErrorDomain, TextureErrorNoBuffer);
+        error = std::make_shared<Error>(TextureBase::ErrorDomain, TextureErrorNoBuffer);
     }
     
     if (callback) {
@@ -176,40 +176,40 @@ void BGE::TextureOpenGLES2::createTextureFromAlphaBuffer(unsigned char *buffer, 
     }
 }
 
-void BGE::TextureOpenGLES2::createTextureFromRGB565Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<BGE::Error>)> callback) {
-    std::shared_ptr<BGE::Error> error;
+void BGE::TextureOpenGLES2::createTextureFromRGB565Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback) {
+    std::shared_ptr<Error> error;
     
     if (callback) {
         callback(error);
     }
 }
 
-void BGE::TextureOpenGLES2::createTextureFromRGB888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<BGE::Error>)> callback) {
-    std::shared_ptr<BGE::Error> error;
+void BGE::TextureOpenGLES2::createTextureFromRGB888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback) {
+    std::shared_ptr<Error> error;
     
     if (callback) {
         callback(error);
     }
 }
 
-void BGE::TextureOpenGLES2::createTextureFromRGBA5551Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<BGE::Error>)> callback) {
-    std::shared_ptr<BGE::Error> error;
+void BGE::TextureOpenGLES2::createTextureFromRGBA5551Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback) {
+    std::shared_ptr<Error> error;
     
     if (callback) {
         callback(error);
     }
 }
 
-void BGE::TextureOpenGLES2::createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<BGE::Error>)> callback) {
-    std::shared_ptr<BGE::Error> error;
+void BGE::TextureOpenGLES2::createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback) {
+    std::shared_ptr<Error> error;
 
     if (callback) {
         callback(error);
     }
 }
 
-void BGE::TextureOpenGLES2::createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<BGE::Error>)> callback) {
-    std::shared_ptr<BGE::Error> error;
+void BGE::TextureOpenGLES2::createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback) {
+    std::shared_ptr<Error> error;
 
     if (callback) {
         callback(error);

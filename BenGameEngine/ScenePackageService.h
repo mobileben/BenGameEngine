@@ -44,7 +44,7 @@ namespace BGE {
         void destroy() {}
         void update(double deltaTime) {}
         
-        void packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<BGE::Error>)> callback);
+        void packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback);
         
         ScenePackageHandle getPackage(std::string name);
         ScenePackage *getDereferencedPackage(std::string name);

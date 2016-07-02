@@ -23,7 +23,7 @@ namespace BGE {
     class Texture : public TextureBase
     {
     public:
-        Texture(uint64_t texId, std::string name);
+        Texture(ObjectId texId, std::string name);
         
         virtual ~Texture() {}
         
@@ -31,8 +31,8 @@ namespace BGE {
         virtual uint32_t getY() const { return y_; }
         virtual bool isSubTexture() const { return isSubTexture_; }
         
-        virtual void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Texture>, std::shared_ptr<BGE::Error>)> callback) =0;
-        virtual std::shared_ptr<BGE::Error> createSubTexture(std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height) =0;
+        virtual void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Texture>, std::shared_ptr<Error>)> callback) =0;
+        virtual std::shared_ptr<Error> createSubTexture(std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height) =0;
         
         std::weak_ptr<TextureAtlas> getTextureAtlas() { return atlas_; }
         

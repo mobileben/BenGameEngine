@@ -25,12 +25,9 @@ namespace BGE {
         struct private_key {};
         
     public:
-        static std::shared_ptr<AnimationSequenceComponent> create(uint64_t componentId);
-        static std::shared_ptr<AnimationSequenceComponent> create(uint64_t componentId, std::string name);
+        static std::shared_ptr<AnimationSequenceComponent> create(ObjectId componentId);
         
-        AnimationSequenceComponent(struct private_key const& key, uint64_t componentId);
-        AnimationSequenceComponent(struct private_key const& key, uint64_t componentId, std::string name);
-        
+        AnimationSequenceComponent(struct private_key const& key, ObjectId componentId);
         ~AnimationSequenceComponent();
         
         void setAnimationSequenceReference(AnimationSequenceReference& animSeqRef);

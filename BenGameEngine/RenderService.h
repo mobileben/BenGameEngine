@@ -51,7 +51,7 @@ namespace BGE {
         OpenGLCentered          // Center of screen (X-right, Y-up)
     };
     
-    class RenderService: public BGE::Service
+    class RenderService: public Service
     {
     public:
         RenderService();
@@ -74,19 +74,19 @@ namespace BGE {
         
         std::shared_ptr<RenderWindow> getRenderWindow() { return renderWindow_; }
         
-        std::shared_ptr<BGE::ShaderService> getShaderService() { return shaderService_; }
+        std::shared_ptr<ShaderService> getShaderService() { return shaderService_; }
         
-        virtual std::shared_ptr<BGE::ShaderProgram> pushShaderProgram(std::string program) =0;
-        virtual std::shared_ptr<BGE::ShaderProgram> popShaderProgram() =0;
+        virtual std::shared_ptr<ShaderProgram> pushShaderProgram(std::string program) =0;
+        virtual std::shared_ptr<ShaderProgram> popShaderProgram() =0;
         
         virtual void render() =0;
         
     protected:
         std::shared_ptr<RenderContext> renderContext_;
         std::shared_ptr<RenderWindow> renderWindow_;
-        std::shared_ptr<BGE::ShaderService> shaderService_;
+        std::shared_ptr<ShaderService> shaderService_;
         
-        std::vector<std::shared_ptr<BGE::ShaderProgram>> shaderProgramStack_;
+        std::vector<std::shared_ptr<ShaderProgram>> shaderProgramStack_;
         
     private:
         bool ready_;
