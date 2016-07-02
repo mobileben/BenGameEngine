@@ -53,43 +53,37 @@ namespace BGE {
         
         template <typename T>
         void removeComponent() {
-            auto space = getSpace().lock();
             std::type_index typeId = typeid(T);
             
-            if (space) {
-                auto component = components_.find(typeId);
-                
-                if (component != components_.end()) {
-#ifdef NOT_YET
-                    space->removeComponent<T>(component->second->getInstanceId());
-#endif
-                }
-            }
-            
-            components_.erase(typeId);
+            removeComponent(typeId);
         }
+        
+        void removeComponent(std::type_index typeIndex);
         
         void removeAllComponents();
         
         bool isActive() const { return active_; }
         void setActive(bool active) { active_ = active; }
 
-        std::weak_ptr<Space> getSpace() const { return space_; }
-
+        Space *getSpace() const;
+        SpaceHandle getSpaceHandle() const { return spaceHandle_; }
+        
     protected:
         
+#ifdef NOT_YET
         GameObject() = delete;
         GameObject(GameObject const&) = delete;
         GameObject(uint64_t objId) = delete;
         GameObject(uint64_t objId, std::string name) = delete;
-
-        void setSpace(std::shared_ptr<Space> space) { space_ = space; }
+#endif
+        
+        void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
 
     private:
         friend GameObjectService;
         
         bool                    active_;
-        std::shared_ptr<Space>  space_;
+        SpaceHandle             spaceHandle_;
         std::unordered_map<std::type_index, std::shared_ptr<BGE::Component>> components_;
     };
 }

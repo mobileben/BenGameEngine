@@ -11,7 +11,7 @@
 BGE::ComponentService::ComponentService() {
 }
 
-BGE::ComponentService::ComponentService(std::shared_ptr<Space> space) : space_(space) {
+BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : spaceHandle_(spaceHandle) {
 }
 
 BGE::ComponentService::~ComponentService() {

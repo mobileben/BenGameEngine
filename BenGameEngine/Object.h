@@ -44,6 +44,10 @@ namespace BGE {
         Object();
         Object(Object const& object);
         Object& operator=(Object const&);
+        
+        void setInstanceId(uint64_t id) {
+            id_ = id;
+        }
                 
     private:
         friend GameObjectService;

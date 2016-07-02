@@ -7,27 +7,22 @@
 //
 
 #include "Space.h"
+#include "Game.h"
 
-BGE::Space::Space(struct private_key const& key, uint64_t spaceId, std::shared_ptr<BGE::GameObjectService> gameObjectService, std::shared_ptr<ComponentService> componentService) : BGE::Object(spaceId), gameObjectService_(gameObjectService), componentService_(componentService) {
+BGE::Space::Space( uint64_t spaceId) : BGE::Object(spaceId) {
 }
 
-BGE::Space::Space(struct private_key const& key, uint64_t spaceId, std::string name, std::shared_ptr<BGE::GameObjectService> gameObjectService, std::shared_ptr<ComponentService> componentService) : BGE::Object(spaceId, name), gameObjectService_(gameObjectService), componentService_(componentService) {
+BGE::Space::Space(uint64_t spaceId, std::string name) : BGE::Object(spaceId, name) {
 }
 
-std::shared_ptr<BGE::Space> BGE::Space::create(uint64_t spaceId, std::shared_ptr<BGE::GameObjectService> gameObjectService, std::shared_ptr<ComponentService> componentService) {
-    auto space =  std::make_shared<Space>(private_key{}, spaceId, gameObjectService, componentService);
+void BGE::Space::initialize(SpaceHandle handle, uint64_t spaceId, std::string name) {
+    spaceHandle_ = handle;
+    setInstanceId(spaceId);
+    setName(name);
 
-    space->getGameObjectService()->setSpace(space);
-    space->getComponentService()->setSpace(space);
-
-    return space;
-}
-
-std::shared_ptr<BGE::Space> BGE::Space::create(uint64_t spaceId, std::string name, std::shared_ptr<BGE::GameObjectService> gameObjectService, std::shared_ptr<ComponentService> componentService) {
-    auto space =  std::make_shared<Space>(private_key{}, spaceId, name, gameObjectService, componentService);
-
-    space->getGameObjectService()->setSpace(space);
-    space->getComponentService()->setSpace(space);
-
-    return space;
+    gameObjectService_ = std::make_shared<GameObjectService>();
+    gameObjectService_->setSpaceHandle(spaceHandle_);
+    
+    componentService_ = std::make_shared<ComponentService>();
+    componentService_->setSpaceHandle(spaceHandle_);
 }

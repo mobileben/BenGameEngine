@@ -8,6 +8,7 @@
 
 #include "GameObjectService.h"
 #include "GameObject.h"
+#include "Game.h"
 
 BGE::GameObjectService::GameObjectService() {
 }
@@ -63,4 +64,8 @@ std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(std::string name) 
     }
     
     return found;
+}
+
+BGE::Space *BGE::GameObjectService::getSpace(void) const {
+    return Game::getInstance()->getSpaceService()->getSpace(spaceHandle_);
 }

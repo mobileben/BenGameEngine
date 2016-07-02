@@ -24,7 +24,7 @@
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderWindow> renderWindow;
 @property (nonatomic, weak) GLKView *glView;
 @property (nonatomic, assign) BOOL once;
-@property (nonatomic, assign) std::shared_ptr<BGE::Space> space;
+@property (nonatomic, assign) BGE::SpaceHandle spaceHandle;
 @end
 
 @implementation ViewController
@@ -45,7 +45,7 @@
     self.renderWindow->setView((GLKView *) self.view);
     
     BGE::Game::getInstance()->getRenderService()->bindRenderWindow(self.renderContext, self.renderWindow);
-    self.space = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
+    self.spaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
     
     NSLog(@"DIDLOAD view is %f %f %f %f", self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
     
@@ -119,12 +119,13 @@
                 gameObj->addComponent(text);
 #endif
                 
-                gameObj = self.space->createObject<BGE::GameObject>();
+                auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+                gameObj = space->createObject<BGE::GameObject>();
                 // Animation game object requires: xform, animator, animation sequence
-                transformComponent = self.space->createComponent<BGE::TransformComponent>();
-                auto anim = self.space->createComponent<BGE::AnimationSequenceComponent>();
+                transformComponent = space->createComponent<BGE::TransformComponent>();
+                auto anim = space->createComponent<BGE::AnimationSequenceComponent>();
                 auto animSeqRef = BGE::Game::getInstance()->getScenePackageService()->getAnimationSequenceReference("SaleGlowAnim");
-                auto animator = self.space->createComponent<BGE::AnimatorComponent>();
+                auto animator = space->createComponent<BGE::AnimatorComponent>();
 
                 transformComponent->setX(200);
                 transformComponent->setY(1000);

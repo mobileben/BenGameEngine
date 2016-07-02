@@ -15,26 +15,33 @@
 #include "Object.h"
 #include "GameObjectService.h"
 #include "ComponentService.h"
+#include "Handle.h"
 
 namespace BGE {
+    struct SpaceTag {};
+    using SpaceHandle = Handle<SpaceTag>;
+    
     class SpaceService;
     
     class Space : public Object
     {
-    private:
-        struct private_key {};
-        
     public:
-        static std::shared_ptr<Space> create(uint64_t spaceId, std::shared_ptr<GameObjectService> gameObjectService, std::shared_ptr<ComponentService> componentService);
-        static std::shared_ptr<Space> create(uint64_t spaceId, std::string name, std::shared_ptr<GameObjectService> gameObjectService, std::shared_ptr<ComponentService> componentService);
-        
-        Space(struct private_key const& key, uint64_t spaceId, std::shared_ptr<GameObjectService> gameObjectService, std::shared_ptr<ComponentService> componentService);
-        Space(struct private_key const& key, uint64_t spaceId, std::string name, std::shared_ptr<GameObjectService> gameObjectService, std::shared_ptr<ComponentService> componentService);
+        Space(uint64_t spaceId);
+        Space(uint64_t spaceId, std::string name);
 
         virtual ~Space() {}
         
+        void initialize(SpaceHandle handle, uint64_t spaceId, std::string name);
+
         std::shared_ptr<GameObjectService> getGameObjectService() const { return gameObjectService_; }
+        void setGameObjectService(std::shared_ptr<GameObjectService> gameObjectService) {
+            gameObjectService_ = gameObjectService;
+        }
+        
         std::shared_ptr<ComponentService> getComponentService() const { return componentService_; }
+        void setComponentService(std::shared_ptr<ComponentService> componentService) {
+            componentService_ = componentService;
+        }
         
         template < typename T, typename... Args >
         std::shared_ptr< T > createObject(Args&&... args) {
@@ -54,7 +61,7 @@ namespace BGE {
             auto component = componentService_->createComponent<T>(std::forward<Args>(args)...);
             
             if (component) {
-                component->setSpace(componentService_->getSpace());
+                component->setSpaceHandle(componentService_->getSpaceHandle());
             }
             
             return component;
@@ -88,12 +95,9 @@ namespace BGE {
             componentService_->removeComponent(typeIndex, name);
         }
 
-        bool operator<(const Space& rhs) const { return order_ < rhs.order_; }
-        
     protected:
-        Space() = delete;
-        Space(Space const&) = delete;
-
+        SpaceHandle spaceHandle_;
+        
     private:
         friend SpaceService;
         

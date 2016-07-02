@@ -36,7 +36,7 @@ BGE::AnimationSequenceComponent::~AnimationSequenceComponent() {
 }
 
 void BGE::AnimationSequenceComponent::created() {
-    auto space = getSpace().lock();
+    auto space = getSpace();
     
     assert(space);
     
@@ -63,7 +63,7 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(AnimationSeq
     }
     
     AnimationChannelReference *channels = animSeqRef.channels;
-    auto space = getSpace().lock();
+    auto space = getSpace();
 
     for (auto i=0;i<numChannels;i++) {
         auto obj = space->createObject<GameObject>();

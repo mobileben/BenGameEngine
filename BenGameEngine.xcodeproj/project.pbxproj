@@ -165,9 +165,9 @@
 		B508CD921CAE285000127B97 /* TransformComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransformComponent.h; path = components/TransformComponent.h; sourceTree = "<group>"; };
 		B508CD981CAF95A000127B97 /* BGEGameObjectAndComponentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BGEGameObjectAndComponentTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B508CD9C1CAF95A000127B97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = BGEGameObjectAndComponentTests/Info.plist; sourceTree = "<group>"; };
-		B508CDA31CB4DD5B00127B97 /* Component.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Component.cpp; sourceTree = "<group>"; };
+		B508CDA31CB4DD5B00127B97 /* Component.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Component.cpp; sourceTree = "<group>"; };
 		B508CDA41CB4DD5B00127B97 /* Component.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Component.h; sourceTree = "<group>"; };
-		B508CDA61CB4DE6D00127B97 /* GameObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameObject.cpp; sourceTree = "<group>"; };
+		B508CDA61CB4DE6D00127B97 /* GameObject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = GameObject.cpp; sourceTree = "<group>"; };
 		B508CDA71CB4DE6D00127B97 /* GameObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
 		B508CDA91CB4DE8E00127B97 /* Object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Object.cpp; sourceTree = "<group>"; };
 		B508CDAA1CB4DE8E00127B97 /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };

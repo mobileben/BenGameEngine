@@ -26,7 +26,7 @@ namespace BGE {
     {
     public:
         ComponentService();
-        ComponentService(std::shared_ptr<Space> space);
+        ComponentService(SpaceHandle spaceHandle);
         ~ComponentService();
         
         void initialize() {}
@@ -38,15 +38,15 @@ namespace BGE {
         void destroy() {}
         void update(double deltaTime) {}
 
-        void setSpace(std::shared_ptr<Space> space) { space_ = space; }
-        std::shared_ptr<Space> getSpace(void) const { return space_; }
+        void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
+        SpaceHandle getSpaceHandle(void) const { return spaceHandle_; }
         
         template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
             static_assert(std::is_base_of<Component, T>::value, "Not Component");
             uint64_t objId = getIdAndIncrement();
             std::shared_ptr<T> component = T::create(objId, std::forward<Args>(args)...);
             
-            component->setSpace(space_);
+            component->setSpaceHandle(spaceHandle_);
             addComponent(component);
             
             component->created();
@@ -73,7 +73,7 @@ namespace BGE {
         typedef std::unordered_map<std::type_index, void *> ComponentPoolMap;
         typedef std::unordered_map<std::type_index, size_t> ComponentPoolSize;
         
-        std::shared_ptr<Space> space_;
+        SpaceHandle spaceHandle_;
         ComponentMap components_;
         
         template <typename T> void addComponent(std::shared_ptr<T> component) {

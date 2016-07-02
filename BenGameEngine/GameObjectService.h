@@ -33,8 +33,9 @@ namespace BGE {
         void destroy() {}
         void update(double deltaTime) {}
 
-        void setSpace(std::shared_ptr<Space> space) { space_ = space; }
-        std::shared_ptr<Space> getSpace(void) const { return space_; }
+        void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
+        Space *getSpace(void) const;
+        SpaceHandle getSpaceHandle() const { return spaceHandle_; }
 
         template < typename T, typename... Args >
         std::shared_ptr< T > createObject(Args&&... args) {
@@ -43,7 +44,7 @@ namespace BGE {
             uint64_t objId = getIdAndIncrement();
             std::shared_ptr<T> object = GameObject::create(objId, std::forward<Args>(args)...);
             
-            object->setSpace(space_);
+            object->setSpaceHandle(spaceHandle_);
             objects_[objId] = object;
             
             return object;
@@ -62,7 +63,7 @@ namespace BGE {
     private:
         friend Space;
         
-        std::shared_ptr<Space>   space_;
+        SpaceHandle   spaceHandle_;
         std::unordered_map<uint64_t, std::shared_ptr<BGE::GameObject>> objects_;
     };
 }

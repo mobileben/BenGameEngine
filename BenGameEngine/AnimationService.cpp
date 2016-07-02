@@ -35,13 +35,17 @@ void BGE::AnimationService::update(double deltaTime) {
     }
     
     // For all the spaces
-    for (auto space : Game::getInstance()->getSpaceService()->getSpaces()) {
-        for (auto obj : space->getGameObjectService()->getGameObjects()) {
-            auto animSeq = obj.second->getComponent<AnimationSequenceComponent>();
-            auto animator = obj.second->getComponent<AnimatorComponent>();
-            
-            if (animSeq && animator) {
-                animateSequence(animSeq, animator, dt);
+    for (auto handle : Game::getInstance()->getSpaceService()->getSpaces()) {
+        auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
+        
+        if (space) {
+            for (auto obj : space->getGameObjectService()->getGameObjects()) {
+                auto animSeq = obj.second->getComponent<AnimationSequenceComponent>();
+                auto animator = obj.second->getComponent<AnimatorComponent>();
+                
+                if (animSeq && animator) {
+                    animateSequence(animSeq, animator, dt);
+                }
             }
         }
     }
@@ -216,7 +220,7 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
             
             auto colorMatrix = obj->getComponent<ColorMatrixComponent>();
             auto colorTransform = obj->getComponent<ColorTransformComponent>();
-            auto space = obj->getSpace().lock();
+            auto space = obj->getSpace();
             
             if (keyframe->colorMatrix) {
                 if (colorMatrix) {

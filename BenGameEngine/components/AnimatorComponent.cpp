@@ -87,7 +87,7 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
                             } else if (frame >= keyframe->startFrame && frame < (keyframe->startFrame + keyframe->totalFrames)) {
                                 auto colorMatrix = chanGameObj->getComponent<ColorMatrixComponent>();
                                 auto colorTransform = chanGameObj->getComponent<ColorTransformComponent>();
-                                auto space = channel->getSpace().lock();
+                                auto space = channel->getSpace();
                                 animator->currKeyframe = ki;
                                 xform->setPosition(*keyframe->position);
                                 xform->setScale(*keyframe->scale);

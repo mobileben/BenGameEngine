@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include "Service.h"
 #include "Space.h"
+#include "HandleService.h"
 #include <type_traits>
 
 namespace BGE {
@@ -31,19 +32,27 @@ namespace BGE {
         void destroy() {}
         void update(double deltaTime) {}
 
-        std::shared_ptr<Space> createSpace(std::string name);
-        void removeSpace(std::shared_ptr<Space> space);
+        SpaceHandle createSpace(std::string name);
+        
+        void removeSpace(SpaceHandle spaceHandle);
         void removeSpace(uint64_t objId);
         void removeSpace(std::string name);
 
-        std::shared_ptr<Space> find(std::shared_ptr<Space> space);
-        std::shared_ptr<Space> find(uint64_t spaceId);
-        std::shared_ptr<Space> find(std::string name);
-
-        std::vector<std::shared_ptr<Space>> getSpaces();
+        Space *getSpace(SpaceHandle spaceHandle);
+        Space *getSpace(uint64_t objId);
+        Space *getSpace(std::string name);
+        
+        std::vector<SpaceHandle> getSpaces();
         
     private:
-        std::unordered_map<uint64_t, std::shared_ptr<Space>> spaces_;
+        static const uint32_t InitialSpaceReserve = 32;
+        
+        using SpaceHandleService = HandleService<Space, SpaceHandle>;
+        using SpacesMap = std::unordered_map<uint64_t, SpaceHandle>;
+        using SpacesMapIterator = SpacesMap::iterator;
+
+        SpaceHandleService  spaceHandleService_;
+        SpacesMap           spaces_;
         
         // TODO: Should just create sorted vector here each time space is removed or added, but also must think how to handle order change
     };

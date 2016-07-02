@@ -47,7 +47,7 @@ void BGE::AnimationChannelComponent::updateReference() {
             NSLog(@"HERE");
         }
         
-        auto space = getSpace().lock();
+        auto space = getSpace();
         
         // TODO: Do we do this later?
         switch (this->channel->referenceType) {

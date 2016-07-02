@@ -11,11 +11,14 @@
 
 #include <stdio.h>
 #include "Object.h"
+#include "Handle.h"
 
 namespace BGE {
     class GameObject;
-    class Space;
     class ComponentService;
+    struct SpaceTag;
+    using SpaceHandle = Handle<SpaceTag>;
+    class Space;
     
     class Component : public BGE::Object
     {
@@ -32,7 +35,8 @@ namespace BGE {
         
         bool hasGameObject() const { return !gameObject_.expired(); }
         std::weak_ptr<GameObject> getGameObject() const { return gameObject_; }
-        std::weak_ptr<Space> getSpace() const { return space_; }
+        Space *getSpace() const;
+        SpaceHandle getSpaceHandle() const { return spaceHandle_; }
         
     protected:
         Component() = delete;
@@ -41,7 +45,7 @@ namespace BGE {
         Component(uint64_t componentId, std::string name);
 
         void setGameObject(std::shared_ptr<GameObject> gameObject) { gameObject_ = gameObject; }
-        void setSpace(std::shared_ptr<Space> space) { space_ = space; }
+        void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
 
         virtual void created() {}
         
@@ -51,8 +55,7 @@ namespace BGE {
         friend Space;
         
         std::weak_ptr<GameObject>   gameObject_;
-        std::weak_ptr<Space>        space_;
-        
+        SpaceHandle                 spaceHandle_;
     };
 }
 

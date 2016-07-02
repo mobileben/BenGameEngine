@@ -9,31 +9,37 @@
 #include "SpaceService.h"
 #include "Game.h"
 
-BGE::SpaceService::SpaceService() {
+BGE::SpaceService::SpaceService() : spaceHandleService_(InitialSpaceReserve, SpaceHandleService::NoMaxLimit){
 }
 
 BGE::SpaceService::~SpaceService() {
 }
 
-std::shared_ptr<BGE::Space> BGE::SpaceService::createSpace(std::string name) {
-    uint64_t spaceId = getIdAndIncrement();
+BGE::SpaceHandle BGE::SpaceService::createSpace(std::string name) {
+    SpaceHandle handle;
+    Space *space = spaceHandleService_.allocate(handle);
     
-    std::shared_ptr<Space> space = Space::create(spaceId, std::make_shared<GameObjectService>(), std::make_shared<BGE::ComponentService>());
+    if (space) {
+        uint64_t spaceId = getIdAndIncrement();
+        
+        space->initialize(handle, spaceId, name);
+        spaces_[spaceId] = handle;
+    }
     
-    spaces_[spaceId] = space;
-    
-    return space;
+    return handle;
 
 }
 
-void BGE::SpaceService::removeSpace(std::shared_ptr<Space> space) {
+void BGE::SpaceService::removeSpace(SpaceHandle spaceHandle) {
+    Space *space = getSpace(spaceHandle);
+    
     if (space) {
         removeSpace(space->getInstanceId());
     }
 }
 
 void BGE::SpaceService::removeSpace(uint64_t objId) {
-    std::unordered_map<uint64_t, std::shared_ptr<Space>>::iterator it = spaces_.find(objId);
+    auto it = spaces_.find(objId);
     
     if (it != spaces_.end()) {
         spaces_.erase(objId);
@@ -41,49 +47,64 @@ void BGE::SpaceService::removeSpace(uint64_t objId) {
 }
 
 void BGE::SpaceService::removeSpace(std::string name) {
-    for (auto space : spaces_) {
-        if (space.second->getName() == name) {
-            removeSpace(space.second->getInstanceId());
-            return;
+    for (auto sp : spaces_) {
+        auto space = getSpace(sp.second);
+        
+        if (space) {
+            if (space->getName() == name) {
+                removeSpace(space->getInstanceId());
+                return;
+            }
         }
     }
 }
 
-std::shared_ptr<BGE::Space> BGE::SpaceService::find(std::shared_ptr<BGE::Space> space) {
-    if (space) {
-        return find(space->getInstanceId());
-    } else {
-        return std::shared_ptr<Space>();
+BGE::Space *BGE::SpaceService::getSpace(SpaceHandle spaceHandle) {
+    return spaceHandleService_.dereference(spaceHandle);
+}
+
+BGE::Space *BGE::SpaceService::getSpace(uint64_t objId) {
+    auto it = spaces_.find(objId);
+    
+    if (it != spaces_.end()) {
+        return getSpace(it->second);
     }
+    
+    return nullptr;
 }
 
-std::shared_ptr<BGE::Space> BGE::SpaceService::find(uint64_t spaceId) {
-    std::unordered_map<uint64_t, std::shared_ptr<Space>>::iterator it = spaces_.find(spaceId);
-    
-    return it->second;
-}
-
-std::shared_ptr<BGE::Space> BGE::SpaceService::find(std::string name) {
-    std::shared_ptr<Space> found;
-    
-    for (auto kv : spaces_) {
-        if (kv.second->getName() == name) {
-            found = kv.second;
-            break;
+BGE::Space *BGE::SpaceService::getSpace(std::string name) {
+    for (auto sp : spaces_) {
+        auto space = getSpace(sp.second);
+        
+        if (space) {
+            if (space->getName() == name) {
+                return space;
+            }
         }
     }
     
-    return found;
+    return nullptr;
 }
 
-std::vector<std::shared_ptr<BGE::Space>> BGE::SpaceService::getSpaces() {
-    std::vector<std::shared_ptr<Space>> spaces;
+std::vector<BGE::SpaceHandle> BGE::SpaceService::getSpaces() {
+    std::vector<SpaceHandle> spaces;
     
     for(auto kv : spaces_) {
         spaces.push_back(kv.second);
     }
 
-    std::sort(spaces.begin(), spaces.end());
+    std::sort(spaces.begin(), spaces.end(),
+              [this](const SpaceHandle &lhs, const SpaceHandle &rhs) {
+                  auto lSpace = this->getSpace(lhs);
+                  auto rSpace = this->getSpace(rhs);
+                  
+                  if (lSpace && rSpace) {
+                      return lSpace->order_ < rSpace->order_;
+                  }
+                  
+                  return false;
+              });
     
     return spaces;
 }

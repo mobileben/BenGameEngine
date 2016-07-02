@@ -1016,14 +1016,18 @@ void BGE::RenderServiceOpenGLES2::render()
             renderGameObject(obj.second, true);
         }
         
-        std::vector<std::shared_ptr<Space>> spaces = Game::getInstance()->getSpaceService()->getSpaces();
+        std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
         
         
-        for (auto space : spaces) {
-            NSLog(@"SPACE %s", space->getName().c_str());
-            for (auto obj : space->getGameObjects()) {
-                NSLog(@"renderGameObject %s", obj.second->getName().c_str());
-                renderGameObject(obj.second, true);
+        for (auto handle : spaceHandles) {
+            auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
+            
+            if (space) {
+                NSLog(@"SPACE %s", space->getName().c_str());
+                for (auto obj : space->getGameObjects()) {
+                    NSLog(@"renderGameObject %s", obj.second->getName().c_str());
+                    renderGameObject(obj.second, true);
+                }
             }
         }
         

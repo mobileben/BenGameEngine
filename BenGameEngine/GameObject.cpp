@@ -8,6 +8,7 @@
 
 #include "GameObject.h"
 #include "Space.h"
+#include "Game.h"
 
 std::shared_ptr<BGE::GameObject> BGE::GameObject::create(uint64_t objId) {
     return std::make_shared<GameObject>(private_key{}, objId);
@@ -27,8 +28,22 @@ BGE::GameObject::~GameObject() {
     removeAllComponents();
 }
 
+void BGE::GameObject::removeComponent(std::type_index typeIndex) {
+    auto space = getSpace();
+    
+    if (space) {
+        auto component = components_.find(typeIndex);
+        
+        if (component != components_.end()) {
+            space->removeComponent(typeIndex, component->second->getInstanceId());
+        }
+    }
+    
+    components_.erase(typeIndex);
+}
+
 void BGE::GameObject::removeAllComponents() {
-    auto space = getSpace().lock();
+    auto space = getSpace();
     
     if (space) {
         for (auto component : components_) {
@@ -38,4 +53,8 @@ void BGE::GameObject::removeAllComponents() {
     }
     
     components_.clear();
+}
+
+BGE::Space *BGE::GameObject::getSpace() const {
+    return Game::getInstance()->getSpaceService()->getSpace(spaceHandle_);
 }
