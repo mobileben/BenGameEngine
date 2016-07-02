@@ -656,7 +656,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<GameObject> gameO
         
         if (flatRect) {
             Vertex *const vertices = flatRect->getVertices();
-            std::shared_ptr<Material> material = flatRect->getMaterial().lock();
+            auto material = flatRect->getMaterial();
             
             if (material) {
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
@@ -682,7 +682,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<GameObject> gameO
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, float thickness, bool loop, std::shared_ptr<Material> material) {
+void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, float thickness, bool loop, Material *material) {
     Vector3 vertices[points.size()];
     GLubyte indices[points.size()];
     
@@ -726,7 +726,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObj
         
         if (sprite) {
             VertexTex *const vertices = sprite->getVertices();
-            std::shared_ptr<Material> material = sprite->getMaterial().lock();
+            auto material = sprite->getMaterial();
             if (material) {
                 std::shared_ptr<TextureBase> texture = material->getTexture().lock();
                 
@@ -790,7 +790,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObj
         
         if (sprite) {
             VertexTex *const vertices = sprite->getVertices();
-            std::shared_ptr<Material> material = sprite->getMaterial().lock();
+            auto material = sprite->getMaterial();
             if (material) {
                 std::shared_ptr<TextureBase> texture = material->getTexture().lock();
                 
@@ -1090,7 +1090,7 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
         if (gameObj->getComponent<LineRenderComponent>()) {
             std::shared_ptr<BGE::LineRenderComponent> line = gameObj->getComponent<LineRenderComponent>();
             
-            drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial().lock());
+            drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial());
         } else if (gameObj->getComponent<FlatRectRenderComponent>()) {
             drawFlatRect(gameObj);
         } else if (gameObj->getComponent<SpriteRenderComponent>()) {

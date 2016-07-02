@@ -31,7 +31,7 @@ void BGE::SpriteRenderComponent::materialsUpdated() {
 
 void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
     // Right now we are only supporting one material
-    std::shared_ptr<Material> material = getMaterial().lock();
+    auto material = getMaterial();
     
     assert(material);
     

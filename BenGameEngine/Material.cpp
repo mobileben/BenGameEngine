@@ -8,16 +8,17 @@
 
 #include "Material.h"
 
-std::shared_ptr<BGE::Material> BGE::Material::create(ObjectId matId) {
-    return std::make_shared<Material>(private_key{}, matId);
-}
-
-BGE::Material::Material(struct private_key const& key, ObjectId matId) : Object(matId), colorDirty_(false)  {
+BGE::Material::Material(ObjectId matId) : Object(matId), colorDirty_(false)  {
     Matrix4MakeIdentify(colorMatrix_.matrix);
     colorMatrix_.offset.r = 0;
     colorMatrix_.offset.g = 0;
     colorMatrix_.offset.b = 0;
     colorMatrix_.offset.a = 0;
+}
+
+void BGE::Material::initialize(MaterialHandle handle, ObjectId matId) {
+    handle_ = handle;
+    setInstanceId(matId);
 }
 
 void BGE::Material::getColorMatrix(ColorMatrix& colorMatrix) const {

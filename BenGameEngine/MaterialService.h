@@ -17,6 +17,7 @@
 #include "MathTypes.h"
 #include "Material.h"
 #include "Texture.h"
+#include "HandleService.h"
 
 namespace BGE {
     class MaterialService : public Service
@@ -34,21 +35,30 @@ namespace BGE {
         void destroy();
         void update(double deltaTime) {}
 
-        std::shared_ptr<Material> createMaterial(Vector4& color);
-        std::shared_ptr<Material> createMaterial(std::shared_ptr<TextureBase> texture);
-        std::shared_ptr<Material> createMaterial(Vector4& color, std::shared_ptr<TextureBase> texture);
+        MaterialHandle createMaterial(Vector4& color);
+        MaterialHandle createMaterial(std::shared_ptr<TextureBase> texture);
+        MaterialHandle createMaterial(Vector4& color, std::shared_ptr<TextureBase> texture);
         
+        void removeMaterial(MaterialHandle handle);
         void removeMaterial(ObjectId matId);
         
-        std::shared_ptr<Material> materialWithId(ObjectId matId);
+        MaterialHandle materialWithId(ObjectId matId);
+        
+        Material *getMaterial(MaterialHandle handle);
+        Material *getMaterial(ObjectId matId);
         
     private:
-        using MaterialMap = std::unordered_map<ObjectId, std::shared_ptr<Material>>;
+        static const uint32_t InitialMaterialReserve = 1024;
+        
+        using MaterialHandleService = HandleService<Material, MaterialHandle>;
+        
+        using MaterialMap = std::unordered_map<ObjectId, MaterialHandle>;
         using MaterialMapIterator = MaterialMap::iterator;
         
-        MaterialMap materials_;
+        MaterialHandleService   handleService_;
+        MaterialMap             materials_;
         
-        void addMaterial(std::shared_ptr<Material> material);
+        void addMaterial(MaterialHandle material);
     };
 }
 

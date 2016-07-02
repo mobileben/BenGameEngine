@@ -15,19 +15,22 @@
 #include "Object.h"
 #include "MathTypes.h"
 #include "TextureBase.h"
+#include "Handle.h"
 
 namespace BGE {
     class MaterialService;
     
+    struct MaterialTag {};
+    using MaterialHandle = Handle<MaterialTag>;
+    
     class Material : public Object {
-    private:
-        struct private_key {};
-        
     public:
-        static std::shared_ptr<Material> create(ObjectId matId);
-        
-        Material(struct private_key const& key, ObjectId matId);
+        Material(ObjectId matId);
         ~Material() {}
+        
+        void initialize(MaterialHandle handle, ObjectId matId);
+        
+        MaterialHandle getHandle() const { return handle_; }
         
         void getColor(Color& color) const { color = colorMatrix_.offset; }
         void setColor(Color& color) { colorMatrix_.offset = color; }
@@ -42,6 +45,7 @@ namespace BGE {
         friend MaterialService;
         
     private:
+        MaterialHandle              handle_;
         bool                        colorDirty_;
         ColorMatrix                 colorMatrix_;
         

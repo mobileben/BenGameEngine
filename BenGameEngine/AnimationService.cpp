@@ -186,20 +186,20 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
         xform->setVisibility(true);
         
         if (true || origFrame != channelFrame) {
-            std::shared_ptr<Material> material;
+            Material *material = nullptr;
             
             if (obj->getComponent<LineRenderComponent>()) {
                 std::shared_ptr<LineRenderComponent> render = obj->getComponent<LineRenderComponent>();
-                material = render->getMaterial().lock();
+                material = render->getMaterial();
             } else if (obj->getComponent<FlatRectRenderComponent>()) {
                 std::shared_ptr<FlatRectRenderComponent> render = obj->getComponent<FlatRectRenderComponent>();
-                material = render->getMaterial().lock();
+                material = render->getMaterial();
             } else if (obj->getComponent<SpriteRenderComponent>()) {
                 std::shared_ptr<SpriteRenderComponent> render = obj->getComponent<SpriteRenderComponent>();
-                material = render->getMaterial().lock();
+                material = render->getMaterial();
             } else if (obj->getComponent<TextComponent>()) {
                 std::shared_ptr<TextComponent> render = obj->getComponent<TextComponent>();
-                material = render->getMaterial().lock();
+                material = render->getMaterial();
             }
             
             animator->currKeyframe = channelFrame;

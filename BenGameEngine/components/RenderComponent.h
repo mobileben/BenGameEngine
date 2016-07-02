@@ -37,8 +37,9 @@ namespace BGE {
         void setEnabled(bool enabled) { enabled_ = enabled; }
         RenderComponentAnchor getAnchor() const { return anchor_; }
         
-        std::weak_ptr<Material> getMaterial(uint32_t index=0);
-        void setMaterials(std::vector<std::shared_ptr<Material>> materials);
+        MaterialHandle getMaterialHandle(uint32_t index=0);
+        Material *getMaterial(uint32_t index=0);
+        void setMaterials(std::vector<MaterialHandle> materials);
         
     protected:
         RenderComponent(ObjectId componentId);
@@ -60,7 +61,7 @@ namespace BGE {
         Rect                    globalBounds_;  // Global. This includes any transforms applied
         RenderComponentAnchor   anchor_;
         
-        std::vector<std::weak_ptr<Material>> materials_;
+        std::vector<MaterialHandle> materialHandles_;
     };
 }
 

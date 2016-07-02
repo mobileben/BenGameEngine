@@ -57,7 +57,7 @@ namespace BGE {
         // Using the more updated means
         void drawFlatRect(std::shared_ptr<GameObject> gameObject);
         // TODO: Transform
-        void drawLines(const std::vector<Vector2>& points, float thickness, bool loop, std::shared_ptr<Material> material);
+        void drawLines(const std::vector<Vector2>& points, float thickness, bool loop, Material *material);
         void drawSprite(std::shared_ptr<GameObject> gameObject);
         
         int8_t createMask(Vector2 &position, std::shared_ptr<TextureBase> mask);

@@ -8,7 +8,7 @@
 
 #include "MaterialService.h"
 
-BGE::MaterialService::MaterialService() {
+BGE::MaterialService::MaterialService() :  handleService_(InitialMaterialReserve, MaterialHandleService::NoMaxLimit) {
 }
 
 BGE::MaterialService::~MaterialService() {
@@ -22,63 +22,110 @@ void BGE::MaterialService::pause() {}
 void BGE::MaterialService::resume() {}
 void BGE::MaterialService::destroy() {}
 
-std::shared_ptr<BGE::Material> BGE::MaterialService::createMaterial(Vector4& color) {
-    ObjectId objId = getIdAndIncrement();
-    std::shared_ptr<Material> material = Material::create(objId);
+BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color) {
+    MaterialHandle handle;
+    Material *material = handleService_.allocate(handle);
     
     if (material) {
+        ObjectId objId = getIdAndIncrement();
+        
+        material->initialize(handle, objId);
         material->setColor(color);
-        addMaterial(material);
+        addMaterial(handle);
     }
     
-    return material;
+    return handle;
 }
 
-std::shared_ptr<BGE::Material> BGE::MaterialService::createMaterial(std::shared_ptr<TextureBase> texture) {
-    ObjectId objId = getIdAndIncrement();
-    std::shared_ptr<Material> material = Material::create(objId);;
+BGE::MaterialHandle BGE::MaterialService::createMaterial(std::shared_ptr<TextureBase> texture) {
+    MaterialHandle handle;
+    Material *material = handleService_.allocate(handle);
     
     if (material) {
+        ObjectId objId = getIdAndIncrement();
+        
+        material->initialize(handle, objId);
         material->setTexture(texture);
-        addMaterial(material);
+        addMaterial(handle);
     }
     
-    return material;
+    return handle;
 }
 
-std::shared_ptr<BGE::Material> BGE::MaterialService::createMaterial(Vector4& color, std::shared_ptr<TextureBase> texture) {
-    ObjectId objId = getIdAndIncrement();
-    std::shared_ptr<Material> material = Material::create(objId);;
+BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color, std::shared_ptr<TextureBase> texture) {
+    MaterialHandle handle;
+    Material *material = handleService_.allocate(handle);
     
     if (material) {
+        ObjectId objId = getIdAndIncrement();
+        
+        material->initialize(handle, objId);
         material->setColor(color);
         material->setTexture(texture);
-        addMaterial(material);
+        addMaterial(handle);
     }
     
-    return material;
+    return handle;
 }
 
-void BGE::MaterialService::addMaterial(std::shared_ptr<Material> material) {
-    MaterialMapIterator it = materials_.find(material->getInstanceId());
+void BGE::MaterialService::addMaterial(MaterialHandle handle) {
+    auto material = getMaterial(handle);
     
-    if (it != materials_.end()) {
-        // We already have the material
-        // TODO: Error, warning, override?
+    if (material) {
+        MaterialMapIterator it = materials_.find(material->getInstanceId());
+        
+        if (it != materials_.end()) {
+            // We already have the material
+            // TODO: Error, warning, override?
+        } else {
+            materials_[material->getInstanceId()] = handle;
+        }
     } else {
-        materials_[material->getInstanceId()] = material;
+        // TODO: Error, what do we do?
     }
+}
 
+void BGE::MaterialService::removeMaterial(MaterialHandle handle) {
+    auto material = getMaterial(handle);
+    
+    if (material) {
+        MaterialMapIterator it = materials_.find(material->getInstanceId());
+        
+        if (it != materials_.end()) {
+            handleService_.release(handle);
+            materials_.erase(material->getInstanceId());
+        }
+    }
 }
 
 void BGE::MaterialService::removeMaterial(ObjectId matId) {
-    materials_.erase(matId);
+    MaterialMapIterator it = materials_.find(matId);
+    
+    if (it != materials_.end()) {
+        handleService_.release(it->second);
+        materials_.erase(matId);
+    }
 }
 
-std::shared_ptr<BGE::Material> BGE::MaterialService::materialWithId(ObjectId matId) {
+BGE::MaterialHandle BGE::MaterialService::materialWithId(ObjectId matId) {
     if (materials_.find(matId) != materials_.end()) {
         return materials_[matId];
     } else {
-        return nullptr;
+        return MaterialHandle();
     }
 }
+
+BGE::Material *BGE::MaterialService::getMaterial(MaterialHandle handle) {
+    return handleService_.dereference(handle);
+}
+
+BGE::Material *BGE::MaterialService::getMaterial(ObjectId matId) {
+    MaterialMapIterator it = materials_.find(matId);
+    
+    if (it != materials_.end()) {
+        return handleService_.dereference(it->second);
+    }
+
+    return nullptr;
+}
+
