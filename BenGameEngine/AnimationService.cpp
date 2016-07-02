@@ -12,6 +12,8 @@
 #include "AnimationSequenceComponent.h"
 #include "AnimationChannelComponent.h"
 #include "AnimatorComponent.h"
+#include "ColorMatrixComponent.h"
+#include "ColorTransformComponent.h"
 
 BGE::AnimationService::AnimationService() {
 }
@@ -53,10 +55,8 @@ void BGE::AnimationService::animateSequence(std::shared_ptr<AnimationSequenceCom
             bool triggerEvent = false;
             float adjustedDeltaTime = animator->speed * deltaTime;
             
-            NSLog(@"Adjust dt %f %f", adjustedDeltaTime, animator->frameRemainderTime);
             // Are we going to step past our current frame?
             if (adjustedDeltaTime >= animator->frameRemainderTime) {
-                NSLog(@"HERE 1");
                 // Trim off the time left in the frame
                 adjustedDeltaTime -= animator->frameRemainderTime;
 
@@ -84,7 +84,6 @@ void BGE::AnimationService::animateSequence(std::shared_ptr<AnimationSequenceCom
                     // Resolve our time by stepping over any frames we missed
                     while (animator->state == AnimState::Playing && adjustedDeltaTime >= animator->secPerFrame) {
                         if (animator->forward) {
-                            NSLog(@"HERE 2");
                             frame++;
                             
                             if (frame >= seq->totalFrames) {
@@ -121,8 +120,6 @@ void BGE::AnimationService::animateSequence(std::shared_ptr<AnimationSequenceCom
             if (origFrame != frame) {
                 // We need to update frames
                 animator->currentFrame = frame;
-                
-                NSLog(@"XXXXX Frame is %d", frame);
                 
                 for (auto child : seq->channels) {
                     animateChannel(child, frame);
@@ -179,13 +176,12 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
         // We have the correct keyframe
     }
     
-    NSLog(@"Channel frame %s %d %d", channel->channel->name, origFrame, channelFrame);
     if (hide) {
         xform->setVisibility(false);
     } else {
         xform->setVisibility(true);
         
-        if (origFrame != channelFrame) {
+        if (true || origFrame != channelFrame) {
             std::shared_ptr<Material> material;
             
             if (obj->getComponent<BGE::LineRenderComponent>()) {
@@ -218,16 +214,44 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
                 xform->setScaleY(1);
             }
             
+            auto colorMatrix = obj->getComponent<ColorMatrixComponent>();
+            auto colorTransform = obj->getComponent<ColorTransformComponent>();
+            auto space = obj->getSpace().lock();
+            
             if (keyframe->colorMatrix) {
+                if (colorMatrix) {
+                    colorMatrix->matrix = *keyframe->colorMatrix;
+                } else {
+                    colorMatrix = space->createComponent<ColorMatrixComponent>();
+                    obj->addComponent(colorMatrix);
+                }
+                
+                colorMatrix->matrix = *keyframe->colorMatrix;
+
                 if (material) {
-                    assert(material);
                     material->setColorMatrix(*keyframe->colorMatrix);
                     NSLog(@"Color is %f %f %f %f", keyframe->colorMatrix->offset.r, keyframe->colorMatrix->offset.g, keyframe->colorMatrix->offset.b, keyframe->colorMatrix->offset.a);
                 }
+            } else {
+                if (colorMatrix) {
+                    obj->removeComponent<ColorMatrixComponent>();
+                }
             }
+                
             
             if (keyframe->colorTransform) {
-                assert(material);
+                if (colorTransform) {
+                    colorTransform->transform = *keyframe->colorTransform;
+                } else {
+                    colorTransform = space->createComponent<ColorTransformComponent>();
+                    obj->addComponent(colorTransform);
+                }
+                
+                colorTransform->transform = *keyframe->colorTransform;
+            } else {
+                if (colorTransform) {
+                    obj->removeComponent<ColorTransformComponent>();
+                }
             }
             
             // Update our render
@@ -261,8 +285,7 @@ void BGE::AnimationService::animateChannel(std::shared_ptr<GameObject> obj, int3
 }
 
 void BGE::AnimationService::animateSequenceByFrame(std::shared_ptr<AnimationSequenceComponent> seq, std::shared_ptr<FrameAnimatorComponent> animator, int32_t frame) {
-    NSLog(@"subframe %d %d", animator->currentFrame, frame);
-    if (frame != animator->currentFrame) {
+    if (true || frame != animator->currentFrame) {
         animator->currentFrame = frame;
         
         for (auto child : seq->channels) {

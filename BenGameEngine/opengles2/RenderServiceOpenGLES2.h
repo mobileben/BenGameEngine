@@ -77,6 +77,8 @@ namespace BGE {
         std::vector<Matrix4> matrixStack_;
         ColorMatrix currentColorMatrix_;
         std::vector<ColorMatrix> colorMatrixStack_;
+        ColorTransform currentColorTransform_;
+        std::vector<ColorTransform> colorTransformStack_;
         
         bool texturingEnabled_[MaxTextureUnits];
         uint64_t currentTexture_[MaxTextureUnits];
@@ -92,8 +94,16 @@ namespace BGE {
         // TODO: This will get moved out
         void transformGameObject(std::shared_ptr<GameObject> gameObj);
 
+        void resetStacks();
+        
         void pushMatrix();
         void popMatrix();
+        
+        void pushColorMatrix();
+        void popColorMatrix();
+        
+        void pushColorTransform();
+        void popColorTransform();
     };
 }
 

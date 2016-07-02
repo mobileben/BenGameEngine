@@ -155,6 +155,75 @@ namespace BGE {
         return false;
     }
     
+    void ColorMatrixMakeIdentify(ColorMatrix &matrix) {
+        Matrix4MakeIdentify(matrix.matrix);
+        matrix.offset.r = matrix.offset.g = matrix.offset.b = matrix.offset.a = 0;
+    }
+    
+    void ColorMatrixMultiply(ColorMatrix& matrix, ColorMatrix& left, ColorMatrix& right) {
+        // First Column
+        matrix.c[0] = left.c[0]*right.c[0] + left.c[4]*right.c[1] + left.c[8]*right.c[2] + left.c[12]*right.c[3];
+        matrix.c[1] = left.c[1]*right.c[0] + left.c[5]*right.c[1] + left.c[9]*right.c[2] + left.c[13]*right.c[3];
+        matrix.c[2] = left.c[2]*right.c[0] + left.c[6]*right.c[1] + left.c[10]*right.c[2] + left.c[14]*right.c[3];
+        matrix.c[3] = left.c[3]*right.c[0] + left.c[7]*right.c[1] + left.c[11]*right.c[2] + left.c[15]*right.c[3];
+        matrix.c[16] = left.c[16]*right.c[0] + left.c[17]*right.c[1] + left.c[18]*right.c[2] + left.c[19]*right.c[3] + right.c[16];
+        
+        // Second Column
+        matrix.c[4] = left.c[0]*right.c[4] + left.c[4]*right.c[5] + left.c[8]*right.c[6] + left.c[12]*right.c[7];
+        matrix.c[5] = left.c[1]*right.c[4] + left.c[5]*right.c[5] + left.c[9]*right.c[6] + left.c[13]*right.c[7];
+        matrix.c[6] = left.c[2]*right.c[4] + left.c[6]*right.c[5] + left.c[10]*right.c[6] + left.c[14]*right.c[7];
+        matrix.c[7] = left.c[3]*right.c[4] + left.c[7]*right.c[5] + left.c[11]*right.c[6] + left.c[15]*right.c[7];
+        matrix.c[17] = left.c[16]*right.c[4] + left.c[17]*right.c[5] + left.c[18]*right.c[6] + left.c[19]*right.c[7] + right.c[17];
+        
+        // Third Column
+        matrix.c[8] = left.c[0]*right.c[8] + left.c[4]*right.c[9] + left.c[8]*right.c[10] + left.c[12]*right.c[11];
+        matrix.c[9] = left.c[1]*right.c[8] + left.c[5]*right.c[9] + left.c[9]*right.c[10] + left.c[13]*right.c[11];
+        matrix.c[10] = left.c[2]*right.c[8] + left.c[6]*right.c[9] + left.c[10]*right.c[10] + left.c[14]*right.c[11];
+        matrix.c[11] = left.c[3]*right.c[8] + left.c[7]*right.c[9] + left.c[11]*right.c[10] + left.c[15]*right.c[11];
+        matrix.c[18] = left.c[16]*right.c[8] + left.c[17]*right.c[9] + left.c[18]*right.c[10] + left.c[19]*right.c[11] + right.c[18];
+        
+        // Fourth Column
+        matrix.c[12] = left.c[0]*right.c[12] + left.c[4]*right.c[13] + left.c[8]*right.c[14] + left.c[12]*right.c[15];
+        matrix.c[13] = left.c[1]*right.c[12] + left.c[5]*right.c[13] + left.c[9]*right.c[14] + left.c[13]*right.c[15];
+        matrix.c[14] = left.c[2]*right.c[12] + left.c[6]*right.c[13] + left.c[10]*right.c[14] + left.c[14]*right.c[15];
+        matrix.c[15] = left.c[3]*right.c[12] + left.c[7]*right.c[13] + left.c[11]*right.c[14] + left.c[15]*right.c[15];
+        matrix.c[19] = left.c[16]*right.c[12] + left.c[17]*right.c[13] + left.c[18]*right.c[14] + left.c[19]*right.c[15] + right.c[19];
+    }
+
+    ColorMatrix operator*(ColorMatrix& lhs, ColorMatrix& rhs) {
+        ColorMatrix matrix;
+
+        // First Column
+        matrix.c[0] = lhs.c[0]*rhs.c[0] + lhs.c[4]*rhs.c[1] + lhs.c[8]*rhs.c[2] + lhs.c[12]*rhs.c[3];
+        matrix.c[1] = lhs.c[1]*rhs.c[0] + lhs.c[5]*rhs.c[1] + lhs.c[9]*rhs.c[2] + lhs.c[13]*rhs.c[3];
+        matrix.c[2] = lhs.c[2]*rhs.c[0] + lhs.c[6]*rhs.c[1] + lhs.c[10]*rhs.c[2] + lhs.c[14]*rhs.c[3];
+        matrix.c[3] = lhs.c[3]*rhs.c[0] + lhs.c[7]*rhs.c[1] + lhs.c[11]*rhs.c[2] + lhs.c[15]*rhs.c[3];
+        matrix.c[16] = lhs.c[16]*rhs.c[0] + lhs.c[17]*rhs.c[1] + lhs.c[18]*rhs.c[2] + lhs.c[19]*rhs.c[3] + rhs.c[16];
+        
+        // Second Column
+        matrix.c[4] = lhs.c[0]*rhs.c[4] + lhs.c[4]*rhs.c[5] + lhs.c[8]*rhs.c[6] + lhs.c[12]*rhs.c[7];
+        matrix.c[5] = lhs.c[1]*rhs.c[4] + lhs.c[5]*rhs.c[5] + lhs.c[9]*rhs.c[6] + lhs.c[13]*rhs.c[7];
+        matrix.c[6] = lhs.c[2]*rhs.c[4] + lhs.c[6]*rhs.c[5] + lhs.c[10]*rhs.c[6] + lhs.c[14]*rhs.c[7];
+        matrix.c[7] = lhs.c[3]*rhs.c[4] + lhs.c[7]*rhs.c[5] + lhs.c[11]*rhs.c[6] + lhs.c[15]*rhs.c[7];
+        matrix.c[17] = lhs.c[16]*rhs.c[4] + lhs.c[17]*rhs.c[5] + lhs.c[18]*rhs.c[6] + lhs.c[19]*rhs.c[7] + rhs.c[17];
+        
+        // Third Column
+        matrix.c[8] = lhs.c[0]*rhs.c[8] + lhs.c[4]*rhs.c[9] + lhs.c[8]*rhs.c[10] + lhs.c[12]*rhs.c[11];
+        matrix.c[9] = lhs.c[1]*rhs.c[8] + lhs.c[5]*rhs.c[9] + lhs.c[9]*rhs.c[10] + lhs.c[13]*rhs.c[11];
+        matrix.c[10] = lhs.c[2]*rhs.c[8] + lhs.c[6]*rhs.c[9] + lhs.c[10]*rhs.c[10] + lhs.c[14]*rhs.c[11];
+        matrix.c[11] = lhs.c[3]*rhs.c[8] + lhs.c[7]*rhs.c[9] + lhs.c[11]*rhs.c[10] + lhs.c[15]*rhs.c[11];
+        matrix.c[18] = lhs.c[16]*rhs.c[8] + lhs.c[17]*rhs.c[9] + lhs.c[18]*rhs.c[10] + lhs.c[19]*rhs.c[11] + rhs.c[18];
+        
+        // Fourth Column
+        matrix.c[12] = lhs.c[0]*rhs.c[12] + lhs.c[4]*rhs.c[13] + lhs.c[8]*rhs.c[14] + lhs.c[12]*rhs.c[15];
+        matrix.c[13] = lhs.c[1]*rhs.c[12] + lhs.c[5]*rhs.c[13] + lhs.c[9]*rhs.c[14] + lhs.c[13]*rhs.c[15];
+        matrix.c[14] = lhs.c[2]*rhs.c[12] + lhs.c[6]*rhs.c[13] + lhs.c[10]*rhs.c[14] + lhs.c[14]*rhs.c[15];
+        matrix.c[15] = lhs.c[3]*rhs.c[12] + lhs.c[7]*rhs.c[13] + lhs.c[11]*rhs.c[14] + lhs.c[15]*rhs.c[15];
+        matrix.c[19] = lhs.c[16]*rhs.c[12] + lhs.c[17]*rhs.c[13] + lhs.c[18]*rhs.c[14] + lhs.c[19]*rhs.c[15] + rhs.c[19];
+
+        return matrix;
+    }
+
     bool operator==(const ColorTransform& lhs, const ColorTransform& rhs) {
         if (lhs.c[0] != rhs.c[0]) {
             return false;
@@ -217,6 +286,18 @@ namespace BGE {
         }
         
         return false;
+    }
+
+    void ColorTransformMakeIdentity(ColorTransform &transform) {
+        transform.multiplier.r = 1;
+        transform.multiplier.g = 1;
+        transform.multiplier.b = 1;
+        transform.multiplier.a = 1;
+        
+        transform.offset.r = 0;
+        transform.offset.g = 0;
+        transform.offset.b = 0;
+        transform.offset.a = 0;
     }
 
     float MathDegreesToRadians(float degrees)

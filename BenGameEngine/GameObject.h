@@ -51,7 +51,24 @@ namespace BGE {
             component->setGameObject(derived_shared_from_this<GameObject>());
         }
         
-        template <typename T> void removeComponent();
+        template <typename T>
+        void removeComponent() {
+            auto space = getSpace().lock();
+            std::type_index typeId = typeid(T);
+            
+            if (space) {
+                auto component = components_.find(typeId);
+                
+                if (component != components_.end()) {
+#ifdef NOT_YET
+                    space->removeComponent<T>(component->second->getInstanceId());
+#endif
+                }
+            }
+            
+            components_.erase(typeId);
+        }
+        
         void removeAllComponents();
         
         bool isActive() const { return active_; }

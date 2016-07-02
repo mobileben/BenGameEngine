@@ -118,6 +118,10 @@ namespace BGE {
     bool operator==(const ColorMatrix& lhs, const ColorMatrix& rhs);
     bool operator!=(const ColorMatrix& lhs, const ColorMatrix& rhs);
 
+    extern void ColorMatrixMakeIdentify(ColorMatrix &matrix);
+    extern void ColorMatrixMultiply(ColorMatrix& matrix, ColorMatrix& left, ColorMatrix& right);
+    ColorMatrix operator*(ColorMatrix& lhs, ColorMatrix& rhs);
+
     typedef union {
         struct {
             Color multiplier;
@@ -130,6 +134,8 @@ namespace BGE {
     bool operator==(const ColorTransform& lhs, const ColorTransform& rhs);
     bool operator!=(const ColorTransform& lhs, const ColorTransform& rhs);
 
+    extern void ColorTransformMakeIdentity(ColorTransform &transform);
+    
     extern float MathDegreesToRadians(float degrees);
     extern float MathRadiansToDegrees(float radians);
     

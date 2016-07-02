@@ -123,7 +123,7 @@
                 // Animation game object requires: xform, animator, animation sequence
                 transformComponent = self.space->createComponent<BGE::TransformComponent>();
                 auto anim = self.space->createComponent<BGE::AnimationSequenceComponent>();
-                auto animSeqRef = BGE::Game::getInstance()->getScenePackageService()->getAnimationSequenceReference("CashMeter");
+                auto animSeqRef = BGE::Game::getInstance()->getScenePackageService()->getAnimationSequenceReference("SaleGlowAnim");
                 auto animator = self.space->createComponent<BGE::AnimatorComponent>();
 
                 transformComponent->setX(200);

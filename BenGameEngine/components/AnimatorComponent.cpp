@@ -12,6 +12,9 @@
 #include "TransformComponent.h"
 #include "AnimationChannelComponent.h"
 #include "ChannelFrameAnimatorComponent.h"
+#include "ColorMatrixComponent.h"
+#include "ColorTransformComponent.h"
+#include "Space.h"
 
 std::shared_ptr<BGE::AnimatorComponent> BGE::AnimatorComponent::create(uint64_t componentId) {
     return std::make_shared<AnimatorComponent>(private_key{}, componentId);
@@ -82,10 +85,43 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
                             if (frame < keyframe->startFrame) {
                                 break;
                             } else if (frame >= keyframe->startFrame && frame < (keyframe->startFrame + keyframe->totalFrames)) {
+                                auto colorMatrix = chanGameObj->getComponent<ColorMatrixComponent>();
+                                auto colorTransform = chanGameObj->getComponent<ColorTransformComponent>();
+                                auto space = channel->getSpace().lock();
                                 animator->currKeyframe = ki;
                                 xform->setPosition(*keyframe->position);
                                 xform->setScale(*keyframe->scale);
                                 xform->setRotation(keyframe->rotation);
+                                
+                                if (keyframe->colorMatrix) {
+                                    if (colorMatrix) {
+                                        colorMatrix->matrix = *keyframe->colorMatrix;
+                                    } else {
+                                        colorMatrix = space->createComponent<ColorMatrixComponent>();
+                                        chanGameObj->addComponent(colorMatrix);
+                                    }
+                                    
+                                    colorMatrix->matrix = *keyframe->colorMatrix;
+                                } else {
+                                    if (colorMatrix) {
+                                        chanGameObj->removeComponent<ColorMatrixComponent>();
+                                    }
+                                }
+                                
+                                if (keyframe->colorTransform) {
+                                    if (colorTransform) {
+                                        colorTransform->transform = *keyframe->colorTransform;
+                                    } else {
+                                        colorTransform = space->createComponent<ColorTransformComponent>();
+                                        chanGameObj->addComponent(colorTransform);
+                                    }
+                                    
+                                    colorTransform->transform = *keyframe->colorTransform;
+                                } else {
+                                    if (colorTransform) {
+                                        chanGameObj->removeComponent<ColorTransformComponent>();
+                                    }
+                                }
                             } else {
                                 break;
                             }

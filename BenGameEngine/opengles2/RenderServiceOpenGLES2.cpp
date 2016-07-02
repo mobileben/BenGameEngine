@@ -17,6 +17,8 @@
 #include "FlatRectRenderComponent.h"
 #include "SpriteRenderComponent.h"
 #include "TextComponent.h"
+#include "ColorMatrixComponent.h"
+#include "ColorTransformComponent.h"
 
 #if 0
 const BGE::VertexColor Vertices[] = {
@@ -825,19 +827,25 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<BGE::GameObject> ga
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
                         }
                         
-                        Matrix4 t1;
-                        Vector4 t2;
-                        Matrix4MakeIdentify(t1);
+#if 0
+                        auto colorMatrix = gameObject->getComponent<ColorMatrixComponent>();
                         
-                        t2.r = 0;
-                        t2.g = 0;
-                        t2.b = 0;
-                        t2.a = 0;
-                        
-                        glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) t1.m);
-                        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) t2.v);
-                        glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) material->getColorMatrixRaw()->matrix.m);
-                        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) material->getColorMatrixRaw()->offset.v);
+                        if (colorMatrix) {
+                            glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix->matrix.matrix.m);
+                            glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorMatrix->matrix.offset.v);
+                        } else {
+                            ColorMatrix noColor;
+                            
+                            ColorMatrixMakeIdentify(noColor);
+//                            glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) material->getColorMatrixRaw()->matrix.m);
+//                            glUniform4fv(colorOffsetLocation, 1, (GLfloat *) material->getColorMatrixRaw()->offset.v);
+                            glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) noColor.matrix.m);
+                            glUniform4fv(colorOffsetLocation, 1, (GLfloat *) noColor.offset.v);
+                        }
+#else
+                        glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) currentColorMatrix_.matrix.m);
+                        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) currentColorMatrix_.offset.v);
+#endif
                         
                         NSLog(@"Render color %f %f %f %f", material->getColorMatrixRaw()->offset.r, material->getColorMatrixRaw()->offset.g, material->getColorMatrixRaw()->offset.b, material->getColorMatrixRaw()->offset.a);
                         glDisable(GL_BLEND);
@@ -929,8 +937,17 @@ void BGE::RenderServiceOpenGLES2::render()
         std::shared_ptr<TextureBase> font;
         
         assert(matrixStack_.size() == 0);
+        assert(colorMatrixStack_.size() == 0);
+        assert(colorTransformStack_.size() == 0);
+        
         Matrix4MakeIdentify(currentMatrix_);
-        matrixStack_.clear();
+        matrixStack_.clear();    // TODO: remove?
+        
+        ColorMatrixMakeIdentify(currentColorMatrix_);
+        colorMatrixStack_.clear();  // TODO: remove?
+        
+        ColorTransformMakeIdentity(currentColorTransform_);
+        colorTransformStack_.clear();
         
         // Reset render states
         shaderProgramStack_.clear();
@@ -1034,6 +1051,8 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
         
         // Since we have the transform, push our
         pushMatrix();
+        pushColorMatrix();
+        pushColorTransform();
         
         Matrix4 xlate;
         Matrix4 scale;
@@ -1050,6 +1069,18 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
             transformComponent->matrix_ = parent->matrix_ * transformComponent->localMatrix_;
         } else {
             transformComponent->matrix_ = transformComponent->localMatrix_;
+        }
+        
+        auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();
+        auto colorTransform = gameObj->getComponent<ColorTransformComponent>();
+        
+        if (colorMatrix) {
+            auto tMat = currentColorMatrix_ * colorMatrix->matrix;
+            currentColorMatrix_ = tMat;
+        }
+        
+        if (colorTransform) {
+            
         }
         
         if (gameObj->getComponent<BGE::LineRenderComponent>()) {
@@ -1084,6 +1115,8 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
         
         // First sort
         
+        popColorTransform();
+        popColorMatrix();
         // Now pop the transform
         popMatrix();
     }
@@ -1096,6 +1129,25 @@ void BGE::RenderServiceOpenGLES2::pushMatrix() {
 void BGE::RenderServiceOpenGLES2::popMatrix() {
     currentMatrix_ = matrixStack_.back();
     matrixStack_.pop_back();
+}
+
+
+void BGE::RenderServiceOpenGLES2::pushColorMatrix() {
+    colorMatrixStack_.push_back(currentColorMatrix_);
+}
+
+void BGE::RenderServiceOpenGLES2::popColorMatrix() {
+    currentColorMatrix_ = colorMatrixStack_.back();
+    colorMatrixStack_.pop_back();
+}
+
+void BGE::RenderServiceOpenGLES2::pushColorTransform() {
+    colorTransformStack_.push_back(currentColorTransform_);
+}
+
+void BGE::RenderServiceOpenGLES2::popColorTransform() {
+    currentColorTransform_ = colorTransformStack_.back();
+    colorTransformStack_.pop_back();
 }
 
 void BGE::RenderServiceOpenGLES2::transformGameObject(std::shared_ptr<GameObject> gameObj) {

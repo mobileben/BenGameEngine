@@ -105,6 +105,8 @@
 		B5AE8CC31CF2DB5500FAA0DC /* xpfill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5AE8CAE1CF2DB5500FAA0DC /* xpfill@2x.png */; };
 		B5AE8CC41CF2DB5500FAA0DC /* xpfillglare@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5AE8CAF1CF2DB5500FAA0DC /* xpfillglare@2x.png */; };
 		B5AE8CC51CF2DB5500FAA0DC /* xpicon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5AE8CB01CF2DB5500FAA0DC /* xpicon@2x.png */; };
+		B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */; };
+		B5C388E21D24D91B00137CEC /* ColorTransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */; };
 		B5DCDA231CE2F9F100CBF0A6 /* HandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */; };
 		B5DCDA261CE59F7400CBF0A6 /* ScenePackageService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA241CE59F7400CBF0A6 /* ScenePackageService.cpp */; };
 		B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5E7B9B51CC35B5000978F1A /* LineVertex.glsl */; };
@@ -312,6 +314,10 @@
 		B5AE8CAE1CF2DB5500FAA0DC /* xpfill@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "xpfill@2x.png"; path = "testPackage/xpfill@2x.png"; sourceTree = "<group>"; };
 		B5AE8CAF1CF2DB5500FAA0DC /* xpfillglare@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "xpfillglare@2x.png"; path = "testPackage/xpfillglare@2x.png"; sourceTree = "<group>"; };
 		B5AE8CB01CF2DB5500FAA0DC /* xpicon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "xpicon@2x.png"; path = "testPackage/xpicon@2x.png"; sourceTree = "<group>"; };
+		B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorMatrixComponent.cpp; path = components/ColorMatrixComponent.cpp; sourceTree = "<group>"; };
+		B5C388DE1D24D90500137CEC /* ColorMatrixComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorMatrixComponent.h; path = components/ColorMatrixComponent.h; sourceTree = "<group>"; };
+		B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformComponent.cpp; path = components/ColorTransformComponent.cpp; sourceTree = "<group>"; };
+		B5C388E11D24D91B00137CEC /* ColorTransformComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorTransformComponent.h; path = components/ColorTransformComponent.h; sourceTree = "<group>"; };
 		B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = HandleTests.m; path = BGEGameObjectAndComponentTests/HandleTests.m; sourceTree = SOURCE_ROOT; };
 		B5DCDA241CE59F7400CBF0A6 /* ScenePackageService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = ScenePackageService.cpp; sourceTree = "<group>"; };
 		B5DCDA251CE59F7400CBF0A6 /* ScenePackageService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenePackageService.h; sourceTree = "<group>"; };
@@ -387,6 +393,10 @@
 				B50A1FA01D0E762F004B450E /* AnimatorComponent.h */,
 				B547F1781D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp */,
 				B547F1791D125BB70031AF58 /* ChannelFrameAnimatorComponent.h */,
+				B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */,
+				B5C388DE1D24D90500137CEC /* ColorMatrixComponent.h */,
+				B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */,
+				B5C388E11D24D91B00137CEC /* ColorTransformComponent.h */,
 				B5E7B9B81CC46A7500978F1A /* FlatRectRenderComponent.cpp */,
 				B5E7B9B91CC46A7500978F1A /* FlatRectRenderComponent.h */,
 				B547F17B1D125BD00031AF58 /* FrameAnimatorComponent.cpp */,
@@ -892,6 +902,7 @@
 				B5AE8C9A1CEC44E100FAA0DC /* ScenePackage.cpp in Sources */,
 				B508CDAB1CB4DE8E00127B97 /* Object.cpp in Sources */,
 				B525E3BA1C89587000C691C0 /* MathTypes.cpp in Sources */,
+				B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */,
 				B5ACE8951CBF7B00004B6871 /* LineRenderComponent.cpp in Sources */,
 				B571F1901C9D0A34007F5A90 /* FontGlyph.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */,
@@ -915,6 +926,7 @@
 				B508CD931CAE285000127B97 /* TransformComponent.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* Game.cpp in Sources */,
 				B5E7B9BA1CC46A7500978F1A /* FlatRectRenderComponent.cpp in Sources */,
+				B5C388E21D24D91B00137CEC /* ColorTransformComponent.cpp in Sources */,
 				B5DCDA261CE59F7400CBF0A6 /* ScenePackageService.cpp in Sources */,
 				B508CDA51CB4DD5B00127B97 /* Component.cpp in Sources */,
 				B525E3B51C89587000C691C0 /* Error.cpp in Sources */,
