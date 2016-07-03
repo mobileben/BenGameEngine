@@ -10,7 +10,7 @@
 #define BGEFontService_h
 
 #include <stdio.h>
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <memory>
 #include <functional>
@@ -33,9 +33,16 @@ namespace BGE {
         FontService(std::map<std::string, std::string> resources = std::map<std::string, std::string>());
         ~FontService() {}
         
+        FontHandle getFontHandle(ObjectId fontId);
+        FontHandle getFontHandle(std::string name, uint32_t pixelSize);
+
+        Font *getFont(ObjectId fontId);
         Font *getFont(std::string name, uint32_t pixelSize);
         Font *getFont(FontHandle handle);
-        FontHandle getFontHandle(std::string name, uint32_t pixelSize);
+        
+        void removeFont(ObjectId fontId);
+        void removeFont(std::string name, uint32_t pixelSize);
+        void removeFont(FontHandle handle);
         
         void initialize() {}
         void reset() {}
@@ -55,9 +62,9 @@ namespace BGE {
         static NSBundle *builtinBundle_;
         static NSBundle *mainBundle_;
         
-        std::map<std::string, std::string> fontResources_;
-        std::map<std::string, std::shared_ptr<FontInfo>> fontTable_;
-        std::vector<std::shared_ptr<FontInfo>> fontInfo_;
+        std::unordered_map<std::string, std::string>                fontResources_;
+        std::unordered_map<std::string, std::shared_ptr<FontInfo>>  fontTable_;
+        std::vector<std::shared_ptr<FontInfo>>                      fontInfo_;
         
         std::string pathForAsset(std::string asset);
         
@@ -66,7 +73,7 @@ namespace BGE {
 
         using FontHandleService = HandleService<Font, FontHandle>;
         
-        FontHandleService fontHandleService_;
+        FontHandleService handleService_;
 
         void buildFontInfoForAsset(std::string asset);
     };

@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include "Font.h"
 
 namespace BGE {
@@ -27,7 +27,7 @@ namespace BGE {
             return family + " " + style;
         }
         
-        std::map<uint32_t, FontHandle> fonts;
+        std::unordered_map<uint32_t, FontHandle> fonts;
     };
 }
 

@@ -32,7 +32,7 @@ void BGE::FontService::mapBundles(std::string bundleName)
     }
 }
 
-BGE::FontService::FontService(std::map<std::string, std::string> resources) : fontHandleService_(InitialFontReserve, FontHandleService::NoMaxLimit) {
+BGE::FontService::FontService(std::map<std::string, std::string> resources) : handleService_(InitialFontReserve, FontHandleService::NoMaxLimit) {
     FontService::mapBundles("BenGameEngineBundle");
 
     std::vector<std::string> assets;
@@ -191,6 +191,49 @@ void BGE::FontService::buildFontInfoForAsset(std::string asset) {
     }
 }
 
+BGE::FontHandle BGE::FontService::getFontHandle(ObjectId fontId) {
+    for (auto fontInfo : fontInfo_) {
+        for (auto it : fontInfo->fonts) {
+            auto font = getFont(it.second);
+            
+            if (font->getInstanceId() == fontId) {
+                return it.second;
+            }
+        }
+    }
+    
+    return FontHandle();
+}
+
+BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) {
+    auto f = fontTable_.find(name);
+    
+    if (f != fontTable_.end()) {
+        auto info = f->second;
+        auto font = info->fonts.find(pixelSize);
+        
+        if (font != info->fonts.end()) {
+            return font->second;
+        }
+    }
+    
+    return FontHandle();
+}
+
+BGE::Font *BGE::FontService::getFont(ObjectId fontId) {
+    for (auto fontInfo : fontInfo_) {
+        for (auto it : fontInfo->fonts) {
+            auto font = getFont(it.second);
+            
+            if (font->getInstanceId() == fontId) {
+                return font;
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
 BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
     auto f = fontTable_.find(name);
     
@@ -207,10 +250,24 @@ BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
 }
 
 BGE::Font *BGE::FontService::getFont(FontHandle handle) {
-    return fontHandleService_.dereference(handle);
+    return handleService_.dereference(handle);
 }
 
-BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) {
+void BGE::FontService::removeFont(ObjectId fontId) {
+    for (auto fontInfo : fontInfo_) {
+        for (auto it : fontInfo->fonts) {
+            auto font = getFont(it.second);
+            
+            if (font->getInstanceId() == fontId) {
+                handleService_.release(it.second);
+                fontInfo->fonts.erase(it.first);
+                return;
+            }
+        }
+    }
+}
+
+void BGE::FontService::removeFont(std::string name, uint32_t pixelSize) {
     auto f = fontTable_.find(name);
     
     if (f != fontTable_.end()) {
@@ -218,11 +275,23 @@ BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixel
         auto font = info->fonts.find(pixelSize);
         
         if (font != info->fonts.end()) {
-            return font->second;
+            handleService_.release(font->second);
+            info->fonts.erase(font->first);
+            return;
         }
     }
-    
-    return FontHandle();
+}
+
+void BGE::FontService::removeFont(FontHandle handle) {
+    for (auto fontInfo : fontInfo_) {
+        for (auto it : fontInfo->fonts) {
+            if (it.second == handle) {
+                handleService_.release(it.second);
+                fontInfo->fonts.erase(it.first);
+                return;
+            }
+        }
+    }
 }
 
 void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function<void(FontHandle, std::shared_ptr<Error>)> callback) {
@@ -243,7 +312,7 @@ void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function
             
             if (path.length() > 0) {
                 FontHandle handle;
-                Font *tFont = fontHandleService_.allocate(handle);
+                Font *tFont = handleService_.allocate(handle);
                 
                 if (tFont) {
                     ObjectId fontId = getIdAndIncrement();
@@ -269,7 +338,7 @@ void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function
                                     if (tFont) {
                                         if (tFont->status_ == FontStatus::Loading) {
                                             info->fonts.erase(pxSize);
-                                            fontHandleService_.release(f->second);
+                                            handleService_.release(f->second);
                                         }
                                     }
                                 }
