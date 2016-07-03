@@ -9,7 +9,7 @@
 #include "SpaceService.h"
 #include "Game.h"
 
-BGE::SpaceService::SpaceService() : spaceHandleService_(InitialSpaceReserve, SpaceHandleService::NoMaxLimit){
+BGE::SpaceService::SpaceService() : handleService_(InitialSpaceReserve, SpaceHandleService::NoMaxLimit){
 }
 
 BGE::SpaceService::~SpaceService() {
@@ -17,7 +17,7 @@ BGE::SpaceService::~SpaceService() {
 
 BGE::SpaceHandle BGE::SpaceService::createSpace(std::string name) {
     SpaceHandle handle;
-    Space *space = spaceHandleService_.allocate(handle);
+    Space *space = handleService_.allocate(handle);
     
     if (space) {
         ObjectId spaceId = getIdAndIncrement();
@@ -42,6 +42,7 @@ void BGE::SpaceService::removeSpace(ObjectId objId) {
     auto it = spaces_.find(objId);
     
     if (it != spaces_.end()) {
+        handleService_.release(it->second);
         spaces_.erase(objId);
     }
 }
@@ -60,7 +61,7 @@ void BGE::SpaceService::removeSpace(std::string name) {
 }
 
 BGE::Space *BGE::SpaceService::getSpace(SpaceHandle spaceHandle) {
-    return spaceHandleService_.dereference(spaceHandle);
+    return handleService_.dereference(spaceHandle);
 }
 
 BGE::Space *BGE::SpaceService::getSpace(ObjectId objId) {

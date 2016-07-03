@@ -51,7 +51,7 @@ namespace BGE {
         using SpacesMap = std::unordered_map<uint32_t, SpaceHandle>;
         using SpacesMapIterator = SpacesMap::iterator;
 
-        SpaceHandleService  spaceHandleService_;
+        SpaceHandleService  handleService_;
         SpacesMap           spaces_;
         
         // TODO: Should just create sorted vector here each time space is removed or added, but also must think how to handle order change
