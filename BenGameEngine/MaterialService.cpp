@@ -107,7 +107,7 @@ void BGE::MaterialService::removeMaterial(ObjectId matId) {
     }
 }
 
-BGE::MaterialHandle BGE::MaterialService::materialWithId(ObjectId matId) {
+BGE::MaterialHandle BGE::MaterialService::getMaterialHandle(ObjectId matId) {
     if (materials_.find(matId) != materials_.end()) {
         return materials_[matId];
     } else {

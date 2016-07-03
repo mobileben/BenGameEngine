@@ -29,6 +29,12 @@ void BGE::ScenePackage::reset() {
     animationSequences_.clear();
 }
 
+void BGE::ScenePackage::initialize(ScenePackageHandle handle, ObjectId scenePackageId, std::string name) {
+    handle_ = handle;
+    setInstanceId(scenePackageId);
+    setName(name);
+}
+
 void BGE::ScenePackage::link() {
     // Link Texture
     std::shared_ptr<TextureService> textureService = Game::getInstance()->getTextureService();

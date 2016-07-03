@@ -46,12 +46,17 @@ namespace BGE {
         
         void packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback);
         
-        ScenePackageHandle getPackage(std::string name);
-        ScenePackage *getDereferencedPackage(std::string name);
-        ScenePackage *getDereferencedPackage(ScenePackageHandle handle);
+        ScenePackageHandle getScenePackageHandle(ObjectId scenePackageId);
+        ScenePackageHandle getScenePackageHandle(std::string name);
+        
+        ScenePackage *getScenePackage(ObjectId scenePackageId);
+        ScenePackage *getScenePackage(std::string name);
+        ScenePackage *getScenePackage(ScenePackageHandle handle);
 
-        void deletePackage(std::string name);
-        void deletePackage(ScenePackageHandle handle);
+        void removePackage(ObjectId scenePackageId);
+        void removePackage(std::string name);
+        void removePackage(ScenePackageHandle handle);
+        
         void resetPackage(std::string name);
         void resetPackage(ScenePackageHandle handle);
 
@@ -69,12 +74,12 @@ namespace BGE {
     private:
         static const uint32_t InitialScenePackageReserve = 32;
         
-        typedef HandleService<ScenePackage, ScenePackageHandle> ScenePackageHandleService;
-        typedef std::unordered_map<std::string, ScenePackageHandle> ScenePackagesMap;
-        typedef std::unordered_map<std::string, ScenePackageHandle>::iterator ScenePackagesMapIterator;
+        using ScenePackageHandleService = HandleService<ScenePackage, ScenePackageHandle>;
+        using ScenePackagesMap = std::unordered_map<ObjectId, ScenePackageHandle>;
+        using ScenePackagesMapIterator = ScenePackagesMap::iterator;
         
-        ScenePackageHandleService scenePackageHandleService_;
-        ScenePackagesMap scenePackages_;
+        ScenePackageHandleService   handleService_;
+        ScenePackagesMap            scenePackages_;
     };
 }
 

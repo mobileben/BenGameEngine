@@ -29,6 +29,8 @@ namespace BGE {
         ScenePackage(ObjectId sceneId);
         ~ScenePackage();
         
+        void initialize(ScenePackageHandle handle, ObjectId scenePackageId, std::string name);
+        
         void link();
         
         bool hasExternalReferences() const {
@@ -46,17 +48,18 @@ namespace BGE {
     private:
         friend class ScenePackageService;
         
-        std::string source_;
-        float frameRate_;
-        float width_;
-        float height_;
-        Vector2 position_;
-        bool fontsLoaded_;
-        bool texturesLoaded_;
-        bool hasExternal_;
+        ScenePackageHandle  handle_;
+        std::string         source_;
+        float               frameRate_;
+        float               width_;
+        float               height_;
+        Vector2             position_;
+        bool                fontsLoaded_;
+        bool                texturesLoaded_;
+        bool                hasExternal_;
         
-        int32_t defaultPositionIndex_;
-        int32_t defaultScaleIndex_;
+        int32_t             defaultPositionIndex_;
+        int32_t             defaultScaleIndex_;
         
         FixedArray<char>                                    strings_;
         FixedArray<TextureReferenceIntermediate>            textures_;

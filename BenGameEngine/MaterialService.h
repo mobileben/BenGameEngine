@@ -42,7 +42,7 @@ namespace BGE {
         void removeMaterial(MaterialHandle handle);
         void removeMaterial(ObjectId matId);
         
-        MaterialHandle materialWithId(ObjectId matId);
+        MaterialHandle getMaterialHandle(ObjectId matId);
         
         Material *getMaterial(MaterialHandle handle);
         Material *getMaterial(ObjectId matId);

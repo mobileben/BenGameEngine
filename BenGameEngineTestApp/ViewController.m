@@ -90,7 +90,7 @@
         
         if (path) {
             BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "common", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getDereferencedPackage(packageHandle);
+                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                 
                 if (package) {
                     package->link();
