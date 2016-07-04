@@ -45,6 +45,8 @@ namespace BGE {
             return 0;
         }
         
+        static uint32_t bitmaskForTypeIndex(std::type_index index);
+        
     private:
         static uint32_t                                         index_;
         static std::unordered_map<std::type_index, uint32_t>    masks_;

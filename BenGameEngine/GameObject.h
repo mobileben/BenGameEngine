@@ -58,12 +58,15 @@ namespace BGE {
         
         template <typename T>
         void removeComponent() {
-            std::type_index typeId = typeid(T);
-            
-            removeComponent(typeId);
+            if (hasComponent<T>()) {
+                std::type_index typeId = Component::getTypeIndex<T>();
+                
+                removeComponentFromSpace(typeId);
+                
+                componentBitmask_ &= ~ComponentBitmask::bitmaskForTypeIndex(typeId);
+                components_.erase(typeId);
+            }
         }
-        
-        void removeComponent(std::type_index typeIndex);
         
         void removeAllComponents();
         
@@ -98,6 +101,8 @@ namespace BGE {
         uint32_t                componentBitmask_;
         SpaceHandle             spaceHandle_;
         std::unordered_map<std::type_index, std::shared_ptr<Component>> components_;
+        
+        void removeComponentFromSpace(std::type_index typeIndex);
     };
 }
 

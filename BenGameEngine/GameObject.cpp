@@ -9,6 +9,7 @@
 #include "GameObject.h"
 #include "Space.h"
 #include "Game.h"
+#include "ComponentBitmask.h"
 
 std::shared_ptr<BGE::GameObject> BGE::GameObject::create(ObjectId objId) {
     return std::make_shared<GameObject>(private_key{}, objId);
@@ -28,18 +29,23 @@ BGE::GameObject::~GameObject() {
     removeAllComponents();
 }
 
-void BGE::GameObject::removeComponent(std::type_index typeIndex) {
+void BGE::GameObject::removeComponentFromSpace(std::type_index typeIndex) {
     auto space = getSpace();
     
     if (space) {
+#if DEBUG
         auto component = components_.find(typeIndex);
+      
+        assert(component != components_.end());
         
         if (component != components_.end()) {
             space->removeComponent(typeIndex, component->second->getInstanceId());
         }
+#else
+        auto component = components_[typeIndex];
+        space->removeComponent(typeIndex, component->second->getInstanceId());
+#endif
     }
-    
-    components_.erase(typeIndex);
 }
 
 void BGE::GameObject::removeAllComponents() {
@@ -48,10 +54,11 @@ void BGE::GameObject::removeAllComponents() {
     if (space) {
         for (auto component : components_) {
             const std::type_info& typeId = typeid(component.second);
-            space->removeComponent(std::type_index(typeId), component.second->getInstanceId());
+            removeComponentFromSpace(typeId);
         }
     }
     
+    componentBitmask_ = 0;
     components_.clear();
 }
 
