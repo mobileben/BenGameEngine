@@ -76,11 +76,9 @@ void BGE::AnimationChannelComponent::updateReference() {
                     auto text = space->createComponent<TextComponent>();
                     
                     text->setTextReference(*textRef);
+                    gameObj->addComponent(text);
                 }
-
-                auto text = Game::getInstance()->getScenePackageService()->createTextComponent(this->channel->reference);
                 // TODO: Remove any older render components
-                gameObj->addComponent(text);
             }
                 break;
                 

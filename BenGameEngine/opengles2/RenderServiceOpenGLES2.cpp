@@ -20,29 +20,6 @@
 #include "ColorMatrixComponent.h"
 #include "ColorTransformComponent.h"
 
-#if 0
-const BGE::VertexColor Vertices[] = {
-    {{100, -100, 0}, {1, 0, 0, 1}},
-    {{100, 100, 0}, {0, 1, 0, 1}},
-    {{-100, 100, 0}, {0, 0, 1, 1}},
-    {{-100, -100, 0}, {0, 0, 0, 1}}
-};
-#else
-const BGE::VertexColor Vertices[] = {
-    {{620, 0, 0}, {1, 0, 0, 1}},
-    {{620, 200, 0}, {0, 1, 0, 1}},
-    {{0, 200, 0}, {0, 0, 1, 1}},
-    {{0, 0, 0}, {0, 0, 0, 1}}
-};
-#endif
-
-const BGE::VertexColorTex TextureVertices[] = {
-    {{750, 100, 0}, {1, 0, 0, 1}, { 1, 0 } },
-    {{750, 200, 0}, {0, 1, 0, 1}, { 1, 1 } },
-    {{50, 200, 0}, {0, 0, 1, 1}, { 0, 1 } },
-    {{50, 100, 0}, {0, 0, 0, 1}, { 0, 0 } }
-};
-
 const GLubyte Indices[] = {
     0, 1, 2,
     2, 3, 0
@@ -395,103 +372,6 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
     
     glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
                    GL_UNSIGNED_BYTE, &indices[0]);
-    
-#if 1
-    if (textureInfo_) {
-        glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("ColorMatrixTexture"));
-        
-        GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
-        GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
-        GLint colorOffsetLocation = glShader->locationForUniform("ColorOffset");
-        
-        positionLocation = glShader->locationForAttribute("Position");
-        colorLocation = glShader->locationForAttribute("SourceColor");
-        texCoordLocation = glShader->locationForAttribute("TexCoordIn");
-        
-        glEnableVertexAttribArray(positionLocation);
-        glEnableVertexAttribArray(colorLocation);
-        glEnableVertexAttribArray(texCoordLocation);
-
-        GLint textureUniform = glShader->locationForUniform("Texture");
-        GLint projectionLocation = glShader->locationForUniform("Projection");
-        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
-
-        Matrix4 colorMatrix;
-        Vector4 colorOffset;
-        
-        Matrix4MakeIdentify(colorMatrix);
-        
-#if 1
-        colorMatrix.m[0] = -35.48653030395508 / 255.0;
-        colorMatrix.m[1] = 22.864973068237305 / 255.0;
-        colorMatrix.m[2] = 23.621559143066406 / 255.0;
-
-        colorMatrix.m[4] = 465.0001220703125 / 255.0;
-        colorMatrix.m[5] = 10.450590133666992 / 255.0;
-        colorMatrix.m[6] = 3.5698392391204834 / 255.0;
-        colorMatrix.m[7] = -3.0204293727874756 / 255.0;
-        
-        colorMatrix.m[8] = 0;
-        colorMatrix.m[9] = 465.0000305175781 / 255.0;
-        colorMatrix.m[10] = -10.0094032287597669 / 255.0;
-        colorMatrix.m[11] = 54.32495880126953 / 255.0;
-        
-        colorMatrix.m[12] = -33.3155517578125 / 255.0;
-        colorMatrix.m[13] = 0;
-        colorMatrix.m[14] = 465 / 255.0;
-#else
-        colorMatrix.m[0] = -35.48653030395508 / 255.0;
-        colorMatrix.m[4] = 22.864973068237305 / 255.0;
-        colorMatrix.m[8] = 23.621559143066406 / 255.0;
-        colorMatrix.m[12] = 0;
-
-        colorMatrix.m[1] = 465.0001220703125 / 255.0;
-        colorMatrix.m[5] = 10.450590133666992 / 255.0;
-        colorMatrix.m[9] = 3.5698392391204834 / 255.0;
-        colorMatrix.m[13] = -3.0204293727874756 / 255.0;
-        
-        colorMatrix.m[2] = 0;
-        colorMatrix.m[6] = 465.0000305175781 / 255.0;
-        colorMatrix.m[10] = -10.0094032287597669 / 255.0;
-        colorMatrix.m[14] = 54.32495880126953 / 255.0;
-        
-        colorMatrix.m[3] = -33.3155517578125 / 255.0;
-        colorMatrix.m[7] = 0;
-        colorMatrix.m[11] = 465 / 255.0;
-        colorMatrix.m[15] = 0;
-#endif
-        glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.m);
-        
-        colorOffset.r = 0;
-        colorOffset.g = 1;
-        colorOffset.b = 1;
-        colorOffset.a = 0;
-        
-        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorOffset.v);
-        
-        glDisable(GL_BLEND);
-//        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-//        glEnable(GL_BLEND);
-//        glBlendEquation( GL_FUNC_ADD );
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(textureInfo_.target, textureInfo_.name);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        
-        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                              sizeof(VertexColorTex), &TextureVertices[0]);
-        glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
-                              sizeof(VertexColorTex), (GLvoid*) (&TextureVertices[0].color));
-        glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                              sizeof(VertexColorTex), (GLvoid*) (&TextureVertices[0].tex));
-        
-        glUniform1i(textureUniform, 0);
-        
-        glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
-                       GL_UNSIGNED_BYTE, &indices[0]);
-        
-	    }
-#endif
 }
 
 void BGE::RenderServiceOpenGLES2::drawFont(Vector2 &position, std::shared_ptr<TextureBase> texture) {
@@ -719,71 +599,6 @@ void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, 
     glDrawArrays(GL_LINE_LOOP, 0, points.size());
 }
 
-#if 0
-void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObject) {
-    if (gameObject) {
-        std::shared_ptr<SpriteRenderComponent> sprite = std::dynamic_pointer_cast<SpriteRenderComponent>(gameObject->getComponent<SpriteRenderComponent>());
-        
-        if (sprite) {
-            VertexTex *const vertices = sprite->getVertices();
-            auto material = sprite->getMaterial();
-            if (material) {
-                std::shared_ptr<TextureBase> texture = material->getTexture().lock();
-                
-                if (texture) {
-                    std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
-                    if (oglTex && oglTex->isValid()) {
-                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
-                        
-                        GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
-                        
-                        GLint positionLocation = glShader->locationForAttribute("Position");
-                        //            texCoordLocation = glShader->locationForAttribute("TexCoordIn");
-                        
-                        glEnableVertexAttribArray(positionLocation);
-                        glEnableVertexAttribArray(texCoordLocation);
-                        
-                        GLint textureUniform = glShader->locationForUniform("Texture");
-                        GLint projectionLocation = glShader->locationForUniform("Projection");
-                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
-                        auto transformComponent = gameObject->getComponent<TransformComponent>();
-                        GLint modelLocation = glShader->locationForUniform("ModelView");
-                        
-                        if (transformComponent) {
-
-                        glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->matrix_.m);
-                        } else {
-                            // This is a hack for now
-                            Matrix4 mat;
-                            
-                            Matrix4MakeIdentify(mat);
-                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
-                        }
-                        
-                        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-                        glEnable(GL_BLEND);
-                        
-                        glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                        
-                        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                              sizeof(VertexTex), &vertices[0]);
-                        glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                                              sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
-                        
-                        glUniform1i(textureUniform, 0);
-                        
-                        glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
-                                       GL_UNSIGNED_BYTE, &Indices[0]);
-                    }
-                }
-            }
-        }
-    }
-}
-#else
 void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObject) {
     if (gameObject) {
         std::shared_ptr<SpriteRenderComponent> sprite = std::dynamic_pointer_cast<SpriteRenderComponent>(gameObject->getComponent<SpriteRenderComponent>());
@@ -827,27 +642,9 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObj
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
                         }
                         
-#if 0
-                        auto colorMatrix = gameObject->getComponent<ColorMatrixComponent>();
-                        
-                        if (colorMatrix) {
-                            glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix->matrix.matrix.m);
-                            glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorMatrix->matrix.offset.v);
-                        } else {
-                            ColorMatrix noColor;
-                            
-                            ColorMatrixMakeIdentify(noColor);
-//                            glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) material->getColorMatrixRaw()->matrix.m);
-//                            glUniform4fv(colorOffsetLocation, 1, (GLfloat *) material->getColorMatrixRaw()->offset.v);
-                            glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) noColor.matrix.m);
-                            glUniform4fv(colorOffsetLocation, 1, (GLfloat *) noColor.offset.v);
-                        }
-#else
                         glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) currentColorMatrix_.matrix.m);
                         glUniform4fv(colorOffsetLocation, 1, (GLfloat *) currentColorMatrix_.offset.v);
-#endif
                         
-                        NSLog(@"Render color %f %f %f %f", material->getColorMatrixRaw()->offset.r, material->getColorMatrixRaw()->offset.g, material->getColorMatrixRaw()->offset.b, material->getColorMatrixRaw()->offset.a);
                         glDisable(GL_BLEND);
                         
                         glActiveTexture(GL_TEXTURE0);
@@ -870,8 +667,16 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObj
         }
     }
 }
-#endif
 
+/**
+ Example mask usage
+ 
+ position = { 200, 400 };
+ createMask(position, texture);
+ drawTexture(position, fish);
+ glDisable(GL_STENCIL_TEST);
+
+ */
 int8_t BGE::RenderServiceOpenGLES2::createMask(Vector2 &position, std::shared_ptr<TextureBase> mask)
 {
     if (this->masksInUse_ < (RenderServiceOpenGLES2::MaxActiveMasks - 1)) {
@@ -921,7 +726,6 @@ void BGE::RenderServiceOpenGLES2::updateTransforms() {
 
 void BGE::RenderServiceOpenGLES2::render()
 {
-    NSLog(@"RENDERING BITCHES");
     std::shared_ptr<RenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<RenderContextOpenGLES2>(getRenderContext());
     glClearColor(1.0, 1.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -929,13 +733,6 @@ void BGE::RenderServiceOpenGLES2::render()
     this->masksInUse_ = 0;
     
     if (isReady()) {
-        std::shared_ptr<TextureBase> texture = Game::getInstance()->getTextureService()->textureWithName("sample");
-        std::shared_ptr<TextureBase> fish = Game::getInstance()->getTextureService()->textureWithName("CoinIcon");
-//        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__font_texture");
-        Font *f = Game::getInstance()->getFontService()->getFont("default", 32);
-//        std::shared_ptr<TextureBase> font = Game::getInstance()->getTextureService()->textureWithName("__Avenir.ttc32_texture");
-        std::shared_ptr<TextureBase> font;
-        
         assert(matrixStack_.size() == 0);
         assert(colorMatrixStack_.size() == 0);
         assert(colorTransformStack_.size() == 0);
@@ -958,64 +755,6 @@ void BGE::RenderServiceOpenGLES2::render()
 //        glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight());
         glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth() * this->getRenderWindow()->getContentScaleFactor(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight() * this->getRenderWindow()->getContentScaleFactor());
         
-#if 1
-        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Default"));
-        
-        GLint positionLocation = glShader->locationForAttribute("Position");
-        GLint colorLocation = glShader->locationForAttribute("SourceColor");
-        GLint projectionLocation = glShader->locationForUniform("Projection");
-        GLint modelLocation = glShader->locationForUniform("ModelView");
-        glEnableVertexAttribArray(positionLocation);
-        glEnableVertexAttribArray(colorLocation);
-        
-        // This is a hack for now
-        Matrix4 mat;
-        
-        Matrix4MakeIdentify(mat);
-        glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
-
-        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
-        
-        // 2
-        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                              sizeof(VertexColor), &Vertices[0]);
-        glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
-                              sizeof(VertexColor), (GLvoid*) (&Vertices[0].color));
-        
-        // 3
-        glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
-                       GL_UNSIGNED_BYTE, &Indices[0]);
-        
-        Vector2 position = { 0, 0 };
-        Vector2 size = { 150, 300 };
-        Vector4 colors[4] = {{ 1, 0, 0, 1 }, { 0, 0, 0, 1 }, { 0, 1, 0, 1 }, { 0, 0, 1, 1 }};
-        
-        drawShadedRect(position, size, colors);
-#if 1
-        if (font) {
-            position = { 400, 400 };
-            drawFont(position, font);
-        }
-#endif   
-        
-        if (texture && fish) {
-#if 1
-            position = { 200, 400 };
-            createMask(position, texture);
-            drawTexture(position, fish);
-            glDisable(GL_STENCIL_TEST);
-            if (f) {
-                position = { 200, 1200 };
-                f->drawString("HELLO YOU SACK OF DIRT AV abcDefg1210312084pdsoinjm_-'\"#*$&%", position, colors[1]);
-            }
-#endif
-        }
-#endif
-        
-        for (auto obj : Game::getInstance()->getGameObjectService()->getGameObjects()) {
-            renderGameObject(obj.second, true);
-        }
-        
         std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
         
         
@@ -1023,9 +762,7 @@ void BGE::RenderServiceOpenGLES2::render()
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space && space->isVisible()) {
-                NSLog(@"SPACE %s", space->getName().c_str());
                 for (auto obj : space->getGameObjects()) {
-                    NSLog(@"renderGameObject %s", obj.second->getName().c_str());
                     renderGameObject(obj.second, true);
                 }
             }

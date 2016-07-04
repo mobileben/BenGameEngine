@@ -63,7 +63,6 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
                     
                     setLocalBounds(bounds);
                     
-                    const Vector2 *xys = texture->getXYs();
                     const Vector2 *uvs = texture->getUVs();
                     
                     if (Game::getInstance()->getRenderService()->hasInvertedYAxis()) {

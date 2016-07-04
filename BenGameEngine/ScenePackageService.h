@@ -63,10 +63,6 @@ namespace BGE {
         TextureReference *getTextureReference(std::string name);
         TextReference *getTextReference(std::string name);
         AnimationSequenceReference *getAnimationSequenceReference(std::string name);
-
-        std::shared_ptr<SpriteRenderComponent> createSpriteRenderComponent(std::string name);
-        std::shared_ptr<TextComponent> createTextComponent(std::string name);
-        std::shared_ptr<AnimationSequenceComponent> createAnimationSequenceComponent(std::string name);
         
         void link();
         void link(ScenePackageHandle handle);

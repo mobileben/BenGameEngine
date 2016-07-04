@@ -24,22 +24,12 @@ BGE::AnimationService::~AnimationService() {
 void BGE::AnimationService::update(double deltaTime) {
     float dt = (float)deltaTime;
 
-    // TODO: Remove this since all game objects are in spaces
-    for (auto obj : Game::getInstance()->getGameObjectService()->getGameObjects()) {
-        auto animSeq = obj.second->getComponent<AnimationSequenceComponent>();
-        auto animator = obj.second->getComponent<AnimatorComponent>();
-        
-        if (animSeq && animator) {
-            animateSequence(animSeq, animator, dt);
-        }
-    }
-    
     // For all the spaces
     for (auto handle : Game::getInstance()->getSpaceService()->getSpaces()) {
         auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
         
         if (space) {
-            for (auto obj : space->getGameObjectService()->getGameObjects()) {
+            for (auto obj : space->getGameObjects()) {
                 auto animSeq = obj.second->getComponent<AnimationSequenceComponent>();
                 auto animator = obj.second->getComponent<AnimatorComponent>();
                 

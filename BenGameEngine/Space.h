@@ -33,16 +33,6 @@ namespace BGE {
         
         void initialize(SpaceHandle handle, ObjectId spaceId, std::string name);
 
-        std::shared_ptr<GameObjectService> getGameObjectService() const { return gameObjectService_; }
-        void setGameObjectService(std::shared_ptr<GameObjectService> gameObjectService) {
-            gameObjectService_ = gameObjectService;
-        }
-        
-        std::shared_ptr<ComponentService> getComponentService() const { return componentService_; }
-        void setComponentService(std::shared_ptr<ComponentService> componentService) {
-            componentService_ = componentService;
-        }
-        
         template < typename T, typename... Args >
         std::shared_ptr< T > createObject(Args&&... args) {
             return gameObjectService_->createObject<T>(std::forward<Args>(args)...);
@@ -50,7 +40,7 @@ namespace BGE {
         
         void removeObject(ObjectId objId) { gameObjectService_->removeObject(objId); }
         
-        const std::unordered_map<ObjectId, std::shared_ptr<GameObject>>& getGameObjects() const { return gameObjectService_->getGameObjects(); }
+        const GameObjectService::GameObjectMap& getGameObjects() const { return gameObjectService_->getGameObjects(); }
 
         std::shared_ptr<GameObject> find(std::shared_ptr<GameObject> object) { return gameObjectService_->find(object); }
         std::shared_ptr<GameObject> find(ObjectId objId) { return gameObjectService_->find(objId); }

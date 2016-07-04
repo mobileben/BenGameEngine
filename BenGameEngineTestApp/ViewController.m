@@ -96,9 +96,15 @@
                     package->link();
                 }
                 
-                auto gameObj = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
-                auto sprite = BGE::Game::getInstance()->getScenePackageService()->createSpriteRenderComponent("SaleBkg");
-                auto transformComponent = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
+                auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+
+                auto gameObj = space->createObject<BGE::GameObject>();
+                auto textureRef = BGE::Game::getInstance()->getScenePackageService()->getTextureReference("SaleBkg");
+                auto transformComponent = space->createComponent<BGE::TransformComponent>();
+                auto sprite = space->createComponent<BGE::SpriteRenderComponent>();
+                
+                sprite->setTextureRef(textureRef);
+                
                 BGE::Vector2 pos = { 700, 700 };
                 BGE::Vector2 scale = { 2, 1 };
                 transformComponent->setPosition(pos);
@@ -109,17 +115,19 @@
                 gameObj->addComponent(transformComponent);
                 gameObj->addComponent(sprite);
                 
-#if 0
-                gameObj = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
-                transformComponent = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
-                auto text =  BGE::Game::getInstance()->getScenePackageService()->createTextComponent("CashText");
+                gameObj = space->createObject<BGE::GameObject>();
+                transformComponent = space->createComponent<BGE::TransformComponent>();
+                auto textRef = BGE::Game::getInstance()->getScenePackageService()->getTextReference("CashText");
+                auto text =  space->createComponent<BGE::TextComponent>();
                 
+                text->setTextReference(*textRef);
+                
+                transformComponent->setX(200);
+                transformComponent->setY(1200);
                 gameObj->setName("Object2");
                 gameObj->addComponent(transformComponent);
                 gameObj->addComponent(text);
-#endif
                 
-                auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
                 gameObj = space->createObject<BGE::GameObject>();
                 // Animation game object requires: xform, animator, animation sequence
                 transformComponent = space->createComponent<BGE::TransformComponent>();

@@ -38,8 +38,6 @@ namespace BGE {
         void provide(std::shared_ptr<TextureService> textureService);
         
         // Services which are implicitly built
-        std::shared_ptr<GameObjectService> getGameObjectService() { return gameObjectService_; }
-        std::shared_ptr<ComponentService> getComponentService() { return componentService_; }
         std::shared_ptr<MaterialService> getMaterialService() { return materialService_; }
         std::shared_ptr<HeartbeatService> getHeartbeatService() { return heartbeatService_; }
         std::shared_ptr<ScenePackageService> getScenePackageService() { return scenePackageService_; }
@@ -63,8 +61,6 @@ namespace BGE {
         std::shared_ptr<FontService> fontService_;
         std::shared_ptr<HeartbeatService> heartbeatService_;
         std::shared_ptr<MaterialService> materialService_;
-        std::shared_ptr<GameObjectService> gameObjectService_;
-        std::shared_ptr<ComponentService> componentService_;
         std::shared_ptr<ScenePackageService> scenePackageService_;
         std::shared_ptr<AnimationService> animationService_;
         std::shared_ptr<SpaceService> spaceService_;
