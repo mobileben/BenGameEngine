@@ -24,6 +24,9 @@ namespace BGE {
     {
     private:
         struct private_key {};
+        friend Component;
+        static uint32_t         bitmask_;
+        static std::type_index  type_index_;
         
     public:
         static std::shared_ptr<TransformComponent> create(ObjectId componentId);

@@ -17,7 +17,10 @@ namespace BGE {
     {
     private:
         struct private_key {};
-        
+        friend Component;
+        static uint32_t         bitmask_;
+        static std::type_index  type_index_;
+
     public:
         static std::shared_ptr<LineRenderComponent> create(ObjectId componentId);
         
@@ -36,7 +39,7 @@ namespace BGE {
         
     private:
         friend ComponentService;
-        
+
         float thickness_;
         std::vector<Vector2> points_;
         bool closedLoop_;

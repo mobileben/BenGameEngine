@@ -18,10 +18,10 @@ std::shared_ptr<BGE::GameObject> BGE::GameObject::create(ObjectId objId, std::st
     return std::make_shared<GameObject>(private_key{}, objId, name);
 }
 
-BGE::GameObject::GameObject(struct private_key const&, ObjectId objId) : NamedObject(objId), active_(true) {
+BGE::GameObject::GameObject(struct private_key const&, ObjectId objId) : NamedObject(objId), active_(true), componentBitmask_(0) {
 }
 
-BGE::GameObject::GameObject(struct private_key const&, ObjectId objId, std::string name) : NamedObject(objId, name), active_(true) {
+BGE::GameObject::GameObject(struct private_key const&, ObjectId objId, std::string name) : NamedObject(objId, name), active_(true), componentBitmask_(0) {
 }
 
 BGE::GameObject::~GameObject() {

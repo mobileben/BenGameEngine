@@ -65,6 +65,7 @@
 		B547F17D1D125BD00031AF58 /* FrameAnimatorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B547F17B1D125BD00031AF58 /* FrameAnimatorComponent.cpp */; };
 		B54821F61CD87A8A0073AFCC /* AnimationSequenceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B54821F41CD87A8A0073AFCC /* AnimationSequenceComponent.cpp */; };
 		B54821F91CD9AD970073AFCC /* AnimationChannelComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B54821F71CD9AD970073AFCC /* AnimationChannelComponent.cpp */; };
+		B55194A41D28C2B100BDAA5D /* ComponentBitmask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B55194A21D28C2B100BDAA5D /* ComponentBitmask.cpp */; };
 		B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */; };
 		B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */; };
 		B571F1771C93B604007F5A90 /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = B571F1761C93B604007F5A90 /* sample.png */; };
@@ -264,6 +265,8 @@
 		B54821F51CD87A8A0073AFCC /* AnimationSequenceComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimationSequenceComponent.h; path = components/AnimationSequenceComponent.h; sourceTree = "<group>"; };
 		B54821F71CD9AD970073AFCC /* AnimationChannelComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = AnimationChannelComponent.cpp; path = components/AnimationChannelComponent.cpp; sourceTree = "<group>"; };
 		B54821F81CD9AD970073AFCC /* AnimationChannelComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimationChannelComponent.h; path = components/AnimationChannelComponent.h; sourceTree = "<group>"; };
+		B55194A21D28C2B100BDAA5D /* ComponentBitmask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComponentBitmask.cpp; sourceTree = "<group>"; };
+		B55194A31D28C2B100BDAA5D /* ComponentBitmask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComponentBitmask.h; sourceTree = "<group>"; };
 		B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureVertex.glsl; path = shaders/ColorMatrixTextureVertex.glsl; sourceTree = "<group>"; };
 		B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureFragment.glsl; path = shaders/ColorMatrixTextureFragment.glsl; sourceTree = "<group>"; };
 		B571F1761C93B604007F5A90 /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sample.png; path = textures/sample.png; sourceTree = "<group>"; };
@@ -283,7 +286,7 @@
 		B571F1941C9E1B94007F5A90 /* FontVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontVertex.glsl; path = shaders/FontVertex.glsl; sourceTree = "<group>"; };
 		B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontFragment.glsl; path = shaders/FontFragment.glsl; sourceTree = "<group>"; };
 		B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TransformComponentTests.m; path = BGEGameObjectAndComponentTests/TransformComponentTests.m; sourceTree = SOURCE_ROOT; };
-		B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComponentService.cpp; sourceTree = "<group>"; };
+		B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = ComponentService.cpp; sourceTree = "<group>"; };
 		B5ACE8911CBB56CE004B6871 /* ComponentService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComponentService.h; sourceTree = "<group>"; };
 		B5ACE8931CBF7AFF004B6871 /* LineRenderComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LineRenderComponent.cpp; path = components/LineRenderComponent.cpp; sourceTree = "<group>"; };
 		B5ACE8941CBF7AFF004B6871 /* LineRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LineRenderComponent.h; path = components/LineRenderComponent.h; sourceTree = "<group>"; };
@@ -446,6 +449,8 @@
 				B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */,
 				B508CDA31CB4DD5B00127B97 /* Component.cpp */,
 				B508CDA41CB4DD5B00127B97 /* Component.h */,
+				B55194A21D28C2B100BDAA5D /* ComponentBitmask.cpp */,
+				B55194A31D28C2B100BDAA5D /* ComponentBitmask.h */,
 				B508CDAF1CB8B2EA00127B97 /* components */,
 				B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */,
 				B5ACE8911CBB56CE004B6871 /* ComponentService.h */,
@@ -927,6 +932,7 @@
 				B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */,
 				B508CD891CA0ABA200127B97 /* TextureBase.cpp in Sources */,
 				B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */,
+				B55194A41D28C2B100BDAA5D /* ComponentBitmask.cpp in Sources */,
 				B525E3C01C89587000C691C0 /* RenderWindow.cpp in Sources */,
 				B525E3C51C89587000C691C0 /* ShaderProgramOpenGLES2.cpp in Sources */,
 				B525E3CA1C89587000C691C0 /* TextureOpenGLES2.cpp in Sources */,

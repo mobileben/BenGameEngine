@@ -140,7 +140,86 @@
                 
                 animator->play(BGE::AnimatorComponent::AnimPlayForever, true, 1 );
 
+                // Spaces are not visible by default
+                space->setVisible(true);
+                
             });
+            
+            auto tSpaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("TestSpace");
+            auto tSpace = BGE::Game::getInstance()->getSpaceService()->getSpace(tSpaceHandle);
+            
+            tSpace->setVisible(false);
+            
+            // Create test objects
+            std::vector<std::shared_ptr<BGE::GameObject>> tObjs;
+            auto numGameObjs = 1000;
+            for (auto i=0;i<numGameObjs;i++) {
+                auto gObj = tSpace->createObject<BGE::GameObject>();
+                auto xform = tSpace->createComponent<BGE::TransformComponent>();
+                auto sprite = tSpace->createComponent<BGE::SpriteRenderComponent>();
+                
+                gObj->addComponent<BGE::TransformComponent>(xform);
+                gObj->addComponent<BGE::SpriteRenderComponent>(sprite);
+                tObjs.push_back(gObj);
+            }
+            
+            auto loops = 500;
+            
+            // Test access by getComponent
+            NSTimeInterval componentTime;
+            NSTimeInterval startTime, endTime;
+            
+            
+            // Test access by bitmask
+            startTime = [[NSDate date] timeIntervalSince1970];
+            
+            for (auto i=0;i<loops;i++) {
+                for (auto gObj : tObjs) {
+                    auto count = 0;
+                    
+#if 1
+                    if (gObj->getComponentBitmask() & BGE::Component::getBitmask<BGE::TransformComponent>()) {
+                        count++;
+                    }
+                    if (gObj->getComponentBitmask() & BGE::Component::getBitmask<BGE::SpriteRenderComponent>()) {
+                        count++;
+                    }
+                    assert(count == 2);
+#endif
+                }
+            }
+            
+            endTime = [[NSDate date] timeIntervalSince1970];
+            
+            NSTimeInterval bitmaskTime = endTime - startTime;
+            
+            NSLog(@"Time interval bitmask %f", endTime - startTime);
+
+            startTime = [[NSDate date] timeIntervalSince1970];
+            
+            for (auto i=0;i<loops;i++) {
+                for (auto gObj : tObjs) {
+                    auto count = 0;
+                    
+#if 1
+                    if (gObj->getComponent<BGE::TransformComponent>()) {
+                        count++;
+                    }
+                    if (gObj->getComponent<BGE::SpriteRenderComponent>()) {
+                        count++;
+                    }
+                    assert(count == 2);
+#endif
+                }
+            }
+
+            endTime = [[NSDate date] timeIntervalSince1970];
+
+            componentTime = endTime - startTime;
+            
+            NSLog(@"Time interval getComponent %f", endTime - startTime);
+            
+            NSLog(@"Diff between component and bitmask = %f (%f)", componentTime - bitmaskTime, componentTime/bitmaskTime);
         }
     }
     

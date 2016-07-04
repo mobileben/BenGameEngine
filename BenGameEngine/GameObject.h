@@ -36,17 +36,22 @@ namespace BGE {
         ~GameObject();
         
         template <typename T> std::shared_ptr<T> getComponent() {
-            std::type_index index(typeid(T));
+            std::type_index index = Component::getTypeIndex<T>();
             
+#if DEBUG
             if(components_.count(index) != 0) {
                 return std::static_pointer_cast<T>(components_[index]);
             } else {
                 return nullptr;
             }
+#else
+            return std::static_pointer_cast<T>(components_[index]);
+#endif
         }
         
         template <typename T> void addComponent(std::shared_ptr<T> component) {
             assert(!component->hasGameObject());
+            componentBitmask_ |= Component::getBitmask<T>();
             components_[typeid(T)] = component;
             component->setGameObject(derived_shared_from_this<GameObject>());
         }
@@ -65,6 +70,13 @@ namespace BGE {
         bool isActive() const { return active_; }
         void setActive(bool active) { active_ = active; }
 
+        inline uint32_t getComponentBitmask() const { return componentBitmask_; }
+        
+        template <typename T>
+        inline bool hasComponent() const {
+            return getComponentBitmask() & Component::getBitmask<T>();
+        }
+        
         Space *getSpace() const;
         SpaceHandle getSpaceHandle() const { return spaceHandle_; }
         
@@ -83,6 +95,7 @@ namespace BGE {
         friend GameObjectService;
         
         bool                    active_;
+        uint32_t                componentBitmask_;
         SpaceHandle             spaceHandle_;
         std::unordered_map<std::type_index, std::shared_ptr<Component>> components_;
     };

@@ -19,7 +19,10 @@ namespace BGE {
     class AnimationChannelComponent : public Component {
     private:
         struct private_key {};
-        
+        friend Component;
+        static uint32_t         bitmask_;
+        static std::type_index  type_index_;
+
     public:
         const AnimationChannelReference *channel;
 

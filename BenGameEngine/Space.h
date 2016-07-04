@@ -48,7 +48,6 @@ namespace BGE {
             return gameObjectService_->createObject<T>(std::forward<Args>(args)...);
         }
         
-        void moveObject(ObjectId objId);
         void removeObject(ObjectId objId) { gameObjectService_->removeObject(objId); }
         
         const std::unordered_map<ObjectId, std::shared_ptr<GameObject>>& getGameObjects() const { return gameObjectService_->getGameObjects(); }
@@ -82,6 +81,15 @@ namespace BGE {
         void removeComponent(std::type_index typeIndex, ObjectId componentId) {
             componentService_->removeComponent(typeIndex, componentId);
         }
+
+        bool isVisible() const { return visible_; }
+        void setVisible(bool visible) { visible_ = visible; }
+        uint32_t getOrder() const { return order_; }
+        void setOrder(uint32_t order) { order_ = order; }
+        bool isUpdatable() const { return updatable_; }
+        void setUpdatable(bool updatable) { updatable_ = updatable; }
+        bool isInteractiable() const { return interactable_; }
+        void setInteractable(bool interactable) { interactable_ = interactable; }
 
     protected:
         SpaceHandle spaceHandle_;

@@ -16,6 +16,9 @@
 #include "ColorTransformComponent.h"
 #include "Space.h"
 
+uint32_t BGE::AnimatorComponent::bitmask_ = Component::InvalidBitmask;
+std::type_index BGE::AnimatorComponent::type_index_ = typeid(BGE::AnimatorComponent);
+
 std::shared_ptr<BGE::AnimatorComponent> BGE::AnimatorComponent::create(ObjectId componentId) {
     return std::make_shared<AnimatorComponent>(private_key{}, componentId);
 }

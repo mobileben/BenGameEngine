@@ -7,7 +7,11 @@
 //
 
 #include "TransformComponent.h"
+#include "ComponentBitmask.h"
 #include <cassert>
+
+uint32_t BGE::TransformComponent::bitmask_ = Component::InvalidBitmask;
+std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComponent);
 
 std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::create(ObjectId componentId) {
     return std::make_shared<TransformComponent>(private_key{}, componentId);

@@ -9,6 +9,9 @@
 #include "SpriteRenderComponent.h"
 #include "Game.h"
 
+uint32_t BGE::SpriteRenderComponent::bitmask_ = Component::InvalidBitmask;
+std::type_index BGE::SpriteRenderComponent::type_index_ = typeid(BGE::SpriteRenderComponent);
+
 std::shared_ptr<BGE::SpriteRenderComponent> BGE::SpriteRenderComponent::create(ObjectId componentId) {
     return std::make_shared<SpriteRenderComponent>(private_key{}, componentId);
 }

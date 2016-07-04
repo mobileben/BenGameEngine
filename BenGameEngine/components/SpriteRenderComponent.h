@@ -22,7 +22,10 @@ namespace BGE {
     {
     private:
         struct private_key {};
-        
+        friend Component;
+        static uint32_t         bitmask_;
+        static std::type_index  type_index_;
+
     public:
         static std::shared_ptr<SpriteRenderComponent> create(ObjectId componentId);
         
@@ -41,7 +44,7 @@ namespace BGE {
         friend ComponentService;
         friend RenderService;
         friend RenderServiceOpenGLES2;
-        
+
         static const uint32_t NumVertices = 4;
         
         VertexTex vertices_[NumVertices];

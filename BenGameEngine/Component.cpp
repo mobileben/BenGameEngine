@@ -10,6 +10,10 @@
 #include "Space.h"
 #include "Game.h"
 
+uint32_t BGE::Component::InvalidBitmask = (uint32_t)-1;
+uint32_t BGE::Component::bitmask_ = InvalidBitmask;
+std::type_index BGE::Component::type_index_ = typeid(BGE::Component);
+
 std::shared_ptr<BGE::Component> BGE::Component::create(ObjectId componentId) {
     return std::make_shared<Component>(private_key(), componentId);
 }

@@ -1022,7 +1022,7 @@ void BGE::RenderServiceOpenGLES2::render()
         for (auto handle : spaceHandles) {
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
-            if (space) {
+            if (space && space->isVisible()) {
                 NSLog(@"SPACE %s", space->getName().c_str());
                 for (auto obj : space->getGameObjects()) {
                     NSLog(@"renderGameObject %s", obj.second->getName().c_str());
@@ -1087,15 +1087,15 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
             
         }
         
-        if (gameObj->getComponent<LineRenderComponent>()) {
+        if (gameObj->hasComponent<LineRenderComponent>()) {
             std::shared_ptr<BGE::LineRenderComponent> line = gameObj->getComponent<LineRenderComponent>();
             
             drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial());
-        } else if (gameObj->getComponent<FlatRectRenderComponent>()) {
+        } else if (gameObj->hasComponent<FlatRectRenderComponent>()) {
             drawFlatRect(gameObj);
-        } else if (gameObj->getComponent<SpriteRenderComponent>()) {
+        } else if (gameObj->hasComponent<SpriteRenderComponent>()) {
             drawSprite(gameObj);
-        } else if (gameObj->getComponent<TextComponent>()) {
+        } else if (gameObj->hasComponent<TextComponent>()) {
             std::shared_ptr<TextComponent> text = gameObj->getComponent<TextComponent>();
             Font *font = Game::getInstance()->getFontService()->getFont(text->getFontHandle());
             

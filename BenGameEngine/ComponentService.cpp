@@ -7,6 +7,33 @@
 //
 
 #include "ComponentService.h"
+#include "AnimationChannelComponent.h"
+#include "AnimationSequenceComponent.h"
+#include "AnimatorComponent.h"
+#include "ChannelFrameAnimatorComponent.h"
+#include "ColorMatrixComponent.h"
+#include "ColorTransformComponent.h"
+#include "FlatRectRenderComponent.h"
+#include "FrameAnimatorComponent.h"
+#include "LineRenderComponent.h"
+#include "SpriteRenderComponent.h"
+#include "TextComponent.h"
+#include "TransformComponent.h"
+
+void BGE::ComponentService::registerComponents() {
+    Component::registerBitmask<AnimationChannelComponent>();
+    Component::registerBitmask<AnimationSequenceComponent>();
+    Component::registerBitmask<AnimatorComponent>();
+    Component::registerBitmask<ChannelFrameAnimatorComponent>();
+    Component::registerBitmask<ColorMatrixComponent>();
+    Component::registerBitmask<ColorTransformComponent>();
+    Component::registerBitmask<FlatRectRenderComponent>();
+    Component::registerBitmask<FrameAnimatorComponent>();
+    Component::registerBitmask<LineRenderComponent>();
+    Component::registerBitmask<SpriteRenderComponent>();
+    Component::registerBitmask<TextComponent>();
+    Component::registerBitmask<TransformComponent>();
+}
 
 BGE::ComponentService::ComponentService() {
 }

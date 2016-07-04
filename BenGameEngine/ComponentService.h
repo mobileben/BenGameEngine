@@ -29,6 +29,8 @@ namespace BGE {
         ComponentService(SpaceHandle spaceHandle);
         ~ComponentService();
         
+        static void registerComponents();
+        
         void initialize() {}
         void reset() {}
         void enteringBackground() {}

@@ -34,8 +34,10 @@ void BGE::Game::provide(std::shared_ptr<TextureService> textureService) {
 }
 
 void BGE::Game::initialize() {
+    // Must call this during initialize since doing it during ctor involves statics from other classes not being 
+    ComponentService::registerComponents();
+    
     getHeartbeatService()->registerListener("Game", std::bind(&Game::update, this, std::placeholders::_1), 0);
-
 }
 
 void BGE::Game::reset() {

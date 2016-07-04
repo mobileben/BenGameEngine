@@ -11,6 +11,9 @@
 #include "GameObject.h"
 #include "SpriteRenderComponent.h"
 
+uint32_t BGE::AnimationChannelComponent::bitmask_ = Component::InvalidBitmask;
+std::type_index BGE::AnimationChannelComponent::type_index_ = typeid(BGE::AnimationChannelComponent);
+
 std::shared_ptr<BGE::AnimationChannelComponent> BGE::AnimationChannelComponent::create(ObjectId componentId) {
     return std::make_shared<AnimationChannelComponent>(private_key{}, componentId);
 }
