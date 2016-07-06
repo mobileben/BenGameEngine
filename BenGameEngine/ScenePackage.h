@@ -33,7 +33,7 @@ namespace BGE {
         
         void link();
         
-        bool hasExternalReferences() const {
+        bool hasExternalPackages() const {
             return hasExternal_;
         }
         
@@ -65,6 +65,12 @@ namespace BGE {
         FixedArray<TextureReferenceIntermediate>            textures_;
         FixedArray<TextReferenceIntermediate>               text_;
         FixedArray<AnimationSequenceReferenceIntermediate>  animationSequences_;
+        FixedArray<PlacementIntermediate>                   placements_;
+        FixedArray<MaskIntermediate>                        masks_;
+        FixedArray<ButtonIntermediate>                      buttons_;
+        FixedArray<ButtonStateIntermediate>                 buttonStates_;
+        FixedArray<ExternalPackageIntermediate>             externalPackages_;
+        FixedArray<AutoDisplayElementIntermediate>          autoDisplayElements_;
         
         FixedArray<Rect>                                    rects_;
         FixedArray<ColorTransform>                          colorTransforms_;
@@ -105,8 +111,30 @@ namespace BGE {
 
         FixedArray<AnimationKeyframeReference *>            animChannelKeyframes_;
         
+        FixedArray<const char *>                            placementNames_;
+        FixedArray<int32_t>                                 placementIndices_;
+        FixedArray<PlacementReference>                      placementRefs_;
+        
+        FixedArray<const char *>                            maskNames_;
+        FixedArray<int32_t>                                 maskIndices_;
+        FixedArray<MaskReference>                           maskRefs_;
+        
+        FixedArray<ButtonStateReference>                    buttonStateRefs_;
+
+        FixedArray<const char *>                            buttonNames_;
+        FixedArray<int32_t>                                 buttonIndices_;
+        FixedArray<ButtonReference>                         buttonRefs_;
+
+        FixedArray<const char *>                            externalPackageNames_;
+        FixedArray<int32_t>                                 externalPackageIndices_;
+        FixedArray<ExternalPackageReference>                externalPackageRefs_;
+
+        FixedArray<AutoDisplayElementReference>             autoDisplayElementRefs_;
+
         void loadTextures(std::function<void()> callback);
         void loadFonts(std::function<void()> callback);
+        
+        GfxReferenceType referenceTypeForString(std::string type);
     };
 }
 

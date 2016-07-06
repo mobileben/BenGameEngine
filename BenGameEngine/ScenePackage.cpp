@@ -195,16 +195,161 @@ void BGE::ScenePackage::link() {
         animSeqRef->channels = animChannelRefs_.addressOf(animSeqRefInt->channels);
         animSeqRef->bounds = boundsRefs_.addressOf(animSeqRefInt->bounds);
     }
+    
+    // Link Placements
+    placementNames_ = FixedArray<const char*>(placements_.size());
+    placementIndices_ = FixedArray<int32_t>(placements_.size());
+    placementRefs_ = FixedArray<PlacementReference>(placements_.size());
+
+    for (auto i=0;i<placements_.size();i++) {
+        PlacementIntermediate *placementInt = placements_.addressOf(i);
+        PlacementReference *placement = placementRefs_.addressOf(i);
+        const char**name = placementNames_.addressOf(i);
+        int32_t *index = placementIndices_.addressOf(i);
+        
+        // Fix names
+        const char* resolvedName = placementInt->name + strings_.baseAddress();
+        
+        *name = resolvedName;
+        *index = i;
+        placement->name = resolvedName;
+        placement->width = placementInt->width;
+        placement->height = placementInt->height;
+    }
+    
+    // Link Masks
+    maskNames_ = FixedArray<const char*>(masks_.size());
+    maskIndices_ = FixedArray<int32_t>(masks_.size());
+    maskRefs_ = FixedArray<MaskReference>(masks_.size());
+    
+    for (auto i=0;i<masks_.size();i++) {
+        MaskIntermediate *maskInt = masks_.addressOf(i);
+        MaskReference *mask = maskRefs_.addressOf(i);
+        const char**name = maskNames_.addressOf(i);
+        int32_t *index = maskIndices_.addressOf(i);
+        
+        // Fix names
+        const char* resolvedName = maskInt->name + strings_.baseAddress();
+        
+        *name = resolvedName;
+        *index = i;
+        mask->name = resolvedName;
+        mask->width = maskInt->width;
+        mask->height = maskInt->height;
+    }
+    
+    // Link Button States
+    buttonStateRefs_ = FixedArray<ButtonStateReference>(buttonStates_.size());
+    
+    for (auto i=0;i<buttonStates_.size();i++) {
+        ButtonStateIntermediate *buttonStateInt = buttonStates_.addressOf(i);
+        ButtonStateReference *buttonState = buttonStateRefs_.addressOf(i);
+        const char *resolvedState = buttonStateInt->state + strings_.baseAddress();
+        const char *resolvedReference = buttonStateInt->reference + strings_.baseAddress();
+        
+        buttonState->state = resolvedState;
+        buttonState->reference = resolvedReference;
+        buttonState->referenceType = buttonStateInt->referenceType;
+    }
+    
+    // Link Buttons
+    buttonNames_ = FixedArray<const char*>(buttons_.size());
+    buttonIndices_ = FixedArray<int32_t>(buttons_.size());
+    buttonRefs_ = FixedArray<ButtonReference>(buttons_.size());
+    
+    for (auto i=0;i<buttons_.size();i++) {
+        ButtonIntermediate *buttonInt = buttons_.addressOf(i);
+        ButtonReference *button = buttonRefs_.addressOf(i);
+        const char**name = buttonNames_.addressOf(i);
+        int32_t *index = buttonIndices_.addressOf(i);
+        
+        // Fix names
+        const char* resolvedName = buttonInt->name + strings_.baseAddress();
+        
+        *name = resolvedName;
+        *index = i;
+        button->name = resolvedName;
+        button->states = buttonStateRefs_.addressOf(buttonInt->states);
+        button->numStates = buttonInt->numStates;
+    }
+    
+    // Link External References
+    externalPackageNames_ = FixedArray<const char*>(externalPackages_.size());
+    externalPackageIndices_ = FixedArray<int32_t>(externalPackages_.size());
+    externalPackageRefs_ = FixedArray<ExternalPackageReference>(externalPackages_.size());
+    
+    for (auto i=0;i<externalPackages_.size();i++) {
+        ExternalPackageIntermediate *externalPackageInt = externalPackages_.addressOf(i);
+        ExternalPackageReference *externalPackage = externalPackageRefs_.addressOf(i);
+        const char**name = externalPackageNames_.addressOf(i);
+        int32_t *index = externalPackageIndices_.addressOf(i);
+        
+        // Fix names
+        const char* resolvedName = externalPackageInt->name + strings_.baseAddress();
+        const char *resolvedExternal = externalPackageInt->externalPackage + strings_.baseAddress();
+        
+        *name = resolvedName;
+        *index = i;
+        externalPackage->name = resolvedName;
+        externalPackage->externalPackage = resolvedExternal;
+    }
+    
+    // Link Auto Display Elements
+    autoDisplayElementRefs_ = FixedArray<AutoDisplayElementReference>(autoDisplayElements_.size());
+    
+    for (auto i=0;i<autoDisplayElements_.size();i++) {
+        AutoDisplayElementIntermediate *elemInt = autoDisplayElements_.addressOf(i);
+        AutoDisplayElementReference *elem = autoDisplayElementRefs_.addressOf(i);
+        const char *resolvedName = elemInt->name + strings_.baseAddress();
+
+        elem->name = resolvedName;
+        elem->flags = elemInt->flags;
+        if (elemInt->position != NullPtrIndex) {
+            elem->position = elemInt->position + vector2s_.baseAddress();
+        } else {
+            elem->position = nullptr;
+        }
+        if (elemInt->scale != NullPtrIndex) {
+            elem->scale = elemInt->scale + vector2s_.baseAddress();
+        } else {
+            elem->scale = nullptr;
+        }
+        elem->rotation = elemInt->rotation;
+        elem->matrix = nullptr;  // TODO
+        if (elemInt->colorMatrix != NullPtrIndex) {
+            elem->colorMatrix = elemInt->colorMatrix + colorMatrices_.baseAddress();
+        } else {
+            elem->colorMatrix = nullptr;
+        }
+        if (elemInt->colorTransform != NullPtrIndex) {
+            elem->colorTransform = elemInt->colorTransform + colorTransforms_.baseAddress();
+        } else {
+            elem->colorTransform = nullptr;
+        }
+        if (elemInt->bounds != NullPtrIndex) {
+            elem->bounds = elemInt->bounds + rects_.baseAddress();
+        } else {
+            elem->bounds = nullptr;
+        }
+    }
 }
 
 void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback) {
     reset();
     float platformScale = 2.0;
+    
+    // Textures
     NSArray *textures = jsonDict[@"textures"];
     StringArrayBuilder stringBuilder ;
     ArrayBuilder<TextureReferenceIntermediate, TextureReferenceIntermediate> texIntBuilder;
     ArrayBuilder<TextReferenceIntermediate, TextReferenceIntermediate> textIntBuilder;
     ArrayBuilder<AnimationSequenceReferenceIntermediate, AnimationSequenceReferenceIntermediate> animSeqIntBuilder;
+    ArrayBuilder<PlacementIntermediate, PlacementIntermediate> placementIntBuilder;
+    ArrayBuilder<MaskIntermediate, MaskIntermediate> maskIntBuilder;
+    ArrayBuilder<ButtonStateIntermediate, ButtonStateIntermediate> buttonStateIntBuilder;
+    ArrayBuilder<ButtonIntermediate, ButtonIntermediate> buttonIntBuilder;
+    ArrayBuilder<ExternalPackageIntermediate, ExternalPackageIntermediate> extPackageIntBuilder;
+    ArrayBuilder<AutoDisplayElementIntermediate, AutoDisplayElementIntermediate> autoDisplayElemIntBuilder;
     
     UniqueArrayBuilder<Rect, Rect> rectBuilder;
     UniqueArrayBuilder<ColorTransform, ColorTransform> colorXformBuilder;
@@ -226,14 +371,16 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
     defaultPositionIndex_ = vector2Builder.add(Vector2{0, 0});
     defaultScaleIndex_ = vector2Builder.add(Vector2{1, 1});
     
-    texIntBuilder.resize(textures.count);
+    texIntBuilder.resize((int32_t) textures.count);
     
-    for (NSInteger index=0;index<textures.count;index++) {
+    for (int32_t index=0;index<textures.count;index++) {
         NSDictionary *texDict = textures[index];
         TextureReferenceIntermediate *texRef = texIntBuilder.addressOf(index);
         
         // Add name
         const char* name = [texDict[@"name"] UTF8String];
+        
+        assert(name);
         
         if (name) {
             texRef->name = stringBuilder.add(name);
@@ -252,22 +399,22 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                     //texRef->texture = texture.get();
                 });
             }
-        } else {
-            // TODO: How to handle non-named items
-            assert(name);
         }
     }
     
+    // Text
     NSArray *text = jsonDict[@"text"];
     
-    textIntBuilder.resize(text.count);
+    textIntBuilder.resize((int32_t) text.count);
     
-    for (NSInteger index=0;index<text.count;index++) {
+    for (int32_t index=0;index<text.count;index++) {
         NSDictionary *textDict = text[index];
         TextReferenceIntermediate *textRef = textIntBuilder.addressOf(index);
         
         const char *name = [textDict[@"name"] UTF8String];
         const char *text = [textDict[@"text"] UTF8String];
+        
+        assert(name);
         
         if (name) {
             NSDictionary *formatDict = textDict[@"format"];
@@ -318,17 +465,15 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                 fontQueue_.push_back(std::make_pair<std::string, int32_t>(fontName, size));
             }
             
-        } else {
-            // TODO: How to handle non-named items
-            assert(name);
         }
     }
     
+    // Symbols
     NSArray *symbols = jsonDict[@"symbols"];
     
-    animSeqIntBuilder.resize(symbols.count);
+    animSeqIntBuilder.resize((int32_t) symbols.count);
     
-    for (NSInteger index=0;index<symbols.count;index++) {
+    for (int32_t index=0;index<symbols.count;index++) {
         NSDictionary *symbolDict = symbols[index];
         AnimationSequenceReferenceIntermediate *animSeq = animSeqIntBuilder.addressOf(index);
         
@@ -382,6 +527,8 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                     NSDictionary *childDict = children[ci];
                     const char *childName = [childDict[@"name"] UTF8String];
                     
+                    assert(childName);
+
                     if (childName) {
                         auto channelIndexIt = channelIndex.find(childName);
                         AnimationChannelReferenceIntermediate *channel;
@@ -390,34 +537,14 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                         } else {
                             AnimationChannelReferenceIntermediate newChannel;
                             const char* reference = [childDict[@"reference"] UTF8String];
+                            const char *type = [childDict[@"referenceType"] UTF8String];
+                            
+                            assert(reference && type);
                             
                             newChannel.name = stringBuilder.add(childName);
                             newChannel.reference = stringBuilder.add(reference);
                             
-                            NSString *type = childDict[@"referenceType"];
-                            GfxReferenceType value;
-                            
-                            if ([type isEqualToString:@"button"]) {
-                                value = GfxReferenceTypeButton;
-                            } else if ([type isEqualToString:@"external"]) {
-                                value = GfxReferenceTypeExternalReference;
-                            } else if ([type isEqualToString:@"mask"]) {
-                                value = GfxReferenceTypeMask;
-                            } else if ([type isEqualToString:@"placement"]) {
-                                value = GfxReferenceTypePlacement;
-                            } else if ([type isEqualToString:@"sprite"]) {
-                                value = GfxReferenceTypeSprite;
-                            } else if ([type isEqualToString:@"symbol"]) {
-                                value = GfxReferenceTypeAnimationSequence;
-                            } else if ([type isEqualToString:@"symbolFrame"]) {
-                                value = GfxReferenceTypeKeyframe;
-                            } else if ([type isEqualToString:@"text"]) {
-                                value = GfxReferenceTypeText;
-                            } else if ([type isEqualToString:@"textureMask"]) {
-                                value = GfxReferenceTypeTextureMask;
-                            } else {
-                                value = GfxReferenceTypeUnknown;
-                            }
+                            GfxReferenceType value = referenceTypeForString(type);
                             
                             newChannel.referenceType = value;
                             
@@ -623,9 +750,6 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
                         } else {
                             assert(false);
                         }
-                    } else {
-                        // TODO: How to handle non-named items
-                        assert(name);
                     }
                 }
             }
@@ -634,17 +758,185 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             
             animSeq->numBounds = (uint32_t) boundsRefIntBuilder.size() - (uint32_t) animSeq->bounds;
             animSeq->numChannels = (uint32_t) channelRefIntBuilder.size() - animSeq->channels;
-        } else {
-            // TODO: How to handle non-named items
-            assert(name);
         }
+    }
+    
+    // Placements
+    NSArray *placements = jsonDict[@"placements"];
+    
+    placementIntBuilder.resize((int32_t) placements.count);
+    
+    for (int32_t index=0;index<placements.count;index++) {
+        NSDictionary *dict = placements[index];
+        PlacementIntermediate *placement = placementIntBuilder.addressOf(index);
+        const char *name = [dict[@"name"] UTF8String];
+
+        assert(name);
+        
+        if (name) {
+            placement->name = stringBuilder.add(name);
+            placement->width = [dict[@"width"] floatValue];
+            placement->height = [dict[@"height"] floatValue];
+        }
+    }
+    
+    // Buttons
+    NSArray *buttons = jsonDict[@"buttons"];
+    int32_t numStates = 0;
+    
+    for (int32_t index=0;index<buttons.count;index++) {
+        NSDictionary *buttonDict = buttons[index];
+        NSArray *states = buttonDict[@"states"];
+        
+        numStates += states.count;
+    }
+    
+    buttonIntBuilder.resize((int32_t) buttons.count);
+    buttonStateIntBuilder.resize(numStates);
+    
+    int32_t stateIndex = 0;
+    
+    for (int32_t index=0;index<buttons.count;index++) {
+        NSDictionary *buttonDict = buttons[index];
+        ButtonIntermediate *button = buttonIntBuilder.addressOf(index);
+        const char *buttonName = [buttonDict[@"name"] UTF8String];
+        
+        assert(buttonName);
+        
+        if (buttonName) {
+            NSArray *states = buttonDict[@"states"];
+            
+            button->name = stringBuilder.add(buttonName);
+            button->states = stateIndex;
+            button->numStates = (int32_t) states.count;
+            
+            for (NSDictionary *state in states) {
+                ButtonStateIntermediate *buttonState = buttonStateIntBuilder.addressOf(stateIndex);
+                const char *stateName = [state[@"state"] UTF8String];
+                const char *reference = [state[@"reference"] UTF8String];
+                const char *type = [state[@"referenceType"] UTF8String];
+
+                assert(stateName);
+                assert(reference);
+                assert(type);
+                
+                if (stateName) {
+                    GfxReferenceType refType = referenceTypeForString(type);
+                    
+                    buttonState->state = stringBuilder.add(stateName);
+                    buttonState->reference = stringBuilder.add(reference);
+                    buttonState->referenceType = refType;
+                    
+                    stateIndex++;
+                }
+            }
+        }
+    }
+    
+    // Masks
+    NSArray *masks = jsonDict[@"masks"];
+    
+    maskIntBuilder.resize((int32_t) masks.count);
+    
+    for (int32_t index=0;index<masks.count;index++) {
+        NSDictionary *dict = masks[index];
+        MaskIntermediate *mask = maskIntBuilder.addressOf(index);
+        const char *name = [dict[@"name"] UTF8String];
+        
+        assert(name);
+        
+        if (name) {
+            mask->name = stringBuilder.add(name);
+            mask->width = [dict[@"width"] floatValue];
+            mask->height = [dict[@"height"] floatValue];
+        }
+    }
+
+    // External References
+    NSArray *externals = jsonDict[@"externalReferences"];
+    
+    extPackageIntBuilder.resize((int32_t) externals.count);
+    
+    for (int32_t index=0;index<externals.count;index++) {
+        NSDictionary *dict = externals[index];
+        ExternalPackageIntermediate *external = extPackageIntBuilder.addressOf(index);
+        const char *name = [dict[@"name"] UTF8String];
+        const char *externalPackage = [dict[@"externalPackage"] UTF8String];
+        
+        assert(name);
+        assert(externalPackage);
+        
+        external->name = stringBuilder.add(name);
+        external->externalPackage = stringBuilder.add(externalPackage);
+    }
+    
+    // Auto display list elements
+    NSArray *autoDisplayElems = jsonDict[@"autoDisplayList"];
+    
+    autoDisplayElemIntBuilder.resize((int32_t) autoDisplayElems.count);
+    
+    for (int32_t index=0;index<autoDisplayElems.count;index++) {
+        NSDictionary *dict = autoDisplayElems[index];
+        AutoDisplayElementIntermediate *elem = autoDisplayElemIntBuilder.addressOf(index);
+        const char *name = [dict[@"name"] UTF8String];
+        const char *reference = [dict[@"reference"] UTF8String];
+        const char *type = [dict[@"referenceType"] UTF8String];
+        
+        assert(name);
+        assert(reference);
+        assert(type);
+        
+        GfxReferenceType refType = referenceTypeForString(type);
+        
+        elem->name = stringBuilder.add(name);
+        elem->reference = stringBuilder.add(reference);
+        elem->referenceType = refType;
+        
+        Rect bounds;
+        
+        bounds.x = [dict[@"bounds"][@"x"] floatValue];
+        bounds.y = [dict[@"bounds"][@"y"] floatValue];
+        bounds.w = [dict[@"bounds"][@"width"] floatValue];
+        bounds.h = [dict[@"bounds"][@"height"] floatValue];
+        
+        elem->bounds = rectBuilder.add(bounds);
+        
+        if (dict[@"position"]) {
+            Vector2 pos;
+            
+            pos.x = [dict[@"position"][@"x"] floatValue];
+            pos.y = [dict[@"position"][@"y"] floatValue];
+            
+            elem->position = vector2Builder.add(pos);
+        } else {
+            elem->position = defaultPositionIndex_;
+        }
+        
+        if (dict[@"scale"]) {
+            Vector2 scale;
+            
+            scale.x = [dict[@"scale"][@"x"] floatValue];
+            scale.y = [dict[@"scale"][@"y"] floatValue];
+            
+            elem->position = vector2Builder.add(scale);
+        } else {
+            elem->scale = defaultScaleIndex_;
+        }
+        
+        elem->rotation = [dict[@"rotation"] floatValue];
+        elem->flags = [dict[@"flags"] unsignedIntValue];
     }
     
     strings_ = stringBuilder.createFixedArray();
     textures_ = texIntBuilder.createFixedArray();
     text_ = textIntBuilder.createFixedArray();
     animationSequences_ = animSeqIntBuilder.createFixedArray();
-    
+    placements_ = placementIntBuilder.createFixedArray();
+    masks_ = maskIntBuilder.createFixedArray();
+    buttons_ = buttonIntBuilder.createFixedArray();
+    buttonStates_ = buttonStateIntBuilder.createFixedArray();
+    externalPackages_ = extPackageIntBuilder.createFixedArray();
+    autoDisplayElements_ = autoDisplayElemIntBuilder.createFixedArray();
     
     rects_ = rectBuilder.createFixedArray();
     colorTransforms_ = colorXformBuilder.createFixedArray();
@@ -743,3 +1035,30 @@ BGE::AnimationSequenceReference *BGE::ScenePackage::getAnimationSequenceReferenc
     return nullptr;
 }
 
+BGE::GfxReferenceType BGE::ScenePackage::referenceTypeForString(std::string type) {
+    GfxReferenceType value;
+    
+    if (type == "button") {
+        value = GfxReferenceTypeButton;
+    } else if (type == "external") {
+        value = GfxReferenceTypeExternalPackage;
+    } else if (type == "mask") {
+        value = GfxReferenceTypeMask;
+    } else if (type == "placement") {
+        value = GfxReferenceTypePlacement;
+    } else if (type == "sprite") {
+        value = GfxReferenceTypeSprite;
+    } else if (type == "symbol") {
+        value = GfxReferenceTypeAnimationSequence;
+    } else if (type == "symbolFrame") {
+        value = GfxReferenceTypeKeyframe;
+    } else if (type == "text") {
+        value = GfxReferenceTypeText;
+    } else if (type == "textureMask") {
+        value = GfxReferenceTypeTextureMask;
+    } else {
+        value = GfxReferenceTypeUnknown;
+    }
+
+    return value;
+}

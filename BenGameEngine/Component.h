@@ -71,7 +71,6 @@ namespace BGE {
             if (T::bitmask_ == Component::InvalidBitmask) {
                 T::bitmask_ = ComponentBitmask::createBitmask<T>();
                 T::type_index_ = typeid(T);
-                printf("HERE %d\n", T::type_index_ == Component::type_index_);
             }
         }
         

@@ -15,95 +15,6 @@
 #include "Font.h"
 
 namespace BGE {
-    struct AnimationKeyframeDataFormat {
-        uint32_t totalFrames;
-        Matrix3 matrix;
-        ColorMatrix colorMatrix;
-        uint32_t flags;
-        Rect bounds;
-    };
-    
-    struct AnimationChannelDataFormat {
-        const char* const reference;
-        const char* const referenceType;
-        uint32_t totalFrames;
-        AnimationKeyframeDataFormat *keyframes;
-    };
-    
-    struct AnimationDataFormat {
-        char *name;
-        uint32_t fps;
-        uint32_t totalFrames;
-        uint32_t numChannels;
-        AnimationChannelDataFormat *channels;
-    };
-    
-    struct MaskDataFormat {
-        const char* const name = nullptr;
-        float width = 0;
-        float height = 0;
-    };
-    
-    struct ExternalReferenceDataFormat {
-        const char* const name;
-        const char* const externalPackage;
-    };
-    
-    struct AutoDisplayListElementDataFormat {
-        const char* const name;
-        const char* const referenceType;
-        uint32_t flags;
-        uint32_t hidden;
-        Rect bounds;
-        Vector2 xy;
-        Vector2 scale;
-        float rotation;
-        const char* const reference;
-    };
-    
-    struct PlacementDataFormat {
-        const char* const name;
-        float width;
-        float height;
-    };
-    
-    struct TextDataFormat {
-        enum Alignment {
-            Left = 0,
-            Center = 1,
-            Right = 2
-        };
-        
-        const char* const name = nullptr;
-        const char* const text = nullptr;
-        const char* const fontName = nullptr;
-        Alignment alignment;
-        uint32_t color = 0;
-        float size = 0;
-        float leading = 0;
-        
-        float width = 0;
-        float height = 0;
-    };
-    
-    struct SubTextureDataFormat {
-        const char* const name;
-        const char* const atlas;
-        float rotation;
-        float x;
-        float y;
-        float width;
-        float height;
-        
-    };
-    
-    struct TextureDataFormat {
-        const char* const name = nullptr;
-        const char* const filename = nullptr;
-        float   width = 0;
-        float   height = 0;
-    };
-
     class Texture;
     
     struct TextReferenceIntermediate {
@@ -198,7 +109,7 @@ namespace BGE {
     typedef enum : uint32_t {
         GfxReferenceTypeUnknown = 0,
         GfxReferenceTypeButton,
-        GfxReferenceTypeExternalReference,
+        GfxReferenceTypeExternalPackage,
         GfxReferenceTypeMask,
         GfxReferenceTypePlacement,
         GfxReferenceTypeSprite,
@@ -249,6 +160,96 @@ namespace BGE {
         uint32_t numBounds;
         AnimationChannelReference *channels;
         BoundsReference *bounds;
+    };
+    
+    struct ButtonStateIntermediate {
+        int32_t             state;
+        int32_t             reference;
+        GfxReferenceType    referenceType;
+    };
+    
+    struct ButtonStateReference {
+        const char *state;
+        const char *reference;
+        GfxReferenceType referenceType;
+    };
+    
+    struct ButtonIntermediate {
+        int32_t     name;
+        int32_t     states;
+        uint32_t    numStates;
+    };
+    
+    struct ButtonReference {
+        const char              *name;
+        ButtonStateReference    *states;
+        uint32_t                numStates;
+    };
+    
+    struct PlacementIntermediate {
+        int32_t name;
+        float   width;
+        float   height;
+    };
+    
+    struct PlacementReference {
+        const char *name;
+        float       width;
+        float       height;
+    };
+    
+    struct MaskIntermediate {
+        int32_t     name;
+        float       width;
+        float       height;
+    };
+    
+    struct MaskReference {
+        const char *name;
+        float       width;
+        float       height;
+    };
+    
+    struct TextureMaskIntermediate {
+        int32_t     name;
+    };
+    
+    struct ExternalPackageIntermediate {
+        int32_t name;
+        int32_t externalPackage;
+    };
+
+    struct ExternalPackageReference {
+        const char *name;
+        const char *externalPackage;
+    };
+    
+    struct AutoDisplayElementIntermediate {
+        int32_t             name;
+        int32_t             bounds;
+        uint32_t            flags;
+        int32_t             position;
+        int32_t             scale;
+        float               rotation;
+        int32_t             matrix;
+        int32_t             colorMatrix;
+        int32_t             colorTransform;
+        int32_t             reference;
+        GfxReferenceType    referenceType;
+    };
+    
+    struct AutoDisplayElementReference {
+        const char          *name;
+        Rect                *bounds;
+        uint32_t            flags;
+        Vector2             *position;
+        Vector2             *scale;
+        float               rotation;
+        Matrix4             *matrix;
+        ColorMatrix         *colorMatrix;
+        ColorTransform      *colorTransform;
+        const char          *reference;
+        GfxReferenceType    referenceType;
     };
 }
 

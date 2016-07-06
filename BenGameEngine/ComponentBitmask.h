@@ -34,7 +34,6 @@ namespace BGE {
                     masks_[index] = mask;
                     index_++;
                     
-                    printf("XXX Creating bitmask %d\n", mask);
                     return mask;
                 }
             } else {
