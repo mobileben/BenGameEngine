@@ -26,3 +26,362 @@ void BGE::Space::initialize(SpaceHandle handle, ObjectId spaceId, std::string na
     componentService_ = std::make_shared<ComponentService>();
     componentService_->setSpaceHandle(spaceHandle_);
 }
+
+
+std::shared_ptr<BGE::GameObject> BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
+    AnimationSequenceReference *animSeqRef;
+    
+    if (package) {
+        animSeqRef = package->getAnimationSequenceReference(name);
+    } else {
+        animSeqRef = Game::getInstance()->getScenePackageService()->getAnimationSequenceReference(name);
+    }
+    
+    if (animSeqRef) {
+        auto obj = createObject<GameObject>(name);
+        auto xform = createComponent<TransformComponent>();
+        auto animSeq = createComponent<AnimationSequenceComponent>();
+        auto animator = createComponent<AnimatorComponent>();
+        
+        obj->addComponent(xform);
+        obj->addComponent(animSeq);
+        obj->addComponent(animator);
+
+        animSeq->setAnimationSequenceReference(animSeqRef);
+        
+        //obj->setActive(true);
+        
+        return obj;
+    }
+    
+    return nullptr;
+}
+
+std::shared_ptr<BGE::GameObject> BGE::Space::createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate) {
+    if (channelRef) {
+        auto obj = createObject<GameObject>(name);
+        auto xform = createComponent<TransformComponent>();
+        auto channel = createComponent<AnimationChannelComponent>();
+        auto animator = createComponent<ChannelFrameAnimatorComponent>();
+        
+        obj->addComponent(xform);
+        obj->addComponent(channel);
+        obj->addComponent(animator);
+        
+        channel->setAnimationChannelReference(channelRef);
+        
+        //obj->setActive(true);
+        
+        return obj;
+    }
+    
+    return nullptr;
+}
+
+std::shared_ptr<BGE::GameObject> BGE::Space::createFrameAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
+    AnimationSequenceReference *animSeqRef;
+    
+    if (package) {
+        animSeqRef = package->getAnimationSequenceReference(name);
+    } else {
+        animSeqRef = Game::getInstance()->getScenePackageService()->getAnimationSequenceReference(name);
+    }
+    
+    if (animSeqRef) {
+        auto obj = createObject<GameObject>(name);
+        auto xform = createComponent<TransformComponent>();
+        auto animSeq = createComponent<AnimationSequenceComponent>();
+        auto animator = createComponent<FrameAnimatorComponent>();
+        
+        obj->addComponent(xform);
+        obj->addComponent(animSeq);
+        obj->addComponent(animator);
+        
+        animSeq->setAnimationSequenceReference(animSeqRef);
+        
+        //obj->setActive(true);
+        
+        return obj;
+    }
+    
+    return nullptr;
+}
+
+std::shared_ptr<BGE::GameObject> BGE::Space::createButton(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
+    ButtonReference *buttonRef;
+    
+    if (package) {
+        buttonRef = package->getButtonReference(name);
+    } else {
+        buttonRef = Game::getInstance()->getScenePackageService()->getButtonReference(name);
+    }
+    
+    if (buttonRef) {
+        auto obj = createObject<GameObject>(name);
+        auto xform = createComponent<TransformComponent>();
+        auto button = createComponent<ButtonComponent>();
+        
+        obj->addComponent(xform);
+        obj->addComponent(button);
+        
+        button->setButtonReference(buttonRef);
+
+        //obj->setActive(true);
+        
+        return obj;
+    }
+    
+    return nullptr;
+}
+
+std::shared_ptr<BGE::GameObject> BGE::Space::createMask(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
+    MaskReference *maskRef;
+    
+    if (package) {
+        maskRef = package->getMaskReference(name);
+    } else {
+        maskRef = Game::getInstance()->getScenePackageService()->getMaskReference(name);
+    }
+    
+    if (maskRef) {
+        auto obj = createObject<GameObject>(name);
+        auto xform = createComponent<TransformComponent>();
+        auto mask = createComponent<MaskComponent>();
+        
+        obj->addComponent(xform);
+        obj->addComponent(mask);
+
+        mask->setMaskReference(maskRef);
+        
+        //obj->setActive(true);
+        
+        return obj;
+    }
+    
+    return nullptr;
+}
+
+std::shared_ptr<BGE::GameObject> BGE::Space::createSprite(std::string name, ScenePackageHandle handle) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
+    TextureReference *texRef;
+    
+    if (package) {
+        texRef = package->getTextureReference(name);
+    } else {
+        texRef = Game::getInstance()->getScenePackageService()->getTextureReference(name);
+    }
+    
+    if (texRef) {
+        auto obj = createObject<GameObject>(name);
+        auto xform = createComponent<TransformComponent>();
+        auto sprite = createComponent<SpriteRenderComponent>();
+        
+        obj->addComponent(xform);
+        obj->addComponent(sprite);
+        
+        sprite->setTextureReference(texRef);
+        
+        //obj->setActive(true);
+        
+        return obj;
+    }
+    
+    return nullptr;
+}
+
+std::shared_ptr<BGE::GameObject> BGE::Space::createText(std::string name, ScenePackageHandle handle) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
+    TextReference *textRef;
+    
+    if (package) {
+        textRef = package->getTextReference(name);
+    } else {
+        textRef = Game::getInstance()->getScenePackageService()->getTextReference(name);
+    }
+    
+    if (textRef) {
+        auto obj = createObject<GameObject>(name);
+        auto xform = createComponent<TransformComponent>();
+        auto text = createComponent<TextComponent>();
+        
+        obj->addComponent(xform);
+        obj->addComponent(text);
+
+        text->setTextReference(textRef);
+        
+        //obj->setActive(true);
+        
+        return obj;
+    }
+    
+    return nullptr;
+}
+
+std::shared_ptr<BGE::GameObject> BGE::Space::createPlacement(std::string name, ScenePackageHandle handle) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
+    PlacementReference *placementRef;
+    
+    if (package) {
+        placementRef = package->getPlacementReference(name);
+    } else {
+        placementRef = Game::getInstance()->getScenePackageService()->getPlacementReference(name);
+    }
+    
+    if (placementRef) {
+        auto obj = createObject<GameObject>(name);
+        auto xform = createComponent<TransformComponent>();
+        
+        obj->addComponent(xform);
+        
+        //obj->setActive(true);
+        
+        return obj;
+    }
+    
+    return nullptr;
+}
+
+void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+    
+    if (package) {
+        auto autoDisplayList = package->getAutoDisplayList();
+        auto num = package->getAutoDisplayListSize();
+        std::map<uint32_t, std::vector<std::shared_ptr<GameObject>>> createdObjects;
+        std::vector<std::shared_ptr<GameObject>> rootObjs;
+        
+        for (auto i=0;i<GfxReferenceTypeLast;i++) {
+            createdObjects[i] = std::vector<std::shared_ptr<GameObject>>();
+        }
+        
+        for (auto i=0;i<num;i++) {
+            auto elem = &autoDisplayList[i];
+            std::shared_ptr<GameObject> obj;
+            auto xform = createComponent<TransformComponent>();
+            
+            if (elem->position) {
+                xform->setPosition(*elem->position);
+            }
+            
+            if (elem->scale) {
+                xform->setScale(*elem->scale);
+            }
+            
+            xform->setRotation(elem->rotation);
+            
+            if (elem->colorMatrix) {
+                
+            }
+            
+            if (elem->colorTransform) {
+                
+            }
+            
+            switch (elem->referenceType) {
+                case GfxReferenceTypeAnimationSequence:
+                    obj = createAnimSequence(elem->reference);
+                    break;
+                    
+                case GfxReferenceTypeButton:
+                    obj = createButton(elem->reference);
+                    break;
+                
+                case GfxReferenceTypeExternalPackage:
+                    break;
+                    
+                case GfxReferenceTypeMask:
+                    obj = createMask(elem->reference);
+                    break;
+                    
+                case GfxReferenceTypePlacement:
+                    obj = createPlacement(elem->reference);
+                    break;
+                    
+                case GfxReferenceTypeSprite:
+                    obj = createSprite(elem->reference);
+                    break;
+                    
+                case GfxReferenceTypeText:
+                    obj = createText(elem->reference);
+                    break;
+                    
+                case GfxReferenceTypeTextureMask:
+                    break;
+                    
+                default:
+                    assert(false);
+                    break;
+            }
+            
+            createdObjects[elem->referenceType].push_back(obj);
+            rootObjs.push_back(obj);
+        }
+        
+        for (auto i=0;i<GfxReferenceTypeLast;i++) {
+            auto items = createdObjects[i];
+            
+            if (items.size() > 0) {
+                std::function<void(std::shared_ptr<GameObject>)> callback = nullptr;
+                
+                switch (i) {
+                    case GfxReferenceTypeAnimationSequence:
+                        callback = delegate.animationSequenceCreatedHandler;
+                        break;
+                        
+                    case GfxReferenceTypeButton:
+                        callback = delegate.buttonCreatedHandler;
+                        break;
+                        
+                    case GfxReferenceTypeExternalPackage:
+                        break;
+                        
+                    case GfxReferenceTypeMask:
+                        callback = delegate.maskCreatedHandler;
+                        break;
+                        
+                    case GfxReferenceTypePlacement:
+                        callback = delegate.placementCreatedHandler;
+                        break;
+                        
+                    case GfxReferenceTypeSprite:
+                        callback = delegate.spriteCreatedHandler;
+                        break;
+                        
+                    case GfxReferenceTypeText:
+                        callback = delegate.textCreatedHandler;
+                        break;
+                        
+                    case GfxReferenceTypeTextureMask:
+                        callback = delegate.textureMaskCreatedHandler;
+                        break;
+                        
+                    default:
+                        assert(false);
+                        break;
+                }
+                
+                if (callback) {
+                    for (auto item : items) {
+                        callback(item);
+                    }
+                }
+            }
+        }
+        
+        for (auto obj : rootObjs) {
+            obj->setActive(true);
+        }
+
+        if (delegate.completionHandler) {
+            delegate.completionHandler(root);
+        }
+    } else {
+        if (delegate.completionHandler) {
+            delegate.completionHandler(root);
+        }
+    }
+}

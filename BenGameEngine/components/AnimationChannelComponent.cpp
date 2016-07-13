@@ -18,11 +18,11 @@ std::shared_ptr<BGE::AnimationChannelComponent> BGE::AnimationChannelComponent::
     return std::make_shared<AnimationChannelComponent>(private_key{}, componentId);
 }
 
-BGE::AnimationChannelComponent::AnimationChannelComponent(struct private_key const& key, ObjectId componentId) : Component(componentId) {
+BGE::AnimationChannelComponent::AnimationChannelComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), channel(nullptr) {
 }
 
-void BGE::AnimationChannelComponent::setGameObject(std::shared_ptr<GameObject> gameObj) {
-    Component::setGameObject(gameObj);
+void BGE::AnimationChannelComponent::setGameObject(std::shared_ptr<GameObject> gameObject) {
+    Component::setGameObject(gameObject);
     
     updateReference();
 }
@@ -36,30 +36,37 @@ void BGE::AnimationChannelComponent::setAnimationChannelReference(const Animatio
 void BGE::AnimationChannelComponent::updateReference() {
     std::shared_ptr<GameObject> gameObj = getGameObject().lock();
     
-    if (gameObj && this->channel && this->channel->referenceData) {
+    if (gameObj && this->channel) {
         // Now setup the proper render component
-        
-        if (gameObj->getName() == "instance2") {
-            NSLog(@"HERE");
-        }
-        
         auto space = getSpace();
         
         // TODO: Do we do this later?
+        NSLog(@"Channel reference %s/%d", this->channel->reference, this->channel->referenceType);
         switch (this->channel->referenceType) {
             case GfxReferenceTypeSprite: {
                 auto sprite = space->createComponent<SpriteRenderComponent>();
                 auto texRef = Game::getInstance()->getScenePackageService()->getTextureReference(this->channel->reference);
                 
-                sprite->setTextureRef(texRef);
                 // TODO: Remove any older render components
                 gameObj->addComponent(sprite);
+                sprite->setTextureReference(texRef);
+            }
+                break;
+                
+            case GfxReferenceTypeButton:{
+                auto button = space->createComponent<ButtonComponent>();
+                auto buttonRef = Game::getInstance()->getScenePackageService()->getButtonReference(this->channel->reference);
+                gameObj->addComponent(button);
+                button->setButtonReference(buttonRef);
             }
                 break;
                 
             case GfxReferenceTypeAnimationSequence: {
-                
+                NSLog(@"WHY");
             }
+                break;
+                
+            case GfxReferenceTypeMask:
                 break;
                 
             case GfxReferenceTypeKeyframe: {
@@ -75,15 +82,22 @@ void BGE::AnimationChannelComponent::updateReference() {
                 if (textRef && !textRef->fontHandle.isNull()) {
                     auto text = space->createComponent<TextComponent>();
                     
-                    text->setTextReference(*textRef);
                     gameObj->addComponent(text);
+                    text->setTextReference(*textRef);
                 }
                 // TODO: Remove any older render components
             }
                 break;
                 
             default:
+                assert(false);
                 break;
+        }
+    } else {
+        if (this->channel) {
+            NSLog(@"You fail %x %x %x", gameObj.get(), this->channel, this->channel->referenceData);
+        } else {
+            NSLog(@"You fail %x", gameObj.get());
         }
     }
 }

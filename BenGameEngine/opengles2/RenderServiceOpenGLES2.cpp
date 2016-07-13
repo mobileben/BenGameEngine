@@ -773,7 +773,10 @@ void BGE::RenderServiceOpenGLES2::render()
 }
 
 void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> gameObj, bool root) {
-
+    if (!gameObj->isActive()) {
+        return;
+    }
+    
     // TODO: Transform
     auto transformComponent = gameObj->getComponent<TransformComponent>();
     

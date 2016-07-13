@@ -19,8 +19,16 @@ std::shared_ptr<BGE::SpriteRenderComponent> BGE::SpriteRenderComponent::create(O
 BGE::SpriteRenderComponent::SpriteRenderComponent(struct private_key const& key, ObjectId componentId) : RenderComponent(componentId) {
 }
 
-void BGE::SpriteRenderComponent::setTextureRef(TextureReference *texRef) {
-    auto material = Game::getInstance()->getMaterialService()->createMaterial(texRef->texture);
+void BGE::SpriteRenderComponent::setTextureReference(TextureReference *texRef) {
+    if (texRef) {
+        setTextureReference(*texRef);
+    } else {
+        NSLog(@"WHAAA");
+    }
+}
+
+void BGE::SpriteRenderComponent::setTextureReference(const TextureReference &texRef) {
+    auto material = Game::getInstance()->getMaterialService()->createMaterial(texRef.texture);
     
     this->setMaterials({material});
 }

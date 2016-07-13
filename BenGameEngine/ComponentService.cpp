@@ -19,6 +19,7 @@
 #include "SpriteRenderComponent.h"
 #include "TextComponent.h"
 #include "TransformComponent.h"
+#include "ButtonComponent.h"
 
 void BGE::ComponentService::registerComponents() {
     Component::registerBitmask<AnimationChannelComponent>();
@@ -33,6 +34,7 @@ void BGE::ComponentService::registerComponents() {
     Component::registerBitmask<SpriteRenderComponent>();
     Component::registerBitmask<TextComponent>();
     Component::registerBitmask<TransformComponent>();
+    Component::registerBitmask<ButtonComponent>();
 }
 
 BGE::ComponentService::ComponentService() {

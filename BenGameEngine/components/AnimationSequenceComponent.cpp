@@ -39,16 +39,27 @@ void BGE::AnimationSequenceComponent::created() {
         sequenceRoot = space->createObject<GameObject>();
         auto xform = space->createComponent<TransformComponent>();
         sequenceRoot->addComponent(xform);
+        sequenceRoot->setActive(true);
     }
 }
 
-void BGE::AnimationSequenceComponent::setAnimationSequenceReference(AnimationSequenceReference& animSeqRef) {
+void BGE::AnimationSequenceComponent::setAnimationSequenceReference(AnimationSequenceReference *animSeqRef) {
+    if (animSeqRef) {
+        setAnimationSequenceReference(*animSeqRef);
+    } else {
+        NSLog(@"NULLL");
+    }
+}
+
+void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const AnimationSequenceReference& animSeqRef) {
     this->frameRate = animSeqRef.frameRate;
     this->totalFrames = animSeqRef.totalFrames;
     this->numChannels = animSeqRef.numChannels;
     this->numBounds = animSeqRef.numBounds;
     
     NSLog(@"setAnimationSequenceReference");
+    
+    sequenceRoot->setName(animSeqRef.name);
     
     // seqRoot xform children need to be purged
     auto seqXform = sequenceRoot->getComponent<TransformComponent>();
@@ -61,51 +72,28 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(AnimationSeq
     auto space = getSpace();
 
     for (auto i=0;i<numChannels;i++) {
-        auto obj = space->createObject<GameObject>();
-        auto xform = space->createComponent<TransformComponent>();
-        auto channel = space->createComponent<AnimationChannelComponent>();
-        auto animator = space->createComponent<ChannelFrameAnimatorComponent>();
         auto channelRef = &channels[i];
-        
-        channel->setAnimationChannelReference(channelRef);
-        
-        NSLog(@"Adding channel %s/%s/%d", channelRef->name, channelRef->reference, channelRef->referenceType);
-        
-        // Channel game objects will have: xform, channel, channel frame animator, render (optional)
-        obj->addComponent(xform);
-        obj->addComponent(channel);
-        obj->addComponent(animator);
-        
+        auto obj = space->createAnimChannel(channelRef->name, channelRef);
+        auto xform = obj->getComponent<TransformComponent>();
+
         seqXform->addChild(xform);
         
         // TODO: Destroy components when done!
         
         this->channels.push_back(obj);
+        obj->setActive(true);
         
         // If this is a sequence keyframe, we need to create more game objects!
         if (channelRef->referenceType == GfxReferenceTypeKeyframe) {
-            auto seqRef = Game::getInstance()->getScenePackageService()->getAnimationSequenceReference(channelRef->reference);
-            
             NSLog(@"Adding sequence %s/%s to channel", channelRef->name, channelRef->reference);
-
-            if (seqRef) {
-                auto newSeq = space->createComponent<AnimationSequenceComponent>();
-                // Create new game object and add to our xform
-                auto newObj = space->createObject<GameObject>(seqRef->name);
+            auto newObj = space->createFrameAnimSequence(channelRef->reference);
+            
+            if (newObj) {
+                auto newXform = newObj->getComponent<TransformComponent>();
                 
-                if (newObj) {
-                    auto newXform = space->createComponent<TransformComponent>();
-                    auto newAnimator = space->createComponent<FrameAnimatorComponent>();
-                    
-                    newObj->addComponent(newXform);
-                    newObj->addComponent(newSeq);
-                    newObj->addComponent(newAnimator);
-                    
-                    xform->addChild(newXform);
-                }
+                xform->addChild(newXform);
                 
-                // Once we've added all components, then add the seq ref
-                newSeq->setAnimationSequenceReference(*seqRef);
+                newObj->setActive(true);
             }
         }
     }
@@ -118,10 +106,6 @@ void BGE::AnimationSequenceComponent::setGameObject(std::shared_ptr<GameObject> 
     if (transformComponent) {
         // If there is a transformComponent, then add us to it, if we have
         transformComponent->addChild(sequenceRoot->getComponent<TransformComponent>());
-    }
-    
-    for (auto i=0;i<numChannels;i++) {
-        auto gameObj = channels[i];
     }
 }
 

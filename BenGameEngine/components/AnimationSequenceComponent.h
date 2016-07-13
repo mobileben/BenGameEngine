@@ -33,7 +33,8 @@ namespace BGE {
         AnimationSequenceComponent(struct private_key const& key, ObjectId componentId);
         ~AnimationSequenceComponent();
         
-        void setAnimationSequenceReference(AnimationSequenceReference& animSeqRef);
+        void setAnimationSequenceReference(AnimationSequenceReference *animSeqRef);
+        void setAnimationSequenceReference(const AnimationSequenceReference& animSeqRef);
 
         // TODO: Handle to AnimationSequenceReference
         uint32_t    frameRate;

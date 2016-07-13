@@ -35,6 +35,14 @@ void BGE::ScenePackage::initialize(ScenePackageHandle handle, ObjectId scenePack
     setName(name);
 }
 
+BGE::AutoDisplayElementReference *BGE::ScenePackage::getAutoDisplayList() const {
+    return autoDisplayElementRefs_.baseAddress();
+}
+
+int32_t BGE::ScenePackage::getAutoDisplayListSize() const {
+    return autoDisplayElementRefs_.getSize();
+}
+
 void BGE::ScenePackage::link() {
     // Link Texture
     std::shared_ptr<TextureService> textureService = Game::getInstance()->getTextureService();
@@ -957,36 +965,89 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
 }
 
 void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
-    textureCount_->store(0);
-    
-    for (auto &tex : textureQueue_) {
-        Game::getInstance()->getTextureService()->namedTextureFromFile(tex.first, tex.second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
-            int val = textureCount_->fetch_add(1) + 1;
-            
-            NSLog(@"Loaded %s (%d)", texture->getName().c_str(), (int)val);
-            if (val == textureQueue_.size()) {
-                if (callback) {
-                    callback();
+    if (textureQueue_.size() > 0) {
+        textureCount_->store(0);
+        
+        for (auto &tex : textureQueue_) {
+            Game::getInstance()->getTextureService()->namedTextureFromFile(tex.first, tex.second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
+                int val = textureCount_->fetch_add(1) + 1;
+                
+                NSLog(@"Loaded %s (%d)", texture->getName().c_str(), (int)val);
+                if (val == textureQueue_.size()) {
+                    if (callback) {
+                        callback();
+                    }
                 }
-            }
-        });
+            });
+        }
+    } else if (callback) {
+        callback();
     }
 }
 
 void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
-    fontCount_->store(0);
-    
-    for (auto &font : fontQueue_) {
-        Game::getInstance()->getFontService()->loadFont(font.first, font.second, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
-            int val = fontCount_->fetch_add(1) + 1;
-            
-            if (val == fontQueue_.size()) {
-                if (callback) {
-                    callback();
+    if (fontQueue_.size() > 0) {
+        fontCount_->store(0);
+        
+        for (auto &font : fontQueue_) {
+            Game::getInstance()->getFontService()->loadFont(font.first, font.second, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
+                int val = fontCount_->fetch_add(1) + 1;
+                
+                if (val == fontQueue_.size()) {
+                    if (callback) {
+                        callback();
+                    }
                 }
-            }
-        });
+            });
+        }
+    } else if (callback) {
+        callback();
     }
+}
+
+BGE::ButtonReference *BGE::ScenePackage::getButtonReference(std::string name) {
+    const char *cstr = name.c_str();
+    
+    // TODO: We will sort the names, then binary search the names here later
+    const char **names = buttonNames_.baseAddress();
+    
+    for (auto i=0;i<buttonNames_.size();i++) {
+        if (!strcmp(names[i], cstr)) {
+            return buttonRefs_.addressOf(*buttonIndices_.addressOf(i));
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::MaskReference *BGE::ScenePackage::getMaskReference(std::string name) {
+    const char *cstr = name.c_str();
+    
+    // TODO: We will sort the names, then binary search the names here later
+    const char **names = maskNames_.baseAddress();
+    
+    for (auto i=0;i<maskNames_.size();i++) {
+        if (!strcmp(names[i], cstr)) {
+            return maskRefs_.addressOf(*maskIndices_.addressOf(i));
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::PlacementReference *BGE::ScenePackage::getPlacementReference(std::string name) {
+    const char *cstr = name.c_str();
+    
+    // TODO: We will sort the names, then binary search the names here later
+    const char **names = placementNames_.baseAddress();
+    
+    for (auto i=0;i<placementNames_.size();i++) {
+        if (!strcmp(names[i], cstr)) {
+            return placementRefs_.addressOf(*placementIndices_.addressOf(i));
+        }
+    }
+    
+    return nullptr;
 }
 
 BGE::TextureReference *BGE::ScenePackage::getTextureReference(std::string name) {

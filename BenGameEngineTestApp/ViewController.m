@@ -96,61 +96,70 @@
                     package->link();
                 }
                 
-                auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+                NSString *path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
+                
+                if (path) {
+                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "lobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                        BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                        
+                        if (package) {
+                            package->link();
+                        }
+                        auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+                        
+                        auto gameObj = space->createSprite("SaleBkg");
+                        auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+                        
+                        BGE::Vector2 pos = { 700, 700 };
+                        BGE::Vector2 scale = { 2, 1 };
+                        transformComponent->setPosition(pos);
+                        transformComponent->setScale(scale);
+                        transformComponent->setRotation(M_PI/16);
+                        
+                        gameObj->setName("Object1");
+                        
+                        gameObj->setActive(true);
+                        
+                        gameObj = space->createText("CashText");
+                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
 
-                auto gameObj = space->createObject<BGE::GameObject>();
-                auto textureRef = BGE::Game::getInstance()->getScenePackageService()->getTextureReference("SaleBkg");
-                auto transformComponent = space->createComponent<BGE::TransformComponent>();
-                auto sprite = space->createComponent<BGE::SpriteRenderComponent>();
-                
-                sprite->setTextureRef(textureRef);
-                
-                BGE::Vector2 pos = { 700, 700 };
-                BGE::Vector2 scale = { 2, 1 };
-                transformComponent->setPosition(pos);
-                transformComponent->setScale(scale);
-                transformComponent->setRotation(M_PI/16);
-                
-                gameObj->setName("Object1");
-                gameObj->addComponent(transformComponent);
-                gameObj->addComponent(sprite);
-                
-                gameObj = space->createObject<BGE::GameObject>();
-                transformComponent = space->createComponent<BGE::TransformComponent>();
-                auto textRef = BGE::Game::getInstance()->getScenePackageService()->getTextReference("CashText");
-                auto text =  space->createComponent<BGE::TextComponent>();
-                
-                text->setTextReference(*textRef);
-                
-                transformComponent->setX(200);
-                transformComponent->setY(1200);
-                gameObj->setName("Object2");
-                gameObj->addComponent(transformComponent);
-                gameObj->addComponent(text);
-                
-                gameObj = space->createObject<BGE::GameObject>();
-                // Animation game object requires: xform, animator, animation sequence
-                transformComponent = space->createComponent<BGE::TransformComponent>();
-                auto anim = space->createComponent<BGE::AnimationSequenceComponent>();
-                auto animSeqRef = BGE::Game::getInstance()->getScenePackageService()->getAnimationSequenceReference("SaleGlowAnim");
-                auto animator = space->createComponent<BGE::AnimatorComponent>();
+                        transformComponent->setX(200);
+                        transformComponent->setY(1200);
+                        gameObj->setName("Object2");
+                        gameObj->setActive(true);
+                        
+                        gameObj = space->createAnimSequence("SaleGlowAnim");
+                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+                        auto animator = gameObj->getComponent<BGE::AnimatorComponent>();
 
-                transformComponent->setX(200);
-                transformComponent->setY(1000);
-                
-                anim->setAnimationSequenceReference(*animSeqRef);
-                
-                gameObj->setName("Object3");
-                gameObj->addComponent(transformComponent);
-                gameObj->addComponent(anim);
-                gameObj->addComponent(animator);
-                animator->reset();
-                
-                animator->play(BGE::AnimatorComponent::AnimPlayForever, true, 1 );
+                        transformComponent->setX(200);
+                        transformComponent->setY(1000);
+                        
+                        gameObj->setName("Object3");
+                        animator->reset();
+                        
+                        animator->play(BGE::AnimatorComponent::AnimPlayForever, true, 1 );
+                        gameObj->setActive(true);
+                        
+                        // Spaces are not visible by default
+                        space->setVisible(true);
 
-                // Spaces are not visible by default
-                space->setVisible(true);
-                
+                        gameObj = space->createAnimSequence("XPMeter");
+                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+                        animator = gameObj->getComponent<BGE::AnimatorComponent>();
+                        animator->reset();
+                        
+                        transformComponent->setX(600);
+                        transformComponent->setY(1000);
+                        
+                        gameObj->setName("Object4");
+                        gameObj->setActive(true);
+
+                        // Spaces are not visible by default
+                        space->setVisible(true);
+
+                    });
+                }
             });
             
             auto tSpaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("TestSpace");
@@ -168,6 +177,7 @@
                 
                 gObj->addComponent<BGE::TransformComponent>(xform);
                 gObj->addComponent<BGE::SpriteRenderComponent>(sprite);
+                gObj->setActive(true);
                 tObjs.push_back(gObj);
             }
             
@@ -263,6 +273,7 @@
     gameObj0->setName("Object0");
     gameObj0->addComponent(transformComponent0);
     gameObj0->addComponent(lineRenderer);
+    gameObj0->setActive(true);
 
     lineRenderer->setMaterials({ material });
     lineRenderer->setPoints({ { 500, 200 }, { 700, 100 }, { 500, 800 } });
@@ -272,6 +283,7 @@
     gameObj1->setName("Object1");
     gameObj1->addComponent(transformComponent1);
     gameObj1->addComponent(flatRect);
+    gameObj1->setActive(true);
 #endif
     BGE::Vector2 wh = { 500, 700 };
     
@@ -281,6 +293,7 @@
     gameObj2->setName("Object2");
     gameObj2->addComponent(transformComponent2);
     gameObj2->addComponent(sprite);
+    gameObj2->setActive(true);
     
     sprite->setMaterials({material});
 #endif

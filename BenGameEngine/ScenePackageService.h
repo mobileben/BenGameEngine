@@ -28,6 +28,8 @@
 #include "SpriteRenderComponent.h"
 #include "TextComponent.h"
 #include "AnimationSequenceComponent.h"
+#include "ButtonComponent.h"
+#include "MaskComponent.h"
 
 namespace BGE {
     class ScenePackageService : public Service {
@@ -60,9 +62,12 @@ namespace BGE {
         void resetPackage(std::string name);
         void resetPackage(ScenePackageHandle handle);
 
+        AnimationSequenceReference *getAnimationSequenceReference(std::string name);
+        ButtonReference *getButtonReference(std::string name);
+        MaskReference *getMaskReference(std::string name);
+        PlacementReference *getPlacementReference(std::string name);
         TextureReference *getTextureReference(std::string name);
         TextReference *getTextReference(std::string name);
-        AnimationSequenceReference *getAnimationSequenceReference(std::string name);
         
         void link();
         void link(ScenePackageHandle handle);

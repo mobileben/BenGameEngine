@@ -15,6 +15,7 @@
 #include "NamedObject.h"
 #include "GameObjectService.h"
 #include "ComponentService.h"
+#include "ScenePackage.h"
 #include "Handle.h"
 
 namespace BGE {
@@ -71,7 +72,7 @@ namespace BGE {
         void removeComponent(std::type_index typeIndex, ObjectId componentId) {
             componentService_->removeComponent(typeIndex, componentId);
         }
-
+        
         bool isVisible() const { return visible_; }
         void setVisible(bool visible) { visible_ = visible; }
         uint32_t getOrder() const { return order_; }
@@ -80,6 +81,17 @@ namespace BGE {
         void setUpdatable(bool updatable) { updatable_ = updatable; }
         bool isInteractiable() const { return interactable_; }
         void setInteractable(bool interactable) { interactable_ = interactable; }
+        
+        std::shared_ptr<GameObject> createAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        std::shared_ptr<GameObject> createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        std::shared_ptr<GameObject> createFrameAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        std::shared_ptr<GameObject> createButton(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        std::shared_ptr<GameObject> createMask(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        std::shared_ptr<GameObject> createSprite(std::string name, ScenePackageHandle handle = ScenePackageHandle());
+        std::shared_ptr<GameObject> createText(std::string name, ScenePackageHandle handle = ScenePackageHandle());
+        std::shared_ptr<GameObject> createPlacement(std::string name, ScenePackageHandle handle = ScenePackageHandle());
+        
+        void createAutoDisplayObjects(std::shared_ptr<GameObject> root, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate);
 
     protected:
         SpaceHandle spaceHandle_;

@@ -235,6 +235,8 @@ namespace BGE {
             }
         }
         
+        int32_t getSize() const { return size_; }
+        
         FixedArrayIterator<T> begin () const {
             return FixedArrayIterator<T>(this, 0);
         }

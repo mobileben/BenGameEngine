@@ -37,9 +37,15 @@ namespace BGE {
             return hasExternal_;
         }
         
-        TextureReference *getTextureReference(std::string name);
-        TextReference *getTextReference(std::string name);
+        AutoDisplayElementReference *getAutoDisplayList() const;
+        int32_t getAutoDisplayListSize() const;
+        
         AnimationSequenceReference *getAnimationSequenceReference(std::string name);
+        ButtonReference *getButtonReference(std::string name);
+        MaskReference *getMaskReference(std::string name);
+        PlacementReference *getPlacementReference(std::string name);
+        TextReference *getTextReference(std::string name);
+        TextureReference *getTextureReference(std::string name);
         
     protected:
         void reset();
@@ -135,6 +141,19 @@ namespace BGE {
         void loadFonts(std::function<void()> callback);
         
         GfxReferenceType referenceTypeForString(std::string type);
+    };
+    
+    class GameObject;
+    
+    struct SceneObjectCreatedDelegate {
+        std::function<void(std::shared_ptr<GameObject>)> animationSequenceCreatedHandler;
+        std::function<void(std::shared_ptr<GameObject>)> buttonCreatedHandler;
+        std::function<void(std::shared_ptr<GameObject>)> maskCreatedHandler;
+        std::function<void(std::shared_ptr<GameObject>)> placementCreatedHandler;
+        std::function<void(std::shared_ptr<GameObject>)> spriteCreatedHandler;
+        std::function<void(std::shared_ptr<GameObject>)> textCreatedHandler;
+        std::function<void(std::shared_ptr<GameObject>)> textureMaskCreatedHandler;
+        std::function<void(std::shared_ptr<GameObject>)> completionHandler;
     };
 }
 

@@ -116,7 +116,8 @@ namespace BGE {
         GfxReferenceTypeAnimationSequence,
         GfxReferenceTypeKeyframe,
         GfxReferenceTypeText,
-        GfxReferenceTypeTextureMask
+        GfxReferenceTypeTextureMask,
+        GfxReferenceTypeLast
     } GfxReferenceType;
     
     struct AnimationChannelReferenceIntermediate {

@@ -56,7 +56,13 @@ namespace BGE {
             color_ = color;
         }
         
-        void setTextReference(TextReference& textRef) {
+        void setTextReference(TextReference *textRef) {
+            if (textRef) {
+                setTextReference(*textRef);
+            }
+        }
+        
+        void setTextReference(const TextReference& textRef) {
             text_ = textRef.text;
             color_ = textRef.color;
             horizAlignment_ = textRef.alignment;

@@ -33,7 +33,8 @@ namespace BGE {
         ~SpriteRenderComponent() {}
 
         std::shared_ptr<TextureBase> getTexture();
-        void setTextureRef(TextureReference *texRef);
+        void setTextureReference(TextureReference *texRef);
+        void setTextureReference(const TextureReference &texRef);
         
     protected:
         void materialsUpdated();

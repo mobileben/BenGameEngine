@@ -158,13 +158,68 @@ void BGE::ScenePackageService::link() {
     }
 }
 
+BGE::ButtonReference *BGE::ScenePackageService::getButtonReference(std::string name) {
+    for (auto const &ent : scenePackages_) {
+        ScenePackageHandle handle = ent.second;
+        auto package = handleService_.dereference(handle);
+        
+        if (package) {
+            auto button = package->getButtonReference(name);
+            
+            if (button) {
+                return button;
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::MaskReference *BGE::ScenePackageService::getMaskReference(std::string name) {
+    for (auto const &ent : scenePackages_) {
+        ScenePackageHandle handle = ent.second;
+        auto package = handleService_.dereference(handle);
+        
+        if (package) {
+            auto mask = package->getMaskReference(name);
+            
+            if (mask) {
+                return mask;
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::PlacementReference *BGE::ScenePackageService::getPlacementReference(std::string name) {
+    for (auto const &ent : scenePackages_) {
+        ScenePackageHandle handle = ent.second;
+        auto package = handleService_.dereference(handle);
+        
+        if (package) {
+            auto placement = package->getPlacementReference(name);
+            
+            if (placement) {
+                return placement;
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
 BGE::TextureReference *BGE::ScenePackageService::getTextureReference(std::string name) {
     for (auto const &ent : scenePackages_) {
         ScenePackageHandle handle = ent.second;
         auto package = handleService_.dereference(handle);
         
         if (package) {
-            return package->getTextureReference(name);
+            auto texture = package->getTextureReference(name);
+            
+            if (texture) {
+                return texture;
+            }
         }
     }
     
@@ -177,7 +232,11 @@ BGE::TextReference *BGE::ScenePackageService::getTextReference(std::string name)
         auto package = handleService_.dereference(handle);
         
         if (package) {
-            return package->getTextReference(name);
+            auto text = package->getTextReference(name);
+            
+            if (text) {
+                return text;
+            }
         }
     }
     
@@ -190,7 +249,11 @@ BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceR
         auto package = handleService_.dereference(handle);
         
         if (package) {
-            return package->getAnimationSequenceReference(name);
+            auto animSeq = package->getAnimationSequenceReference(name);
+            
+            if (animSeq) {
+                return animSeq;
+            }
         }
     }
 
