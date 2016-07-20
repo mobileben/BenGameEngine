@@ -66,7 +66,13 @@ void BGE::AnimationChannelComponent::updateReference() {
             }
                 break;
                 
-            case GfxReferenceTypeMask:
+            case GfxReferenceTypeMask: {
+                auto mask = space->createComponent<MaskComponent>();
+                auto maskRef = Game::getInstance()->getScenePackageService()->getMaskReference(this->channel->reference);
+                
+                gameObj->addComponent(mask);
+                mask->setMaskReference(maskRef);
+            }
                 break;
                 
             case GfxReferenceTypeKeyframe: {

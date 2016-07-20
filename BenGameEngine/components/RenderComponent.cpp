@@ -17,6 +17,12 @@ void BGE::RenderComponent::getGlobalBounds(Rect& bounds) {
     
 }
 
+BGE::RenderComponent::~RenderComponent() {
+    for (auto handle : materialHandles_) {
+        Game::getInstance()->getMaterialService()->removeMaterial(handle);
+    }
+}
+
 BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) {
     if (index < materialHandles_.size()) {
         return materialHandles_[index];
@@ -35,6 +41,13 @@ BGE::Material *BGE::RenderComponent::getMaterial(uint32_t index) {
 }
 
 void BGE::RenderComponent::setMaterials(std::vector<MaterialHandle> materials) {
+    for (auto handle : materialHandles_) {
+        if (std::find(materials.begin(), materials.end(), handle) == materials.end()) {
+            // Make sure handle is not in materials
+            Game::getInstance()->getMaterialService()->removeMaterial(handle);
+        }
+    }
+
     materialHandles_.clear();
     
     for (auto material : materials) {

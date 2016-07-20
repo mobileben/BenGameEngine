@@ -144,7 +144,7 @@
                         // Spaces are not visible by default
                         space->setVisible(true);
 
-                        gameObj = space->createAnimSequence("XPMeter");
+                        gameObj = space->createAnimSequence("BuyButtonObject");
                         transformComponent = gameObj->getComponent<BGE::TransformComponent>();
                         animator = gameObj->getComponent<BGE::AnimatorComponent>();
                         animator->reset();

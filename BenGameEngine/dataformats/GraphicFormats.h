@@ -215,6 +215,11 @@ namespace BGE {
         int32_t     name;
     };
     
+    struct TextureMaskReference {
+        const char *name;
+        TextureReference *texture;
+    };
+    
     struct ExternalPackageIntermediate {
         int32_t name;
         int32_t externalPackage;

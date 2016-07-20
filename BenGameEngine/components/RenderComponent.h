@@ -24,7 +24,7 @@ namespace BGE {
     
     class RenderComponent : public Component {
     public:
-        virtual ~RenderComponent() {}
+        virtual ~RenderComponent();
         
         float getLocalWidth() { return localBounds_.w; }
         float getLocalHeight() { return localBounds_.h; }

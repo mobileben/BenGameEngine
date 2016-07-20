@@ -11,11 +11,14 @@
 
 #include <stdio.h>
 #include <memory>
-#include "Component.h"
+#include "RenderComponent.h"
+#include "RenderService.h"
 #include "GraphicFormats.h"
 
 namespace BGE {
-    class MaskComponent : public Component
+    class RenderServiceOpenGLES2;
+
+    class MaskComponent : public RenderComponent
     {
     private:
         struct private_key {};
@@ -32,7 +35,24 @@ namespace BGE {
         void setMaskReference(MaskReference *maskRef);
         void setMaskReference(const MaskReference &maskRef);
         
+        void setWidth(float width);
+        void setHeight(float height);
+        void setWidthHeight(Vector2 &wh);
+
+        
+    protected:
+        Vertex* const getVertices() { return vertices_; }
+        
+        void materialsUpdated();
+
     private:
+        friend RenderServiceOpenGLES2;
+
+        static const uint32_t NumVertices = 4;
+        
+        Vertex vertices_[NumVertices];
+        
+        void updateLocalBoundsAndVertices(Vector2& wh);
     };
 }
 

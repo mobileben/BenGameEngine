@@ -20,6 +20,8 @@
 #include "TextComponent.h"
 #include "TransformComponent.h"
 #include "ButtonComponent.h"
+#include "MaskComponent.h"
+#include "TextureMaskComponent.h"
 
 void BGE::ComponentService::registerComponents() {
     Component::registerBitmask<AnimationChannelComponent>();
@@ -35,6 +37,8 @@ void BGE::ComponentService::registerComponents() {
     Component::registerBitmask<TextComponent>();
     Component::registerBitmask<TransformComponent>();
     Component::registerBitmask<ButtonComponent>();
+    Component::registerBitmask<MaskComponent>();
+    Component::registerBitmask<TextureMaskComponent>();
 }
 
 BGE::ComponentService::ComponentService() {

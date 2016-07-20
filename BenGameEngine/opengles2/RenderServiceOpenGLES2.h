@@ -21,6 +21,8 @@
 #include <GLKit/GLKit.h>
 
 namespace BGE {
+    class TransformComponent;
+    
     class RenderServiceOpenGLES2 : public RenderService
     {
     public:
@@ -53,16 +55,18 @@ namespace BGE {
         void drawRect(Vector2 &position, Vector2 &size, Vector4 &color);
         void drawShadedRect(Vector2 &position, Vector2 &size, Vector4 color[4]);
         void drawTexture(Vector2 &position, std::shared_ptr<TextureBase> texture);
+        void drawTexture(std::shared_ptr<TransformComponent> transform, std::shared_ptr<TextureBase> texture, VertexTex *const vertices);
         
         // Using the more updated means
         void drawFlatRect(std::shared_ptr<GameObject> gameObject);
+        void drawMaskRect(std::shared_ptr<GameObject> gameObject);
+        
         // TODO: Transform
         void drawLines(const std::vector<Vector2>& points, float thickness, bool loop, Material *material);
         void drawSprite(std::shared_ptr<GameObject> gameObject);
-        
-        int8_t createMask(Vector2 &position, std::shared_ptr<TextureBase> mask);
-        void enableMask(int8_t maskId);
-        void disableMask(int8_t maskId);
+
+        uint8_t enableMask(std::shared_ptr<GameObject> gameObject);
+        void disableMask(uint8_t maskBits);
         
         void drawFont(Vector2 &position, std::shared_ptr<TextureBase> texture);
         void render();
@@ -85,12 +89,11 @@ namespace BGE {
         
         Matrix4 projectionMatrix_;
         GLKTextureInfo *textureInfo_;
-        int8_t masksInUse_;
         uint8_t activeMasks_;
         
         void queueRender(double deltaTime);
         
-        void renderGameObject(std::shared_ptr<GameObject> gameObj, bool root);
+        int8_t renderGameObject(std::shared_ptr<GameObject> gameObj, bool root, bool hasNextSibling = false);
         // TODO: This will get moved out
         void transformGameObject(std::shared_ptr<GameObject> gameObj);
 

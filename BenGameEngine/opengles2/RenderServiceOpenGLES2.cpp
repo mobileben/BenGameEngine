@@ -19,6 +19,7 @@
 #include "TextComponent.h"
 #include "ColorMatrixComponent.h"
 #include "ColorTransformComponent.h"
+#include "TextureMaskComponent.h"
 
 const GLubyte Indices[] = {
     0, 1, 2,
@@ -37,7 +38,7 @@ static uint8_t MaskIdToMaskValue[] = {
     128
 };
 
-BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : masksInUse_(0), activeMasks_(0) {
+BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0) {
     shaderService_ = std::make_shared<ShaderServiceOpenGLES2>();
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
     
@@ -562,6 +563,51 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<GameObject> gameO
     }
 }
 
+void BGE::RenderServiceOpenGLES2::drawMaskRect(std::shared_ptr<GameObject> gameObject) {
+    if (gameObject) {
+        std::shared_ptr<MaskComponent> maskRect = std::dynamic_pointer_cast<MaskComponent>(gameObject->getComponent<MaskComponent>());
+        
+        if (maskRect) {
+            Vertex *const vertices = maskRect->getVertices();
+            auto material = maskRect->getMaterial();
+            
+            if (material) {
+                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+                auto transformComponent = gameObject->getComponent<TransformComponent>();
+                
+                GLint positionLocation = glShader->locationForAttribute("Position");
+                GLint projectionLocation = glShader->locationForUniform("Projection");
+                GLint modelLocation = glShader->locationForUniform("ModelView");
+                GLint colorLocation = glShader->locationForUniform("Color");
+
+                glEnableVertexAttribArray(positionLocation);
+
+                if (transformComponent) {
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->matrix_.m);
+                } else {
+                    // This is a hack for now
+                    Matrix4 mat;
+                    
+                    Matrix4MakeIdentify(mat);
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                }
+
+                glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                      sizeof(Vertex), &vertices[0]);
+                
+                Color color;
+
+                material->getColor(color);
+                glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+                glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
+                glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
+                               GL_UNSIGNED_BYTE, &Indices[0]);
+                
+            }
+        }
+    }
+}
+
 void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, float thickness, bool loop, Material *material) {
     Vector3 vertices[points.size()];
     GLubyte indices[points.size()];
@@ -597,6 +643,10 @@ void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, 
     glLineWidth(12);
     // 3
     glDrawArrays(GL_LINE_LOOP, 0, points.size());
+}
+
+void BGE::RenderServiceOpenGLES2::drawTexture(std::shared_ptr<TransformComponent> transform, std::shared_ptr<TextureBase> texture, VertexTex *const vertices) {
+    
 }
 
 void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObject) {
@@ -668,51 +718,50 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObj
     }
 }
 
-/**
- Example mask usage
- 
- position = { 200, 400 };
- createMask(position, texture);
- drawTexture(position, fish);
- glDisable(GL_STENCIL_TEST);
-
- */
-int8_t BGE::RenderServiceOpenGLES2::createMask(Vector2 &position, std::shared_ptr<TextureBase> mask)
-{
-    if (this->masksInUse_ < (RenderServiceOpenGLES2::MaxActiveMasks - 1)) {
-        int8_t maskId = this->masksInUse_;
-        uint8_t maskValue = MaskIdToMaskValue[this->masksInUse_];
-        this->masksInUse_++;
-        glEnable(GL_STENCIL_TEST);
-        glStencilFunc(GL_ALWAYS, 2, ~0);
-        glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
-//        glStencilMask(0xFF);
+uint8_t BGE::RenderServiceOpenGLES2::enableMask(std::shared_ptr<GameObject> gameObject) {
+    uint8_t maskValue = 0;
+    
+    if (this->activeMasks_ != 0xFF) {
         
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        for (auto i=0;i<MaxActiveMasks;i++) {
+            if (!(this->activeMasks_ & MaskIdToMaskValue[i])) {
+                maskValue = MaskIdToMaskValue[i];
+                break;
+            }
+        }
         
-        drawTexture(position, mask);
-        
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-//        glStencilMask(0);
-        glStencilFunc(GL_NOTEQUAL, 2, ~0);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        return maskId;
-    } else {
-        return -1;
+        if (maskValue) {
+            this->activeMasks_ |= maskValue;
+            glEnable(GL_STENCIL_TEST);
+            glStencilFunc(GL_ALWAYS, maskValue, maskValue);
+            glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+            glStencilMask(this->activeMasks_);
+            
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+            if (gameObject->hasComponent<MaskComponent>()) {
+                drawMaskRect(gameObject);
+            } else if (gameObject->hasComponent<TextureMaskComponent>()) {
+                
+            }
+            
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+            glStencilFunc(GL_EQUAL, maskValue, maskValue);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        }
     }
+    
+    return maskValue;
 }
 
-void BGE::RenderServiceOpenGLES2::enableMask(int8_t maskId)
+void BGE::RenderServiceOpenGLES2::disableMask(uint8_t maskBits)
 {
-    if (maskId >=0 && maskId < this->masksInUse_) {
-        
+    if (maskBits) {
+        activeMasks_ &= ~maskBits;
+        glStencilMask(activeMasks_);
     }
-}
-
-void BGE::RenderServiceOpenGLES2::disableMask(int8_t maskId)
-{
-    if (maskId >=0 && maskId < this->masksInUse_) {
-        
+    
+    if (!activeMasks_) {
+        glDisable(GL_STENCIL_TEST);
     }
 }
 
@@ -730,7 +779,7 @@ void BGE::RenderServiceOpenGLES2::render()
     glClearColor(1.0, 1.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
-    this->masksInUse_ = 0;
+    this->activeMasks_ = 0;
     
     if (isReady()) {
         assert(matrixStack_.size() == 0);
@@ -762,7 +811,7 @@ void BGE::RenderServiceOpenGLES2::render()
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space && space->isVisible()) {
-                for (auto obj : space->getGameObjects()) {
+                for (auto &obj : space->getGameObjects()) {
                     renderGameObject(obj.second, true);
                 }
             }
@@ -772,9 +821,11 @@ void BGE::RenderServiceOpenGLES2::render()
     }
 }
 
-void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> gameObj, bool root) {
+int8_t BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> gameObj, bool root, bool hasNextSibling) {
+    uint8_t maskValue = 0;
+    
     if (!gameObj->isActive()) {
-        return;
+        return maskValue;
     }
     
     // TODO: Transform
@@ -782,15 +833,15 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
     
     if (transformComponent) {
         if (!transformComponent->isVisible()) {
-            return;
+            return maskValue;
         }
 
         auto parent = transformComponent->getParent().lock();
 
         if (root && parent) {
-            return;
+            return maskValue;
         } else if (!root && !parent) {
-            return;
+            return maskValue;
         }
         
         // Since we have the transform, push our
@@ -842,8 +893,12 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
             if (font) {
                 font->drawString(text->getText(), transformComponent, (Color&) text->getColor());
             }
+        } else if (gameObj->hasComponent<MaskComponent>()) {
+            maskValue = enableMask(gameObj);
         }
 
+        uint8_t childrenMasks = 0;;
+        
         // Determine if we have children, if we do process them.
         for (auto i=0;i<transformComponent->getNumChildren();i++) {
             auto childXform = transformComponent->childAtIndex(i);
@@ -852,9 +907,18 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
                 
                 // TODO: Have some better means of identifying the right child. For now brute force it
                 if (childObj) {
-                    renderGameObject(childObj, false);
+                    childrenMasks |= renderGameObject(childObj, false, i < (transformComponent->getNumChildren() - 1));
                 }
             }
+        }
+        
+        if (childrenMasks) {
+            disableMask(childrenMasks);
+        }
+        
+        if (!hasNextSibling) {
+            disableMask(maskValue);
+            maskValue = 0;
         }
         
         // First sort
@@ -864,6 +928,8 @@ void BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> g
         // Now pop the transform
         popMatrix();
     }
+    
+    return maskValue;
 }
 
 void BGE::RenderServiceOpenGLES2::pushMatrix() {

@@ -73,6 +73,7 @@ namespace BGE {
         FixedArray<AnimationSequenceReferenceIntermediate>  animationSequences_;
         FixedArray<PlacementIntermediate>                   placements_;
         FixedArray<MaskIntermediate>                        masks_;
+        FixedArray<TextureMaskIntermediate>                 textureMasks_;
         FixedArray<ButtonIntermediate>                      buttons_;
         FixedArray<ButtonStateIntermediate>                 buttonStates_;
         FixedArray<ExternalPackageIntermediate>             externalPackages_;
@@ -124,6 +125,10 @@ namespace BGE {
         FixedArray<const char *>                            maskNames_;
         FixedArray<int32_t>                                 maskIndices_;
         FixedArray<MaskReference>                           maskRefs_;
+        
+        FixedArray<const char *>                            textureMaskNames_;
+        FixedArray<int32_t>                                 textureMaskIndices_;
+        FixedArray<TextureMaskReference>                    textureMaskRefs_;
         
         FixedArray<ButtonStateReference>                    buttonStateRefs_;
 

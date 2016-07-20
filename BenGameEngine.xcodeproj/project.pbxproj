@@ -20,6 +20,9 @@
 		B50A1FA41D0E8B2A004B450E /* AnimationService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B50A1FA21D0E8B2A004B450E /* AnimationService.cpp */; };
 		B512AD541D2F6DF200DCE362 /* ButtonComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B512AD521D2F6DF200DCE362 /* ButtonComponent.cpp */; };
 		B512AD571D2F7D0400DCE362 /* MaskComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B512AD551D2F7D0400DCE362 /* MaskComponent.cpp */; };
+		B512AD5A1D37648F00DCE362 /* TextureMaskComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B512AD581D37648F00DCE362 /* TextureMaskComponent.cpp */; };
+		B512AD5D1D3F1C2900DCE362 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B512AD5B1D3F1C2900DCE362 /* Input.cpp */; };
+		B512AD601D3F1C5E00DCE362 /* InputService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B512AD5E1D3F1C5E00DCE362 /* InputService.cpp */; };
 		B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */; };
 		B525E36F1C8957A700C691C0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E36E1C8957A700C691C0 /* main.m */; };
 		B525E3721C8957A700C691C0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E3711C8957A700C691C0 /* AppDelegate.m */; };
@@ -186,8 +189,14 @@
 		B50F60011CD343E400A5D017 /* HandleService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandleService.h; sourceTree = "<group>"; };
 		B512AD521D2F6DF200DCE362 /* ButtonComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = ButtonComponent.cpp; path = components/ButtonComponent.cpp; sourceTree = "<group>"; };
 		B512AD531D2F6DF200DCE362 /* ButtonComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonComponent.h; path = components/ButtonComponent.h; sourceTree = "<group>"; };
-		B512AD551D2F7D0400DCE362 /* MaskComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MaskComponent.cpp; path = components/MaskComponent.cpp; sourceTree = "<group>"; };
+		B512AD551D2F7D0400DCE362 /* MaskComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = MaskComponent.cpp; path = components/MaskComponent.cpp; sourceTree = "<group>"; };
 		B512AD561D2F7D0400DCE362 /* MaskComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MaskComponent.h; path = components/MaskComponent.h; sourceTree = "<group>"; };
+		B512AD581D37648F00DCE362 /* TextureMaskComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TextureMaskComponent.cpp; path = components/TextureMaskComponent.cpp; sourceTree = "<group>"; };
+		B512AD591D37648F00DCE362 /* TextureMaskComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextureMaskComponent.h; path = components/TextureMaskComponent.h; sourceTree = "<group>"; };
+		B512AD5B1D3F1C2900DCE362 /* Input.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Input.cpp; sourceTree = "<group>"; };
+		B512AD5C1D3F1C2900DCE362 /* Input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Input.h; sourceTree = "<group>"; };
+		B512AD5E1D3F1C5E00DCE362 /* InputService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = InputService.cpp; sourceTree = "<group>"; };
+		B512AD5F1D3F1C5E00DCE362 /* InputService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputService.h; sourceTree = "<group>"; };
 		B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleGothic.ttf; sourceTree = "<group>"; };
 		B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBenGameEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B525E36B1C8957A700C691C0 /* BenGameEngineTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BenGameEngineTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -427,6 +436,8 @@
 				B5EE9D6B1CC4A4C8005D99CC /* SpriteRenderComponent.h */,
 				B50A1F9C1D092A3C004B450E /* TextComponent.cpp */,
 				B50A1F9D1D092A3C004B450E /* TextComponent.h */,
+				B512AD581D37648F00DCE362 /* TextureMaskComponent.cpp */,
+				B512AD591D37648F00DCE362 /* TextureMaskComponent.h */,
 				B508CD911CAE285000127B97 /* TransformComponent.cpp */,
 				B508CD921CAE285000127B97 /* TransformComponent.h */,
 			);
@@ -495,6 +506,10 @@
 				B50F60011CD343E400A5D017 /* HandleService.h */,
 				B525E38D1C89587000C691C0 /* HeartbeatService.cpp */,
 				B525E38E1C89587000C691C0 /* HeartbeatService.h */,
+				B512AD5B1D3F1C2900DCE362 /* Input.cpp */,
+				B512AD5C1D3F1C2900DCE362 /* Input.h */,
+				B512AD5E1D3F1C5E00DCE362 /* InputService.cpp */,
+				B512AD5F1D3F1C5E00DCE362 /* InputService.h */,
 				B52B760B1CBA183900758249 /* Material.cpp */,
 				B52B760C1CBA183900758249 /* Material.h */,
 				B52B76121CBADF5E00758249 /* MaterialService.cpp */,
@@ -929,6 +944,7 @@
 			files = (
 				B525E3CB1C89587000C691C0 /* TextureService.cpp in Sources */,
 				B547F17A1D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp in Sources */,
+				B512AD601D3F1C5E00DCE362 /* InputService.cpp in Sources */,
 				B525E3BE1C89587000C691C0 /* RenderServiceOpenGLES2.cpp in Sources */,
 				B525E3C61C89587000C691C0 /* ShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,
@@ -940,6 +956,7 @@
 				B525E3BC1C89587000C691C0 /* RenderContextOpenGLES2.cpp in Sources */,
 				B54821F91CD9AD970073AFCC /* AnimationChannelComponent.cpp in Sources */,
 				B525E3CC1C89587000C691C0 /* TextureServiceOpenGLES2.cpp in Sources */,
+				B512AD5A1D37648F00DCE362 /* TextureMaskComponent.cpp in Sources */,
 				B50A1FA11D0E762F004B450E /* AnimatorComponent.cpp in Sources */,
 				B52BFB081D000C650040A839 /* StringArrayBuilder.cpp in Sources */,
 				B5AE8C9A1CEC44E100FAA0DC /* ScenePackage.cpp in Sources */,
@@ -947,6 +964,7 @@
 				B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */,
 				B5ACE8951CBF7B00004B6871 /* LineRenderComponent.cpp in Sources */,
 				B571F1901C9D0A34007F5A90 /* FontGlyph.cpp in Sources */,
+				B512AD5D1D3F1C2900DCE362 /* Input.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* Shader.cpp in Sources */,

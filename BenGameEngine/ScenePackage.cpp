@@ -246,6 +246,26 @@ void BGE::ScenePackage::link() {
         mask->height = maskInt->height;
     }
     
+    // Link Texture Masks
+    textureMaskNames_ = FixedArray<const char*>(textureMasks_.size());
+    textureMaskIndices_ = FixedArray<int32_t>(textureMasks_.size());
+    textureMaskRefs_ = FixedArray<TextureMaskReference>(textureMasks_.size());
+    
+    for (auto i=0;i<textureMasks_.size();i++) {
+        TextureMaskIntermediate *maskInt = textureMasks_.addressOf(i);
+        TextureMaskReference *mask = textureMaskRefs_.addressOf(i);
+        const char**name = textureMaskNames_.addressOf(i);
+        int32_t *index = textureMaskIndices_.addressOf(i);
+        
+        // Fix names
+        const char* resolvedName = maskInt->name + strings_.baseAddress();
+        
+        *name = resolvedName;
+        *index = i;
+        mask->name = resolvedName;
+        mask->texture = getTextureReference(resolvedName);
+    }
+    
     // Link Button States
     buttonStateRefs_ = FixedArray<ButtonStateReference>(buttonStates_.size());
     
@@ -354,6 +374,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
     ArrayBuilder<AnimationSequenceReferenceIntermediate, AnimationSequenceReferenceIntermediate> animSeqIntBuilder;
     ArrayBuilder<PlacementIntermediate, PlacementIntermediate> placementIntBuilder;
     ArrayBuilder<MaskIntermediate, MaskIntermediate> maskIntBuilder;
+    ArrayBuilder<TextureMaskIntermediate, TextureMaskIntermediate> textureMaskIntBuilder;
     ArrayBuilder<ButtonStateIntermediate, ButtonStateIntermediate> buttonStateIntBuilder;
     ArrayBuilder<ButtonIntermediate, ButtonIntermediate> buttonIntBuilder;
     ArrayBuilder<ExternalPackageIntermediate, ExternalPackageIntermediate> extPackageIntBuilder;
@@ -860,6 +881,23 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
         }
     }
 
+    // Texture Masks
+    NSArray *textureMasks = jsonDict[@"textureMasks"];
+    
+    textureMaskIntBuilder.resize((int32_t) textureMasks.count);
+    
+    for (int32_t index=0;index<textureMasks.count;index++) {
+        NSDictionary *dict = textureMasks[index];
+        TextureMaskIntermediate *mask = textureMaskIntBuilder.addressOf(index);
+        const char *name = [dict[@"name"] UTF8String];
+        
+        assert(name);
+        
+        if (name) {
+            mask->name = stringBuilder.add(name);
+        }
+    }
+    
     // External References
     NSArray *externals = jsonDict[@"externalReferences"];
     
@@ -941,6 +979,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
     animationSequences_ = animSeqIntBuilder.createFixedArray();
     placements_ = placementIntBuilder.createFixedArray();
     masks_ = maskIntBuilder.createFixedArray();
+    textureMasks_ = textureMaskIntBuilder.createFixedArray();
     buttons_ = buttonIntBuilder.createFixedArray();
     buttonStates_ = buttonStateIntBuilder.createFixedArray();
     externalPackages_ = extPackageIntBuilder.createFixedArray();
