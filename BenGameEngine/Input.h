@@ -12,38 +12,45 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #include <stdio.h>
+#include "Object.h"
 #include "Handle.h"
 
 namespace BGE {
     struct InputTag {};
     using InputHandle = Handle<InputTag>;
     
-    enum class InputType {
-        None,
-        Touch
-    };
+    class InputService;
     
     enum class TouchType {
         None,
-        Start,
-        End,
+        Down,
+        Up,
         Move,
         Cancel
     };
     
-    class Input {
-        InputType       inputType;
+    class Input : public Object {
+    public:
+        Input(ObjectId matId);
+        ~Input() {}
+        
+        void initialize(InputHandle handle, ObjectId objectId);
+        
+        TouchType       type;
+        InputHandle getHandle() const { return handle_; }
+
         NSTimeInterval  timestamp;
         
-        union {
-            struct {
-                TouchType   type;
-                UITouch     *touch;
-                float       x;
-                float       y;
-                uint32_t    tapCount;
-            } touch;
-        } data;
+        UITouch         *touch;
+        float           x;
+        float           y;
+        uint32_t        tapCount;
+        
+    protected:
+        friend InputService;
+        
+    private:
+        InputHandle     handle_;
     };
 }
 

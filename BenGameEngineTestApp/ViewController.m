@@ -22,7 +22,7 @@
 
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderContextOpenGLES2> renderContext;
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderWindow> renderWindow;
-@property (nonatomic, weak) GLKView *glView;
+@property (nonatomic, weak) BGEView *glView;
 @property (nonatomic, assign) BOOL once;
 @property (nonatomic, assign) BGE::SpaceHandle spaceHandle;
 @end
@@ -37,12 +37,12 @@
     
     self.renderContext = std::make_shared<BGE::RenderContextOpenGLES2>();
     
-    self.glView = (GLKView *) self.view;
+    self.glView = (BGEView *) self.view;
     //    self.glView.context = self.renderContext->getContext();
     self.glView.delegate = self;
     
     self.renderWindow = std::make_shared<BGE::RenderWindow>();
-    self.renderWindow->setView((GLKView *) self.view);
+    self.renderWindow->setView((BGEView *) self.view);
     
     BGE::Game::getInstance()->getRenderService()->bindRenderWindow(self.renderContext, self.renderWindow);
     self.spaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("default");

@@ -21,6 +21,7 @@ BGE::Game::Game()
     animationService_ = std::make_shared<AnimationService>();
     spaceService_ = std::make_shared<SpaceService>();
     fontService_ = std::make_shared<FontService>();
+    inputService_ = std::make_shared<InputService>();
 }
 
 void BGE::Game::provide(std::shared_ptr<RenderService> renderService) {
@@ -58,5 +59,6 @@ void BGE::Game::destroy() {
 
 void BGE::Game::update(double deltaTime) {
     NSLog(@"delta time %f", deltaTime);
+    inputService_->process();
     animationService_->update(deltaTime);
 }

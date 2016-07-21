@@ -14,7 +14,7 @@
 #include <map>
 #include <string>
 #include "RenderContext.h"
-#include <GLKit/GLKit.h>
+#include "BGEView.h"
 
 namespace BGE {
     class RenderView;
@@ -26,8 +26,8 @@ namespace BGE {
         
         ~RenderWindow();
         
-        GLKView *getView() { return view_; }
-        void setView(GLKView *view);
+        BGEView *getView() { return view_; }
+        void setView(BGEView *view);
         
         std::shared_ptr<RenderContext> getRenderContext() { return renderContext_; }
         void setRenderContext(std::shared_ptr<RenderContext> renderContext);
@@ -51,7 +51,7 @@ namespace BGE {
         float height_;
         
     private:
-        GLKView *view_;
+        BGEView *view_;
         std::shared_ptr<RenderContext> renderContext_;
         std::map<std::string, std::shared_ptr<RenderView>> renderViews_;
     };

@@ -124,6 +124,7 @@
 		B5F523131CD9C77E00DE2F82 /* GraphicFormats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F523111CD9C77E00DE2F82 /* GraphicFormats.cpp */; };
 		B5F6B16A1CC8AF7A00E1FD45 /* Space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */; };
 		B5F6B16D1CC8B06E00E1FD45 /* SpaceService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B16B1CC8B06E00E1FD45 /* SpaceService.cpp */; };
+		B5F8716B1D3F2B83000EA018 /* BGEView.m in Sources */ = {isa = PBXBuildFile; fileRef = B5F8716A1D3F2B83000EA018 /* BGEView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -356,6 +357,8 @@
 		B5F6B1691CC8AF7A00E1FD45 /* Space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Space.h; sourceTree = "<group>"; };
 		B5F6B16B1CC8B06E00E1FD45 /* SpaceService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = SpaceService.cpp; sourceTree = "<group>"; };
 		B5F6B16C1CC8B06E00E1FD45 /* SpaceService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpaceService.h; sourceTree = "<group>"; };
+		B5F871691D3F2B83000EA018 /* BGEView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEView.h; path = ios/BGEView.h; sourceTree = "<group>"; };
+		B5F8716A1D3F2B83000EA018 /* BGEView.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEView.m; path = ios/BGEView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -510,6 +513,7 @@
 				B512AD5C1D3F1C2900DCE362 /* Input.h */,
 				B512AD5E1D3F1C5E00DCE362 /* InputService.cpp */,
 				B512AD5F1D3F1C5E00DCE362 /* InputService.h */,
+				B5F871681D3F2B29000EA018 /* ios */,
 				B52B760B1CBA183900758249 /* Material.cpp */,
 				B52B760C1CBA183900758249 /* Material.h */,
 				B52B76121CBADF5E00758249 /* MaterialService.cpp */,
@@ -738,6 +742,15 @@
 			name = dataformats;
 			sourceTree = "<group>";
 		};
+		B5F871681D3F2B29000EA018 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				B5F871691D3F2B83000EA018 /* BGEView.h */,
+				B5F8716A1D3F2B83000EA018 /* BGEView.m */,
+			);
+			name = ios;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -949,6 +962,7 @@
 				B525E3C61C89587000C691C0 /* ShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,
 				B571F1931C9D24E0007F5A90 /* TextureAtlasOpenGLES2.cpp in Sources */,
+				B5F8716B1D3F2B83000EA018 /* BGEView.m in Sources */,
 				B52B760D1CBA183900758249 /* Material.cpp in Sources */,
 				B512AD571D2F7D0400DCE362 /* MaskComponent.cpp in Sources */,
 				B525E3C41C89587000C691C0 /* ShaderProgram.cpp in Sources */,
@@ -1127,6 +1141,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1165,6 +1181,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
