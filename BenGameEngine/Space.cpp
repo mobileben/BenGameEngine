@@ -8,11 +8,13 @@
 
 #include "Space.h"
 #include "Game.h"
+#include "InputTouchComponent.h"
+#include "BoundingBoxComponent.h"
 
-BGE::Space::Space( ObjectId spaceId) : NamedObject(spaceId), visible_(false), order_(0), updatable_(true), interactable_(true) {
+BGE::Space::Space( ObjectId spaceId) : NamedObject(spaceId), visible_(false), order_(0), updatable_(true) {
 }
 
-BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true), interactable_(true) {
+BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true) {
 }
 
 void BGE::Space::initialize(SpaceHandle handle, ObjectId spaceId, std::string name) {
@@ -41,15 +43,17 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createAnimSequence(std::string name
     if (animSeqRef) {
         auto obj = createObject<GameObject>(name);
         auto xform = createComponent<TransformComponent>();
+        auto boundingBox = createComponent<BoundingBoxComponent>();
         auto animSeq = createComponent<AnimationSequenceComponent>();
         auto animator = createComponent<AnimatorComponent>();
         
         obj->addComponent(xform);
+        obj->addComponent(boundingBox);
         obj->addComponent(animSeq);
         obj->addComponent(animator);
 
         animSeq->setAnimationSequenceReference(animSeqRef);
-        
+        animator->setFrame(0, true);
         //obj->setActive(true);
         
         return obj;
@@ -123,9 +127,13 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createButton(std::string name, Scen
         auto obj = createObject<GameObject>(name);
         auto xform = createComponent<TransformComponent>();
         auto button = createComponent<ButtonComponent>();
+        auto bbox = createComponent<BoundingBoxComponent>();
+        auto input = createComponent<InputTouchComponent>();
         
         obj->addComponent(xform);
         obj->addComponent(button);
+        obj->addComponent(input);
+        obj->addComponent(bbox);
         
         button->setButtonReference(buttonRef);
 
@@ -179,9 +187,11 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createSprite(std::string name, Scen
         auto obj = createObject<GameObject>(name);
         auto xform = createComponent<TransformComponent>();
         auto sprite = createComponent<SpriteRenderComponent>();
+        auto bbox = createComponent<BoundingBoxComponent>();
         
         obj->addComponent(xform);
         obj->addComponent(sprite);
+        obj->addComponent(bbox);
         
         sprite->setTextureReference(texRef);
         
@@ -207,10 +217,12 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createText(std::string name, SceneP
         auto obj = createObject<GameObject>(name);
         auto xform = createComponent<TransformComponent>();
         auto text = createComponent<TextComponent>();
+        auto bbox = createComponent<BoundingBoxComponent>();
         
         obj->addComponent(xform);
         obj->addComponent(text);
-
+        obj->addComponent(bbox);
+        
         text->setTextReference(textRef);
         
         //obj->setActive(true);

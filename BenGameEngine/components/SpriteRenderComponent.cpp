@@ -7,6 +7,7 @@
 //
 
 #include "SpriteRenderComponent.h"
+#include "BoundingBoxComponent.h"
 #include "Game.h"
 
 uint32_t BGE::SpriteRenderComponent::bitmask_ = Component::InvalidBitmask;
@@ -22,8 +23,6 @@ BGE::SpriteRenderComponent::SpriteRenderComponent(struct private_key const& key,
 void BGE::SpriteRenderComponent::setTextureReference(TextureReference *texRef) {
     if (texRef) {
         setTextureReference(*texRef);
-    } else {
-        NSLog(@"WHAAA");
     }
 }
 
@@ -159,6 +158,16 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
                         vertices[3].tex.y = uvs[3].y;
                     }
                     break;
+            }
+            
+            auto gameObj = getGameObject().lock();
+            auto bbox = gameObj->getComponent<BoundingBoxComponent>();
+            
+            if (bbox) {
+                bbox->x = 0;
+                bbox->y = 0;
+                bbox->width = texture->getWidth();
+                bbox->height = texture->getHeight();
             }
         }
     }

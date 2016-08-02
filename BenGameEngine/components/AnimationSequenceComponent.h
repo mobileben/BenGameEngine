@@ -48,6 +48,7 @@ namespace BGE {
         
         //  Pointer to meta
         std::vector<std::shared_ptr<GameObject>> channels;
+        BoundsReference *bounds;
         
     protected:
         friend GameObject;

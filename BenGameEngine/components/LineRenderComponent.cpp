@@ -15,7 +15,7 @@ std::shared_ptr<BGE::LineRenderComponent> BGE::LineRenderComponent::create(Objec
     return std::make_shared<LineRenderComponent>(private_key{}, componentId);
 }
 
-BGE::LineRenderComponent::LineRenderComponent(struct private_key const& key, ObjectId componentId) : RenderComponent(componentId), closedLoop_(false) {
+BGE::LineRenderComponent::LineRenderComponent(struct private_key const& key, ObjectId componentId) : RenderComponent(componentId), thickness_(1), closedLoop_(false) {
 }
 
 const std::vector<BGE::Vector2>& BGE::LineRenderComponent::getPoints() const {

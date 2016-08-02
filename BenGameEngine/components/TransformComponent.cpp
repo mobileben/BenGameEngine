@@ -17,10 +17,8 @@ std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::create(ObjectI
     return std::make_shared<TransformComponent>(private_key{}, componentId);
 }
 
-BGE::TransformComponent::TransformComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), visible_(true), interactable_(true), interactableWhenHidden_(false),
-bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }),
-z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0),
-transformDirty_(false), speed_(1), paused_(false) {
+BGE::TransformComponent::TransformComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), visible_(true),
+bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0), transformDirty_(false), speed_(1), paused_(false) {
     Matrix4MakeIdentify(matrix_);
 }
 
@@ -28,21 +26,67 @@ void BGE::TransformComponent::setGameObject(std::shared_ptr<GameObject> gameObje
     Component::setGameObject(gameObject);
 }
 
-void BGE::TransformComponent::getMatrix(Matrix4 &matrix) {
-    if (transformDirty_) {
+void BGE::TransformComponent::updateMatrix() {
+    Matrix4 mat1;
+    Matrix4 mat2;
+    
+    Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
+    Matrix4MakeRotationZ(mat2, rotation_);
+    
+    localMatrix_ = mat2 * mat1;
+    Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
+    localMatrix_ = mat1 * localMatrix_;
+    
+    auto parent = getParent().lock();
+    
+    if (parent) {
+        parent->getMatrix(mat1);
         
+        matrix_ = mat1 * localMatrix_;
     } else {
-        matrix = matrix_;
+        matrix_ = localMatrix_;
     }
 }
 
-const float *BGE::TransformComponent::getMatrixRaw() const {
+void BGE::TransformComponent::getMatrix(Matrix4 &matrix) {
     if (transformDirty_) {
-        // TODO: Do what you need to do here
-        return matrix_.m;
-    } else {
-        return matrix_.m;
+        updateMatrix();
+        
+        transformDirty_ = false;
     }
+    
+    matrix = matrix_;
+}
+
+const float *BGE::TransformComponent::getMatrixRaw() {
+    if (transformDirty_) {
+        updateMatrix();
+        
+        transformDirty_ = false;
+    }
+    
+    return matrix_.m;
+}
+
+
+void BGE::TransformComponent::getLocalMatrix(Matrix4 &matrix) {
+    if (transformDirty_) {
+        updateMatrix();
+        
+        transformDirty_ = false;
+    }
+    
+    matrix = localMatrix_;
+}
+
+const float *BGE::TransformComponent::getLocalMatrixRaw() {
+    if (transformDirty_) {
+        updateMatrix();
+        
+        transformDirty_ = false;
+    }
+    
+    return localMatrix_.m;
 }
 
 void BGE::TransformComponent::addChild(std::shared_ptr<TransformComponent> child) {

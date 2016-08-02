@@ -70,6 +70,7 @@
 		B547F17D1D125BD00031AF58 /* FrameAnimatorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B547F17B1D125BD00031AF58 /* FrameAnimatorComponent.cpp */; };
 		B54821F61CD87A8A0073AFCC /* AnimationSequenceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B54821F41CD87A8A0073AFCC /* AnimationSequenceComponent.cpp */; };
 		B54821F91CD9AD970073AFCC /* AnimationChannelComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B54821F71CD9AD970073AFCC /* AnimationChannelComponent.cpp */; };
+		B5503D471D4EBC3500FC77B6 /* EventService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5503D451D4EBC3500FC77B6 /* EventService.cpp */; };
 		B55194A41D28C2B100BDAA5D /* ComponentBitmask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B55194A21D28C2B100BDAA5D /* ComponentBitmask.cpp */; };
 		B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */; };
 		B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */; };
@@ -125,6 +126,8 @@
 		B5F6B16A1CC8AF7A00E1FD45 /* Space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */; };
 		B5F6B16D1CC8B06E00E1FD45 /* SpaceService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B16B1CC8B06E00E1FD45 /* SpaceService.cpp */; };
 		B5F8716B1D3F2B83000EA018 /* BGEView.m in Sources */ = {isa = PBXBuildFile; fileRef = B5F8716A1D3F2B83000EA018 /* BGEView.m */; };
+		B5F8716E1D406EE5000EA018 /* InputTouchComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F8716C1D406EE5000EA018 /* InputTouchComponent.cpp */; };
+		B5F871711D41E8CC000EA018 /* BoundingBoxComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F8716F1D41E8CC000EA018 /* BoundingBoxComponent.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -285,6 +288,9 @@
 		B54821F51CD87A8A0073AFCC /* AnimationSequenceComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimationSequenceComponent.h; path = components/AnimationSequenceComponent.h; sourceTree = "<group>"; };
 		B54821F71CD9AD970073AFCC /* AnimationChannelComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = AnimationChannelComponent.cpp; path = components/AnimationChannelComponent.cpp; sourceTree = "<group>"; };
 		B54821F81CD9AD970073AFCC /* AnimationChannelComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimationChannelComponent.h; path = components/AnimationChannelComponent.h; sourceTree = "<group>"; };
+		B5503D431D4EB5FD00FC77B6 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
+		B5503D451D4EBC3500FC77B6 /* EventService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EventService.cpp; sourceTree = "<group>"; };
+		B5503D461D4EBC3500FC77B6 /* EventService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventService.h; sourceTree = "<group>"; };
 		B55194A21D28C2B100BDAA5D /* ComponentBitmask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComponentBitmask.cpp; sourceTree = "<group>"; };
 		B55194A31D28C2B100BDAA5D /* ComponentBitmask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComponentBitmask.h; sourceTree = "<group>"; };
 		B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureVertex.glsl; path = shaders/ColorMatrixTextureVertex.glsl; sourceTree = "<group>"; };
@@ -359,6 +365,10 @@
 		B5F6B16C1CC8B06E00E1FD45 /* SpaceService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpaceService.h; sourceTree = "<group>"; };
 		B5F871691D3F2B83000EA018 /* BGEView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEView.h; path = ios/BGEView.h; sourceTree = "<group>"; };
 		B5F8716A1D3F2B83000EA018 /* BGEView.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEView.m; path = ios/BGEView.m; sourceTree = "<group>"; };
+		B5F8716C1D406EE5000EA018 /* InputTouchComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InputTouchComponent.cpp; path = components/InputTouchComponent.cpp; sourceTree = "<group>"; };
+		B5F8716D1D406EE5000EA018 /* InputTouchComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputTouchComponent.h; path = components/InputTouchComponent.h; sourceTree = "<group>"; };
+		B5F8716F1D41E8CC000EA018 /* BoundingBoxComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BoundingBoxComponent.cpp; path = components/BoundingBoxComponent.cpp; sourceTree = "<group>"; };
+		B5F871701D41E8CC000EA018 /* BoundingBoxComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BoundingBoxComponent.h; path = components/BoundingBoxComponent.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -417,6 +427,8 @@
 				B54821F51CD87A8A0073AFCC /* AnimationSequenceComponent.h */,
 				B50A1F9F1D0E762F004B450E /* AnimatorComponent.cpp */,
 				B50A1FA01D0E762F004B450E /* AnimatorComponent.h */,
+				B5F8716F1D41E8CC000EA018 /* BoundingBoxComponent.cpp */,
+				B5F871701D41E8CC000EA018 /* BoundingBoxComponent.h */,
 				B512AD521D2F6DF200DCE362 /* ButtonComponent.cpp */,
 				B512AD531D2F6DF200DCE362 /* ButtonComponent.h */,
 				B547F1781D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp */,
@@ -429,6 +441,8 @@
 				B5E7B9B91CC46A7500978F1A /* FlatRectRenderComponent.h */,
 				B547F17B1D125BD00031AF58 /* FrameAnimatorComponent.cpp */,
 				B547F17C1D125BD00031AF58 /* FrameAnimatorComponent.h */,
+				B5F8716C1D406EE5000EA018 /* InputTouchComponent.cpp */,
+				B5F8716D1D406EE5000EA018 /* InputTouchComponent.h */,
 				B5ACE8931CBF7AFF004B6871 /* LineRenderComponent.cpp */,
 				B5ACE8941CBF7AFF004B6871 /* LineRenderComponent.h */,
 				B512AD551D2F7D0400DCE362 /* MaskComponent.cpp */,
@@ -489,6 +503,9 @@
 				B5F5230A1CD9B4C500DE2F82 /* dataformats */,
 				B525E3851C89587000C691C0 /* Error.cpp */,
 				B525E3861C89587000C691C0 /* Error.h */,
+				B5503D431D4EB5FD00FC77B6 /* Event.h */,
+				B5503D451D4EBC3500FC77B6 /* EventService.cpp */,
+				B5503D461D4EBC3500FC77B6 /* EventService.h */,
 				B571F17C1C97CF42007F5A90 /* external */,
 				B52BFB0F1D0155720040A839 /* FixedArray.h */,
 				B571F1811C97D92E007F5A90 /* Font.cpp */,
@@ -981,6 +998,7 @@
 				B512AD5D1D3F1C2900DCE362 /* Input.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
+				B5F8716E1D406EE5000EA018 /* InputTouchComponent.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* Shader.cpp in Sources */,
 				B5F523131CD9C77E00DE2F82 /* GraphicFormats.cpp in Sources */,
 				B54821F61CD87A8A0073AFCC /* AnimationSequenceComponent.cpp in Sources */,
@@ -988,6 +1006,7 @@
 				B571F1801C97D88E007F5A90 /* FontService.cpp in Sources */,
 				B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */,
 				B525E3C31C89587000C691C0 /* ShaderOpenGLES2.cpp in Sources */,
+				B5503D471D4EBC3500FC77B6 /* EventService.cpp in Sources */,
 				B5F6B16A1CC8AF7A00E1FD45 /* Space.cpp in Sources */,
 				B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */,
 				B525E3C81C89587000C691C0 /* Texture.cpp in Sources */,
@@ -997,6 +1016,7 @@
 				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
 				B50A1F9E1D092A3C004B450E /* TextComponent.cpp in Sources */,
 				B525E3BB1C89587000C691C0 /* RenderContext.cpp in Sources */,
+				B5F871711D41E8CC000EA018 /* BoundingBoxComponent.cpp in Sources */,
 				B508CD931CAE285000127B97 /* TransformComponent.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* Game.cpp in Sources */,
 				B5E7B9BA1CC46A7500978F1A /* FlatRectRenderComponent.cpp in Sources */,

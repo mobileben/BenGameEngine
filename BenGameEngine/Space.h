@@ -61,6 +61,10 @@ namespace BGE {
             return componentService_->getComponent<T>(componentId);
         }
 
+        template <typename T> void getComponents(std::vector<std::shared_ptr<T>> &components) {
+            componentService_->getComponents<T>(components);
+        }
+        
         template <typename T> void removeComponent(ObjectId componentId) {
             componentService_->removeComponent<T>(componentId);
         }
@@ -79,8 +83,6 @@ namespace BGE {
         void setOrder(uint32_t order) { order_ = order; }
         bool isUpdatable() const { return updatable_; }
         void setUpdatable(bool updatable) { updatable_ = updatable; }
-        bool isInteractiable() const { return interactable_; }
-        void setInteractable(bool interactable) { interactable_ = interactable; }
         
         std::shared_ptr<GameObject> createAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
         std::shared_ptr<GameObject> createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
@@ -106,7 +108,6 @@ namespace BGE {
         bool        visible_;
         uint32_t    order_;
         bool        updatable_;
-        bool        interactable_;
         // TODO:
     };
 }

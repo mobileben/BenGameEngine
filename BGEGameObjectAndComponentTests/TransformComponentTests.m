@@ -34,8 +34,6 @@ static BGE::ComponentService componentService;
     XCTAssertEqual(transform!=nullptr, true, @"transform not created");
     XCTAssertEqual(transform->getName(), "test", @"getName is incorrect");
     XCTAssertEqual(transform->isVisible(), true, @"isVisible is incorrect");
-    XCTAssertEqual(transform->isInteractable(), true, @"isInteractable is incorrect");
-    XCTAssertEqual(transform->isInteractableWhenHidden(), false, @"isInteractableWhenHidden is incorrect");
     
     Rect rect;
     
@@ -86,28 +84,16 @@ static BGE::ComponentService componentService;
     XCTAssertEqual(transform2->getName(), newname2, @"getName is incorrect");
 }
 
-- (void)testVisibilityAndInteractability {
+- (void)testVisibility {
     auto name = "test";
     auto transform = componentService.createComponent<BGE::TransformComponent>(name);
 
     XCTAssertEqual(transform->isVisible(), true, @"isVisible is incorrect");
-    XCTAssertEqual(transform->isInteractable(), true, @"isInteractable is incorrect");
-    XCTAssertEqual(transform->isInteractableWhenHidden(), false, @"isInteractableWhenHidden is incorrect");
     
     transform->setVisibility(false);
     XCTAssertEqual(transform->isVisible(), false, @"isVisible is incorrect");
     transform->setVisibility(true);
     XCTAssertEqual(transform->isVisible(), true, @"isVisible is incorrect");
-
-    transform->setInteractability(false);
-    XCTAssertEqual(transform->isInteractable(), false, @"isInteractable is incorrect");
-    transform->setInteractability(true);
-    XCTAssertEqual(transform->isInteractable(), true, @"isInteractable is incorrect");
-    
-    transform->setInteractabilityWhenHidden(false);
-    XCTAssertEqual(transform->isInteractableWhenHidden(), false, @"isInteractableWhenHidden is incorrect");
-    transform->setInteractabilityWhenHidden(true);
-    XCTAssertEqual(transform->isInteractableWhenHidden(), true, @"isInteractableWhenHidden is incorrect");
 }
 
 - (void)testPosition {

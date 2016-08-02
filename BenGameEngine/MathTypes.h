@@ -166,8 +166,9 @@ namespace BGE {
     extern void Matrix4Scale(Matrix4& matrix, float sx, float sy, float sz);
     extern void Matrix4Translate(Matrix4& matrix, float tx, float ty, float tz);
     
-    extern void Matrix4MultiplyVector3(Vector3 &result, Matrix4& matrix, Vector3 vector3);
-        
+    extern void Matrix4MultiplyVector3(Vector3 &result, Matrix4& matrix, Vector3 v3);
+    extern void Matrix4MultiplyVector2(Vector2 &result, Matrix4& matrix, Vector2 v2);
+    
     Matrix4 operator*(Matrix4& lhs, Matrix4& rhs);
 
     extern bool Matrix2IsIdentity(Matrix2& matrix);

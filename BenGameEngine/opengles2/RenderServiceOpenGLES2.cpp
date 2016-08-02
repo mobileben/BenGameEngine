@@ -608,41 +608,67 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(std::shared_ptr<GameObject> gameO
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawLines(const std::vector<Vector2>& points, float thickness, bool loop, Material *material) {
-    Vector3 vertices[points.size()];
-    GLubyte indices[points.size()];
-    
-    uint32_t index = 0;
-    
-    for (auto pt : points) {
-        vertices[index].x = pt.x;
-        vertices[index].y = pt.y;
-        vertices[index].z = 0;
+void BGE::RenderServiceOpenGLES2::drawLines(std::shared_ptr<GameObject> gameObject) {
+    if (gameObject) {
+        auto line = gameObject->getComponent<LineRenderComponent>();
         
-        indices[index] = index;
-        
-        index++;
+        if (line) {
+            auto material = line->getMaterial();
+            auto xform = gameObject->getComponent<TransformComponent>();
+            auto points = line->getPoints();
+            Vector3 vertices[points.size()];
+
+            uint32_t index = 0;
+            
+            for (auto pt : points) {
+                vertices[index].x = pt.x;
+                vertices[index].y = pt.y;
+                vertices[index].z = 0;
+                
+                index++;
+            }
+            
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+            
+            GLint positionLocation = glShader->locationForAttribute("Position");
+            GLint projectionLocation = glShader->locationForUniform("Projection");
+            GLint modelLocation = glShader->locationForUniform("ModelView");
+            GLint colorLocation = glShader->locationForUniform("Color");
+            
+            glEnableVertexAttribArray(positionLocation);
+            
+            Color color;
+            
+            material->getColor(color);
+            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+
+            if (xform) {
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) xform->matrix_.m);
+            } else {
+                // TODO: This is a hack for now
+                Matrix4 mat;
+                
+                Matrix4MakeIdentify(mat);
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+            }
+            
+            glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
+            // 2
+            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                  sizeof(Vertex), &vertices[0]);
+            glLineWidth(line->getThickness());
+            // 3
+            GLenum mode;
+            
+            if (line->isLineLoop()) {
+                mode = GL_LINE_LOOP;
+            } else {
+                mode = GL_LINE_STRIP;
+            }
+            
+            glDrawArrays(mode, 0, (GLsizei) points.size());
+        }
     }
-    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
-    
-    GLint positionLocation = glShader->locationForAttribute("Position");
-    GLint projectionLocation = glShader->locationForUniform("Projection");
-    GLint modelLocation = glShader->locationForUniform("ModelView");
-    GLint colorLocation = glShader->locationForUniform("Color");
-    
-    glEnableVertexAttribArray(positionLocation);
-    
-    Color color;
-    
-    material->getColor(color);
-    glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
-    glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
-    // 2
-    glVertexAttribPointer(positionLocation, points.size(), GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), &vertices[0]);
-    glLineWidth(12);
-    // 3
-    glDrawArrays(GL_LINE_LOOP, 0, points.size());
 }
 
 void BGE::RenderServiceOpenGLES2::drawTexture(std::shared_ptr<TransformComponent> transform, std::shared_ptr<TextureBase> texture, VertexTex *const vertices) {
@@ -685,7 +711,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObj
                         if (transformComponent) {
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->matrix_.m);
                         } else {
-                            // This is a hack for now
+                            // TODO: This is a hack for now
                             Matrix4 mat;
                             
                             Matrix4MakeIdentify(mat);
@@ -879,9 +905,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject>
         }
         
         if (gameObj->hasComponent<LineRenderComponent>()) {
-            std::shared_ptr<BGE::LineRenderComponent> line = gameObj->getComponent<LineRenderComponent>();
-            
-            drawLines(line->getPoints(), line->getThickness(), line->isLineLoop(), line->getMaterial());
+            drawLines(gameObj);
         } else if (gameObj->hasComponent<FlatRectRenderComponent>()) {
             drawFlatRect(gameObj);
         } else if (gameObj->hasComponent<SpriteRenderComponent>()) {

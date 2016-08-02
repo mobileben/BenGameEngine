@@ -22,6 +22,8 @@
 #include "ButtonComponent.h"
 #include "MaskComponent.h"
 #include "TextureMaskComponent.h"
+#include "InputTouchComponent.h"
+#include "BoundingBoxComponent.h"
 
 void BGE::ComponentService::registerComponents() {
     Component::registerBitmask<AnimationChannelComponent>();
@@ -39,6 +41,8 @@ void BGE::ComponentService::registerComponents() {
     Component::registerBitmask<ButtonComponent>();
     Component::registerBitmask<MaskComponent>();
     Component::registerBitmask<TextureMaskComponent>();
+    Component::registerBitmask<InputTouchComponent>();
+    Component::registerBitmask<BoundingBoxComponent>();
 }
 
 BGE::ComponentService::ComponentService() {

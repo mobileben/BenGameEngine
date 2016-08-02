@@ -46,8 +46,6 @@ void BGE::AnimationSequenceComponent::created() {
 void BGE::AnimationSequenceComponent::setAnimationSequenceReference(AnimationSequenceReference *animSeqRef) {
     if (animSeqRef) {
         setAnimationSequenceReference(*animSeqRef);
-    } else {
-        NSLog(@"NULLL");
     }
 }
 
@@ -97,6 +95,8 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
             }
         }
     }
+    
+    bounds = animSeqRef.bounds;
 }
 
 void BGE::AnimationSequenceComponent::setGameObject(std::shared_ptr<GameObject> gameObject) {

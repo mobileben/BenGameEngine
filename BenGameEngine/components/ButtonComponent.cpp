@@ -121,6 +121,24 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
     }
 }
 
+std::shared_ptr<BGE::BoundingBoxComponent> BGE::ButtonComponent::getBoundingBox() {
+    if (currentButton) {
+        return currentButton->getComponent<BoundingBoxComponent>();
+    } else {
+        auto gameObj = getGameObject().lock();
+        return gameObj->getComponent<BoundingBoxComponent>();
+    }
+}
+
+std::shared_ptr<BGE::TransformComponent> BGE::ButtonComponent::getTransform() {
+    if (currentButton) {
+        return currentButton->getComponent<TransformComponent>();
+    } else {
+        auto gameObj = getGameObject().lock();
+        return gameObj->getComponent<TransformComponent>();
+    }
+}
+
 bool BGE::ButtonComponent::isAnimating() const {
     return animate;
 }
@@ -408,3 +426,81 @@ void BGE::ButtonComponent::useNormalButton() {
         }
     }
 }
+
+BGE::Event BGE::ButtonComponent::handleInput(TouchType type, bool inBounds) {
+    Event event = Event::None;
+    
+    switch (type) {
+        case TouchType::Down:
+            event = handleTouchDownEvent(inBounds);
+            break;
+            
+        case TouchType::Up:
+            event = handleTouchUpEvent(inBounds);
+            break;
+            
+        case TouchType::Cancel:
+            event = handleTouchCancelEvent();
+            break;
+            
+        default:
+            break;
+    }
+    
+    return event;
+}
+
+
+BGE::Event BGE::ButtonComponent::handleTouchDownEvent(bool inBounds) {
+    Event event = Event::None;
+    
+    if (inBounds) {
+        if (isEnabled()) {
+            setHighlighted(true);
+            event = Event::TouchDown;
+        }
+    }
+    
+    return event;
+}
+
+BGE::Event BGE::ButtonComponent::handleTouchCancelEvent() {
+    Event event = Event::TouchCancel;
+    
+    useNormalButton();
+    
+    return event;
+}
+
+BGE::Event BGE::ButtonComponent::handleTouchUpEvent(bool inBounds) {
+    Event event = Event::None;
+    
+    if (isEnabled()) {
+        if (inBounds) {
+            if (toggleable) {
+                if (toggleOn) {
+                    setToggleOn(false);
+                } else {
+                    setToggleOn(true);
+                }
+                
+                if (toggleOn) {
+                    useHighlightedButton();
+                } else {
+                    useNormalButton();
+                }
+            } else {
+                setHighlighted(false);
+            }
+            
+            event = Event::TouchUpInside;
+        } else {
+            setHighlighted(false);
+            
+            event = Event::TouchUpOutside;
+        }
+    }
+    
+    return event;
+}
+

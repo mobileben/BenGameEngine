@@ -23,6 +23,7 @@
 #include "ScenePackageService.h"
 #include "SpaceService.h"
 #include "InputService.h"
+#include "EventService.h"
 
 namespace BGE {
     class Game : public Service
@@ -46,6 +47,7 @@ namespace BGE {
         std::shared_ptr<SpaceService> getSpaceService() { return spaceService_; }
         std::shared_ptr<FontService> getFontService() { return fontService_; }
         std::shared_ptr<InputService> getInputService() { return inputService_; }
+        std::shared_ptr<EventService> getEventService() { return eventService_ ; }
         
         // Service functions
         void initialize();
@@ -67,6 +69,7 @@ namespace BGE {
         std::shared_ptr<AnimationService> animationService_;
         std::shared_ptr<SpaceService> spaceService_;
         std::shared_ptr<InputService> inputService_;
+        std::shared_ptr<EventService> eventService_;
     };
 }
 

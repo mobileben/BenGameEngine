@@ -709,11 +709,16 @@ namespace BGE {
     
     void Matrix4MultiplyVector3(Vector3 &result, Matrix4& matrix, Vector3 v3)
     {
-        result.x = matrix.m[0]*v3.x + matrix.m[4]*v3.y + matrix.m[8]*v3.z;
-        result.y = matrix.m[1]*v3.x + matrix.m[5]*v3.y + matrix.m[9]*v3.z;
-        result.z = matrix.m[2]*v3.x + matrix.m[6]*v3.y + matrix.m[10]*v3.z;
+        result.x = matrix.m[0]*v3.x + matrix.m[4]*v3.y + matrix.m[8]*v3.z + matrix.m[12];
+        result.y = matrix.m[1]*v3.x + matrix.m[5]*v3.y + matrix.m[9]*v3.z + matrix.m[13];
+        result.z = matrix.m[2]*v3.x + matrix.m[6]*v3.y + matrix.m[10]*v3.z + matrix.m[14];
     }
     
+    void Matrix4MultiplyVector2(Vector2 &result, Matrix4& matrix, Vector2 v2) {
+        result.x = matrix.m[0]*v2.x + matrix.m[4]*v2.y + matrix.m[12];
+        result.y = matrix.m[1]*v2.x + matrix.m[5]*v2.y + matrix.m[13];
+    }
+
     bool Matrix2IsIdentity(Matrix2& matrix) {
         if (matrix.m00 != 1) {
             return false;

@@ -10,6 +10,8 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "SpriteRenderComponent.h"
+#include "InputTouchComponent.h"
+#include "BoundingBoxComponent.h"
 
 uint32_t BGE::AnimationChannelComponent::bitmask_ = Component::InvalidBitmask;
 std::type_index BGE::AnimationChannelComponent::type_index_ = typeid(BGE::AnimationChannelComponent);
@@ -46,17 +48,26 @@ void BGE::AnimationChannelComponent::updateReference() {
             case GfxReferenceTypeSprite: {
                 auto sprite = space->createComponent<SpriteRenderComponent>();
                 auto texRef = Game::getInstance()->getScenePackageService()->getTextureReference(this->channel->reference);
+                auto bbox = space->createComponent<BoundingBoxComponent>();
                 
                 // TODO: Remove any older render components
                 gameObj->addComponent(sprite);
+                gameObj->addComponent(bbox);
+                
                 sprite->setTextureReference(texRef);
             }
                 break;
                 
             case GfxReferenceTypeButton:{
                 auto button = space->createComponent<ButtonComponent>();
+                auto input = space->createComponent<InputTouchComponent>();
+                auto bbox = space->createComponent<BoundingBoxComponent>();
+                
                 auto buttonRef = Game::getInstance()->getScenePackageService()->getButtonReference(this->channel->reference);
                 gameObj->addComponent(button);
+                gameObj->addComponent(input);
+                gameObj->addComponent(bbox);
+                
                 button->setButtonReference(buttonRef);
             }
                 break;
@@ -87,8 +98,11 @@ void BGE::AnimationChannelComponent::updateReference() {
                 
                 if (textRef && !textRef->fontHandle.isNull()) {
                     auto text = space->createComponent<TextComponent>();
-                    
+                    auto bbox = space->createComponent<BoundingBoxComponent>();
+
                     gameObj->addComponent(text);
+                    gameObj->addComponent(bbox);
+                    
                     text->setTextReference(*textRef);
                 }
                 // TODO: Remove any older render components

@@ -22,6 +22,7 @@ BGE::Game::Game()
     spaceService_ = std::make_shared<SpaceService>();
     fontService_ = std::make_shared<FontService>();
     inputService_ = std::make_shared<InputService>();
+    eventService_ = std::make_shared<EventService>();
 }
 
 void BGE::Game::provide(std::shared_ptr<RenderService> renderService) {

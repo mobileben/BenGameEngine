@@ -14,12 +14,16 @@
 #include <stdio.h>
 #include "Object.h"
 #include "Handle.h"
+#include <functional>
 
 namespace BGE {
     struct InputTag {};
     using InputHandle = Handle<InputTag>;
-    
+
     class InputService;
+    class Input;
+    
+    using InputHandler = std::function<void(Input *)>;
     
     enum class TouchType {
         None,
@@ -31,20 +35,22 @@ namespace BGE {
     
     class Input : public Object {
     public:
-        Input(ObjectId matId);
-        ~Input() {}
-        
-        void initialize(InputHandle handle, ObjectId objectId);
-        
         TouchType       type;
         InputHandle getHandle() const { return handle_; }
-
+        
         NSTimeInterval  timestamp;
         
         UITouch         *touch;
         float           x;
         float           y;
         uint32_t        tapCount;
+        
+        Input(ObjectId matId);
+        ~Input() {}
+        
+        void initialize(InputHandle handle, ObjectId objectId);
+        
+        bool operator <(const Input &rhs) const { return timestamp < rhs.timestamp; }
         
     protected:
         friend InputService;

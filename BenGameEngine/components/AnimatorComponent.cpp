@@ -14,6 +14,7 @@
 #include "ChannelFrameAnimatorComponent.h"
 #include "ColorMatrixComponent.h"
 #include "ColorTransformComponent.h"
+#include "BoundingBoxComponent.h"
 #include "Space.h"
 
 uint32_t BGE::AnimatorComponent::bitmask_ = Component::InvalidBitmask;
@@ -123,6 +124,23 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
                             }
                         }
                     }
+                }
+            }
+            
+            // Update the bounds
+            for (auto i=0;i<seq->numBounds;i++) {
+                auto bounds = seq->bounds[i];
+                
+                if (bounds.startFrame >= i && i < (bounds.startFrame + bounds.totalFrames)) {
+                    auto bbox = gameObj->getComponent<BoundingBoxComponent>();
+                    
+                    if (bbox) {
+                        bbox->x = bounds.bounds->x;
+                        bbox->y = bounds.bounds->y;
+                        bbox->width = bounds.bounds->w;
+                        bbox->height = bounds.bounds->h;
+                    }
+                    break;
                 }
             }
         }

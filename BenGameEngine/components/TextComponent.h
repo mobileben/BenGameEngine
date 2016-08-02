@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "RenderService.h"
+#include "BoundingBoxComponent.h"
 #include "RenderComponent.h"
 #include "Font.h"
 #include "GraphicFormats.h"
@@ -36,17 +37,13 @@ namespace BGE {
             return text_;
         }
         
-        void setText(std::string& text) {
-            text_ = text;
-        }
+        void setText(std::string& text);
         
         FontHandle getFontHandle() const {
             return fontHandle_;
         }
         
-        void setFont(FontHandle fontHandle) {
-            fontHandle_ = fontHandle;
-        }
+        void setFont(FontHandle fontHandle);
         
         const Color& getColor() const {
             return color_;
@@ -62,13 +59,7 @@ namespace BGE {
             }
         }
         
-        void setTextReference(const TextReference& textRef) {
-            text_ = textRef.text;
-            color_ = textRef.color;
-            horizAlignment_ = textRef.alignment;
-            vertAlignment_ = FontVerticalAlignment::Center;
-            fontHandle_ = textRef.fontHandle;
-        }
+        void setTextReference(const TextReference& textRef);
         
         float getWidth(bool minimum=true);
         
@@ -86,6 +77,8 @@ namespace BGE {
         FontHorizontalAlignment horizAlignment_;
         FontVerticalAlignment   vertAlignment_;
         
+        void getWidthHeight(float &width, float &height);
+        void updateBoundingBox();
     };
 }
 

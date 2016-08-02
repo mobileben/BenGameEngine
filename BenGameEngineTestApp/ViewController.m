@@ -22,6 +22,7 @@
 
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderContextOpenGLES2> renderContext;
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderWindow> renderWindow;
+@property (nonatomic, assign) std::shared_ptr<BGE::LineRenderComponent> buttonBounds;
 @property (nonatomic, weak) BGEView *glView;
 @property (nonatomic, assign) BOOL once;
 @property (nonatomic, assign) BGE::SpaceHandle spaceHandle;
@@ -151,13 +152,30 @@
                         
                         transformComponent->setX(600);
                         transformComponent->setY(1000);
+                        transformComponent->setRotation(0);
                         
                         gameObj->setName("Object4");
                         gameObj->setActive(true);
 
                         // Spaces are not visible by default
                         space->setVisible(true);
-
+                        
+                        gameObj = space->createObject<BGE::GameObject>();
+                        transformComponent = space->createComponent<BGE::TransformComponent>();
+                        gameObj->addComponent(transformComponent);
+                        auto line = space->createComponent<BGE::LineRenderComponent>();
+                        BGE::Color color = { 1, 0, 1, 1 };
+                        auto material = BGE::Game::getInstance()->getMaterialService()->createMaterial(color);
+                        line->setMaterials({material});
+                        gameObj->addComponent(line);
+                        gameObj->setActive(true);
+                        
+                        self.buttonBounds = line;
+                        
+                        typedef void (*func)(id, SEL, std::shared_ptr<BGE::GameObject>, BGE::Event);
+                        func impl = (func)[self methodForSelector:@selector(handleInput:event:)];
+                        std::function<void(std::shared_ptr<BGE::GameObject>, BGE::Event)> fnc = std::bind(impl, self, @selector(handleInput:event:), std::placeholders::_1, std::placeholders::_2);
+                        BGE::Game::getInstance()->getInputService()->registerEventHandler("buy_button", BGE::Event::TouchUpInside, fnc);
                     });
                 }
             });
@@ -244,28 +262,34 @@
     [self.glView display];
 }
 
+- (void)handleInput:(std::shared_ptr<BGE::GameObject>)gameObj event:(BGE::Event)event {
+    
+}
+
 - (void)racer:(std::shared_ptr<BGE::TextureBase>)texture error:(std::shared_ptr<BGE::Error>)error {
     std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGE::Game::getInstance()->getRenderService());
     std::shared_ptr<BGE::TextureOpenGLES2> glTex = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(texture);
     renderer->setGLKTextureInfo(glTex->getTextureInfo());
     BGE::Game::getInstance()->getRenderService()->render();
     
-#if 0
+#if 1
     // Let's create and add a game object
     std::string name = "hello";
-    auto gameObj0 = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
+    auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+    auto gameObj0 = space->createObject<BGE::GameObject>();
 #if 1
-    auto gameObj1 = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
+    auto gameObj1 = space->createObject<BGE::GameObject>();
 #endif
-    auto gameObj2 = BGE::Game::getInstance()->getGameObjectService()->createObject<BGE::GameObject>();
+    auto gameObj2 = space->createObject<BGE::GameObject>();
     
-    auto material = BGE::Game::getInstance()->getMaterialService()->createMaterial(texture);
-    auto transformComponent0 = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
-    auto transformComponent1 = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
-    auto transformComponent2 = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::TransformComponent>();
-    auto lineRenderer = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::LineRenderComponent>();
-    auto flatRect = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::FlatRectRenderComponent>();
-    auto sprite = BGE::Game::getInstance()->getComponentService()->createComponent<BGE::SpriteRenderComponent>();
+    auto materialHandle = BGE::Game::getInstance()->getMaterialService()->createMaterial(texture);
+    auto material = BGE::Game::getInstance()->getMaterialService()->getMaterial(materialHandle);
+    auto transformComponent0 = space->createComponent<BGE::TransformComponent>();
+    auto transformComponent1 = space->createComponent<BGE::TransformComponent>();
+    auto transformComponent2 = space->createComponent<BGE::TransformComponent>();
+    auto lineRenderer = space->createComponent<BGE::LineRenderComponent>();
+    auto flatRect = space->createComponent<BGE::FlatRectRenderComponent>();
+    auto sprite = space->createComponent<BGE::SpriteRenderComponent>();
     
     BGE::Color color = { 1, 0, 0, 1 };
     
@@ -275,8 +299,8 @@
     gameObj0->addComponent(lineRenderer);
     gameObj0->setActive(true);
 
-    lineRenderer->setMaterials({ material });
-    lineRenderer->setPoints({ { 500, 200 }, { 700, 100 }, { 500, 800 } });
+    lineRenderer->setMaterials({ materialHandle });
+    lineRenderer->setPoints({ { 500, 200 }, { 700, 100 }, { 500, 800 } }, true);
     
 //    NSLog(@"game object name %s", gameObj->getName().c_str());
 #if 1
@@ -287,7 +311,7 @@
 #endif
     BGE::Vector2 wh = { 500, 700 };
     
-    flatRect->setMaterials({ material });
+    flatRect->setMaterials({ materialHandle });
     flatRect->setWidthHeight(wh);
     
     gameObj2->setName("Object2");
@@ -295,7 +319,7 @@
     gameObj2->addComponent(sprite);
     gameObj2->setActive(true);
     
-    sprite->setMaterials({material});
+    sprite->setMaterials({materialHandle});
 #endif
     
 }
@@ -315,6 +339,48 @@
 
 - (void) glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
+    auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+    
+    auto gameObj = space->find("buy_button");
+    
+    if (gameObj) {
+        auto button = gameObj->getComponent<BGE::ButtonComponent>();
+        
+        if (button) {
+            auto bbox = button->getBoundingBox();
+            if (bbox) {
+                auto xform = button->getTransform();
+                auto parent = xform->getParent().lock();
+                BGE::Matrix4 matrix;
+                BGE::Vector2 point;
+                std::vector<BGE::Vector2> points;
+                
+                xform->getMatrix(matrix);
+                bbox->computeAABB(matrix);
+                
+                point.x = bbox->aabbMinX;
+                point.y = bbox->aabbMinY;
+                points.push_back(point);
+                
+                point.x = bbox->aabbMaxX;
+                point.y = bbox->aabbMinY;
+                points.push_back(point);
+
+                point.x = bbox->aabbMaxX;
+                point.y = bbox->aabbMaxY;
+                points.push_back(point);
+#if 1
+                point.x = bbox->aabbMinX;
+                point.y = bbox->aabbMaxY;
+                points.push_back(point);
+#endif
+                
+                self.buttonBounds->setPoints(points);
+                
+                NSLog(@"GOT YOU BITCHY");
+            }
+        }
+    }
     BGE::Game::getInstance()->getRenderService()->render();
 }
 

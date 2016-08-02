@@ -13,6 +13,9 @@
 #include <memory>
 #include "Component.h"
 #include "GraphicFormats.h"
+#include "Input.h"
+#include "Event.h"
+#include "HandleService.h"
 
 namespace BGE {
     enum ButtonState : uint32_t {
@@ -21,6 +24,9 @@ namespace BGE {
         ButtonStateDisabled = 1 << 1,
         ButtonStateSelected = 1 << 2
     };
+    
+    class BoundingBoxComponent;
+    class Input;
     
     class ButtonComponent : public Component
     {
@@ -39,6 +45,11 @@ namespace BGE {
         void setButtonReference(ButtonReference *buttonRef);
         void setButtonReference(const ButtonReference &buttonRef);
 
+        // This may be considered unconventional in that we are allowing us to get another component from this, however it allows us to properly
+        // get the most updated BBOX info
+        std::shared_ptr<BoundingBoxComponent> getBoundingBox();
+        std::shared_ptr<TransformComponent> getTransform();
+        
         bool isAnimating() const;
         void setAnimate(bool animate);
         bool isEnabled() const;
@@ -49,7 +60,11 @@ namespace BGE {
         void setSelected(bool selected);
         void setToggleOn(bool on);
         
+        Event handleInput(TouchType type, bool inBounds);
+        
     private:
+        using EventHandlerService = HandleService<EventHandler, EventHandlerHandle>;
+
         uint32_t    state;
         bool        animate;
         bool        enabled;
@@ -66,10 +81,15 @@ namespace BGE {
         std::shared_ptr<GameObject> highlightedButton;
         std::shared_ptr<GameObject> highlightedAnimButton;
         std::shared_ptr<GameObject> currentButton;
-        
+  
         void useHighlightedButton();
         void useDisabledButton();
         void useNormalButton();
+
+        // TODO: If multi-touch then we will need to match touches, if necessary
+        Event handleTouchDownEvent(bool inBounds);
+        Event handleTouchCancelEvent();
+        Event handleTouchUpEvent(bool inBounds);
     };
 }
 

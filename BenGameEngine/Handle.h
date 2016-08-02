@@ -23,8 +23,8 @@ namespace BGE {
         static const uint32_t MAX_MAGIC = (1 << NUM_MAGIC_BITS) - 1;
 
         Handle() : handle_(0) {}
-        Handle(uint32_t index) {
-            
+        Handle(uint32_t h) : handle_(h) {
+            printf("HERE WITH HANDLE CONSTRUCTOR %d\n", h);
         }
 
         uint32_t getIndex() const { return index_; }

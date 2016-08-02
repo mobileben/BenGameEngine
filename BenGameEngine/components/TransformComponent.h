@@ -37,12 +37,6 @@ namespace BGE {
         bool isVisible() const { return visible_; }
         void setVisibility(bool visible) { visible_ = visible; }
         
-        bool isInteractable() const { return interactable_; }
-        void setInteractability(bool interactable) { interactable_ = interactable; }
-        
-        bool isInteractableWhenHidden() const { return interactableWhenHidden_; }
-        void setInteractabilityWhenHidden(bool interactableWhenHidden) { interactableWhenHidden_ = interactableWhenHidden; }
-        
         void getBounds(Rect &bounds) { bounds = bounds_; }
         
         float getX() const { return position_.x; }
@@ -77,7 +71,10 @@ namespace BGE {
         
         // TODO: This should be made so that matrices are exposed. This is to reduce overhead of copies
         void getMatrix(Matrix4 &matrix);
-        const float *getMatrixRaw() const;
+        const float *getMatrixRaw();
+        
+        void getLocalMatrix(Matrix4 &matrix);
+        const float *getLocalMatrixRaw();
         
         std::weak_ptr<TransformComponent> getParent() { return parent_; }
         std::vector<std::shared_ptr<TransformComponent>> getChildren() { return children_; }
@@ -103,8 +100,6 @@ namespace BGE {
         
         // Identity
         bool            visible_;
-        bool            interactable_;
-        bool            interactableWhenHidden_;
         
         // Bounds
         Rect            bounds_;
@@ -133,6 +128,7 @@ namespace BGE {
         bool            paused_;
         
         void setGameObject(std::shared_ptr<GameObject> gameObject);
+        void updateMatrix();
     };
 }
 

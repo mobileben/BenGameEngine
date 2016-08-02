@@ -79,6 +79,10 @@ namespace BGE {
         }
         
         void release(HANDLE handle) {
+            if (handle.isNull()) {
+                return;
+            }
+            
             auto index = handle.getIndex();
             
 #if UNIT_TESTING

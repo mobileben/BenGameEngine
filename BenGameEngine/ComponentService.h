@@ -18,6 +18,7 @@
 
 #include "Service.h"
 #include "Component.h"
+#include "GameObject.h"
 
 namespace BGE {
     class Space;
@@ -57,6 +58,21 @@ namespace BGE {
         }
         
         template <typename T> std::shared_ptr<T> getComponent(ObjectId componentId);
+        template <typename T> void getComponents(std::vector<std::shared_ptr<T>> &components) {
+            components.clear();
+            
+            ComponentMapIterator it = components_.find(Component::getTypeIndex<T>());
+            
+            if (it != components_.end()) {
+                for (auto component : it->second) {
+                    auto gameObj = component->getGameObject().lock();
+                    if (gameObj->isActive()) {
+                        auto z = std::static_pointer_cast<T>(component);
+                        components.push_back(z);
+                    }
+                }
+            }
+        }
         
         template <typename T> void removeComponent(ObjectId componentId);
         template <typename T> void removeAllComponents();
@@ -76,7 +92,7 @@ namespace BGE {
         ComponentMap components_;
         
         template <typename T> void addComponent(std::shared_ptr<T> component) {
-            std::type_index index(typeid(T));
+            std::type_index index = Component::getTypeIndex<T>();
             ComponentMapIterator it = components_.find(index);
             
             if (it != components_.end()) {
