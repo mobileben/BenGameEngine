@@ -96,8 +96,8 @@ void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<RenderContext
 //    CAEAGLLayer *eaglLayer = (CAEAGLLayer *)window->getView().layer;
 //    eaglLayer.contentsScale = window->getView().contentScaleFactor;
 
-#if 0
-    setCoordinateSystem2D(Render2DCoordinateSystem::OpenGL);
+#if 1
+    setCoordinateSystem2D(Render2DCoordinateSystem::OpenGLCentered);
 #else
     setCoordinateSystem2D(Render2DCoordinateSystem::Traditional);
 #endif
@@ -838,7 +838,7 @@ void BGE::RenderServiceOpenGLES2::render()
             
             if (space && space->isVisible()) {
                 for (auto &obj : space->getGameObjects()) {
-                    renderGameObject(obj.second, true);
+                    renderGameObject(obj, true);
                 }
             }
         }

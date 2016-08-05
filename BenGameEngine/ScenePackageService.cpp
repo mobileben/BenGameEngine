@@ -260,4 +260,38 @@ BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceR
     return nullptr;
 }
 
+BGE::ExternalPackageReference *BGE::ScenePackageService::getExternalReference(std::string name) {
+    for (auto const &ent : scenePackages_) {
+        ScenePackageHandle handle = ent.second;
+        auto package = handleService_.dereference(handle);
+        
+        if (package) {
+            auto extRef = package->getExternalReference(name);
+            
+            if (extRef) {
+                return extRef;
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string name) {
+    for (auto const &ent : scenePackages_) {
+        ScenePackageHandle handle = ent.second;
+        auto package = handleService_.dereference(handle);
+        
+        if (package) {
+            auto type = package->getReferenceType(name);
+            
+            if (type != GfxReferenceTypeUnknown) {
+                return type;
+            }
+        }
+    }
+
+    return GfxReferenceTypeUnknown;
+}
+
 

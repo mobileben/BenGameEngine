@@ -46,6 +46,10 @@ namespace BGE {
         PlacementReference *getPlacementReference(std::string name);
         TextReference *getTextReference(std::string name);
         TextureReference *getTextureReference(std::string name);
+        ExternalPackageReference *getExternalReference(std::string name);
+        
+        // Get the reference type for the item, if it exists
+        GfxReferenceType getReferenceType(std::string name);
         
     protected:
         void reset();
@@ -142,6 +146,8 @@ namespace BGE {
 
         FixedArray<AutoDisplayElementReference>             autoDisplayElementRefs_;
 
+        std::unordered_map<std::string, GfxReferenceType>   referenceTypes_;
+        
         void loadTextures(std::function<void()> callback);
         void loadFonts(std::function<void()> callback);
         

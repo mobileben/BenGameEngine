@@ -90,94 +90,124 @@
         path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
         
         if (path) {
-            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "common", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "Common", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                 BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                 
                 if (package) {
                     package->link();
                 }
-                
-                NSString *path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
+
+                NSString *path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
                 
                 if (path) {
-                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "lobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "CommonLobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                         BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                         
                         if (package) {
                             package->link();
                         }
-                        auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
                         
-                        auto gameObj = space->createSprite("SaleBkg");
-                        auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+                        NSString *path = [[NSBundle mainBundle] pathForResource:@"CommonHUD-iPh6" ofType:@"json"];
                         
-                        BGE::Vector2 pos = { 700, 700 };
-                        BGE::Vector2 scale = { 2, 1 };
-                        transformComponent->setPosition(pos);
-                        transformComponent->setScale(scale);
-                        transformComponent->setRotation(M_PI/16);
-                        
-                        gameObj->setName("Object1");
-                        
-                        gameObj->setActive(true);
-                        
-                        gameObj = space->createText("CashText");
-                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+                        if (path) {
+                            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "CommonHUD", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                                
+                                if (package) {
+                                    package->link();
+                                }
+                                
+                                NSString *path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
+                                
+                                if (path) {
+                                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "Lobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                                        BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                                        
+                                        if (package) {
+                                            package->link();
+                                        }
+                                        auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+                                        
+                                        auto gameObj = space->createSprite("SaleBkg");
+                                        auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+                                        
+                                        BGE::Vector2 pos = { 700, 700 };
+                                        BGE::Vector2 scale = { 2, 1 };
+                                        transformComponent->setPosition(pos);
+                                        transformComponent->setScale(scale);
+                                        transformComponent->setRotation(M_PI/16);
+                                        
+                                        gameObj->setName("Object1");
+                                        
+                                        gameObj->setActive(true);
+                                        
+                                        gameObj = space->createText("CashText");
+                                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+                                        
+                                        transformComponent->setX(200);
+                                        transformComponent->setY(1200);
+                                        gameObj->setName("Object2");
+                                        gameObj->setActive(true);
+                                        
+                                        gameObj = space->createAnimSequence("SaleGlowAnim");
+                                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+                                        auto animator = gameObj->getComponent<BGE::AnimatorComponent>();
+                                        
+                                        transformComponent->setX(200);
+                                        transformComponent->setY(1000);
+                                        
+                                        gameObj->setName("Object3");
+                                        animator->reset();
+                                        
+                                        animator->play(BGE::AnimatorComponent::AnimPlayForever, true, 1 );
+                                        gameObj->setActive(true);
+                                        
+                                        // Spaces are not visible by default
+                                        space->setVisible(true);
+                                        
+                                        gameObj = space->createAnimSequence("BuyButtonObject");
+                                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
+                                        animator = gameObj->getComponent<BGE::AnimatorComponent>();
+                                        animator->reset();
+                                        
+                                        transformComponent->setX(600);
+                                        transformComponent->setY(1000);
+                                        transformComponent->setRotation(0);
+                                        
+                                        gameObj->setName("Object4");
+                                        gameObj->setActive(true);
+                                        
+                                        // Spaces are not visible by default
+                                        space->setVisible(true);
+                                        
+                                        // Now create auto display objects
+                                        BGE::SceneObjectCreatedDelegate delegate;
 
-                        transformComponent->setX(200);
-                        transformComponent->setY(1200);
-                        gameObj->setName("Object2");
-                        gameObj->setActive(true);
-                        
-                        gameObj = space->createAnimSequence("SaleGlowAnim");
-                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
-                        auto animator = gameObj->getComponent<BGE::AnimatorComponent>();
-
-                        transformComponent->setX(200);
-                        transformComponent->setY(1000);
-                        
-                        gameObj->setName("Object3");
-                        animator->reset();
-                        
-                        animator->play(BGE::AnimatorComponent::AnimPlayForever, true, 1 );
-                        gameObj->setActive(true);
-                        
-                        // Spaces are not visible by default
-                        space->setVisible(true);
-
-                        gameObj = space->createAnimSequence("BuyButtonObject");
-                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
-                        animator = gameObj->getComponent<BGE::AnimatorComponent>();
-                        animator->reset();
-                        
-                        transformComponent->setX(600);
-                        transformComponent->setY(1000);
-                        transformComponent->setRotation(0);
-                        
-                        gameObj->setName("Object4");
-                        gameObj->setActive(true);
-
-                        // Spaces are not visible by default
-                        space->setVisible(true);
-                        
-                        gameObj = space->createObject<BGE::GameObject>();
-                        transformComponent = space->createComponent<BGE::TransformComponent>();
-                        gameObj->addComponent(transformComponent);
-                        auto line = space->createComponent<BGE::LineRenderComponent>();
-                        BGE::Color color = { 1, 0, 1, 1 };
-                        auto material = BGE::Game::getInstance()->getMaterialService()->createMaterial(color);
-                        line->setMaterials({material});
-                        gameObj->addComponent(line);
-                        gameObj->setActive(true);
-                        
-                        self.buttonBounds = line;
-                        
-                        typedef void (*func)(id, SEL, std::shared_ptr<BGE::GameObject>, BGE::Event);
-                        func impl = (func)[self methodForSelector:@selector(handleInput:event:)];
-                        std::function<void(std::shared_ptr<BGE::GameObject>, BGE::Event)> fnc = std::bind(impl, self, @selector(handleInput:event:), std::placeholders::_1, std::placeholders::_2);
-                        BGE::Game::getInstance()->getInputService()->registerEventHandler("buy_button", BGE::Event::TouchUpInside, fnc);
+                                        space->createAutoDisplayObjects(nullptr, packageHandle, delegate);
+                                        
+                                        gameObj = space->createObject<BGE::GameObject>();
+                                        transformComponent = space->createComponent<BGE::TransformComponent>();
+                                        gameObj->addComponent(transformComponent);
+                                        auto line = space->createComponent<BGE::LineRenderComponent>();
+                                        BGE::Color color = { 1, 0, 1, 1 };
+                                        auto material = BGE::Game::getInstance()->getMaterialService()->createMaterial(color);
+                                        line->setMaterials({material});
+                                        gameObj->addComponent(line);
+                                        gameObj->setActive(true);
+                                        
+                                        self.buttonBounds = line;
+                                        
+                                        typedef void (*func)(id, SEL, std::shared_ptr<BGE::GameObject>, BGE::Event);
+                                        func impl = (func)[self methodForSelector:@selector(handleInput:event:)];
+                                        std::function<void(std::shared_ptr<BGE::GameObject>, BGE::Event)> fnc = std::bind(impl, self, @selector(handleInput:event:), std::placeholders::_1, std::placeholders::_2);
+                                        BGE::Game::getInstance()->getInputService()->registerEventHandler("settings_button", BGE::Event::TouchUpInside, fnc);
+                                    });
+                                }
+                            });
+                        }
                     });
                 }
+                
             });
             
             auto tSpaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("TestSpace");
@@ -272,7 +302,7 @@
     renderer->setGLKTextureInfo(glTex->getTextureInfo());
     BGE::Game::getInstance()->getRenderService()->render();
     
-#if 1
+#if 0
     // Let's create and add a game object
     std::string name = "hello";
     auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
@@ -341,7 +371,7 @@
 {
     auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
     
-    auto gameObj = space->find("buy_button");
+    auto gameObj = space->find("settings_button");
     
     if (gameObj) {
         auto button = gameObj->getComponent<BGE::ButtonComponent>();
@@ -369,11 +399,10 @@
                 point.x = bbox->aabbMaxX;
                 point.y = bbox->aabbMaxY;
                 points.push_back(point);
-#if 1
+
                 point.x = bbox->aabbMinX;
                 point.y = bbox->aabbMaxY;
                 points.push_back(point);
-#endif
                 
                 self.buttonBounds->setPoints(points);
                 

@@ -68,6 +68,10 @@ namespace BGE {
         PlacementReference *getPlacementReference(std::string name);
         TextureReference *getTextureReference(std::string name);
         TextReference *getTextReference(std::string name);
+        ExternalPackageReference *getExternalReference(std::string name);
+        
+        // TODO: Remove this as this is a hack
+        GfxReferenceType getReferenceType(std::string name);
         
         void link();
         void link(ScenePackageHandle handle);

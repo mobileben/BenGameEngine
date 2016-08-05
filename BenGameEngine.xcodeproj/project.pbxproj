@@ -71,6 +71,37 @@
 		B54821F61CD87A8A0073AFCC /* AnimationSequenceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B54821F41CD87A8A0073AFCC /* AnimationSequenceComponent.cpp */; };
 		B54821F91CD9AD970073AFCC /* AnimationChannelComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B54821F71CD9AD970073AFCC /* AnimationChannelComponent.cpp */; };
 		B5503D471D4EBC3500FC77B6 /* EventService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5503D451D4EBC3500FC77B6 /* EventService.cpp */; };
+		B5503D651D51A6A700FC77B6 /* collectbezel@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D4A1D51A6A700FC77B6 /* collectbezel@2x.png */; };
+		B5503D661D51A6A700FC77B6 /* collectbuttonbkg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D4B1D51A6A700FC77B6 /* collectbuttonbkg@2x.png */; };
+		B5503D671D51A6A700FC77B6 /* collectmeterfill@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D4C1D51A6A700FC77B6 /* collectmeterfill@2x.png */; };
+		B5503D681D51A6A700FC77B6 /* collectmeterfillmid@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D4D1D51A6A700FC77B6 /* collectmeterfillmid@2x.png */; };
+		B5503D691D51A6A700FC77B6 /* collectmeterfillr@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D4E1D51A6A700FC77B6 /* collectmeterfillr@2x.png */; };
+		B5503D6A1D51A6A700FC77B6 /* collectmeterslot@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D4F1D51A6A700FC77B6 /* collectmeterslot@2x.png */; };
+		B5503D6B1D51A6A700FC77B6 /* collectmwheelbkg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D501D51A6A700FC77B6 /* collectmwheelbkg@2x.png */; };
+		B5503D6C1D51A6A700FC77B6 /* collectmwheelborder@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D511D51A6A700FC77B6 /* collectmwheelborder@2x.png */; };
+		B5503D6D1D51A6A700FC77B6 /* collectmwheelfxring@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D521D51A6A700FC77B6 /* collectmwheelfxring@2x.png */; };
+		B5503D6E1D51A6A700FC77B6 /* collectmwheelrim@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D531D51A6A700FC77B6 /* collectmwheelrim@2x.png */; };
+		B5503D6F1D51A6A700FC77B6 /* collecttimerbkg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D541D51A6A700FC77B6 /* collecttimerbkg@2x.png */; };
+		B5503D701D51A6A700FC77B6 /* CommonLobby-iPh6.json in Resources */ = {isa = PBXBuildFile; fileRef = B5503D551D51A6A700FC77B6 /* CommonLobby-iPh6.json */; };
+		B5503D711D51A6A700FC77B6 /* lowerbuttonbezel@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D561D51A6A700FC77B6 /* lowerbuttonbezel@2x.png */; };
+		B5503D721D51A6A700FC77B6 /* machinecarouseldivider@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D571D51A6A700FC77B6 /* machinecarouseldivider@2x.png */; };
+		B5503D731D51A6A700FC77B6 /* machinecarouselgutterright@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D581D51A6A700FC77B6 /* machinecarouselgutterright@2x.png */; };
+		B5503D741D51A6A700FC77B6 /* mwheelsm@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D591D51A6A700FC77B6 /* mwheelsm@2x.png */; };
+		B5503D751D51A6A700FC77B6 /* navarrowlobby@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D5A1D51A6A700FC77B6 /* navarrowlobby@2x.png */; };
+		B5503D761D51A6A700FC77B6 /* nextbonustext@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D5B1D51A6A700FC77B6 /* nextbonustext@2x.png */; };
+		B5503D771D51A6A700FC77B6 /* reducetimebezel@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D5C1D51A6A700FC77B6 /* reducetimebezel@2x.png */; };
+		B5503D781D51A6A700FC77B6 /* reducetimebuttonbkg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D5D1D51A6A700FC77B6 /* reducetimebuttonbkg@2x.png */; };
+		B5503D791D51A6A700FC77B6 /* reducetimefxring@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D5E1D51A6A700FC77B6 /* reducetimefxring@2x.png */; };
+		B5503D7A1D51A6A700FC77B6 /* reducetimeglare@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D5F1D51A6A700FC77B6 /* reducetimeglare@2x.png */; };
+		B5503D7B1D51A6A700FC77B6 /* rewardsbuttonbkg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D601D51A6A700FC77B6 /* rewardsbuttonbkg@2x.png */; };
+		B5503D7C1D51A6A700FC77B6 /* storebuttonbezel@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D611D51A6A700FC77B6 /* storebuttonbezel@2x.png */; };
+		B5503D7D1D51A6A700FC77B6 /* storebuttonbkg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D621D51A6A700FC77B6 /* storebuttonbkg@2x.png */; };
+		B5503D7E1D51A6A700FC77B6 /* storebuttoninsetbkg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D631D51A6A700FC77B6 /* storebuttoninsetbkg@2x.png */; };
+		B5503D7F1D51A6A700FC77B6 /* tournlobbybuttonbkg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D641D51A6A700FC77B6 /* tournlobbybuttonbkg@2x.png */; };
+		B5503D841D51A6B700FC77B6 /* CommonHUD-iPh6.json in Resources */ = {isa = PBXBuildFile; fileRef = B5503D801D51A6B700FC77B6 /* CommonHUD-iPh6.json */; };
+		B5503D851D51A6B700FC77B6 /* hudbottombkgiph6@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D811D51A6B700FC77B6 /* hudbottombkgiph6@2x.png */; };
+		B5503D861D51A6B700FC77B6 /* hudtopbkgiph6@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5503D821D51A6B700FC77B6 /* hudtopbkgiph6@2x.png */; };
+		B5503D871D51A6B700FC77B6 /* texdef.json in Resources */ = {isa = PBXBuildFile; fileRef = B5503D831D51A6B700FC77B6 /* texdef.json */; };
 		B55194A41D28C2B100BDAA5D /* ComponentBitmask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B55194A21D28C2B100BDAA5D /* ComponentBitmask.cpp */; };
 		B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */; };
 		B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */; };
@@ -291,6 +322,37 @@
 		B5503D431D4EB5FD00FC77B6 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
 		B5503D451D4EBC3500FC77B6 /* EventService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EventService.cpp; sourceTree = "<group>"; };
 		B5503D461D4EBC3500FC77B6 /* EventService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventService.h; sourceTree = "<group>"; };
+		B5503D4A1D51A6A700FC77B6 /* collectbezel@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectbezel@2x.png"; path = "testPackage/commlobby/collectbezel@2x.png"; sourceTree = "<group>"; };
+		B5503D4B1D51A6A700FC77B6 /* collectbuttonbkg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectbuttonbkg@2x.png"; path = "testPackage/commlobby/collectbuttonbkg@2x.png"; sourceTree = "<group>"; };
+		B5503D4C1D51A6A700FC77B6 /* collectmeterfill@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectmeterfill@2x.png"; path = "testPackage/commlobby/collectmeterfill@2x.png"; sourceTree = "<group>"; };
+		B5503D4D1D51A6A700FC77B6 /* collectmeterfillmid@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectmeterfillmid@2x.png"; path = "testPackage/commlobby/collectmeterfillmid@2x.png"; sourceTree = "<group>"; };
+		B5503D4E1D51A6A700FC77B6 /* collectmeterfillr@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectmeterfillr@2x.png"; path = "testPackage/commlobby/collectmeterfillr@2x.png"; sourceTree = "<group>"; };
+		B5503D4F1D51A6A700FC77B6 /* collectmeterslot@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectmeterslot@2x.png"; path = "testPackage/commlobby/collectmeterslot@2x.png"; sourceTree = "<group>"; };
+		B5503D501D51A6A700FC77B6 /* collectmwheelbkg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectmwheelbkg@2x.png"; path = "testPackage/commlobby/collectmwheelbkg@2x.png"; sourceTree = "<group>"; };
+		B5503D511D51A6A700FC77B6 /* collectmwheelborder@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectmwheelborder@2x.png"; path = "testPackage/commlobby/collectmwheelborder@2x.png"; sourceTree = "<group>"; };
+		B5503D521D51A6A700FC77B6 /* collectmwheelfxring@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectmwheelfxring@2x.png"; path = "testPackage/commlobby/collectmwheelfxring@2x.png"; sourceTree = "<group>"; };
+		B5503D531D51A6A700FC77B6 /* collectmwheelrim@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collectmwheelrim@2x.png"; path = "testPackage/commlobby/collectmwheelrim@2x.png"; sourceTree = "<group>"; };
+		B5503D541D51A6A700FC77B6 /* collecttimerbkg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "collecttimerbkg@2x.png"; path = "testPackage/commlobby/collecttimerbkg@2x.png"; sourceTree = "<group>"; };
+		B5503D551D51A6A700FC77B6 /* CommonLobby-iPh6.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "CommonLobby-iPh6.json"; path = "testPackage/commlobby/CommonLobby-iPh6.json"; sourceTree = "<group>"; };
+		B5503D561D51A6A700FC77B6 /* lowerbuttonbezel@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "lowerbuttonbezel@2x.png"; path = "testPackage/commlobby/lowerbuttonbezel@2x.png"; sourceTree = "<group>"; };
+		B5503D571D51A6A700FC77B6 /* machinecarouseldivider@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "machinecarouseldivider@2x.png"; path = "testPackage/commlobby/machinecarouseldivider@2x.png"; sourceTree = "<group>"; };
+		B5503D581D51A6A700FC77B6 /* machinecarouselgutterright@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "machinecarouselgutterright@2x.png"; path = "testPackage/commlobby/machinecarouselgutterright@2x.png"; sourceTree = "<group>"; };
+		B5503D591D51A6A700FC77B6 /* mwheelsm@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "mwheelsm@2x.png"; path = "testPackage/commlobby/mwheelsm@2x.png"; sourceTree = "<group>"; };
+		B5503D5A1D51A6A700FC77B6 /* navarrowlobby@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "navarrowlobby@2x.png"; path = "testPackage/commlobby/navarrowlobby@2x.png"; sourceTree = "<group>"; };
+		B5503D5B1D51A6A700FC77B6 /* nextbonustext@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "nextbonustext@2x.png"; path = "testPackage/commlobby/nextbonustext@2x.png"; sourceTree = "<group>"; };
+		B5503D5C1D51A6A700FC77B6 /* reducetimebezel@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "reducetimebezel@2x.png"; path = "testPackage/commlobby/reducetimebezel@2x.png"; sourceTree = "<group>"; };
+		B5503D5D1D51A6A700FC77B6 /* reducetimebuttonbkg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "reducetimebuttonbkg@2x.png"; path = "testPackage/commlobby/reducetimebuttonbkg@2x.png"; sourceTree = "<group>"; };
+		B5503D5E1D51A6A700FC77B6 /* reducetimefxring@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "reducetimefxring@2x.png"; path = "testPackage/commlobby/reducetimefxring@2x.png"; sourceTree = "<group>"; };
+		B5503D5F1D51A6A700FC77B6 /* reducetimeglare@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "reducetimeglare@2x.png"; path = "testPackage/commlobby/reducetimeglare@2x.png"; sourceTree = "<group>"; };
+		B5503D601D51A6A700FC77B6 /* rewardsbuttonbkg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "rewardsbuttonbkg@2x.png"; path = "testPackage/commlobby/rewardsbuttonbkg@2x.png"; sourceTree = "<group>"; };
+		B5503D611D51A6A700FC77B6 /* storebuttonbezel@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "storebuttonbezel@2x.png"; path = "testPackage/commlobby/storebuttonbezel@2x.png"; sourceTree = "<group>"; };
+		B5503D621D51A6A700FC77B6 /* storebuttonbkg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "storebuttonbkg@2x.png"; path = "testPackage/commlobby/storebuttonbkg@2x.png"; sourceTree = "<group>"; };
+		B5503D631D51A6A700FC77B6 /* storebuttoninsetbkg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "storebuttoninsetbkg@2x.png"; path = "testPackage/commlobby/storebuttoninsetbkg@2x.png"; sourceTree = "<group>"; };
+		B5503D641D51A6A700FC77B6 /* tournlobbybuttonbkg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "tournlobbybuttonbkg@2x.png"; path = "testPackage/commlobby/tournlobbybuttonbkg@2x.png"; sourceTree = "<group>"; };
+		B5503D801D51A6B700FC77B6 /* CommonHUD-iPh6.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "CommonHUD-iPh6.json"; path = "testPackage/commonhud/CommonHUD-iPh6.json"; sourceTree = "<group>"; };
+		B5503D811D51A6B700FC77B6 /* hudbottombkgiph6@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hudbottombkgiph6@2x.png"; path = "testPackage/commonhud/hudbottombkgiph6@2x.png"; sourceTree = "<group>"; };
+		B5503D821D51A6B700FC77B6 /* hudtopbkgiph6@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hudtopbkgiph6@2x.png"; path = "testPackage/commonhud/hudtopbkgiph6@2x.png"; sourceTree = "<group>"; };
+		B5503D831D51A6B700FC77B6 /* texdef.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = texdef.json; path = testPackage/commonhud/texdef.json; sourceTree = "<group>"; };
 		B55194A21D28C2B100BDAA5D /* ComponentBitmask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComponentBitmask.cpp; sourceTree = "<group>"; };
 		B55194A31D28C2B100BDAA5D /* ComponentBitmask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComponentBitmask.h; sourceTree = "<group>"; };
 		B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureVertex.glsl; path = shaders/ColorMatrixTextureVertex.glsl; sourceTree = "<group>"; };
@@ -671,6 +733,51 @@
 			name = animation;
 			sourceTree = "<group>";
 		};
+		B5503D481D51A68D00FC77B6 /* commonhud */ = {
+			isa = PBXGroup;
+			children = (
+				B5503D801D51A6B700FC77B6 /* CommonHUD-iPh6.json */,
+				B5503D811D51A6B700FC77B6 /* hudbottombkgiph6@2x.png */,
+				B5503D821D51A6B700FC77B6 /* hudtopbkgiph6@2x.png */,
+				B5503D831D51A6B700FC77B6 /* texdef.json */,
+			);
+			name = commonhud;
+			sourceTree = "<group>";
+		};
+		B5503D491D51A69500FC77B6 /* commonlobby */ = {
+			isa = PBXGroup;
+			children = (
+				B5503D4A1D51A6A700FC77B6 /* collectbezel@2x.png */,
+				B5503D4B1D51A6A700FC77B6 /* collectbuttonbkg@2x.png */,
+				B5503D4C1D51A6A700FC77B6 /* collectmeterfill@2x.png */,
+				B5503D4D1D51A6A700FC77B6 /* collectmeterfillmid@2x.png */,
+				B5503D4E1D51A6A700FC77B6 /* collectmeterfillr@2x.png */,
+				B5503D4F1D51A6A700FC77B6 /* collectmeterslot@2x.png */,
+				B5503D501D51A6A700FC77B6 /* collectmwheelbkg@2x.png */,
+				B5503D511D51A6A700FC77B6 /* collectmwheelborder@2x.png */,
+				B5503D521D51A6A700FC77B6 /* collectmwheelfxring@2x.png */,
+				B5503D531D51A6A700FC77B6 /* collectmwheelrim@2x.png */,
+				B5503D541D51A6A700FC77B6 /* collecttimerbkg@2x.png */,
+				B5503D551D51A6A700FC77B6 /* CommonLobby-iPh6.json */,
+				B5503D561D51A6A700FC77B6 /* lowerbuttonbezel@2x.png */,
+				B5503D571D51A6A700FC77B6 /* machinecarouseldivider@2x.png */,
+				B5503D581D51A6A700FC77B6 /* machinecarouselgutterright@2x.png */,
+				B5503D591D51A6A700FC77B6 /* mwheelsm@2x.png */,
+				B5503D5A1D51A6A700FC77B6 /* navarrowlobby@2x.png */,
+				B5503D5B1D51A6A700FC77B6 /* nextbonustext@2x.png */,
+				B5503D5C1D51A6A700FC77B6 /* reducetimebezel@2x.png */,
+				B5503D5D1D51A6A700FC77B6 /* reducetimebuttonbkg@2x.png */,
+				B5503D5E1D51A6A700FC77B6 /* reducetimefxring@2x.png */,
+				B5503D5F1D51A6A700FC77B6 /* reducetimeglare@2x.png */,
+				B5503D601D51A6A700FC77B6 /* rewardsbuttonbkg@2x.png */,
+				B5503D611D51A6A700FC77B6 /* storebuttonbezel@2x.png */,
+				B5503D621D51A6A700FC77B6 /* storebuttonbkg@2x.png */,
+				B5503D631D51A6A700FC77B6 /* storebuttoninsetbkg@2x.png */,
+				B5503D641D51A6A700FC77B6 /* tournlobbybuttonbkg@2x.png */,
+			);
+			name = commonlobby;
+			sourceTree = "<group>";
+		};
 		B571F1741C928BA5007F5A90 /* opengles2 */ = {
 			isa = PBXGroup;
 			children = (
@@ -706,6 +813,8 @@
 			isa = PBXGroup;
 			children = (
 				B5F1F2C01D2CCC920034E1B7 /* common */,
+				B5503D481D51A68D00FC77B6 /* commonhud */,
+				B5503D491D51A69500FC77B6 /* commonlobby */,
 				B5F1F2C11D2CCC970034E1B7 /* lobby */,
 			);
 			name = testPackages;
@@ -899,6 +1008,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5503D721D51A6A700FC77B6 /* machinecarouseldivider@2x.png in Resources */,
+				B5503D6A1D51A6A700FC77B6 /* collectmeterslot@2x.png in Resources */,
 				B5F1F2D81D2CCCAA0034E1B7 /* buybuttonbkg@2x.png in Resources */,
 				B5F1F2DB1D2CCCAA0034E1B7 /* cashbkg@2x.png in Resources */,
 				B525E3E61C895FCC00C691C0 /* item_powerup_fish.png in Resources */,
@@ -907,25 +1018,54 @@
 				B5F1F2D71D2CCCAA0034E1B7 /* buybuttonbezel@2x.png in Resources */,
 				B5F1F2E51D2CCCAA0034E1B7 /* settingsbuttonbkg@2x.png in Resources */,
 				B525E3E01C895A3000C691C0 /* BenGameEngineBundle.bundle in Resources */,
+				B5503D7E1D51A6A700FC77B6 /* storebuttoninsetbkg@2x.png in Resources */,
+				B5503D701D51A6A700FC77B6 /* CommonLobby-iPh6.json in Resources */,
+				B5503D651D51A6A700FC77B6 /* collectbezel@2x.png in Resources */,
 				B525E37D1C8957A700C691C0 /* LaunchScreen.storyboard in Resources */,
 				B5F1F2DA1D2CCCAA0034E1B7 /* buyglare@2x.png in Resources */,
 				B5F1F2E61D2CCCAA0034E1B7 /* settingsbuttoninsetbkg@2x.png in Resources */,
 				B5F1F2E71D2CCCAA0034E1B7 /* settingsdisabled@2x.png in Resources */,
 				B5F1F2DF1D2CCCAA0034E1B7 /* infobezel@2x.png in Resources */,
+				B5503D6E1D51A6A700FC77B6 /* collectmwheelrim@2x.png in Resources */,
 				B5F1F2D91D2CCCAA0034E1B7 /* buybuttoninsetbkg@2x.png in Resources */,
+				B5503D761D51A6A700FC77B6 /* nextbonustext@2x.png in Resources */,
 				B5F1F2E31D2CCCAA0034E1B7 /* salelabel@2x.png in Resources */,
+				B5503D741D51A6A700FC77B6 /* mwheelsm@2x.png in Resources */,
+				B5503D781D51A6A700FC77B6 /* reducetimebuttonbkg@2x.png in Resources */,
 				B5F1F2E81D2CCCAA0034E1B7 /* xpbkg@2x.png in Resources */,
 				B5F1F2F31D2CCD2B0034E1B7 /* machinecarouseldivider@2x.png in Resources */,
+				B5503D791D51A6A700FC77B6 /* reducetimefxring@2x.png in Resources */,
+				B5503D731D51A6A700FC77B6 /* machinecarouselgutterright@2x.png in Resources */,
 				B5F1F2E11D2CCCAA0034E1B7 /* infodisabled@2x.png in Resources */,
+				B5503D861D51A6B700FC77B6 /* hudtopbkgiph6@2x.png in Resources */,
+				B5503D841D51A6B700FC77B6 /* CommonHUD-iPh6.json in Resources */,
+				B5503D751D51A6A700FC77B6 /* navarrowlobby@2x.png in Resources */,
+				B5503D7A1D51A6A700FC77B6 /* reducetimeglare@2x.png in Resources */,
 				B5F1F2F01D2CCD2B0034E1B7 /* bonusanimslug@2x.png in Resources */,
 				B5F1F2DD1D2CCCAA0034E1B7 /* Common-iPh6.json in Resources */,
 				B525E37A1C8957A700C691C0 /* Assets.xcassets in Resources */,
 				B525E3781C8957A700C691C0 /* Main.storyboard in Resources */,
+				B5503D7C1D51A6A700FC77B6 /* storebuttonbezel@2x.png in Resources */,
 				B5F1F2E41D2CCCAA0034E1B7 /* settingsbuttonbezel@2x.png in Resources */,
 				B5F1F2DC1D2CCCAA0034E1B7 /* coinicon@2x.png in Resources */,
+				B5503D7B1D51A6A700FC77B6 /* rewardsbuttonbkg@2x.png in Resources */,
 				B5F1F2E91D2CCCAA0034E1B7 /* xpfill@2x.png in Resources */,
+				B5503D7D1D51A6A700FC77B6 /* storebuttonbkg@2x.png in Resources */,
+				B5503D661D51A6A700FC77B6 /* collectbuttonbkg@2x.png in Resources */,
 				B5F1F2EB1D2CCCAA0034E1B7 /* xpicon@2x.png in Resources */,
+				B5503D6D1D51A6A700FC77B6 /* collectmwheelfxring@2x.png in Resources */,
+				B5503D681D51A6A700FC77B6 /* collectmeterfillmid@2x.png in Resources */,
+				B5503D6F1D51A6A700FC77B6 /* collecttimerbkg@2x.png in Resources */,
+				B5503D6B1D51A6A700FC77B6 /* collectmwheelbkg@2x.png in Resources */,
+				B5503D691D51A6A700FC77B6 /* collectmeterfillr@2x.png in Resources */,
+				B5503D6C1D51A6A700FC77B6 /* collectmwheelborder@2x.png in Resources */,
+				B5503D871D51A6B700FC77B6 /* texdef.json in Resources */,
+				B5503D7F1D51A6A700FC77B6 /* tournlobbybuttonbkg@2x.png in Resources */,
+				B5503D771D51A6A700FC77B6 /* reducetimebezel@2x.png in Resources */,
+				B5503D671D51A6A700FC77B6 /* collectmeterfill@2x.png in Resources */,
+				B5503D851D51A6B700FC77B6 /* hudbottombkgiph6@2x.png in Resources */,
 				B5F1F2E21D2CCCAA0034E1B7 /* salebkg@2x.png in Resources */,
+				B5503D711D51A6A700FC77B6 /* lowerbuttonbezel@2x.png in Resources */,
 				B5F1F2E01D2CCCAA0034E1B7 /* infobuttonbkg@2x.png in Resources */,
 				B5F1F2DE1D2CCCAA0034E1B7 /* genericunknownphoto@2x.png in Resources */,
 				B571F1771C93B604007F5A90 /* sample.png in Resources */,

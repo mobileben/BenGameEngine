@@ -50,6 +50,8 @@ void BGE::ScenePackage::link() {
     textureIndices_ = FixedArray<int32_t>(textures_.size());
     textureRefs_ = FixedArray<TextureReference>(textures_.size());
     
+    referenceTypes_.clear();
+    
     for (auto i=0;i<textures_.size();i++) {
         TextureReferenceIntermediate *texRefInt = textures_.addressOf(i);
         const char**name = textureNames_.addressOf(i);
@@ -62,6 +64,7 @@ void BGE::ScenePackage::link() {
         *index = i;
         texRef->name = resolvedName;
         texRef->texture = textureService->textureWithName(resolvedName);
+        referenceTypes_[resolvedName] = GfxReferenceTypeSprite;
     }
 
     // Link TextReference
@@ -92,6 +95,7 @@ void BGE::ScenePackage::link() {
         textRef->alignment = textRefInt->alignment;
         
         textRef->fontHandle = fontService->getFontHandle(fontName, textRefInt->size);
+        referenceTypes_[resolvedName] = GfxReferenceTypeText;
     }
     
     // Link BoundsRefs
@@ -202,6 +206,7 @@ void BGE::ScenePackage::link() {
         
         animSeqRef->channels = animChannelRefs_.addressOf(animSeqRefInt->channels);
         animSeqRef->bounds = boundsRefs_.addressOf(animSeqRefInt->bounds);
+        referenceTypes_[resolvedName] = GfxReferenceTypeAnimationSequence;
     }
     
     // Link Placements
@@ -223,6 +228,7 @@ void BGE::ScenePackage::link() {
         placement->name = resolvedName;
         placement->width = placementInt->width;
         placement->height = placementInt->height;
+        referenceTypes_[resolvedName] = GfxReferenceTypePlacement;
     }
     
     // Link Masks
@@ -244,6 +250,7 @@ void BGE::ScenePackage::link() {
         mask->name = resolvedName;
         mask->width = maskInt->width;
         mask->height = maskInt->height;
+        referenceTypes_[resolvedName] = GfxReferenceTypeMask;
     }
     
     // Link Texture Masks
@@ -264,6 +271,7 @@ void BGE::ScenePackage::link() {
         *index = i;
         mask->name = resolvedName;
         mask->texture = getTextureReference(resolvedName);
+        referenceTypes_[resolvedName] = GfxReferenceTypeTextureMask;
     }
     
     // Link Button States
@@ -299,6 +307,7 @@ void BGE::ScenePackage::link() {
         button->name = resolvedName;
         button->states = buttonStateRefs_.addressOf(buttonInt->states);
         button->numStates = buttonInt->numStates;
+        referenceTypes_[resolvedName] = GfxReferenceTypeButton;
     }
     
     // Link External References
@@ -320,6 +329,7 @@ void BGE::ScenePackage::link() {
         *index = i;
         externalPackage->name = resolvedName;
         externalPackage->externalPackage = resolvedExternal;
+        referenceTypes_[resolvedName] = GfxReferenceTypeExternalReference;
     }
     
     // Link Auto Display Elements
@@ -329,9 +339,14 @@ void BGE::ScenePackage::link() {
         AutoDisplayElementIntermediate *elemInt = autoDisplayElements_.addressOf(i);
         AutoDisplayElementReference *elem = autoDisplayElementRefs_.addressOf(i);
         const char *resolvedName = elemInt->name + strings_.baseAddress();
-
+        const char *referenceResolvedName = elemInt->reference + strings_.baseAddress();
+        
         elem->name = resolvedName;
+        elem->reference = referenceResolvedName;
+        elem->referenceType = elemInt->referenceType;
         elem->flags = elemInt->flags;
+        elem->hidden = elemInt->hidden;
+        
         if (elemInt->position != NullPtrIndex) {
             elem->position = elemInt->position + vector2s_.baseAddress();
         } else {
@@ -343,7 +358,7 @@ void BGE::ScenePackage::link() {
             elem->scale = nullptr;
         }
         elem->rotation = elemInt->rotation;
-        elem->matrix = nullptr;  // TODO
+        elem->matrix = nullptr;  // TODO default matrix and default color matrix and default color transform
         if (elemInt->colorMatrix != NullPtrIndex) {
             elem->colorMatrix = elemInt->colorMatrix + colorMatrices_.baseAddress();
         } else {
@@ -804,8 +819,8 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
         
         if (name) {
             placement->name = stringBuilder.add(name);
-            placement->width = [dict[@"width"] floatValue];
-            placement->height = [dict[@"height"] floatValue];
+            placement->width = [dict[@"width"] floatValue] * platformScale;
+            placement->height = [dict[@"height"] floatValue] * platformScale;
         }
     }
     
@@ -876,8 +891,8 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
         
         if (name) {
             mask->name = stringBuilder.add(name);
-            mask->width = [dict[@"width"] floatValue];
-            mask->height = [dict[@"height"] floatValue];
+            mask->width = [dict[@"width"] floatValue] * platformScale;
+            mask->height = [dict[@"height"] floatValue] * platformScale;
         }
     }
 
@@ -950,8 +965,8 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
         if (dict[@"position"]) {
             Vector2 pos;
             
-            pos.x = [dict[@"position"][@"x"] floatValue];
-            pos.y = [dict[@"position"][@"y"] floatValue];
+            pos.x = [dict[@"position"][@"x"] floatValue] * platformScale;
+            pos.y = [dict[@"position"][@"y"] floatValue] * platformScale;
             
             elem->position = vector2Builder.add(pos);
         } else {
@@ -964,11 +979,16 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             scale.x = [dict[@"scale"][@"x"] floatValue];
             scale.y = [dict[@"scale"][@"y"] floatValue];
             
-            elem->position = vector2Builder.add(scale);
+            elem->scale = vector2Builder.add(scale);
         } else {
             elem->scale = defaultScaleIndex_;
         }
         
+        if (dict[@"hidden"]) {
+            elem->hidden = [dict[@"hidden"] boolValue];
+        } else {
+            elem->hidden = false;
+        }
         elem->rotation = [dict[@"rotation"] floatValue];
         elem->flags = [dict[@"flags"] unsignedIntValue];
     }
@@ -1135,13 +1155,38 @@ BGE::AnimationSequenceReference *BGE::ScenePackage::getAnimationSequenceReferenc
     return nullptr;
 }
 
+BGE::ExternalPackageReference *BGE::ScenePackage::getExternalReference(std::string name) {
+    const char *cstr = name.c_str();
+    
+    // TODO: We will sort the names, then binary search the names here later
+    const char **names = externalPackageNames_.baseAddress();
+    
+    for (auto i=0;i<externalPackageNames_.size();i++) {
+        if (!strcmp(names[i], cstr)) {
+            return externalPackageRefs_.addressOf(*externalPackageIndices_.addressOf(i));
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::GfxReferenceType BGE::ScenePackage::getReferenceType(std::string name) {
+    auto it = referenceTypes_.find(name);
+    
+    if (it != referenceTypes_.end()) {
+        return it->second;
+    } else {
+        return GfxReferenceTypeUnknown;
+    }
+}
+
 BGE::GfxReferenceType BGE::ScenePackage::referenceTypeForString(std::string type) {
     GfxReferenceType value;
     
     if (type == "button") {
         value = GfxReferenceTypeButton;
-    } else if (type == "external") {
-        value = GfxReferenceTypeExternalPackage;
+    } else if (type == "externalReference") {
+        value = GfxReferenceTypeExternalReference;
     } else if (type == "mask") {
         value = GfxReferenceTypeMask;
     } else if (type == "placement") {

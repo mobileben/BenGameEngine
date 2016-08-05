@@ -83,6 +83,14 @@ namespace BGE {
         Space *getSpace() const;
         SpaceHandle getSpaceHandle() const { return spaceHandle_; }
         
+        bool operator==(const GameObject &other) const {
+            return getInstanceId() == other.getInstanceId();
+        }
+        
+        bool operator!=(const GameObject &other) const {
+            return getInstanceId() != other.getInstanceId();
+        }
+        
     protected:
         
 #ifdef NOT_YET

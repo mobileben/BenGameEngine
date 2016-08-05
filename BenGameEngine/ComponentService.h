@@ -97,6 +97,7 @@ namespace BGE {
             
             if (it != components_.end()) {
                 // We already have a vector of type T
+                it->second.push_back(component);
             } else {
                 ComponentVector components = { component };
                 components_[index] = components;

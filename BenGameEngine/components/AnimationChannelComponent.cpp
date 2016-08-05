@@ -109,6 +109,10 @@ void BGE::AnimationChannelComponent::updateReference() {
             }
                 break;
                 
+            case GfxReferenceTypePlacement:
+                // No-op
+                break;
+                
             default:
                 assert(false);
                 break;

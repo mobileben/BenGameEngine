@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 #include "Service.h"
 #include "GameObject.h"
 #include <type_traits>
@@ -22,6 +23,7 @@ namespace BGE {
     class GameObjectService : public Service {
     public:
         using GameObjectMap = std::unordered_map<ObjectId, std::shared_ptr<GameObject>>;
+        using GameObjectVector = std::vector<std::shared_ptr<GameObject>>;
         
         GameObjectService();
         ~GameObjectService();
@@ -47,7 +49,8 @@ namespace BGE {
             std::shared_ptr<T> object = GameObject::create(objId, std::forward<Args>(args)...);
             
             object->setSpaceHandle(spaceHandle_);
-            objects_[objId] = object;
+            objects_.push_back(object);
+            mappedObjects_[objId] = object;
             
             return object;
         }
@@ -56,7 +59,7 @@ namespace BGE {
         void removeObject(ObjectId objId);
         void removeObject(std::string name);
         
-        const GameObjectMap& getGameObjects() const { return objects_; }
+        const GameObjectVector& getGameObjects() const { return objects_; }
         
         std::shared_ptr<GameObject> find(std::shared_ptr<GameObject> object);
         std::shared_ptr<GameObject> find(ObjectId objId);
@@ -65,8 +68,9 @@ namespace BGE {
     private:
         friend Space;
         
-        SpaceHandle   spaceHandle_;
-        GameObjectMap objects_;
+        SpaceHandle         spaceHandle_;
+        GameObjectMap       mappedObjects_;
+        GameObjectVector    objects_;
     };
 }
 

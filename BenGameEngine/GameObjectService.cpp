@@ -23,15 +23,22 @@ void BGE::GameObjectService::removeObject(std::shared_ptr<GameObject> object) {
 }
 
 void BGE::GameObjectService::removeObject(ObjectId objId) {
-    GameObjectMap::iterator it = objects_.find(objId);
+    GameObjectMap::iterator it = mappedObjects_.find(objId);
     
-    if (it != objects_.end()) {
-        objects_.erase(objId);
+    if (it != mappedObjects_.end()) {
+        mappedObjects_.erase(objId);
+    }
+    
+    for (std::vector<std::shared_ptr<GameObject>>::iterator obj = objects_.begin();obj != objects_.end();obj++) {
+        if ((*obj)->getInstanceId() == objId) {
+            objects_.erase(obj);
+            break;
+        }
     }
 }
 
 void BGE::GameObjectService::removeObject(std::string name) {
-    for (auto obj : objects_) {
+    for (auto obj : mappedObjects_) {
         if (obj.second->getName() == name) {
             removeObject(obj.second->getInstanceId());
             return;
@@ -48,7 +55,7 @@ std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(std::shared_ptr<Ga
 }
 
 std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(ObjectId objId) {
-    GameObjectMap::iterator it = objects_.find(objId);
+    GameObjectMap::iterator it = mappedObjects_.find(objId);
     
     return it->second;
 }
@@ -56,7 +63,7 @@ std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(ObjectId objId) {
 std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(std::string name) {
     std::shared_ptr<GameObject> found;
     
-    for (auto kv : objects_) {
+    for (auto kv : mappedObjects_) {
         if (kv.second->getName() == name) {
             found = kv.second;
             break;

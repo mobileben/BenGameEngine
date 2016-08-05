@@ -145,6 +145,58 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createButton(std::string name, Scen
     return nullptr;
 }
 
+std::shared_ptr<BGE::GameObject> BGE::Space::createExternalReference(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
+    ExternalPackageReference *extRef;
+    
+    if (package) {
+        extRef = package->getExternalReference(name);
+    } else {
+        extRef = Game::getInstance()->getScenePackageService()->getExternalReference(name);
+    }
+    
+    if (extRef) {
+        auto extPackage = Game::getInstance()->getScenePackageService()->getScenePackage(extRef->externalPackage);
+
+        if (extPackage) {
+            std::string refName = extRef->name;
+            auto type = extPackage->getReferenceType(refName);
+            
+            printf("XXXXX %s/%d\n", refName.c_str(), type);
+            
+            switch (type) {
+                case GfxReferenceTypeAnimationSequence:
+                    return createAnimSequence(refName);
+                    
+                case GfxReferenceTypeButton:
+                    return createButton(refName);
+                    
+                case GfxReferenceTypeExternalReference:
+                    return createExternalReference(refName);
+                    
+                case GfxReferenceTypeMask:
+                    return createMask(refName);
+                    
+                case GfxReferenceTypePlacement:
+                    return createPlacement(refName);
+                    
+                case GfxReferenceTypeSprite:
+                    return createSprite(refName);
+                    
+                case GfxReferenceTypeText:
+                    return createText(refName);
+                    
+                case GfxReferenceTypeTextureMask:
+                default:
+                    assert(false);
+                break;
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
 std::shared_ptr<BGE::GameObject> BGE::Space::createMask(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     MaskReference *maskRef;
@@ -273,25 +325,6 @@ void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, Scen
         for (auto i=0;i<num;i++) {
             auto elem = &autoDisplayList[i];
             std::shared_ptr<GameObject> obj;
-            auto xform = createComponent<TransformComponent>();
-            
-            if (elem->position) {
-                xform->setPosition(*elem->position);
-            }
-            
-            if (elem->scale) {
-                xform->setScale(*elem->scale);
-            }
-            
-            xform->setRotation(elem->rotation);
-            
-            if (elem->colorMatrix) {
-                
-            }
-            
-            if (elem->colorTransform) {
-                
-            }
             
             switch (elem->referenceType) {
                 case GfxReferenceTypeAnimationSequence:
@@ -302,7 +335,8 @@ void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, Scen
                     obj = createButton(elem->reference);
                     break;
                 
-                case GfxReferenceTypeExternalPackage:
+                case GfxReferenceTypeExternalReference:
+                    obj = createExternalReference(elem->reference);
                     break;
                     
                 case GfxReferenceTypeMask:
@@ -329,6 +363,33 @@ void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, Scen
                     break;
             }
             
+            if (obj) {
+                auto xform = obj->getComponent<TransformComponent>();
+                
+                if (elem->position) {
+                    xform->setPosition(*elem->position);
+                    printf("XXXX %s %f %f\n", obj->getName().c_str(), elem->position->x, elem->position->y);
+                }
+                
+                if (elem->scale) {
+                    xform->setScale(*elem->scale);
+                }
+                
+                xform->setRotation(elem->rotation);
+                
+                if (elem->colorMatrix) {
+                    
+                }
+                
+                if (elem->colorTransform) {
+                    
+                }
+                
+                if (elem->hidden) {
+                    xform->setVisibility(false);
+                }
+            }
+
             createdObjects[elem->referenceType].push_back(obj);
             rootObjs.push_back(obj);
         }
@@ -348,7 +409,7 @@ void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, Scen
                         callback = delegate.buttonCreatedHandler;
                         break;
                         
-                    case GfxReferenceTypeExternalPackage:
+                    case GfxReferenceTypeExternalReference:
                         break;
                         
                     case GfxReferenceTypeMask:
@@ -384,7 +445,18 @@ void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, Scen
             }
         }
         
+        std::shared_ptr<TransformComponent> rootXform;
+        
+        if (root) {
+            rootXform = root->getComponent<TransformComponent>();
+        }
+        
         for (auto obj : rootObjs) {
+            if (rootXform) {
+                auto xform = obj->getComponent<TransformComponent>();
+                rootXform->addChild(xform);
+            }
+            
             obj->setActive(true);
         }
 

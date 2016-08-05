@@ -109,7 +109,7 @@ namespace BGE {
     typedef enum : uint32_t {
         GfxReferenceTypeUnknown = 0,
         GfxReferenceTypeButton,
-        GfxReferenceTypeExternalPackage,
+        GfxReferenceTypeExternalReference,
         GfxReferenceTypeMask,
         GfxReferenceTypePlacement,
         GfxReferenceTypeSprite,
@@ -241,6 +241,7 @@ namespace BGE {
         int32_t             colorMatrix;
         int32_t             colorTransform;
         int32_t             reference;
+        bool                hidden;
         GfxReferenceType    referenceType;
     };
     
@@ -251,6 +252,7 @@ namespace BGE {
         Vector2             *position;
         Vector2             *scale;
         float               rotation;
+        bool                hidden;
         Matrix4             *matrix;
         ColorMatrix         *colorMatrix;
         ColorTransform      *colorTransform;

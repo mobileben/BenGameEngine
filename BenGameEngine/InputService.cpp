@@ -45,8 +45,29 @@ void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view)
         input->touch = touch;
         input->type = type;
         input->tapCount = (uint32_t) [touch tapCount];
-        input->x = p.x;
-        input->y = p.y;
+        
+        // Convert to proper coordinates if needed
+        std::shared_ptr<RenderWindow> window = Game::getInstance()->getRenderService()->getRenderWindow();
+
+        switch (Game::getInstance()->getRenderService()->getCoordinateSystem2D()) {
+            case Render2DCoordinateSystem::Traditional:
+                input->x = p.x;
+                input->y = p.y;
+                break;
+            case Render2DCoordinateSystem::TraditionalCentered:
+                input->x = p.x - (window->getWidth() * window->getContentScaleFactor() / 2.0);
+                input->y = p.y - (window->getHeight() * window->getContentScaleFactor() / 2.0);
+                break;
+            case Render2DCoordinateSystem::OpenGL:
+                input->x = p.x;
+                input->y = (window->getHeight() * window->getContentScaleFactor()) - p.y;
+                break;
+            case Render2DCoordinateSystem::OpenGLCentered:
+                input->x = p.x - (window->getWidth() * window->getContentScaleFactor() / 2.0);
+                input->y = (window->getHeight() * window->getContentScaleFactor() / 2.0) - p.y;
+                break;
+        }
+        
         
         NSLog(@"XXXXX Touch %f %f", input->x, input->y);
         inputs_.push_back(input);

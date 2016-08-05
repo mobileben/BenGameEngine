@@ -430,7 +430,6 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, Color &color
                 break;
         }
         
-        bool inverted = Game::getInstance()->getRenderService()->hasInvertedYAxis();
         float deltaY = 0;
         
         switch (vertAlignment) {
@@ -448,10 +447,6 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, Color &color
                 
             default:
                 break;
-        }
-        
-        if (inverted) {
-            deltaY = -deltaY;
         }
         
         y -= deltaY;
