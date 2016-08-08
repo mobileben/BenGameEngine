@@ -32,7 +32,7 @@ void BGE::TextureBase::releaseCurrentTexture() {
         xys_[i].y = 0;
     }
 }
-void BGE::TextureBase::updateUVs() {
+void BGE::TextureBase::updateUVs(bool rotated) {
     /*
      Defaults to OpenGL setup
      
@@ -47,15 +47,26 @@ void BGE::TextureBase::updateUVs() {
      3--------2
      
      */
-    uvs_[0].x = 0;
-    uvs_[0].y = 0;
-    uvs_[1].x = 1;
-    uvs_[1].y = 0;
-    uvs_[2].x = 1;
-    uvs_[2].y = 1;
-    uvs_[3].x = 0;
-    uvs_[3].y = 1;
-
+    
+    if (rotated) {
+        uvs_[3].x = 0;
+        uvs_[3].y = 0;
+        uvs_[0].x = 1;
+        uvs_[0].y = 0;
+        uvs_[1].x = 1;
+        uvs_[1].y = 1;
+        uvs_[2].x = 0;
+        uvs_[2].y = 1;
+    } else {
+        uvs_[0].x = 0;
+        uvs_[0].y = 0;
+        uvs_[1].x = 1;
+        uvs_[1].y = 0;
+        uvs_[2].x = 1;
+        uvs_[2].y = 1;
+        uvs_[3].x = 0;
+        uvs_[3].y = 1;
+    }
 }
 
 void BGE::TextureBase::updateXYs() {

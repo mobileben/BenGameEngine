@@ -216,9 +216,9 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                     int x = 0, y = 0;
                     unsigned char *dest;
                     unsigned char *currBuffer;
-                    BGESubTextureDef subTexDef;
+                    SubTextureDef subTexDef;
                     FontGlyphDef glyphDefs[NumSupportedCharacters];
-                    std::map<std::string, BGESubTextureDef> subTexDefs;
+                    std::vector<SubTextureDef> subTexDefs;
                     std::string fontKeyBase = FontService::fontAsKey(getName(), pixelSize_) + "_";
                     
                     memset(atlasBuffer, 0, atlasW * atlasH);
@@ -236,6 +236,8 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                             
                             currBuffer = currBitmap->buffer;
                             
+                            // We want the key to use the proper extended ASCII value, so add InitialSupportedCharacterOffset
+                            subTexDef.name = fontKeyBase + std::to_string(index + InitialSupportedCharacterOffset);
                             subTexDef.x = x;
                             subTexDef.y = y;
                             
@@ -257,10 +259,9 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                                 subTexDef.height = 0;
                             }
                             
-                            // We want the key to use the proper extended ASCII value, so add InitialSupportedCharacterOffset
-                            std::string key = fontKeyBase + std::to_string(index + InitialSupportedCharacterOffset);
+                            subTexDef.rotated = false;
                             
-                            subTexDefs[key] = subTexDef;
+                            subTexDefs.push_back(subTexDef);
                         }
                     }
                     

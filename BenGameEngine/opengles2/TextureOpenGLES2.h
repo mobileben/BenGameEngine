@@ -28,7 +28,7 @@ namespace BGE {
         GLenum getTarget() const;
         
         void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Texture>, std::shared_ptr<Error>)> callback);
-        std::shared_ptr<Error> createSubTexture(std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+        std::shared_ptr<Error> createSubTexture(std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated=false);
         
     private:
         friend class TextureService;

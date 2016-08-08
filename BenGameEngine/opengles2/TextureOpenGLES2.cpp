@@ -106,7 +106,7 @@ void BGE::TextureOpenGLES2::createFromBuffer(void *buffer, TextureFormat format,
     }
 }
 
-std::shared_ptr<BGE::Error> BGE::TextureOpenGLES2::createSubTexture(std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
+std::shared_ptr<BGE::Error> BGE::TextureOpenGLES2::createSubTexture(std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated) {
     releaseCurrentTexture();
     
     std::shared_ptr<Error> error;
@@ -123,13 +123,19 @@ std::shared_ptr<BGE::Error> BGE::TextureOpenGLES2::createSubTexture(std::shared_
             
             x_ = x;
             y_ = y;
-            width_ = width;
-            height_ = height;
+            
+            if (rotated) {
+                width_ = height;
+                height_ = width;
+            } else {
+                width_ = width;
+                height_ = height;
+            }
             
             hwId_ = oglAtlas->getHWTextureId();
             target_ = oglAtlas->getTarget();
             
-            updateUVs();
+            updateUVs(rotated);
             updateXYs();
             
             NSLog(@"Created Subtexture %s", getName().c_str());

@@ -66,7 +66,7 @@ void BGE::ScenePackage::link() {
         texRef->texture = textureService->textureWithName(resolvedName);
         referenceTypes_[resolvedName] = GfxReferenceTypeSprite;
     }
-
+    
     // Link TextReference
     std::shared_ptr<FontService> fontService = Game::getInstance()->getFontService();
     textNames_ = FixedArray<const char*>(text_.size());
@@ -382,6 +382,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
     float platformScale = 2.0;
     
     // Textures
+    NSArray *subtextures = jsonDict[@"subtextures"];
     NSArray *textures = jsonDict[@"textures"];
     StringArrayBuilder stringBuilder ;
     ArrayBuilder<TextureReferenceIntermediate, TextureReferenceIntermediate> texIntBuilder;
@@ -415,7 +416,8 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
     defaultPositionIndex_ = vector2Builder.add(Vector2{0, 0});
     defaultScaleIndex_ = vector2Builder.add(Vector2{1, 1});
     
-    texIntBuilder.resize((int32_t) textures.count);
+    // TextureReferenceIntermediate total count are all textures and subTextures
+    texIntBuilder.resize((int32_t) (textures.count + subtextures.count));
     
     for (int32_t index=0;index<textures.count;index++) {
         NSDictionary *texDict = textures[index];
@@ -437,13 +439,32 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             
             if (filename) {
                 textureQueue_.push_back(std::make_pair<std::string, std::string>(name, [filename UTF8String]));
-                Game::getInstance()->getTextureService()->namedTextureFromFile(name, [filename UTF8String], [texRef, name](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
-                    NSLog(@"%s: texture %x", name, texture.get());
-                    
-                    //texRef->texture = texture.get();
-                });
             }
         }
+    }
+    
+    // Subtextures
+    for (auto index=0;index<subtextures.count;index++) {
+        NSDictionary *subTexDict = subtextures[index];
+        
+        SubTextureDef subTexDef;
+        TextureReferenceIntermediate *texRef = texIntBuilder.addressOf((int) (textures.count + index));
+        
+        subTexDef.name = [subTexDict[@"name"] UTF8String];
+        subTexDef.x = [subTexDict[@"x"] floatValue] * platformScale;
+        subTexDef.y = [subTexDict[@"y"] floatValue] * platformScale;
+        subTexDef.width = [subTexDict[@"width"] floatValue] * platformScale;
+        subTexDef.height = [subTexDict[@"height"] floatValue] * platformScale;
+        subTexDef.rotated = [subTexDict[@"rotated"] boolValue];
+        
+        NSString *atlasName = subTexDict[@"atlas"];
+        std::vector<SubTextureDef> &subTexDefs = subTextures_[[atlasName UTF8String]];
+        
+        subTexDefs.push_back(subTexDef);
+        
+        texRef->name = stringBuilder.add(subTexDef.name.c_str());
+        texRef->width = subTexDef.width;
+        texRef->height = subTexDef.height;
     }
     
     // Text
@@ -1028,16 +1049,32 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
         textureCount_->store(0);
         
         for (auto &tex : textureQueue_) {
-            Game::getInstance()->getTextureService()->namedTextureFromFile(tex.first, tex.second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
-                int val = textureCount_->fetch_add(1) + 1;
-                
-                NSLog(@"Loaded %s (%d)", texture->getName().c_str(), (int)val);
-                if (val == textureQueue_.size()) {
-                    if (callback) {
-                        callback();
+            // Do we have subtextures affiliated with this?
+            auto it = subTextures_.find(tex.first);
+            
+            if (it != subTextures_.end()) {
+                Game::getInstance()->getTextureService()->namedTextureAtlasFromFile(tex.first, tex.second, it->second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
+                    int val = textureCount_->fetch_add(1) + 1;
+                    
+                    NSLog(@"Loaded atlas %s (%d)", texture->getName().c_str(), (int)val);
+                    if (val == textureQueue_.size()) {
+                        if (callback) {
+                            callback();
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                Game::getInstance()->getTextureService()->namedTextureFromFile(tex.first, tex.second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
+                    int val = textureCount_->fetch_add(1) + 1;
+                    
+                    NSLog(@"Loaded %s (%d)", texture->getName().c_str(), (int)val);
+                    if (val == textureQueue_.size()) {
+                        if (callback) {
+                            callback();
+                        }
+                    }
+                });
+            }
         }
     } else if (callback) {
         callback();

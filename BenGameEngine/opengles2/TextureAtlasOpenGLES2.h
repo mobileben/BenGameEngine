@@ -24,7 +24,8 @@ namespace BGE {
         uint32_t getHWTextureId() const;
         GLenum getTarget() const;
         
-        void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback);
+        void createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback);
+        void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback);
         
     private:
         friend class TextureService;

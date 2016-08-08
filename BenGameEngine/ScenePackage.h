@@ -92,6 +92,8 @@ namespace BGE {
         FixedArray<AnimationKeyframeReferenceIntermediate>  keyframes_;
         FixedArray<AnimationChannelReferenceIntermediate>   channels_;
         
+        std::unordered_map<std::string, std::vector<SubTextureDef>> subTextures_;
+        
         std::shared_ptr<std::atomic_int>                    textureCount_;
         std::vector<std::pair<std::string, std::string>>    textureQueue_;
         std::shared_ptr<std::atomic_int>                    fontCount_;

@@ -21,7 +21,7 @@ void BGE::Texture::releaseCurrentTexture() {
 }
 
 
-void BGE::Texture::updateUVs() {
+void BGE::Texture::updateUVs(bool rotated) {
     if (!isSubTexture_) {
         TextureBase::updateUVs();
     } else {
@@ -49,14 +49,29 @@ void BGE::Texture::updateUVs() {
              3--------2
              
              */
-            uvs_[0].x = x / atlasW;
-            uvs_[0].y = y / atlasH;
-            uvs_[1].x = (x + width) / atlasW;
-            uvs_[1].y = y / atlasH;
-            uvs_[2].x = (x + width) / atlasW;
-            uvs_[2].y = (y + height) / atlasH;
-            uvs_[3].x = x / atlasW;
-            uvs_[3].y = (y + height) / atlasH;
+            if (rotated) {
+                // If rotated, then width and height have been swapped, so swap them
+                width = height_;
+                height = width_;
+                
+                uvs_[3].x = x / atlasW;
+                uvs_[3].y = y / atlasH;
+                uvs_[0].x = (x + width) / atlasW;
+                uvs_[0].y = y / atlasH;
+                uvs_[1].x = (x + width) / atlasW;
+                uvs_[1].y = (y + height) / atlasH;
+                uvs_[2].x = x / atlasW;
+                uvs_[2].y = (y + height) / atlasH;
+            } else {
+                uvs_[0].x = x / atlasW;
+                uvs_[0].y = y / atlasH;
+                uvs_[1].x = (x + width) / atlasW;
+                uvs_[1].y = y / atlasH;
+                uvs_[2].x = (x + width) / atlasW;
+                uvs_[2].y = (y + height) / atlasH;
+                uvs_[3].x = x / atlasW;
+                uvs_[3].y = (y + height) / atlasH;
+            }
         }
     }
 }

@@ -16,14 +16,16 @@
 #include "TextureBase.h"
 #include "Texture.h"
 
-typedef struct {
-    int x;
-    int y;
-    int width;
-    int height;
-} BGESubTextureDef;
-
 namespace BGE {
+    typedef struct {
+        std::string name;
+        int         x;
+        int         y;
+        int         width;
+        int         height;
+        bool        rotated;
+    } SubTextureDef;
+    
     class TextureAtlas : public TextureBase
     {
     public:
@@ -38,7 +40,8 @@ namespace BGE {
         std::shared_ptr<Texture> getTexture() const { return texture_; };
         std::shared_ptr<Texture> getSubTexture(std::string name);
         
-        virtual void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::map<std::string, BGESubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) =0;
+        virtual void createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) =0;
+        virtual void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) =0;
         
         void releaseCurrentTexture();
         

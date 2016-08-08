@@ -161,8 +161,8 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createExternalReference(std::string
         if (extPackage) {
             std::string refName = extRef->name;
             auto type = extPackage->getReferenceType(refName);
-            
-            printf("XXXXX %s/%d\n", refName.c_str(), type);
+
+            printf("XXXXX %s/%d", refName.c_str(), type);
             
             switch (type) {
                 case GfxReferenceTypeAnimationSequence:

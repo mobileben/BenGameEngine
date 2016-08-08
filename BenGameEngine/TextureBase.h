@@ -115,7 +115,7 @@ namespace BGE {
         void setWidth(uint32_t width) { width_ = width; }
         void setHeight(uint32_t height) { height_ = height; }
         
-        virtual void updateUVs();
+        virtual void updateUVs(bool rotated = false);
         virtual void updateXYs();
     };
 }
