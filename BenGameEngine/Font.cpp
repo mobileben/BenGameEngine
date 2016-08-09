@@ -306,7 +306,7 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                         }
                     }
                     
-                    Game::getInstance()->getTextureService()->namedTextureAtlasFromBuffer(FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<TextureAtlas> atlas, std::shared_ptr<Error> error) -> void {
+                    Game::getInstance()->getTextureService()->createTextureAtlasFromBuffer(FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](std::shared_ptr<TextureAtlas> atlas, std::shared_ptr<Error> error) -> void {
                         if (atlas) {
                             textureAtlas_ = atlas;
                             glyphs_.clear();

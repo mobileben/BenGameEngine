@@ -74,7 +74,7 @@
             typedef void (*func)(id, SEL, std::shared_ptr<BGE::TextureBase>, std::shared_ptr<BGE::Error>);
             func impl = (func)[self methodForSelector:@selector(racer:error:)];
             std::function<void(std::shared_ptr<BGE::TextureBase>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
-            BGE::Game::getInstance()->getTextureService()->namedTextureFromFile("sample", [path UTF8String], fnc);
+            BGE::Game::getInstance()->getTextureService()->createTextureFromFile("sample", [path UTF8String], fnc);
         }
         
         path = [[NSBundle mainBundle] pathForResource:@"item_powerup_fish" ofType:@"png"];
@@ -83,7 +83,7 @@
             typedef void (*func)(id, SEL, std::shared_ptr<BGE::TextureBase>, std::shared_ptr<BGE::Error>);
             func impl = (func)[self methodForSelector:@selector(racer:error:)];
             std::function<void(std::shared_ptr<BGE::TextureBase>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
-            BGE::Game::getInstance()->getTextureService()->namedTextureFromFile("fish", [path UTF8String], nullptr);
+            BGE::Game::getInstance()->getTextureService()->createTextureFromFile("fish", [path UTF8String], nullptr);
         }
         
         path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];

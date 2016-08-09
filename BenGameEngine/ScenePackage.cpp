@@ -1058,7 +1058,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
             auto it = subTextures_.find(tex.first);
             
             if (it != subTextures_.end()) {
-                Game::getInstance()->getTextureService()->namedTextureAtlasFromFile(tex.first, tex.second, it->second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
+                Game::getInstance()->getTextureService()->createTextureAtlasFromFile(tex.first, tex.second, it->second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
                     NSLog(@"Loaded atlas %s (%d)", texture->getName().c_str(), (int)val);
@@ -1069,7 +1069,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
                     }
                 });
             } else {
-                Game::getInstance()->getTextureService()->namedTextureFromFile(tex.first, tex.second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
+                Game::getInstance()->getTextureService()->createTextureFromFile(tex.first, tex.second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
                     NSLog(@"Loaded %s (%d)", texture->getName().c_str(), (int)val);

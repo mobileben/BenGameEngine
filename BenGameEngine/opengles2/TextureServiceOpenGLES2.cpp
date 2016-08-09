@@ -26,7 +26,7 @@ void BGE::TextureServiceOpenGLES2::pause() {}
 void BGE::TextureServiceOpenGLES2::resume() {}
 void BGE::TextureServiceOpenGLES2::destroy() {}
 
-void BGE::TextureServiceOpenGLES2::namedTextureFromFile(std::string name, std::string filename, std::function<void(std::shared_ptr<TextureBase>, std::shared_ptr<Error>)> callback)
+void BGE::TextureServiceOpenGLES2::createTextureFromFile(std::string name, std::string filename, std::function<void(std::shared_ptr<TextureBase>, std::shared_ptr<Error>)> callback)
 {
     std::unordered_map<std::string, std::shared_ptr<TextureBase>>::iterator texIt = sTextures_.find(name);
     
@@ -65,7 +65,7 @@ void BGE::TextureServiceOpenGLES2::namedTextureFromFile(std::string name, std::s
     }
 }
 
-void BGE::TextureServiceOpenGLES2::namedTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error> error)> callback) {
+void BGE::TextureServiceOpenGLES2::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error> error)> callback) {
     std::unordered_map<std::string, std::shared_ptr<TextureBase>>::iterator texIt = sTextures_.find(name);
     std::shared_ptr<Error> bgeError;
 
@@ -110,7 +110,7 @@ void BGE::TextureServiceOpenGLES2::namedTextureAtlasFromFile(std::string name, s
     }
 }
 
-void BGE::TextureServiceOpenGLES2::namedTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<TextureBase>, std::shared_ptr<Error>)> callback)
+void BGE::TextureServiceOpenGLES2::createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<TextureBase>, std::shared_ptr<Error>)> callback)
 {
     // TODO: Add domains
     std::unordered_map<std::string, std::shared_ptr<TextureBase>>::iterator texIt = sTextures_.find(name);
@@ -146,7 +146,7 @@ void BGE::TextureServiceOpenGLES2::namedTextureFromBuffer(std::string name, void
     }
 }
 
-void BGE::TextureServiceOpenGLES2::namedTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) {
+void BGE::TextureServiceOpenGLES2::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) {
     // TODO: Add domains
     
     std::unordered_map<std::string, std::shared_ptr<TextureBase>>::iterator texIt = sTextures_.find(name);
@@ -194,7 +194,7 @@ void BGE::TextureServiceOpenGLES2::namedTextureAtlasFromBuffer(std::string name,
 }
 
 
-std::shared_ptr<BGE::Texture> BGE::TextureServiceOpenGLES2::namedSubTexture(std::string name, std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated) {
+std::shared_ptr<BGE::Texture> BGE::TextureServiceOpenGLES2::createSubTexture(std::string name, std::shared_ptr<TextureAtlas> atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated) {
     // TODO: Add domains
     std::unordered_map<std::string, std::shared_ptr<TextureBase>>::iterator texIt = sTextures_.find(name);
     std::shared_ptr<TextureOpenGLES2> texture;

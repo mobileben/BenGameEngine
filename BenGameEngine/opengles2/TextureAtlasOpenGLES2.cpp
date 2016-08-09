@@ -37,7 +37,7 @@ GLenum BGE::TextureAtlasOpenGLES2::getTarget() const {
 void BGE::TextureAtlasOpenGLES2::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) {
     releaseCurrentTexture();
     
-    Game::getInstance()->getTextureService()->namedTextureFromFile(atlasTextureKey(), filename, [this, &subTextures, callback](std::shared_ptr<TextureBase> atlas, std::shared_ptr<Error> error) {
+    Game::getInstance()->getTextureService()->createTextureFromFile(atlasTextureKey(), filename, [this, &subTextures, callback](std::shared_ptr<TextureBase> atlas, std::shared_ptr<Error> error) {
         if (!error) {
             std::shared_ptr<TextureAtlas> a = derived_shared_from_this<TextureAtlas>();
             std::shared_ptr<Texture> subTex;
@@ -54,7 +54,7 @@ void BGE::TextureAtlasOpenGLES2::createFromFile(std::string filename, std::vecto
                 if (subTextures.size() > 0) {
                     for (auto& st : subTextures) {
                         std::string key = st.name;
-                        subTex = Game::getInstance()->getTextureService()->namedSubTexture(key, a, st.x, st.y, st.width, st.height, st.rotated);
+                        subTex = Game::getInstance()->getTextureService()->createSubTexture(key, a, st.x, st.y, st.width, st.height, st.rotated);
                         
                         if (subTex) {
                             this->subTextures_[key] = subTex;
@@ -88,7 +88,7 @@ void BGE::TextureAtlasOpenGLES2::createFromFile(std::string filename, std::vecto
 void BGE::TextureAtlasOpenGLES2::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) {
     releaseCurrentTexture();
 
-    Game::getInstance()->getTextureService()->namedTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<TextureBase> atlas, std::shared_ptr<Error> error) {
+    Game::getInstance()->getTextureService()->createTextureFromBuffer(atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](std::shared_ptr<TextureBase> atlas, std::shared_ptr<Error> error) {
         if (!error) {
             std::shared_ptr<TextureAtlas> a = derived_shared_from_this<TextureAtlas>();
             std::shared_ptr<Texture> subTex;
@@ -105,7 +105,7 @@ void BGE::TextureAtlasOpenGLES2::createFromBuffer(void *buffer, TextureFormat fo
                 if (subTextures.size() > 0) {
                     for (auto& st : subTextures) {
                         std::string key = st.name;
-                        subTex = Game::getInstance()->getTextureService()->namedSubTexture(key, a, st.x, st.y, st.width, st.height, st.rotated);
+                        subTex = Game::getInstance()->getTextureService()->createSubTexture(key, a, st.x, st.y, st.width, st.height, st.rotated);
                         
                         if (subTex) {
                             subTextures_[key] = subTex;
