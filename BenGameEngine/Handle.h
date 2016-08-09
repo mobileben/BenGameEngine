@@ -24,7 +24,6 @@ namespace BGE {
 
         Handle() : handle_(0) {}
         Handle(uint32_t h) : handle_(h) {
-            printf("HERE WITH HANDLE CONSTRUCTOR %d\n", h);
         }
 
         uint32_t getIndex() const { return index_; }
@@ -65,6 +64,32 @@ namespace BGE {
     inline bool operator!= (const Handle<TAG>& lhs, const Handle<TAG>& rhs) { return lhs.getHandle() != rhs.getHandle(); }
     template <typename TAG>
     inline bool operator== (const Handle<TAG>& lhs, const Handle<TAG>& rhs) { return lhs.getHandle() == rhs.getHandle(); }
+    
+    // Define handles here, so they can be used anywhere
+    struct EventHandlerTag {};
+    using EventHandlerHandle = Handle<EventHandlerTag>;
+
+    struct FontTag {};
+    using FontHandle = Handle<FontTag>;
+    
+    struct InputTag {};
+    using InputHandle = Handle<InputTag>;
+    
+    struct MaterialTag {};
+    using MaterialHandle = Handle<MaterialTag>;
+    
+    struct ScenePackageTag {};
+    using ScenePackageHandle = Handle<ScenePackageTag>;
+
+    struct SpaceTag {};
+    using SpaceHandle = Handle<SpaceTag>;
 }
+
+template<typename TAG>
+struct std::hash<BGE::Handle<TAG>> {
+    size_t operator()(const BGE::Handle<TAG> handle) const {
+        return handle.getHandle();
+    }
+};
 
 #endif /* Handle_h */

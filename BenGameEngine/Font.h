@@ -50,9 +50,6 @@ namespace BGE {
         Valid
     };
     
-    struct FontTag {};
-    using FontHandle = Handle<FontTag>;
-    
     class Font : public NamedObject
     {
     public:
@@ -70,6 +67,8 @@ namespace BGE {
         int32_t getBaseline() const { return baseline_; }
         
         std::shared_ptr<FontGlyph> glyphForExtendedASCII(uint16_t code);
+        
+        std::string getNameAsKey() const;
         
         bool isValid(void) const { return valid_; }
         bool hasKerning() const { return hasKerning_; }

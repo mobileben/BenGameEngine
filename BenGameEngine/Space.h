@@ -19,9 +19,6 @@
 #include "Handle.h"
 
 namespace BGE {
-    struct SpaceTag {};
-    using SpaceHandle = Handle<SpaceTag>;
-    
     class SpaceService;
     
     class Space : public NamedObject

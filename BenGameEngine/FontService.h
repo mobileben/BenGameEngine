@@ -26,23 +26,11 @@ namespace BGE {
     class FontService : public Service
     {
     public:
-        
         static std::string fontAsKey(std::string name, uint32_t pixelSize);
         static void mapBundles(std::string bundleName);
         
         FontService(std::map<std::string, std::string> resources = std::map<std::string, std::string>());
         ~FontService() {}
-        
-        FontHandle getFontHandle(ObjectId fontId);
-        FontHandle getFontHandle(std::string name, uint32_t pixelSize);
-
-        Font *getFont(ObjectId fontId);
-        Font *getFont(std::string name, uint32_t pixelSize);
-        Font *getFont(FontHandle handle);
-        
-        void removeFont(ObjectId fontId);
-        void removeFont(std::string name, uint32_t pixelSize);
-        void removeFont(FontHandle handle);
         
         void initialize() {}
         void reset() {}
@@ -53,18 +41,29 @@ namespace BGE {
         void destroy() {}
         void update(double deltaTime) {}
 
-        void loadFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
-        void unloadFont(FontHandle handle);
-        void unloadFont(std::string name, uint32_t pixelSize);
+        void createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+        void createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+
+        void removeFont(FontHandle handle, ScenePackageHandle scenePackageHandle);
+        void removeFont(FontHandle handle, SpaceHandle spaceHandle);
+
+        FontHandle getFontHandle(std::string name, uint32_t pixelSize);
+        
+        Font *getFont(std::string name, uint32_t pixelSize);
+        Font *getFont(FontHandle handle);
  
     protected:
         // TODO: For now this is Mac/iOS specific
         static NSBundle *builtinBundle_;
         static NSBundle *mainBundle_;
         
-        std::unordered_map<std::string, std::string>                fontResources_;
-        std::unordered_map<std::string, std::shared_ptr<FontInfo>>  fontTable_;
-        std::vector<std::shared_ptr<FontInfo>>                      fontInfo_;
+        using FontTableMap = std::unordered_map<std::string, std::shared_ptr<FontInfo>>;
+        
+        std::unordered_map<std::string, std::string>                    fontResources_;
+        FontTableMap                                                    fontTable_;
+        std::unordered_map<FontHandle, std::vector<ScenePackageHandle>> fontScenePackages_;
+        std::unordered_map<FontHandle, std::vector<SpaceHandle>>        fontSpaces_;
+        std::vector<std::shared_ptr<FontInfo>>                          fontInfo_;
         
         std::string pathForAsset(std::string asset);
         
@@ -73,9 +72,13 @@ namespace BGE {
 
         using FontHandleService = HandleService<Font, FontHandle>;
         
+        void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
         FontHandleService handleService_;
+        void removeFont(FontHandle handle);
 
         void buildFontInfoForAsset(std::string asset);
+        
+        bool fontHasReferences(FontHandle fontHandle);
     };
 }
 

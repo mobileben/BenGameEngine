@@ -41,8 +41,6 @@ struct std::hash<BGE::Event> {
 namespace BGE {
     class GameObject;
 
-    struct EventHandlerTag {};
-    using EventHandlerHandle = Handle<EventHandlerTag>;
     using EventHandlerFunction = std::function<void(std::shared_ptr<GameObject>, Event)>;
     
     struct EventHandler : public NamedObject {

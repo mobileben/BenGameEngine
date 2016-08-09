@@ -20,9 +20,6 @@
 namespace BGE {
     class MaterialService;
     
-    struct MaterialTag {};
-    using MaterialHandle = Handle<MaterialTag>;
-    
     class Material : public Object {
     public:
         Material(ObjectId matId);

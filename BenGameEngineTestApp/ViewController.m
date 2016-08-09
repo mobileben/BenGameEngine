@@ -67,7 +67,6 @@
         self.once = YES;
         
         BGE::Game::getInstance()->provide(std::make_shared<BGE::TextureServiceOpenGLES2>(self.renderContext->getContext()));
-        BGE::Game::getInstance()->getFontService()->loadFont("default", 32, nullptr);
         
         NSString *path = [[NSBundle mainBundle] pathForResource:@"sample" ofType:@"png"];
         

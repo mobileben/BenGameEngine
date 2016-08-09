@@ -54,6 +54,10 @@ std::shared_ptr<BGE::FontGlyph> BGE::Font::glyphForExtendedASCII(uint16_t code) 
     return glyphs_[code];
 }
 
+std::string BGE::Font::getNameAsKey() const {
+    return FontService::fontAsKey(getName(), pixelSize_);
+}
+
 int32_t BGE::Font::kerningForPair(uint16_t prev, uint16_t curr) {
     int32_t kerning = 0;
     

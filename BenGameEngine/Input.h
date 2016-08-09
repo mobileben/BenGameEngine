@@ -17,9 +17,6 @@
 #include <functional>
 
 namespace BGE {
-    struct InputTag {};
-    using InputHandle = Handle<InputTag>;
-
     class InputService;
     class Input;
     

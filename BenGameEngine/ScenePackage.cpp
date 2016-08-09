@@ -24,6 +24,11 @@ BGE::ScenePackage::~ScenePackage() {
 }
 
 void BGE::ScenePackage::reset() {
+    // Release all textures
+    
+    // Release all fonts
+    
+    
     textures_.clear();
     text_.clear();
     animationSequences_.clear();
@@ -1086,7 +1091,7 @@ void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
         fontCount_->store(0);
         
         for (auto &font : fontQueue_) {
-            Game::getInstance()->getFontService()->loadFont(font.first, font.second, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
+            Game::getInstance()->getFontService()->createFont(font.first, font.second, handle_, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
                 int val = fontCount_->fetch_add(1) + 1;
                 
                 if (val == fontQueue_.size()) {

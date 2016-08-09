@@ -18,8 +18,6 @@
 namespace BGE {
     class GameObject;
     class ComponentService;
-    struct SpaceTag;
-    using SpaceHandle = Handle<SpaceTag>;
     class Space;
     
     class Component : public Object

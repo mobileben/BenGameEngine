@@ -21,9 +21,6 @@
 #include "MathTypes.h"
 
 namespace BGE {
-    struct ScenePackageTag {};
-    typedef Handle<ScenePackageTag> ScenePackageHandle;
-    
     class ScenePackage : public NamedObject {
     public:
         ScenePackage(ObjectId sceneId);

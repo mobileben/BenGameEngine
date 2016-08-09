@@ -191,20 +191,6 @@ void BGE::FontService::buildFontInfoForAsset(std::string asset) {
     }
 }
 
-BGE::FontHandle BGE::FontService::getFontHandle(ObjectId fontId) {
-    for (auto fontInfo : fontInfo_) {
-        for (auto it : fontInfo->fonts) {
-            auto font = getFont(it.second);
-            
-            if (font->getInstanceId() == fontId) {
-                return it.second;
-            }
-        }
-    }
-    
-    return FontHandle();
-}
-
 BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) {
     auto f = fontTable_.find(name);
     
@@ -218,20 +204,6 @@ BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixel
     }
     
     return FontHandle();
-}
-
-BGE::Font *BGE::FontService::getFont(ObjectId fontId) {
-    for (auto fontInfo : fontInfo_) {
-        for (auto it : fontInfo->fonts) {
-            auto font = getFont(it.second);
-            
-            if (font->getInstanceId() == fontId) {
-                return font;
-            }
-        }
-    }
-    
-    return nullptr;
 }
 
 BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
@@ -253,36 +225,46 @@ BGE::Font *BGE::FontService::getFont(FontHandle handle) {
     return handleService_.dereference(handle);
 }
 
-void BGE::FontService::removeFont(ObjectId fontId) {
-    for (auto fontInfo : fontInfo_) {
-        for (auto it : fontInfo->fonts) {
-            auto font = getFont(it.second);
-            
-            if (font->getInstanceId() == fontId) {
-                handleService_.release(it.second);
-                fontInfo->fonts.erase(it.first);
+void BGE::FontService::removeFont(FontHandle handle, ScenePackageHandle scenePackageHandle) {
+    auto sceneIt = fontScenePackages_.find(handle);
+    
+    if (sceneIt != fontScenePackages_.end()) {
+        for (auto scene=sceneIt->second.begin();scene != sceneIt->second.end();scene++) {
+            if (*scene == scenePackageHandle) {
+                sceneIt->second.erase(scene);
+                
+                if (!fontHasReferences(handle)) {
+                    removeFont(handle);
+                }
                 return;
             }
         }
+    } else if (!fontHasReferences(handle)) {
+        removeFont(handle);
     }
 }
 
-void BGE::FontService::removeFont(std::string name, uint32_t pixelSize) {
-    auto f = fontTable_.find(name);
+void BGE::FontService::removeFont(FontHandle handle, SpaceHandle spaceHandle) {
+    auto spaceIt = fontSpaces_.find(handle);
     
-    if (f != fontTable_.end()) {
-        auto info = f->second;
-        auto font = info->fonts.find(pixelSize);
-        
-        if (font != info->fonts.end()) {
-            handleService_.release(font->second);
-            info->fonts.erase(font->first);
-            return;
+    if (spaceIt != fontSpaces_.end()) {
+        for (auto space=spaceIt->second.begin();space != spaceIt->second.end();space++) {
+            if (*space == spaceHandle) {
+                spaceIt->second.erase(space);
+                
+                if (!fontHasReferences(handle)) {
+                    removeFont(handle);
+                }
+                return;
+            }
         }
+    } else if (!fontHasReferences(handle)) {
+        removeFont(handle);
     }
 }
 
 void BGE::FontService::removeFont(FontHandle handle) {
+    
     for (auto fontInfo : fontInfo_) {
         for (auto it : fontInfo->fonts) {
             if (it.second == handle) {
@@ -294,7 +276,23 @@ void BGE::FontService::removeFont(FontHandle handle) {
     }
 }
 
-void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function<void(FontHandle, std::shared_ptr<Error>)> callback) {
+bool BGE::FontService::fontHasReferences(FontHandle fontHandle) {
+    auto sceneIt = fontScenePackages_.find(fontHandle);
+    
+    if (sceneIt->second.size() > 0) {
+        return true;
+    }
+
+    auto spaceIt = fontSpaces_.find(fontHandle);
+    
+    if (spaceIt->second.size() > 0) {
+        return true;
+    }
+    
+    return false;
+}
+
+void BGE::FontService::createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle, std::shared_ptr<Error>)> callback) {
     auto entry = fontTable_.find(name);
     
     if (entry != fontTable_.end()) {
@@ -362,10 +360,53 @@ void BGE::FontService::loadFont(std::string name, uint32_t pxSize, std::function
     }
 }
 
-void BGE::FontService::unloadFont(std::string name, uint32_t pixelSize) {
-    
+void BGE::FontService::createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback) {
+    createFont(name, pxSize, [this, scenePackageHandle, callback](FontHandle fontHandle, std::shared_ptr<Error> error) -> void {
+        if (!fontHandle.isNull()) {
+            auto &scenePackages = fontScenePackages_[fontHandle];
+            bool found = false;
+            
+            for (auto package : scenePackages) {
+                if (scenePackageHandle == package) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                scenePackages.push_back(scenePackageHandle);
+            }
+            
+        }
+        
+        if (callback) {
+            callback(fontHandle, error);
+        }
+    });
 }
 
-void BGE::FontService::unloadFont(FontHandle handle) {
+void BGE::FontService::createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback) {
+    createFont(name, pxSize, [this, spaceHandle, callback](FontHandle fontHandle, std::shared_ptr<Error> error) -> void {
+        if (!fontHandle.isNull()) {
+            auto &spaces = fontSpaces_[fontHandle];
+            bool found = false;
+            
+            for (auto space : spaces) {
+                if (spaceHandle == space) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                spaces.push_back(spaceHandle);
+            }
+            
+        }
+        
+        if (callback) {
+            callback(fontHandle, error);
+        }
+    });
 }
 

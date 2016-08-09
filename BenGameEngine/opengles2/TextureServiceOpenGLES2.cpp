@@ -110,11 +110,6 @@ void BGE::TextureServiceOpenGLES2::namedTextureAtlasFromFile(std::string name, s
     }
 }
 
-void BGE::TextureServiceOpenGLES2::namedTextureFromURL(std::string name, std::string url, std::function<void(std::shared_ptr<TextureBase>, std::shared_ptr<Error> error)> callback)
-{
-    
-}
-
 void BGE::TextureServiceOpenGLES2::namedTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<TextureBase>, std::shared_ptr<Error>)> callback)
 {
     // TODO: Add domains
