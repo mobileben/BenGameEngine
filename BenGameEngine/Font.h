@@ -66,7 +66,9 @@ namespace BGE {
         uint32_t getGlyphH() const { return glyphH_; }
         int32_t getBaseline() const { return baseline_; }
         
+#ifdef NOT_YET
         std::shared_ptr<FontGlyph> glyphForExtendedASCII(uint16_t code);
+#endif
         
         std::string getNameAsKey() const;
         
@@ -100,9 +102,9 @@ namespace BGE {
         
         bool hasKerning_;
         
-        std::shared_ptr<TextureAtlas> textureAtlas_;
-        std::map<uint16_t, std::shared_ptr<FontGlyph>> glyphs_;
-        std::map<std::pair<uint16_t, uint16_t>, int32_t> kerning_;
+        TextureAtlasHandle                                  textureAtlasHandle_;
+        std::map<uint16_t, FontGlyph>                       glyphs_;
+        std::map<std::pair<uint16_t, uint16_t>, int32_t>    kerning_;
         
         template <typename T>
         std::shared_ptr<T> derived_shared_from_this()

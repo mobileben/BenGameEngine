@@ -13,7 +13,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "TextureBase.h"
 #include "Texture.h"
 
 namespace BGE {
@@ -26,32 +25,64 @@ namespace BGE {
         bool        rotated;
     } SubTextureDef;
     
-    class TextureAtlas : public TextureBase
+    class TextureAtlas : public NamedObject
     {
     public:
+        static const std::string ErrorDomain;
+        
+        TextureAtlas(ObjectId fontId);
         TextureAtlas(ObjectId objId, std::string name);
+        ~TextureAtlas();
         
-        virtual uint32_t getHWTextureId() const =0;
+        void initialize(TextureAtlasHandle handle, ObjectId texId, std::string name);
+
+        inline bool isValid() const { return valid_; }
+
+        inline TextureAtlasHandle getHandle() const { return handle_; }
+        inline TextureHandle getTextureHandle() const { return textureHandle_; };
         
-        uint32_t getWidth() const { return texture_ ? texture_->getWidth() : 0; }
-        uint32_t getHeight() const { return texture_ ? texture_->getHeight() : 0; }
+        inline uint32_t getHWTextureId() const {
+            return hwId_;
+        }
+        
+        inline GLenum getTarget() const {
+            return target_;
+        }
+        
+        inline TextureAlphaState getAlphaState() const { return alphaState_; }
+        inline TextureFormat getFormat() const { return format_; }
+
+        inline uint32_t getWidth() const {
+            return width_;
+        }
+        
+        inline uint32_t getHeight() const {
+            return height_;
+        }
         
         std::string atlasTextureKey() const;
-        std::shared_ptr<Texture> getTexture() const { return texture_; };
-        std::shared_ptr<Texture> getSubTexture(std::string name);
+        TextureHandle getSubTextureHandle(std::string name);
         
-        virtual void createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) =0;
-        virtual void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, std::function<void(std::shared_ptr<TextureAtlas>, std::shared_ptr<Error>)> callback) =0;
+        void createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
+        void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         
-        void releaseCurrentTexture();
+    private:
+        bool                    valid_;
+        TextureAtlasHandle      handle_;
+        TextureHandle           textureHandle_;
         
-    protected:
-        std::string textureName_;
+        uint32_t                width_;
+        uint32_t                height_;
         
-        // TODO: Make weak?
-        std::shared_ptr<Texture> texture_;
-        // TODO: Make weak?
-        std::map<std::string, std::shared_ptr<Texture>> subTextures_;
+        GLuint                  hwId_;
+        GLenum                  target_;
+        
+        TextureFormat           format_;
+        TextureAlphaState       alphaState_;
+        
+        std::map<std::string, TextureHandle> subTextures_;
+        
+        void reset();
     };
 }
 

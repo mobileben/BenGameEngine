@@ -32,7 +32,7 @@ namespace BGE {
         SpriteRenderComponent(struct private_key const& key, ObjectId componentId);
         ~SpriteRenderComponent() {}
 
-        std::shared_ptr<TextureBase> getTexture();
+        TextureHandle getTextureHandle();
         void setTextureReference(TextureReference *texRef);
         void setTextureReference(const TextureReference &texRef);
         

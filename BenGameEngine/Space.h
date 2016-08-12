@@ -31,6 +31,8 @@ namespace BGE {
         
         void initialize(SpaceHandle handle, ObjectId spaceId, std::string name);
 
+        inline SpaceHandle getHandle() const { return spaceHandle_; }
+        
         template < typename T, typename... Args >
         std::shared_ptr< T > createObject(Args&&... args) {
             return gameObjectService_->createObject<T>(std::forward<Args>(args)...);

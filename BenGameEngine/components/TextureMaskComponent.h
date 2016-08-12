@@ -30,7 +30,7 @@ namespace BGE {
         TextureMaskComponent(struct private_key const& key, ObjectId componentId);
         ~TextureMaskComponent() {}
         
-        std::shared_ptr<TextureBase> getTexture();
+        TextureHandle getTextureHandle();
         void setTextureMaskReference(TextureMaskReference *maskRef);
         void setTextureMaskReference(const TextureMaskReference &maskRef);
         

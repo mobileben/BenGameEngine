@@ -14,7 +14,7 @@
 #include <string>
 #include "Object.h"
 #include "MathTypes.h"
-#include "TextureBase.h"
+#include "Texture.h"
 #include "Handle.h"
 
 namespace BGE {
@@ -35,8 +35,8 @@ namespace BGE {
         void setColorMatrix(ColorMatrix& colorMatrix);
         
         const ColorMatrix *getColorMatrixRaw() const { return &colorMatrix_; }
-        std::weak_ptr<TextureBase> getTexture() const { return texture_; }
-        void setTexture(std::shared_ptr<TextureBase> texture) { texture_ = texture; }
+        TextureHandle getTextureHandle() const { return textureHandle_; }
+        void setTextureHandle(TextureHandle textureHandle) { textureHandle_ = textureHandle; }
         
     protected:
         friend MaterialService;
@@ -45,8 +45,7 @@ namespace BGE {
         MaterialHandle              handle_;
         bool                        colorDirty_;
         ColorMatrix                 colorMatrix_;
-        
-        std::weak_ptr<TextureBase>   texture_;
+        TextureHandle               textureHandle_;
     };
 }
 

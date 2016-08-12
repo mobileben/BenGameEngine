@@ -54,8 +54,7 @@ namespace BGE {
         
         void drawRect(Vector2 &position, Vector2 &size, Vector4 &color);
         void drawShadedRect(Vector2 &position, Vector2 &size, Vector4 color[4]);
-        void drawTexture(Vector2 &position, std::shared_ptr<TextureBase> texture);
-        void drawTexture(std::shared_ptr<TransformComponent> transform, std::shared_ptr<TextureBase> texture, VertexTex *const vertices);
+        void drawTexture(Vector2 &position, std::shared_ptr<Texture> texture);
         
         // Using the more updated means
         void drawFlatRect(std::shared_ptr<GameObject> gameObject);
@@ -67,7 +66,6 @@ namespace BGE {
         uint8_t enableMask(std::shared_ptr<GameObject> gameObject);
         void disableMask(uint8_t maskBits);
         
-        void drawFont(Vector2 &position, std::shared_ptr<TextureBase> texture);
         void render();
         
         // TODO: This will get moved out

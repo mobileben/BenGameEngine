@@ -141,7 +141,7 @@ bool BGE::operator==(const TextureReference& lhs, const TextureReference& rhs) {
         }
     }
     
-    if (lhs.texture != rhs.texture) {
+    if (lhs.textureHandle != rhs.textureHandle) {
         return false;
     }
     
@@ -161,7 +161,7 @@ bool BGE::operator!=(const TextureReference& lhs, const TextureReference& rhs) {
         }
     }
     
-    if (lhs.texture != rhs.texture) {
+    if (lhs.textureHandle != rhs.textureHandle) {
         return true;
     }
     

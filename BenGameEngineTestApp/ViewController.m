@@ -11,8 +11,6 @@
 #include "RenderWindow.h"
 #include "RenderContextOpenGLES2.h"
 #include "RenderServiceOpenGLES2.h"
-#include "TextureServiceOpenGLES2.h"
-#include "TextureOpenGLES2.h"
 #include "TransformComponent.h"
 #include "LineRenderComponent.h"
 #include "FlatRectRenderComponent.h"
@@ -66,25 +64,27 @@
         BGE::Game::getInstance()->getRenderService()->setIsReady();
         self.once = YES;
         
-        BGE::Game::getInstance()->provide(std::make_shared<BGE::TextureServiceOpenGLES2>(self.renderContext->getContext()));
+        BGE::Game::getInstance()->provide(std::make_shared<BGE::TextureService>(self.renderContext->getContext()));
         
         NSString *path = [[NSBundle mainBundle] pathForResource:@"sample" ofType:@"png"];
         
+#ifdef NOT_YET
         if (path) {
-            typedef void (*func)(id, SEL, std::shared_ptr<BGE::TextureBase>, std::shared_ptr<BGE::Error>);
+            typedef void (*func)(id, SEL, std::shared_ptr<BGE::Texture>, std::shared_ptr<BGE::Error>);
             func impl = (func)[self methodForSelector:@selector(racer:error:)];
-            std::function<void(std::shared_ptr<BGE::TextureBase>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
+            std::function<void(std::shared_ptr<BGE::Texture>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
             BGE::Game::getInstance()->getTextureService()->createTextureFromFile("sample", [path UTF8String], fnc);
         }
         
         path = [[NSBundle mainBundle] pathForResource:@"item_powerup_fish" ofType:@"png"];
         
         if (path) {
-            typedef void (*func)(id, SEL, std::shared_ptr<BGE::TextureBase>, std::shared_ptr<BGE::Error>);
+            typedef void (*func)(id, SEL, std::shared_ptr<BGE::Texture>, std::shared_ptr<BGE::Error>);
             func impl = (func)[self methodForSelector:@selector(racer:error:)];
-            std::function<void(std::shared_ptr<BGE::TextureBase>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
+            std::function<void(std::shared_ptr<BGE::Texture>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
             BGE::Game::getInstance()->getTextureService()->createTextureFromFile("fish", [path UTF8String], nullptr);
         }
+#endif
         
         path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
         
@@ -295,10 +295,9 @@
     
 }
 
-- (void)racer:(std::shared_ptr<BGE::TextureBase>)texture error:(std::shared_ptr<BGE::Error>)error {
+- (void)racer:(std::shared_ptr<BGE::Texture>)texture error:(std::shared_ptr<BGE::Error>)error {
     std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGE::Game::getInstance()->getRenderService());
-    std::shared_ptr<BGE::TextureOpenGLES2> glTex = std::dynamic_pointer_cast<BGE::TextureOpenGLES2>(texture);
-    renderer->setGLKTextureInfo(glTex->getTextureInfo());
+    renderer->setGLKTextureInfo(texture->getTextureInfo());
     BGE::Game::getInstance()->getRenderService()->render();
     
 #if 0

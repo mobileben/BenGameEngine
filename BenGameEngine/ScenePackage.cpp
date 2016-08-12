@@ -64,11 +64,36 @@ void BGE::ScenePackage::link() {
         TextureReference *texRef = textureRefs_.addressOf(i);
         
         // Fix names
-        const char* resolvedName = texRefInt->name + strings_.addressOf(0);
+        const char* resolvedName = strings_.addressOf(texRefInt->name);
+        const char *resolvedAtlasName = strings_.safeAddressOf(texRefInt->atlasName);
         *name = resolvedName;
         *index = i;
         texRef->name = resolvedName;
-        texRef->texture = textureService->textureWithName(resolvedName);
+        
+        if (resolvedAtlasName) {
+            // textureHandle is derived from atlas
+            auto atlasHandle = textureService->getTextureAtlasHandle(getHandle(), resolvedAtlasName);
+            auto subTexHandle = textureService->getTextureHandle(atlasHandle, resolvedName);
+            
+            texRef->textureHandle = subTexHandle;
+
+            texRef->isAtlas = false;
+            texRef->isSubTexture = true;
+        } else if (texRefInt->isAtlas) {
+            // textureHandle is derived from atlas
+            auto atlas = textureService->getTextureAtlas(getHandle(), resolvedName);
+            
+            texRef->textureHandle = atlas->getTextureHandle();
+
+            texRef->isAtlas = true;
+            texRef->isSubTexture = false;
+        } else {
+            texRef->textureHandle = textureService->getTextureHandle(getHandle(), resolvedName);
+
+            texRef->isAtlas = false;
+            texRef->isSubTexture = false;
+        }
+        
         referenceTypes_[resolvedName] = GfxReferenceTypeSprite;
     }
     
@@ -410,7 +435,6 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
     ArrayBuilder<AnimationKeyframeReferenceIntermediate, AnimationKeyframeReferenceIntermediate> keyframeIntBuilder;
     ArrayBuilder<AnimationChannelReferenceIntermediate, AnimationChannelReferenceIntermediate> channelRefIntBuilder;
     
-    setName([jsonDict[@"name"] UTF8String]);
     width_ = [jsonDict[@"width"] floatValue] * platformScale;
     height_ = [jsonDict[@"height"] floatValue] * platformScale;
     source_ = [jsonDict[@"source"] UTF8String];
@@ -420,40 +444,18 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
     
     defaultPositionIndex_ = vector2Builder.add(Vector2{0, 0});
     defaultScaleIndex_ = vector2Builder.add(Vector2{1, 1});
-    
+
     // TextureReferenceIntermediate total count are all textures and subTextures
     texIntBuilder.resize((int32_t) (textures.count + subtextures.count));
     
-    for (int32_t index=0;index<textures.count;index++) {
-        NSDictionary *texDict = textures[index];
-        TextureReferenceIntermediate *texRef = texIntBuilder.addressOf(index);
-        
-        // Add name
-        const char* name = [texDict[@"name"] UTF8String];
-        
-        assert(name);
-        
-        if (name) {
-            texRef->name = stringBuilder.add(name);
-            
-            texRef->width = [texDict[@"width"] floatValue] * platformScale;
-            texRef->height = [texDict[@"height"] floatValue] * platformScale;
-            
-            // Now get the file information
-            NSString* filename = [[NSBundle mainBundle] pathForResource:texDict[@"filename"] ofType:nil];
-            
-            if (filename) {
-                textureQueue_.push_back(std::make_pair<std::string, std::string>(name, [filename UTF8String]));
-            }
-        }
-    }
+    // Do subtextures first, since we will use this info to know if our textures are atlases
     
     // Subtextures
     for (auto index=0;index<subtextures.count;index++) {
         NSDictionary *subTexDict = subtextures[index];
-        
+        TextureReferenceIntermediate *texRef = texIntBuilder.addressOf(index);
+
         SubTextureDef subTexDef;
-        TextureReferenceIntermediate *texRef = texIntBuilder.addressOf((int) (textures.count + index));
         
         subTexDef.name = [subTexDict[@"name"] UTF8String];
         subTexDef.x = [subTexDict[@"x"] floatValue] * platformScale;
@@ -468,10 +470,44 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
         subTexDefs.push_back(subTexDef);
         
         texRef->name = stringBuilder.add(subTexDef.name.c_str());
+        texRef->atlasName = stringBuilder.add([atlasName UTF8String]);
         texRef->width = subTexDef.width;
         texRef->height = subTexDef.height;
+        texRef->isAtlas = false;
     }
     
+    for (int32_t index=0;index<textures.count;index++) {
+        NSDictionary *texDict = textures[index];
+        TextureReferenceIntermediate *texRef = texIntBuilder.addressOf((int) (subtextures.count + index));
+        
+        // Add name
+        const char* name = [texDict[@"name"] UTF8String];
+        
+        assert(name);
+        
+        if (name) {
+            texRef->name = stringBuilder.add(name);
+            texRef->atlasName = NullPtrIndex;
+            texRef->width = [texDict[@"width"] floatValue] * platformScale;
+            texRef->height = [texDict[@"height"] floatValue] * platformScale;
+            
+            auto subTex = subTextures_.find(name);
+            
+            if (subTex != subTextures_.end()) {
+                texRef->isAtlas = true;
+            } else {
+                texRef->isAtlas = false;
+            }
+            
+            // Now get the file information
+            NSString* filename = [[NSBundle mainBundle] pathForResource:texDict[@"filename"] ofType:nil];
+            
+            if (filename) {
+                textureQueue_.push_back(std::make_pair<std::string, std::string>(name, [filename UTF8String]));
+            }
+        }
+    }
+
     // Text
     NSArray *text = jsonDict[@"text"];
     
@@ -1058,10 +1094,10 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
             auto it = subTextures_.find(tex.first);
             
             if (it != subTextures_.end()) {
-                Game::getInstance()->getTextureService()->createTextureAtlasFromFile(tex.first, tex.second, it->second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
+                Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.first, tex.second, it->second, [this, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
-                    NSLog(@"Loaded atlas %s (%d)", texture->getName().c_str(), (int)val);
+                    NSLog(@"Loaded atlas %s (%d)", atlas->getName().c_str(), (int)val);
                     if (val == textureQueue_.size()) {
                         if (callback) {
                             callback();
@@ -1069,7 +1105,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
                     }
                 });
             } else {
-                Game::getInstance()->getTextureService()->createTextureFromFile(tex.first, tex.second, [this, callback](std::shared_ptr<TextureBase> texture, std::shared_ptr<Error> error) -> void {
+                Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), tex.first, tex.second, [this, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
                     NSLog(@"Loaded %s (%d)", texture->getName().c_str(), (int)val);

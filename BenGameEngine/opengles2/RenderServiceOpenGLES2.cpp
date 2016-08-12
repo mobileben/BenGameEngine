@@ -10,7 +10,6 @@
 #include "RenderView.h"
 #include "ShaderServiceOpenGLES2.h"
 #include "RenderContextOpenGLES2.h"
-#include "TextureOpenGLES2.h"
 #include "MathTypes.h"
 #include "Game.h"
 #include "LineRenderComponent.h"
@@ -375,93 +374,15 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
                    GL_UNSIGNED_BYTE, &indices[0]);
 }
 
-void BGE::RenderServiceOpenGLES2::drawFont(Vector2 &position, std::shared_ptr<TextureBase> texture) {
-    if (texture) {
-        VertexTex vertices[4];
-        GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
-        std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
-        
-        if (oglTex && oglTex->isValid()) {
-            const Vector2 *xys = oglTex->getXYs();
-            const Vector2 *uvs = oglTex->getUVs();
-            
-            vertices[0].position.x = position.x + xys[0].x;
-            vertices[0].position.y = position.y + xys[0].y;
-            vertices[0].position.z = 0;
-            vertices[0].tex.x = uvs[0].x;
-            vertices[0].tex.y = uvs[0].y;
-            
-            vertices[1].position.x = position.x + xys[1].x;
-            vertices[1].position.y = position.y + xys[1].y;
-            vertices[1].position.z = 0;
-            vertices[1].tex.x = uvs[1].x;
-            vertices[1].tex.y = uvs[1].y;
-            
-            vertices[2].position.x = position.x + xys[2].x;
-            vertices[2].position.y = position.y + xys[2].y;
-            vertices[2].position.z = 0;
-            vertices[2].tex.x = uvs[2].x;
-            vertices[2].tex.y = uvs[2].y;
-            
-            vertices[3].position.x = position.x + xys[3].x;
-            vertices[3].position.y = position.y + xys[3].y;
-            vertices[3].position.z = 0;
-            vertices[3].tex.x = uvs[3].x;
-            vertices[3].tex.y = uvs[3].y;
-            
-            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Font"));
-            
-            GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
-            GLint positionLocation = glShader->locationForAttribute("Position");
-            
-            glEnableVertexAttribArray(positionLocation);
-            glEnableVertexAttribArray(texCoordLocation);
-            
-            GLint textureUniform = glShader->locationForUniform("Texture");
-            GLint projectionLocation = glShader->locationForUniform("Projection");
-            GLint modelLocation = glShader->locationForUniform("ModelView");
-            GLint colorUniform = glShader->locationForUniform("SourceColor");
-            
-            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
-            
-            // This is a hack for now
-            Matrix4 mat;
-            
-            Matrix4MakeIdentify(mat);
-            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
-
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            glEnable(GL_BLEND);
-            
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                  sizeof(VertexTex), &vertices[0]);
-            glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                                  sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
-            
-            glUniform1i(textureUniform, 0);
-            glUniform4f(colorUniform, 1, 0, 0, 1);
-            
-            glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
-                           GL_UNSIGNED_BYTE, &indices[0]);
-        }
-    }
-}
-
-void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr<TextureBase> texture)
+void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr<Texture> texture)
 {
     if (texture) {
         VertexTex vertices[4];
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
-        std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
 
-        if (oglTex && oglTex->isValid()) {
-            const Vector2 *xys = oglTex->getXYs();
-            const Vector2 *uvs = oglTex->getUVs();
+        if (texture && texture->isValid()) {
+            const Vector2 *xys = texture->getXYs();
+            const Vector2 *uvs = texture->getUVs();
             
             vertices[0].position.x = position.x + xys[0].x;
             vertices[0].position.y = position.y + xys[0].y;
@@ -514,7 +435,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             glEnable(GL_BLEND);
             
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
+            glBindTexture(texture->getTarget(), texture->getHWTextureId());
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             
@@ -671,10 +592,6 @@ void BGE::RenderServiceOpenGLES2::drawLines(std::shared_ptr<GameObject> gameObje
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawTexture(std::shared_ptr<TransformComponent> transform, std::shared_ptr<TextureBase> texture, VertexTex *const vertices) {
-    
-}
-
 void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObject) {
     if (gameObject) {
         std::shared_ptr<SpriteRenderComponent> sprite = std::dynamic_pointer_cast<SpriteRenderComponent>(gameObject->getComponent<SpriteRenderComponent>());
@@ -683,13 +600,13 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObj
             VertexTex *const vertices = sprite->getVertices();
             auto material = sprite->getMaterial();
             if (material) {
-                std::shared_ptr<TextureBase> texture = material->getTexture().lock();
+                auto textureHandle = material->getTextureHandle();
+                auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
                 
                 if (texture) {
                     NSLog(@"Rendering sprite %s", texture->getName().c_str());
                     
-                    std::shared_ptr<TextureOpenGLES2> oglTex = std::dynamic_pointer_cast<TextureOpenGLES2>(texture);
-                    if (oglTex && oglTex->isValid()) {
+                    if (texture && texture->isValid()) {
                         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("ColorMatrixTexture"));
                         
                         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
@@ -724,7 +641,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObj
                         glDisable(GL_BLEND);
                         
                         glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(oglTex->getTarget(), oglTex->getHWTextureId());
+                        glBindTexture(texture->getTarget(), texture->getHWTextureId());
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                         

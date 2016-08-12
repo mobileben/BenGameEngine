@@ -83,6 +83,12 @@ namespace BGE {
 
     struct SpaceTag {};
     using SpaceHandle = Handle<SpaceTag>;
+    
+    struct TextureTag {};
+    using TextureHandle = Handle<TextureTag>;
+    
+    struct TextureAtlasTag {};
+    using TextureAtlasHandle = Handle<TextureAtlasTag>;
 }
 
 template<typename TAG>

@@ -36,8 +36,8 @@ namespace BGE {
         void update(double deltaTime) {}
 
         MaterialHandle createMaterial(Vector4& color);
-        MaterialHandle createMaterial(std::shared_ptr<TextureBase> texture);
-        MaterialHandle createMaterial(Vector4& color, std::shared_ptr<TextureBase> texture);
+        MaterialHandle createMaterial(TextureHandle textureHandle);
+        MaterialHandle createMaterial(Vector4& color, TextureHandle textureHandle);
         
         void removeMaterial(MaterialHandle handle);
         void removeMaterial(ObjectId matId);

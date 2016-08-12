@@ -48,15 +48,17 @@ namespace BGE {
     
     struct TextureReferenceIntermediate {
         int32_t name;
+        int32_t atlasName;
         float   width;
         float   height;
+        bool    isAtlas;
     };
     
     struct TextureReference {
         const char* name;
-        
-        // TODO: Change this to Handle later. Note with this it is not a POD
-        std::shared_ptr<TextureBase> texture;
+        bool isAtlas;
+        bool isSubTexture;
+        TextureHandle textureHandle;
     };
     
     bool operator==(const TextureReference& lhs, const TextureReference& rhs);

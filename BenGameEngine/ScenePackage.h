@@ -34,6 +34,8 @@ namespace BGE {
             return hasExternal_;
         }
         
+        inline ScenePackageHandle getHandle() const { return handle_; }
+        
         AutoDisplayElementReference *getAutoDisplayList() const;
         int32_t getAutoDisplayListSize() const;
         

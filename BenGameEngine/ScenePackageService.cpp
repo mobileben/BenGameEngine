@@ -38,14 +38,14 @@ void BGE::ScenePackageService::packageFromJSONFile(std::string filename, std::st
             NSError *err = nil;
             NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
             
+            // The loading system relies on having the package initalized with handle
+            ObjectId objId = this->getIdAndIncrement();
+            package->initialize(handle, objId, name);
+            
             package->load(jsonDict, [this, handle, name, callback](ScenePackage * package) {
                 auto tHandle = handle;
                 
                 if (package) {
-                    ObjectId objId = this->getIdAndIncrement();
-                    
-                    package->initialize(tHandle, objId, name);
-                    
                     scenePackages_[package->getInstanceId()] = tHandle;
                 } else {
                     // There is no package, so we need to release this

@@ -37,7 +37,7 @@ BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color) {
     return handle;
 }
 
-BGE::MaterialHandle BGE::MaterialService::createMaterial(std::shared_ptr<TextureBase> texture) {
+BGE::MaterialHandle BGE::MaterialService::createMaterial(TextureHandle textureHandle) {
     MaterialHandle handle;
     Material *material = handleService_.allocate(handle);
     
@@ -45,14 +45,14 @@ BGE::MaterialHandle BGE::MaterialService::createMaterial(std::shared_ptr<Texture
         ObjectId objId = getIdAndIncrement();
         
         material->initialize(handle, objId);
-        material->setTexture(texture);
+        material->setTextureHandle(textureHandle);
         addMaterial(handle);
     }
     
     return handle;
 }
 
-BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color, std::shared_ptr<TextureBase> texture) {
+BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color, TextureHandle textureHandle) {
     MaterialHandle handle;
     Material *material = handleService_.allocate(handle);
     
@@ -61,7 +61,7 @@ BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color, std::sh
         
         material->initialize(handle, objId);
         material->setColor(color);
-        material->setTexture(texture);
+        material->setTextureHandle(textureHandle);
         addMaterial(handle);
     }
     

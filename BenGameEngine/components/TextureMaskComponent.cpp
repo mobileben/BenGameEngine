@@ -28,7 +28,7 @@ void BGE::TextureMaskComponent::setTextureMaskReference(TextureMaskReference *te
 }
 
 void BGE::TextureMaskComponent::setTextureMaskReference(const TextureMaskReference &texMaskRef) {
-    auto material = Game::getInstance()->getMaterialService()->createMaterial(texMaskRef.texture->texture);
+    auto material = Game::getInstance()->getMaterialService()->createMaterial(texMaskRef.texture->textureHandle);
     
     this->setMaterials({material});
 }
@@ -39,6 +39,17 @@ void BGE::TextureMaskComponent::materialsUpdated() {
     updateLocalBoundsAndVertices();
 }
 
+BGE::TextureHandle BGE::TextureMaskComponent::getTextureHandle() {
+    auto material = getMaterial();
+    
+    assert(material);
+    
+    if (material) {
+        return material->getTextureHandle();
+    }
+    
+    return TextureHandle();
+}
 
 void BGE::TextureMaskComponent::updateLocalBoundsAndVertices() {
     // Right now we are only supporting one material
@@ -47,7 +58,8 @@ void BGE::TextureMaskComponent::updateLocalBoundsAndVertices() {
     assert(material);
     
     if (material) {
-        std::shared_ptr<TextureBase> texture = material->getTexture().lock();
+        auto textureHandle = material->getTextureHandle();
+        auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
         
         assert(texture);
         

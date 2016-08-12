@@ -27,7 +27,7 @@ void BGE::SpriteRenderComponent::setTextureReference(TextureReference *texRef) {
 }
 
 void BGE::SpriteRenderComponent::setTextureReference(const TextureReference &texRef) {
-    auto material = Game::getInstance()->getMaterialService()->createMaterial(texRef.texture);
+    auto material = Game::getInstance()->getMaterialService()->createMaterial(texRef.textureHandle);
     
     this->setMaterials({material});
 }
@@ -46,7 +46,8 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
     assert(material);
     
     if (material) {
-        std::shared_ptr<TextureBase> texture = material->getTexture().lock();
+        auto textureHandle = material->getTextureHandle();
+        auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
         
         assert(texture);
         
