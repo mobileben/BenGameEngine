@@ -106,3 +106,8 @@ void BGE::ComponentService::removeComponent(std::type_index typeIndex, ObjectId 
         }
     }
 }
+
+BGE::GameObject *BGE::ComponentService::getComponentGameObject(Component *component, GameObjectHandle gameObjHandle) {
+    return component->getSpace()->getGameObject(gameObjHandle);
+}
+

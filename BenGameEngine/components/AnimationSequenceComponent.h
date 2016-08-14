@@ -44,17 +44,17 @@ namespace BGE {
         
         // AnimationChannel
         //  GameObject
-        std::shared_ptr<GameObject> sequenceRoot;
+        GameObjectHandle sequenceRootHandle;
         
         //  Pointer to meta
-        std::vector<std::shared_ptr<GameObject>> channels;
+        std::vector<GameObjectHandle> channels;
         BoundsReference *bounds;
         
     protected:
         friend GameObject;
         friend ComponentService;
         
-        void setGameObject(std::shared_ptr<GameObject> gameObject);
+        void setGameObjectHandle(GameObjectHandle handle);
         void created();
     };
 }

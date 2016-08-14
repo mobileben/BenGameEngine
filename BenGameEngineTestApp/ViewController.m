@@ -182,9 +182,9 @@
                                         // Now create auto display objects
                                         BGE::SceneObjectCreatedDelegate delegate;
 
-                                        space->createAutoDisplayObjects(nullptr, packageHandle, delegate);
+                                        space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
                                         
-                                        gameObj = space->createObject<BGE::GameObject>();
+                                        gameObj = space->createGameObject();
                                         transformComponent = space->createComponent<BGE::TransformComponent>();
                                         gameObj->addComponent(transformComponent);
                                         auto line = space->createComponent<BGE::LineRenderComponent>();
@@ -196,9 +196,9 @@
                                         
                                         self.buttonBounds = line;
                                         
-                                        typedef void (*func)(id, SEL, std::shared_ptr<BGE::GameObject>, BGE::Event);
-                                        func impl = (func)[self methodForSelector:@selector(handleInput:event:)];
-                                        std::function<void(std::shared_ptr<BGE::GameObject>, BGE::Event)> fnc = std::bind(impl, self, @selector(handleInput:event:), std::placeholders::_1, std::placeholders::_2);
+                                        typedef void (*func)(id, SEL, BGE::SpaceHandle, BGE::GameObjectHandle, BGE::Event);
+                                        func impl = (func)[self methodForSelector:@selector(handleInput:gameObjectHandle:event:)];
+                                        std::function<void(BGE::SpaceHandle, BGE::GameObjectHandle, BGE::Event)> fnc = std::bind(impl, self, @selector(handleInput:gameObjectHandle:event:), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                                         BGE::Game::getInstance()->getInputService()->registerEventHandler("settings_button", BGE::Event::TouchUpInside, fnc);
                                     });
                                 }
@@ -215,10 +215,10 @@
             tSpace->setVisible(false);
             
             // Create test objects
-            std::vector<std::shared_ptr<BGE::GameObject>> tObjs;
+            std::vector<BGE::GameObject *> tObjs;
             auto numGameObjs = 1000;
             for (auto i=0;i<numGameObjs;i++) {
-                auto gObj = tSpace->createObject<BGE::GameObject>();
+                auto gObj = tSpace->createGameObject();
                 auto xform = tSpace->createComponent<BGE::TransformComponent>();
                 auto sprite = tSpace->createComponent<BGE::SpriteRenderComponent>();
                 
@@ -291,7 +291,7 @@
     [self.glView display];
 }
 
-- (void)handleInput:(std::shared_ptr<BGE::GameObject>)gameObj event:(BGE::Event)event {
+- (void)handleInput:(BGE::SpaceHandle)spaceHandle gameObjectHandle:(BGE::GameObjectHandle)gameObjectHandle event:(BGE::Event)event {
     
 }
 
@@ -369,7 +369,7 @@
 {
     auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
     
-    auto gameObj = space->find("settings_button");
+    auto gameObj = space->getGameObject("settings_button");
     
     if (gameObj) {
         auto button = gameObj->getComponent<BGE::ButtonComponent>();

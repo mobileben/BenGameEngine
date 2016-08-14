@@ -23,7 +23,8 @@ void BGE::TextComponent::materialsUpdated() {
 }
 
 void BGE::TextComponent::setTextReference(const TextReference& textRef) {
-    auto gameObj = getGameObject().lock();
+    auto gameObjHandle = getGameObjectHandle();
+    auto gameObj = getSpace()->getGameObject(gameObjHandle);
     auto bbox = gameObj->getComponent<BoundingBoxComponent>();
     text_ = textRef.text;
     color_ = textRef.color;
@@ -75,7 +76,8 @@ void BGE::TextComponent::getWidthHeight(float &width, float &height) {
 
 void BGE::TextComponent::updateBoundingBox() {
     float width, height;
-    auto gameObj = getGameObject().lock();
+    auto gameObjHandle = getGameObjectHandle();
+    auto gameObj = getSpace()->getGameObject(gameObjHandle);
     auto bbox = gameObj->getComponent<BoundingBoxComponent>();
     
     getWidthHeight(width, height);

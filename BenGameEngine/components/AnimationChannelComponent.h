@@ -14,6 +14,7 @@
 #include <vector>
 #include "Component.h"
 #include "GraphicFormats.h"
+#include "Handle.h"
 
 namespace BGE {
     class AnimationChannelComponent : public Component {
@@ -39,7 +40,7 @@ namespace BGE {
         friend ComponentService;
         friend GameObject;
         
-        void setGameObject(std::shared_ptr<GameObject> gameObject);
+        void setGameObjectHandle(GameObjectHandle handle);
     };
 }
 

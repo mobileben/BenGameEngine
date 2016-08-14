@@ -13,6 +13,12 @@
 #include "StringArrayBuilder.h"
 #include <type_traits>
 
+BGE::ScenePackage::ScenePackage() : NamedObject(), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
+    position_ = Vector2{0, 0};
+    textureCount_ = std::make_shared<std::atomic_int>(0);
+    fontCount_ = std::make_shared<std::atomic_int>(0);
+}
+
 BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
     position_ = Vector2{0, 0};
     textureCount_ = std::make_shared<std::atomic_int>(0);

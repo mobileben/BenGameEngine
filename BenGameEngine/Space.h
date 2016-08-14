@@ -24,6 +24,7 @@ namespace BGE {
     class Space : public NamedObject
     {
     public:
+        Space();
         Space(ObjectId spaceId);
         Space(ObjectId spaceId, std::string name);
 
@@ -33,18 +34,35 @@ namespace BGE {
 
         inline SpaceHandle getHandle() const { return spaceHandle_; }
         
-        template < typename T, typename... Args >
-        std::shared_ptr< T > createObject(Args&&... args) {
-            return gameObjectService_->createObject<T>(std::forward<Args>(args)...);
+        inline GameObject *createGameObject(std::string name = "") {
+            return gameObjectService_->createGameObject(name);
         }
         
-        void removeObject(ObjectId objId) { gameObjectService_->removeObject(objId); }
+        inline GameObjectHandle getGameObjectHandle(ObjectId objId) {
+            return gameObjectService_->getGameObjectHandle(objId);
+        }
+        
+        inline GameObjectHandle getGameObjectHandle(std::string name) {
+            return gameObjectService_->getGameObjectHandle(name);
+        }
+        
+        inline GameObject *getGameObject(ObjectId objId) {
+            return gameObjectService_->getGameObject(objId);
+        }
+        
+        inline GameObject *getGameObject(std::string name) {
+            return gameObjectService_->getGameObject(name);
+        }
+        
+        inline GameObject *getGameObject(GameObjectHandle handle) {
+            return gameObjectService_->getGameObject(handle);
+        }
+        
+        inline void removeGameObject(GameObjectHandle handle) {
+            gameObjectService_->removeGameObject(handle);
+        }
         
         const GameObjectService::GameObjectVector& getGameObjects() const { return gameObjectService_->getGameObjects(); }
-
-        std::shared_ptr<GameObject> find(std::shared_ptr<GameObject> object) { return gameObjectService_->find(object); }
-        std::shared_ptr<GameObject> find(ObjectId objId) { return gameObjectService_->find(objId); }
-        std::shared_ptr<GameObject> find(std::string name) { return gameObjectService_->find(name); }
         
         template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
             auto component = componentService_->createComponent<T>(std::forward<Args>(args)...);
@@ -83,17 +101,17 @@ namespace BGE {
         bool isUpdatable() const { return updatable_; }
         void setUpdatable(bool updatable) { updatable_ = updatable; }
         
-        std::shared_ptr<GameObject> createAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        std::shared_ptr<GameObject> createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        std::shared_ptr<GameObject> createFrameAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        std::shared_ptr<GameObject> createButton(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        std::shared_ptr<GameObject> createExternalReference(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        std::shared_ptr<GameObject> createMask(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        std::shared_ptr<GameObject> createSprite(std::string name, ScenePackageHandle handle = ScenePackageHandle());
-        std::shared_ptr<GameObject> createText(std::string name, ScenePackageHandle handle = ScenePackageHandle());
-        std::shared_ptr<GameObject> createPlacement(std::string name, ScenePackageHandle handle = ScenePackageHandle());
+        GameObject *createAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        GameObject *createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        GameObject *createFrameAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        GameObject *createButton(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        GameObject *createExternalReference(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        GameObject *createMask(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
+        GameObject *createSprite(std::string name, ScenePackageHandle handle = ScenePackageHandle());
+        GameObject *createText(std::string name, ScenePackageHandle handle = ScenePackageHandle());
+        GameObject *createPlacement(std::string name, ScenePackageHandle handle = ScenePackageHandle());
         
-        void createAutoDisplayObjects(std::shared_ptr<GameObject> root, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate);
+        void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate);
 
     protected:
         SpaceHandle spaceHandle_;
@@ -103,7 +121,6 @@ namespace BGE {
         
         std::shared_ptr<GameObjectService> gameObjectService_;
         std::shared_ptr<ComponentService> componentService_;
-        std::vector<GameObject> gameObjects_;
         
         bool        visible_;
         uint32_t    order_;

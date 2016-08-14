@@ -161,7 +161,8 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
                     break;
             }
             
-            auto gameObj = getGameObject().lock();
+            auto gameObjHandle = getGameObjectHandle();
+            auto gameObj = getSpace()->getGameObject(gameObjHandle);
             auto bbox = gameObj->getComponent<BoundingBoxComponent>();
             
             if (bbox) {

@@ -15,7 +15,6 @@
 #include "ColorMatrixComponent.h"
 #include "ColorTransformComponent.h"
 #include "BoundingBoxComponent.h"
-#include "Space.h"
 
 uint32_t BGE::AnimatorComponent::bitmask_ = Component::InvalidBitmask;
 std::type_index BGE::AnimatorComponent::type_index_ = typeid(BGE::AnimatorComponent);
@@ -32,7 +31,8 @@ void BGE::AnimatorComponent::reset() {
     iterations = 1;
     state = AnimState::Done;
     
-    auto gameObj = getGameObject().lock();
+    auto gameObjHandle = getGameObjectHandle();
+    auto gameObj = getSpace()->getGameObject(gameObjHandle);
     auto seq = gameObj->getComponent<AnimationSequenceComponent>();
     
     if (seq->frameRate != 0) {
@@ -45,7 +45,9 @@ void BGE::AnimatorComponent::reset() {
 }
 
 void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
-    auto gameObj = getGameObject().lock();
+    auto space = getSpace();
+    auto gameObjHandle = getGameObjectHandle();
+    auto gameObj = space->getGameObject(gameObjHandle);
     
     if (gameObj) {
         auto seq = gameObj->getComponent<AnimationSequenceComponent>();
@@ -60,7 +62,8 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
             
             // Traverse our seq and setup all transforms, references, colors, etc
             for (auto i=0;i<seq->numChannels;i++) {
-                auto chanGameObj = seq->channels[i];
+                auto chanGameObjHandle = seq->channels[i];
+                auto chanGameObj = space->getGameObject(chanGameObjHandle);
                 auto xform = chanGameObj->getComponent<TransformComponent>();
                 auto channel = chanGameObj->getComponent<AnimationChannelComponent>();
                 auto animator = chanGameObj->getComponent<ChannelFrameAnimatorComponent>();

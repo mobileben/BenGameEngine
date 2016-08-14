@@ -22,8 +22,8 @@ bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0
     Matrix4MakeIdentify(matrix_);
 }
 
-void BGE::TransformComponent::setGameObject(std::shared_ptr<GameObject> gameObject) {
-    Component::setGameObject(gameObject);
+void BGE::TransformComponent::setGameObjectHandle(GameObjectHandle handle) {
+    Component::setGameObjectHandle(handle);
 }
 
 void BGE::TransformComponent::updateMatrix() {

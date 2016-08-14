@@ -23,7 +23,7 @@ BGE::Input *BGE::InputService::createInput() {
     Input *input = handleService_.allocate(handle);
     
     if (input) {
-        input->initialize(handle, getIdAndIncrement());
+        input->initialize(handle);
     }
     
     return input;
@@ -119,7 +119,7 @@ void BGE::InputService::process() {
                 space->getComponents<ButtonComponent>(touchComponents);
                 
                 for (auto touch : touchComponents) {
-                    auto gameObj = touch->getGameObject();
+                    auto gameObjHandle = touch->getGameObjectHandle();
                     
                     // Compute collision if exists
                     auto bbox = touch->getBoundingBox();
@@ -139,7 +139,8 @@ void BGE::InputService::process() {
                     
                     InputButtonHandler buttonHandler;
                     
-                    buttonHandler.gameObj = gameObj;
+                    buttonHandler.gameObjHandle = gameObjHandle;
+                    buttonHandler.spaceHandle = handle;
                     buttonHandler.buttonComponent = touch;
                     buttonHandler.touchType = input->type;
                     buttonHandler.inBounds = inBounds;
@@ -159,7 +160,8 @@ void BGE::InputService::process() {
     auto eventService = Game::getInstance()->getEventService();
     
     for (auto buttonHandler : inputButtonHandlers_) {
-        auto gameObj = buttonHandler.gameObj.lock();
+        auto space = Game::getInstance()->getSpaceService()->getSpace(buttonHandler.spaceHandle);
+        auto gameObj = space->getGameObject(buttonHandler.gameObjHandle);
         
         if (gameObj) {
             auto event = buttonHandler.buttonComponent->handleInput(buttonHandler.touchType, buttonHandler.inBounds);
@@ -178,11 +180,11 @@ void BGE::InputService::process() {
                         
                         if (name.length()) {
                             if (gameObjName == name) {
-                                handler->handler(gameObj, event);
+                                handler->handler(space->getHandle(), buttonHandler.gameObjHandle, event);
                             }
                         } else {
                             // Un-named handlers always fire
-                            handler->handler(gameObj, event);
+                            handler->handler(space->getHandle(), buttonHandler.gameObjHandle, event);
                         }
                     }
                 }

@@ -57,13 +57,13 @@ namespace BGE {
         void drawTexture(Vector2 &position, std::shared_ptr<Texture> texture);
         
         // Using the more updated means
-        void drawFlatRect(std::shared_ptr<GameObject> gameObject);
-        void drawMaskRect(std::shared_ptr<GameObject> gameObject);
-        void drawLines(std::shared_ptr<GameObject> gameObject);
+        void drawFlatRect(GameObject *gameObject);
+        void drawMaskRect(GameObject *gameObject);
+        void drawLines(GameObject *gameObject);
         
-        void drawSprite(std::shared_ptr<GameObject> gameObject);
+        void drawSprite(GameObject *gameObject);
 
-        uint8_t enableMask(std::shared_ptr<GameObject> gameObject);
+        uint8_t enableMask(GameObject *gameObject);
         void disableMask(uint8_t maskBits);
         
         void render();
@@ -90,9 +90,9 @@ namespace BGE {
         
         void queueRender(double deltaTime);
         
-        int8_t renderGameObject(std::shared_ptr<GameObject> gameObj, bool root, bool hasNextSibling = false);
+        int8_t renderGameObject(GameObject *gameObj, bool root, bool hasNextSibling = false);
         // TODO: This will get moved out
-        void transformGameObject(std::shared_ptr<GameObject> gameObj);
+        void transformGameObject(GameObject *gameObj);
 
         void resetStacks();
         

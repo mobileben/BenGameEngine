@@ -74,13 +74,13 @@ namespace BGE {
         bool        toggleable;
         bool        toggleOn;
         
-        std::shared_ptr<GameObject> disabledButton;
-        std::shared_ptr<GameObject> disabledAnimButton;
-        std::shared_ptr<GameObject> normalButton;
-        std::shared_ptr<GameObject> normalAnimButton;
-        std::shared_ptr<GameObject> highlightedButton;
-        std::shared_ptr<GameObject> highlightedAnimButton;
-        std::shared_ptr<GameObject> currentButton;
+        GameObjectHandle disabledButtonHandle;
+        GameObjectHandle disabledAnimButtonHandle;
+        GameObjectHandle normalButtonHandle;
+        GameObjectHandle normalAnimButtonHandle;
+        GameObjectHandle highlightedButtonHandle;
+        GameObjectHandle highlightedAnimButtonHandle;
+        GameObjectHandle currentButtonHandle;
   
         void useHighlightedButton();
         void useDisabledButton();

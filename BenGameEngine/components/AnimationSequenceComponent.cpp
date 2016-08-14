@@ -25,8 +25,10 @@ BGE::AnimationSequenceComponent::AnimationSequenceComponent(struct private_key c
 BGE::AnimationSequenceComponent::~AnimationSequenceComponent() {
     // Remove all channels
     
-    if (sequenceRoot) {
-        
+    auto space = getSpace();
+    
+    if (space) {
+        space->removeGameObject(sequenceRootHandle);
     }
 }
 
@@ -36,7 +38,9 @@ void BGE::AnimationSequenceComponent::created() {
     assert(space);
     
     if (space) {
-        sequenceRoot = space->createObject<GameObject>();
+        auto sequenceRoot = space->createGameObject();
+        sequenceRootHandle = sequenceRoot->getHandle();
+        
         auto xform = space->createComponent<TransformComponent>();
         sequenceRoot->addComponent(xform);
         sequenceRoot->setActive(true);
@@ -56,6 +60,8 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
     this->numBounds = animSeqRef.numBounds;
     
     NSLog(@"setAnimationSequenceReference");
+    
+    auto sequenceRoot = getSpace()->getGameObject(sequenceRootHandle);
     
     sequenceRoot->setName(animSeqRef.name);
     
@@ -78,7 +84,7 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
         
         // TODO: Destroy components when done!
         
-        this->channels.push_back(obj);
+        this->channels.push_back(obj->getHandle());
         obj->setActive(true);
         
         // If this is a sequence keyframe, we need to create more game objects!
@@ -99,11 +105,15 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
     bounds = animSeqRef.bounds;
 }
 
-void BGE::AnimationSequenceComponent::setGameObject(std::shared_ptr<GameObject> gameObject) {
-    Component::setGameObject(gameObject);
+void BGE::AnimationSequenceComponent::setGameObjectHandle(GameObjectHandle handle) {
+    Component::setGameObjectHandle(handle);
+    
+    auto space = getSpace();
+    auto gameObject = space->getGameObject(handle);
     auto transformComponent = gameObject->getComponent<TransformComponent>();
 
     if (transformComponent) {
+        auto sequenceRoot = getSpace()->getGameObject(sequenceRootHandle);
         // If there is a transformComponent, then add us to it, if we have
         transformComponent->addChild(sequenceRoot->getComponent<TransformComponent>());
     }

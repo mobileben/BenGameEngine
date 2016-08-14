@@ -72,6 +72,9 @@ namespace BGE {
     struct FontTag {};
     using FontHandle = Handle<FontTag>;
     
+    struct GameObjectTag {};
+    using GameObjectHandle = Handle<GameObjectTag>;
+    
     struct InputTag {};
     using InputHandle = Handle<InputTag>;
     

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <memory>
 #include <vector>
+#include "Space.h"
 #include "Component.h"
 #include "GraphicFormats.h"
 

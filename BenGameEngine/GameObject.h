@@ -23,17 +23,20 @@ namespace BGE {
     
     class GameObject : public NamedObject
     {
-    private:
-        struct private_key {};
-        
     public:
-        static std::shared_ptr<GameObject> create(ObjectId objId);
-        static std::shared_ptr<GameObject> create(ObjectId objId, std::string name);
-
-        GameObject(struct private_key const&, ObjectId objId);
-        GameObject(struct private_key const&, ObjectId objId, std::string name);
-        
+        GameObject();
+        GameObject(ObjectId objId);
         ~GameObject();
+        
+        void initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, std::string name);
+        
+        inline GameObjectHandle getHandle() const { return handle_; }
+        
+        inline bool isActive() const { return active_; }
+        inline void setActive(bool active) { active_ = active; }
+
+        inline Space *getSpace() const;
+        inline SpaceHandle getSpaceHandle() const { return spaceHandle_; }
         
         template <typename T> std::shared_ptr<T> getComponent() {
             std::type_index index = Component::getTypeIndex<T>();
@@ -53,7 +56,7 @@ namespace BGE {
             assert(!component->hasGameObject());
             componentBitmask_ |= Component::getBitmask<T>();
             components_[typeid(T)] = component;
-            component->setGameObject(derived_shared_from_this<GameObject>());
+            component->setGameObjectHandle(getHandle());
         }
         
         template <typename T>
@@ -70,9 +73,6 @@ namespace BGE {
         
         void removeAllComponents();
         
-        bool isActive() const { return active_; }
-        void setActive(bool active) { active_ = active; }
-
         inline uint32_t getComponentBitmask() const { return componentBitmask_; }
         
         template <typename T>
@@ -80,37 +80,25 @@ namespace BGE {
             return getComponentBitmask() & Component::getBitmask<T>();
         }
         
-        Space *getSpace() const;
-        SpaceHandle getSpaceHandle() const { return spaceHandle_; }
-        
-        bool operator==(const GameObject &other) const {
+        inline bool operator==(const GameObject &other) const {
             return getInstanceId() == other.getInstanceId();
         }
         
-        bool operator!=(const GameObject &other) const {
+        inline bool operator!=(const GameObject &other) const {
             return getInstanceId() != other.getInstanceId();
         }
         
-    protected:
-        
-#ifdef NOT_YET
-        GameObject() = delete;
-        GameObject(GameObject const&) = delete;
-        GameObject(ObjectId objId) = delete;
-        GameObject(ObjectId objId, std::string name) = delete;
-#endif
-        
-        void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
-
     private:
         friend GameObjectService;
         
         bool                    active_;
         uint32_t                componentBitmask_;
+        GameObjectHandle        handle_;
         SpaceHandle             spaceHandle_;
         std::unordered_map<std::type_index, std::shared_ptr<Component>> components_;
         
         void removeComponentFromSpace(std::type_index typeIndex);
+        void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
     };
 }
 

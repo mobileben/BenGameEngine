@@ -53,10 +53,11 @@ namespace BGE {
     class GameObject;
     class ButtonComponent;
     
-    using InputTouchEventHandler = std::function<void(std::shared_ptr<GameObject>, InputTouchEvent)>;
+    using InputTouchEventHandler = std::function<void(GameObjectHandle, InputTouchEvent)>;
     
     struct InputButtonHandler {
-        std::weak_ptr<GameObject>           gameObj;
+        GameObjectHandle                    gameObjHandle;
+        SpaceHandle                         spaceHandle;
         std::shared_ptr<ButtonComponent>    buttonComponent;
         TouchType                           touchType;
         bool                                inBounds;

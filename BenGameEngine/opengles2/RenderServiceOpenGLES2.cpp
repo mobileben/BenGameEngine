@@ -452,7 +452,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<GameObject> gameObject) {
+void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
     if (gameObject) {
         std::shared_ptr<FlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<FlatRectRenderComponent>(gameObject->getComponent<FlatRectRenderComponent>());
         
@@ -484,7 +484,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(std::shared_ptr<GameObject> gameO
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawMaskRect(std::shared_ptr<GameObject> gameObject) {
+void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
     if (gameObject) {
         std::shared_ptr<MaskComponent> maskRect = std::dynamic_pointer_cast<MaskComponent>(gameObject->getComponent<MaskComponent>());
         
@@ -529,7 +529,7 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(std::shared_ptr<GameObject> gameO
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawLines(std::shared_ptr<GameObject> gameObject) {
+void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
     if (gameObject) {
         auto line = gameObject->getComponent<LineRenderComponent>();
         
@@ -592,7 +592,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(std::shared_ptr<GameObject> gameObje
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObject) {
+void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
     if (gameObject) {
         std::shared_ptr<SpriteRenderComponent> sprite = std::dynamic_pointer_cast<SpriteRenderComponent>(gameObject->getComponent<SpriteRenderComponent>());
         
@@ -661,7 +661,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(std::shared_ptr<GameObject> gameObj
     }
 }
 
-uint8_t BGE::RenderServiceOpenGLES2::enableMask(std::shared_ptr<GameObject> gameObject) {
+uint8_t BGE::RenderServiceOpenGLES2::enableMask(GameObject *gameObject) {
     uint8_t maskValue = 0;
     
     if (this->activeMasks_ != 0xFF) {
@@ -754,7 +754,9 @@ void BGE::RenderServiceOpenGLES2::render()
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space && space->isVisible()) {
-                for (auto &obj : space->getGameObjects()) {
+                for (auto objHandle : space->getGameObjects()) {
+                    auto obj = space->getGameObject(objHandle);
+                    
                     renderGameObject(obj, true);
                 }
             }
@@ -764,7 +766,7 @@ void BGE::RenderServiceOpenGLES2::render()
     }
 }
 
-int8_t BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject> gameObj, bool root, bool hasNextSibling) {
+int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool root, bool hasNextSibling) {
     uint8_t maskValue = 0;
     
     if (!gameObj->isActive()) {
@@ -844,7 +846,8 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(std::shared_ptr<GameObject>
         for (auto i=0;i<transformComponent->getNumChildren();i++) {
             auto childXform = transformComponent->childAtIndex(i);
             if (childXform->hasGameObject()) {
-                auto childObj = childXform->getGameObject().lock();
+                auto childObjHandle = childXform->getGameObjectHandle();
+                auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
                 
                 // TODO: Have some better means of identifying the right child. For now brute force it
                 if (childObj) {
@@ -901,7 +904,7 @@ void BGE::RenderServiceOpenGLES2::popColorTransform() {
     colorTransformStack_.pop_back();
 }
 
-void BGE::RenderServiceOpenGLES2::transformGameObject(std::shared_ptr<GameObject> gameObj) {
+void BGE::RenderServiceOpenGLES2::transformGameObject(GameObject *gameObj) {
     // TODO: Transform
     auto transformComponent = gameObj->getComponent<TransformComponent>();
     

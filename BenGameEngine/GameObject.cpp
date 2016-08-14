@@ -11,22 +11,25 @@
 #include "Game.h"
 #include "ComponentBitmask.h"
 
-std::shared_ptr<BGE::GameObject> BGE::GameObject::create(ObjectId objId) {
-    return std::make_shared<GameObject>(private_key{}, objId);
+BGE::GameObject::GameObject() : NamedObject(), active_(false), componentBitmask_(0) {
 }
 
-std::shared_ptr<BGE::GameObject> BGE::GameObject::create(ObjectId objId, std::string name) {
-    return std::make_shared<GameObject>(private_key{}, objId, name);
-}
-
-BGE::GameObject::GameObject(struct private_key const&, ObjectId objId) : NamedObject(objId), active_(false), componentBitmask_(0) {
-}
-
-BGE::GameObject::GameObject(struct private_key const&, ObjectId objId, std::string name) : NamedObject(objId, name), active_(false), componentBitmask_(0) {
+BGE::GameObject::GameObject(ObjectId objId) : NamedObject(objId), active_(false), componentBitmask_(0) {
 }
 
 BGE::GameObject::~GameObject() {
     removeAllComponents();
+}
+
+void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, std::string name) {
+    setName(name);
+
+    active_ = false;
+
+    removeAllComponents();
+
+    handle_ = gameObjHandle;
+    spaceHandle_ = spaceHandle;
 }
 
 void BGE::GameObject::removeComponentFromSpace(std::type_index typeIndex) {

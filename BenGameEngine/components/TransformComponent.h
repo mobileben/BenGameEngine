@@ -127,7 +127,7 @@ namespace BGE {
         float           speed_;
         bool            paused_;
         
-        void setGameObject(std::shared_ptr<GameObject> gameObject);
+        void setGameObjectHandle(GameObjectHandle handle);
         void updateMatrix();
     };
 }

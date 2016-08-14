@@ -41,13 +41,17 @@ struct std::hash<BGE::Event> {
 namespace BGE {
     class GameObject;
 
-    using EventHandlerFunction = std::function<void(std::shared_ptr<GameObject>, Event)>;
+    using EventHandlerFunction = std::function<void(SpaceHandle, GameObjectHandle, Event)>;
     
     struct EventHandler : public NamedObject {
         EventHandlerHandle          handle;
-        std::shared_ptr<GameObject> gameObj;
+        SpaceHandle                 spaceHandle;
+        GameObjectHandle            gameObjHandle;
         Event                       event;
         EventHandlerFunction        handler;
+        
+        EventHandler() : NamedObject() {
+        }
         
         EventHandler(ObjectId objId) : NamedObject(objId) {
         }

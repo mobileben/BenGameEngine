@@ -10,69 +10,75 @@
 #include "GameObject.h"
 #include "Game.h"
 
-BGE::GameObjectService::GameObjectService() {
+BGE::GameObjectService::GameObjectService() : handleService_(InitialGameObjectReserve, GameObjectHandleService::NoMaxLimit) {
 }
 
 BGE::GameObjectService::~GameObjectService() {
 }
 
-void BGE::GameObjectService::removeObject(std::shared_ptr<GameObject> object) {
-    if (object) {
-        removeObject(object->getInstanceId());
+BGE::GameObject *BGE::GameObjectService::createGameObject(std::string name) {
+    GameObjectHandle handle;
+    auto obj = handleService_.allocate(handle);
+    
+    if (obj) {
+        obj->initialize(spaceHandle_, handle, name);
+        gameObjects_.push_back(handle);
     }
+    
+    return obj;
 }
 
-void BGE::GameObjectService::removeObject(ObjectId objId) {
-    GameObjectMap::iterator it = mappedObjects_.find(objId);
-    
-    if (it != mappedObjects_.end()) {
-        mappedObjects_.erase(objId);
-    }
-    
-    for (std::vector<std::shared_ptr<GameObject>>::iterator obj = objects_.begin();obj != objects_.end();obj++) {
-        if ((*obj)->getInstanceId() == objId) {
-            objects_.erase(obj);
-            break;
+BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(ObjectId objId) {
+    for (auto handle : gameObjects_) {
+        auto obj = getGameObject(handle);
+        
+        if (obj) {
+            if (obj->getInstanceId() == objId) {
+                return handle;
+            }
         }
     }
+    
+    return GameObjectHandle();
 }
 
-void BGE::GameObjectService::removeObject(std::string name) {
-    for (auto obj : mappedObjects_) {
-        if (obj.second->getName() == name) {
-            removeObject(obj.second->getInstanceId());
+BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(std::string name) {
+    for (auto handle : gameObjects_) {
+        auto obj = getGameObject(handle);
+        
+        if (obj) {
+            if (obj->getName() == name) {
+                return handle;
+            }
+        }
+    }
+    
+    return GameObjectHandle();
+}
+
+BGE::GameObject *BGE::GameObjectService::getGameObject(ObjectId objId) {
+    return handleService_.dereference(getGameObjectHandle(objId));
+}
+
+BGE::GameObject *BGE::GameObjectService::getGameObject(std::string name) {
+    return handleService_.dereference(getGameObjectHandle(name));
+}
+
+BGE::GameObject *BGE::GameObjectService::getGameObject(GameObjectHandle handle) {
+    return handleService_.dereference(handle);
+}
+
+void BGE::GameObjectService::removeGameObject(GameObjectHandle handle) {
+    for (auto it = gameObjects_.begin();it != gameObjects_.end();++it) {
+        if (*it == handle) {
+            handleService_.release(handle);
+            gameObjects_.erase(it);
             return;
         }
     }
 }
 
-std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(std::shared_ptr<GameObject> object) {
-    if (object) {
-        return find(object->getInstanceId());
-    } else {
-        return std::shared_ptr<GameObject>();
-    }
-}
-
-std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(ObjectId objId) {
-    GameObjectMap::iterator it = mappedObjects_.find(objId);
-    
-    return it->second;
-}
-
-std::shared_ptr<BGE::GameObject> BGE::GameObjectService::find(std::string name) {
-    std::shared_ptr<GameObject> found;
-    
-    for (auto kv : mappedObjects_) {
-        if (kv.second->getName() == name) {
-            found = kv.second;
-            break;
-        }
-    }
-    
-    return found;
-}
-
 BGE::Space *BGE::GameObjectService::getSpace(void) const {
     return Game::getInstance()->getSpaceService()->getSpace(spaceHandle_);
 }
+

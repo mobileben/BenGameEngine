@@ -23,8 +23,8 @@ std::shared_ptr<BGE::AnimationChannelComponent> BGE::AnimationChannelComponent::
 BGE::AnimationChannelComponent::AnimationChannelComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), channel(nullptr) {
 }
 
-void BGE::AnimationChannelComponent::setGameObject(std::shared_ptr<GameObject> gameObject) {
-    Component::setGameObject(gameObject);
+void BGE::AnimationChannelComponent::setGameObjectHandle(GameObjectHandle handle) {
+    Component::setGameObjectHandle(handle);
     
     updateReference();
 }
@@ -36,11 +36,11 @@ void BGE::AnimationChannelComponent::setAnimationChannelReference(const Animatio
 }
 
 void BGE::AnimationChannelComponent::updateReference() {
-    std::shared_ptr<GameObject> gameObj = getGameObject().lock();
+    auto space = getSpace();
+    auto gameObj = space->getGameObject(getGameObjectHandle());
     
-    if (gameObj && this->channel) {
+    if (this->channel) {
         // Now setup the proper render component
-        auto space = getSpace();
         
         // TODO: Do we do this later?
         NSLog(@"Channel reference %s/%d", this->channel->reference, this->channel->referenceType);
@@ -119,9 +119,9 @@ void BGE::AnimationChannelComponent::updateReference() {
         }
     } else {
         if (this->channel) {
-            NSLog(@"You fail %x %x %x", gameObj.get(), this->channel, this->channel->referenceData);
+            NSLog(@"You fail %x %x %x", gameObj, this->channel, this->channel->referenceData);
         } else {
-            NSLog(@"You fail %x", gameObj.get());
+            NSLog(@"You fail %x", gameObj);
         }
     }
 }

@@ -40,10 +40,11 @@ namespace BGE {
         Component(struct private_key const& key, ObjectId componentId);
         virtual ~Component() {}
         
-        bool hasGameObject() const { return !gameObject_.expired(); }
-        std::weak_ptr<GameObject> getGameObject() const { return gameObject_; }
+        inline bool hasGameObject() const { return !gameObjectHandle_.isNull(); }
+        inline GameObjectHandle getGameObjectHandle() const { return gameObjectHandle_; }
+        
         Space *getSpace() const;
-        SpaceHandle getSpaceHandle() const { return spaceHandle_; }
+        inline SpaceHandle getSpaceHandle() const { return spaceHandle_; }
 
         template <typename T>
         static uint32_t getBitmask() {
@@ -80,8 +81,8 @@ namespace BGE {
             return T::bitmask_ != Component::InvalidBitmask && T::type_index_ != Component::type_index_;
         }
         
-        void setGameObject(std::shared_ptr<GameObject> gameObject) { gameObject_ = gameObject; }
-        void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
+        inline void setGameObjectHandle(GameObjectHandle gameObjectHandle) { gameObjectHandle_ = gameObjectHandle; }
+        inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
 
         virtual void created() {}
         
@@ -90,8 +91,8 @@ namespace BGE {
         friend GameObject;
         friend Space;
         
-        std::weak_ptr<GameObject>   gameObject_;
-        SpaceHandle                 spaceHandle_;
+        GameObjectHandle    gameObjectHandle_;
+        SpaceHandle         spaceHandle_;
     };
 }
 

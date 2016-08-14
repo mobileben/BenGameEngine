@@ -11,7 +11,10 @@
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
 
-BGE::Space::Space( ObjectId spaceId) : NamedObject(spaceId), visible_(false), order_(0), updatable_(true) {
+BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true) {
+}
+
+BGE::Space::Space(ObjectId spaceId) : NamedObject(spaceId), visible_(false), order_(0), updatable_(true) {
 }
 
 BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true) {
@@ -30,7 +33,7 @@ void BGE::Space::initialize(SpaceHandle handle, ObjectId spaceId, std::string na
 }
 
 
-std::shared_ptr<BGE::GameObject> BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     AnimationSequenceReference *animSeqRef;
     
@@ -41,7 +44,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createAnimSequence(std::string name
     }
     
     if (animSeqRef) {
-        auto obj = createObject<GameObject>(name);
+        auto obj = createGameObject(name);
         auto xform = createComponent<TransformComponent>();
         auto boundingBox = createComponent<BoundingBoxComponent>();
         auto animSeq = createComponent<AnimationSequenceComponent>();
@@ -62,9 +65,9 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createAnimSequence(std::string name
     return nullptr;
 }
 
-std::shared_ptr<BGE::GameObject> BGE::Space::createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate) {
     if (channelRef) {
-        auto obj = createObject<GameObject>(name);
+        auto obj = createGameObject(name);
         auto xform = createComponent<TransformComponent>();
         auto channel = createComponent<AnimationChannelComponent>();
         auto animator = createComponent<ChannelFrameAnimatorComponent>();
@@ -83,7 +86,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createAnimChannel(std::string name,
     return nullptr;
 }
 
-std::shared_ptr<BGE::GameObject> BGE::Space::createFrameAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     AnimationSequenceReference *animSeqRef;
     
@@ -94,7 +97,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createFrameAnimSequence(std::string
     }
     
     if (animSeqRef) {
-        auto obj = createObject<GameObject>(name);
+        auto obj = createGameObject(name);
         auto xform = createComponent<TransformComponent>();
         auto animSeq = createComponent<AnimationSequenceComponent>();
         auto animator = createComponent<FrameAnimatorComponent>();
@@ -113,7 +116,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createFrameAnimSequence(std::string
     return nullptr;
 }
 
-std::shared_ptr<BGE::GameObject> BGE::Space::createButton(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     ButtonReference *buttonRef;
     
@@ -124,7 +127,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createButton(std::string name, Scen
     }
     
     if (buttonRef) {
-        auto obj = createObject<GameObject>(name);
+        auto obj = createGameObject(name);
         auto xform = createComponent<TransformComponent>();
         auto button = createComponent<ButtonComponent>();
         auto bbox = createComponent<BoundingBoxComponent>();
@@ -145,7 +148,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createButton(std::string name, Scen
     return nullptr;
 }
 
-std::shared_ptr<BGE::GameObject> BGE::Space::createExternalReference(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     ExternalPackageReference *extRef;
     
@@ -197,7 +200,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createExternalReference(std::string
     return nullptr;
 }
 
-std::shared_ptr<BGE::GameObject> BGE::Space::createMask(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     MaskReference *maskRef;
     
@@ -208,7 +211,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createMask(std::string name, SceneP
     }
     
     if (maskRef) {
-        auto obj = createObject<GameObject>(name);
+        auto obj = createGameObject(name);
         auto xform = createComponent<TransformComponent>();
         auto mask = createComponent<MaskComponent>();
         
@@ -225,7 +228,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createMask(std::string name, SceneP
     return nullptr;
 }
 
-std::shared_ptr<BGE::GameObject> BGE::Space::createSprite(std::string name, ScenePackageHandle handle) {
+BGE::GameObject *BGE::Space::createSprite(std::string name, ScenePackageHandle handle) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     TextureReference *texRef;
     
@@ -236,7 +239,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createSprite(std::string name, Scen
     }
     
     if (texRef) {
-        auto obj = createObject<GameObject>(name);
+        auto obj = createGameObject(name);
         auto xform = createComponent<TransformComponent>();
         auto sprite = createComponent<SpriteRenderComponent>();
         auto bbox = createComponent<BoundingBoxComponent>();
@@ -255,7 +258,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createSprite(std::string name, Scen
     return nullptr;
 }
 
-std::shared_ptr<BGE::GameObject> BGE::Space::createText(std::string name, ScenePackageHandle handle) {
+BGE::GameObject *BGE::Space::createText(std::string name, ScenePackageHandle handle) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     TextReference *textRef;
     
@@ -266,7 +269,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createText(std::string name, SceneP
     }
     
     if (textRef) {
-        auto obj = createObject<GameObject>(name);
+        auto obj = createGameObject(name);
         auto xform = createComponent<TransformComponent>();
         auto text = createComponent<TextComponent>();
         auto bbox = createComponent<BoundingBoxComponent>();
@@ -285,7 +288,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createText(std::string name, SceneP
     return nullptr;
 }
 
-std::shared_ptr<BGE::GameObject> BGE::Space::createPlacement(std::string name, ScenePackageHandle handle) {
+BGE::GameObject *BGE::Space::createPlacement(std::string name, ScenePackageHandle handle) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     PlacementReference *placementRef;
     
@@ -296,7 +299,7 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createPlacement(std::string name, S
     }
     
     if (placementRef) {
-        auto obj = createObject<GameObject>(name);
+        auto obj = createGameObject(name);
         auto xform = createComponent<TransformComponent>();
         
         obj->addComponent(xform);
@@ -309,22 +312,23 @@ std::shared_ptr<BGE::GameObject> BGE::Space::createPlacement(std::string name, S
     return nullptr;
 }
 
-void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate) {
+void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+    auto root = getGameObject(rootHandle);
     
     if (package) {
         auto autoDisplayList = package->getAutoDisplayList();
         auto num = package->getAutoDisplayListSize();
-        std::map<uint32_t, std::vector<std::shared_ptr<GameObject>>> createdObjects;
-        std::vector<std::shared_ptr<GameObject>> rootObjs;
+        std::map<uint32_t, std::vector<GameObjectHandle>> createdObjectHandles;
+        std::vector<GameObjectHandle> rootObjHandles;
         
         for (auto i=0;i<GfxReferenceTypeLast;i++) {
-            createdObjects[i] = std::vector<std::shared_ptr<GameObject>>();
+            createdObjectHandles[i] = std::vector<GameObjectHandle>();
         }
         
         for (auto i=0;i<num;i++) {
             auto elem = &autoDisplayList[i];
-            std::shared_ptr<GameObject> obj;
+            GameObject *obj;
             
             switch (elem->referenceType) {
                 case GfxReferenceTypeAnimationSequence:
@@ -390,15 +394,15 @@ void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, Scen
                 }
             }
 
-            createdObjects[elem->referenceType].push_back(obj);
-            rootObjs.push_back(obj);
+            createdObjectHandles[elem->referenceType].push_back(obj->getHandle());
+            rootObjHandles.push_back(obj->getHandle());
         }
         
         for (auto i=0;i<GfxReferenceTypeLast;i++) {
-            auto items = createdObjects[i];
+            auto itemHandles = createdObjectHandles[i];
             
-            if (items.size() > 0) {
-                std::function<void(std::shared_ptr<GameObject>)> callback = nullptr;
+            if (itemHandles.size() > 0) {
+                std::function<void(GameObject *)> callback = nullptr;
                 
                 switch (i) {
                     case GfxReferenceTypeAnimationSequence:
@@ -438,7 +442,8 @@ void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, Scen
                 }
                 
                 if (callback) {
-                    for (auto item : items) {
+                    for (auto itemHandle : itemHandles) {
+                        auto item = getGameObject(itemHandle);
                         callback(item);
                     }
                 }
@@ -451,7 +456,9 @@ void BGE::Space::createAutoDisplayObjects(std::shared_ptr<GameObject> root, Scen
             rootXform = root->getComponent<TransformComponent>();
         }
         
-        for (auto obj : rootObjs) {
+        for (auto objHandle : rootObjHandles) {
+            auto obj = getGameObject(objHandle);
+            
             if (rootXform) {
                 auto xform = obj->getComponent<TransformComponent>();
                 rootXform->addChild(xform);

@@ -23,6 +23,7 @@
 namespace BGE {
     class ScenePackage : public NamedObject {
     public:
+        ScenePackage();
         ScenePackage(ObjectId sceneId);
         ~ScenePackage();
         
@@ -158,14 +159,14 @@ namespace BGE {
     class GameObject;
     
     struct SceneObjectCreatedDelegate {
-        std::function<void(std::shared_ptr<GameObject>)> animationSequenceCreatedHandler;
-        std::function<void(std::shared_ptr<GameObject>)> buttonCreatedHandler;
-        std::function<void(std::shared_ptr<GameObject>)> maskCreatedHandler;
-        std::function<void(std::shared_ptr<GameObject>)> placementCreatedHandler;
-        std::function<void(std::shared_ptr<GameObject>)> spriteCreatedHandler;
-        std::function<void(std::shared_ptr<GameObject>)> textCreatedHandler;
-        std::function<void(std::shared_ptr<GameObject>)> textureMaskCreatedHandler;
-        std::function<void(std::shared_ptr<GameObject>)> completionHandler;
+        std::function<void(GameObject *)> animationSequenceCreatedHandler;
+        std::function<void(GameObject *)> buttonCreatedHandler;
+        std::function<void(GameObject *)> maskCreatedHandler;
+        std::function<void(GameObject *)> placementCreatedHandler;
+        std::function<void(GameObject *)> spriteCreatedHandler;
+        std::function<void(GameObject *)> textCreatedHandler;
+        std::function<void(GameObject *)> textureMaskCreatedHandler;
+        std::function<void(GameObject *)> completionHandler;
     };
 }
 

@@ -15,7 +15,6 @@
 #include <unordered_map>
 #include <vector>
 #include <type_traits>
-
 #include "Service.h"
 #include "Component.h"
 #include "GameObject.h"
@@ -65,7 +64,8 @@ namespace BGE {
             
             if (it != components_.end()) {
                 for (auto component : it->second) {
-                    auto gameObj = component->getGameObject().lock();
+                    auto gameObjHandle = component->getGameObjectHandle();
+                    auto gameObj = getComponentGameObject(component.get(), gameObjHandle);
                     if (gameObj->isActive()) {
                         auto z = std::static_pointer_cast<T>(component);
                         components.push_back(z);
@@ -90,6 +90,8 @@ namespace BGE {
         
         SpaceHandle spaceHandle_;
         ComponentMap components_;
+        
+        GameObject *getComponentGameObject(Component *, GameObjectHandle gameObjHandle);
         
         template <typename T> void addComponent(std::shared_ptr<T> component) {
             std::type_index index = Component::getTypeIndex<T>();
