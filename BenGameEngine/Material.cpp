@@ -16,6 +16,14 @@ BGE::Material::Material(ObjectId matId) : Object(matId), colorDirty_(false)  {
     colorMatrix_.offset.a = 0;
 }
 
+BGE::Material::Material() : Object(), colorDirty_(false)  {
+    Matrix4MakeIdentify(colorMatrix_.matrix);
+    colorMatrix_.offset.r = 0;
+    colorMatrix_.offset.g = 0;
+    colorMatrix_.offset.b = 0;
+    colorMatrix_.offset.a = 0;
+}
+
 void BGE::Material::initialize(MaterialHandle handle, ObjectId matId) {
     handle_ = handle;
     setInstanceId(matId);

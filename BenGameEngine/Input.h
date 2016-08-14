@@ -42,10 +42,10 @@ namespace BGE {
         float           y;
         uint32_t        tapCount;
         
-        Input(ObjectId matId);
+        Input();
         ~Input() {}
         
-        void initialize(InputHandle handle, ObjectId objectId);
+        void initialize(InputHandle handle);
         
         bool operator <(const Input &rhs) const { return timestamp < rhs.timestamp; }
         

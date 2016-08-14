@@ -21,6 +21,9 @@ static const int NumSupportedCharacters = 256 - InitialSupportedCharacterOffset;
 
 const std::string BGE::Font::ErrorDomain = "Font";
 
+BGE::Font::Font() : NamedObject(), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), valid_(false), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
+}
+
 BGE::Font::Font(ObjectId fontId) : NamedObject(fontId), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), valid_(false), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
 }
 

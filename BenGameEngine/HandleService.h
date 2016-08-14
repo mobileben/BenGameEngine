@@ -64,9 +64,7 @@ namespace BGE {
                 index = (uint32_t) magic_.size();
                 handle.init(index);
                 
-                ObjectId objId = getIdAndIncrement();
-
-                data_.push_back(DATA(objId));
+                data_.push_back(DATA());
                 magic_.push_back(handle.getMagic());
             } else {
                 index = freeSlots_.back();
@@ -75,7 +73,11 @@ namespace BGE {
                 magic_[index] = handle.getMagic();
             }
             
-            return &data_[index];
+            auto data = &data_[index];
+            ObjectId objId = getIdAndIncrement();
+
+            data->setInstanceId(objId);
+            return data;
         }
         
         void release(HANDLE handle) {

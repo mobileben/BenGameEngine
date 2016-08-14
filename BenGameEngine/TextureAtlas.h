@@ -30,6 +30,7 @@ namespace BGE {
     public:
         static const std::string ErrorDomain;
         
+        TextureAtlas();
         TextureAtlas(ObjectId fontId);
         TextureAtlas(ObjectId objId, std::string name);
         ~TextureAtlas();

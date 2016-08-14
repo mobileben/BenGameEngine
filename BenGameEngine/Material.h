@@ -22,6 +22,7 @@ namespace BGE {
     
     class Material : public Object {
     public:
+        Material();
         Material(ObjectId matId);
         ~Material() {}
         

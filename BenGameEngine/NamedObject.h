@@ -17,6 +17,7 @@ namespace BGE {
     class NamedObject : public Object
     {
     public:
+        NamedObject() : Object() {}
         NamedObject(ObjectId objId) : Object(objId) {}
         NamedObject(ObjectId objId, std::string name) : Object(objId), name_(name) {}
         virtual ~NamedObject() {}

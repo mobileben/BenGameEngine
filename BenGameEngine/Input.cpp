@@ -8,12 +8,11 @@
 
 #include "Input.h"
 
-BGE::Input::Input(ObjectId inputId) : Object(inputId)  {
+BGE::Input::Input() : Object()  {
 }
 
-void BGE::Input::initialize(InputHandle handle, ObjectId inputId) {
+void BGE::Input::initialize(InputHandle handle) {
     handle_ = handle;
-    setInstanceId(inputId);
     
     type = TouchType::None;
     timestamp = 0;

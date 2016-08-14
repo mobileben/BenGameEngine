@@ -55,6 +55,7 @@ namespace BGE {
     public:
         static const std::string ErrorDomain;
 
+        Font();
         Font(ObjectId fontId);
         Font(std::string name, uint32_t pixelSize);
         virtual ~Font();

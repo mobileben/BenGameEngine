@@ -22,6 +22,7 @@ namespace BGE {
     class Object : public std::enable_shared_from_this<Object>
     {
     public:
+        Object() : id_(0) {}
         Object(ObjectId objId) : id_(objId) {}
         virtual ~Object() {}
         
@@ -35,8 +36,6 @@ namespace BGE {
         }
 
     protected:
-        Object() : id_(0) {}
-        
         void setInstanceId(ObjectId id) {
             id_ = id;
         }

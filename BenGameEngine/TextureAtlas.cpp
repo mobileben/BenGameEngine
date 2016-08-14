@@ -11,6 +11,9 @@
 
 const std::string BGE::TextureAtlas::ErrorDomain = "TextureAtlas";
 
+BGE::TextureAtlas::TextureAtlas() : NamedObject(), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0), hwId_(0), target_(GL_TEXTURE_2D) {
+}
+
 BGE::TextureAtlas::TextureAtlas(ObjectId texId) : NamedObject(texId), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0), hwId_(0), target_(GL_TEXTURE_2D) {
 }
 

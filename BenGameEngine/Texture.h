@@ -64,9 +64,12 @@ namespace BGE {
     public:
         static const std::string ErrorDomain;
 
+        Texture();
+#ifdef NOT_YET
         Texture(ObjectId texId);
         Texture(ObjectId texId, std::string name);
         Texture(uint32_t texId, std::string name, GLKTextureInfo *textureInfo);
+#endif
         ~Texture();
         
         void initialize(TextureHandle handle, ObjectId texId, std::string name);

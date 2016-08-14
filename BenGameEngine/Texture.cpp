@@ -12,6 +12,12 @@
 
 const std::string BGE::Texture::ErrorDomain = "Texture";
 
+BGE::Texture::Texture() : NamedObject(), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
+    updateUVs();
+    updateXYs();
+}
+
+#ifdef NOT_YET
 BGE::Texture::Texture(uint32_t texId) : NamedObject(texId), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
     updateUVs();
     updateXYs();
@@ -36,6 +42,7 @@ BGE::Texture::Texture(uint32_t texId, std::string name, GLKTextureInfo *textureI
         updateXYs();
     }
 }
+#endif
 
 BGE::Texture::~Texture() {
     GLuint name;
