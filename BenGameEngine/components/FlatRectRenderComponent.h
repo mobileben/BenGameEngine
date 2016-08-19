@@ -22,10 +22,12 @@ namespace BGE {
     private:
         struct private_key {};
         friend Component;
-        static uint32_t         bitmask_;
-        static std::type_index  type_index_;
 
     public:
+        static std::type_index  type_index_;
+        static uint32_t         typeId_;
+        static uint32_t         bitmask_;
+        
         static std::shared_ptr<FlatRectRenderComponent> create(ObjectId componentId);
         
         FlatRectRenderComponent(struct private_key const& key, ObjectId componentId);

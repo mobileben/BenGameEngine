@@ -17,6 +17,7 @@ static const char *ButtonStateHighlightedString = "highlighted";
 static const char *ButtonStateHighlightedAnimString = "highlighted-anim";
 
 uint32_t BGE::ButtonComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent);
 
 std::shared_ptr<BGE::ButtonComponent> BGE::ButtonComponent::create(ObjectId componentId) {

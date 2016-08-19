@@ -42,6 +42,10 @@ namespace BGE {
         HandleService() = delete;
         ~HandleService() {}
         
+        static HandleService<DATA, HANDLE> *createService(uint32_t reserve, uint32_t maxLimit) {
+            return new HandleService<DATA, HANDLE>(reserve, maxLimit);
+        }
+        
         void initialize() {}
         void reset() {}
         void enteringBackground() {}
@@ -52,7 +56,7 @@ namespace BGE {
         void update(double deltaTime) {}
 
         DATA* allocate(HANDLE& handle) {
-            uint32_t index;
+            HandleBackingType index;
             
             if (freeSlots_.empty()) {
                 // We have no free slots, so create a new one if we are not at our limit
@@ -61,7 +65,7 @@ namespace BGE {
                     return nullptr;
                 }
                 
-                index = (uint32_t) magic_.size();
+                index = (HandleBackingType) magic_.size();
                 handle.init(index);
                 
                 data_.push_back(DATA());
@@ -148,8 +152,8 @@ namespace BGE {
         
     private:
         typedef std::vector<DATA> DataVector;
-        typedef std::vector<uint32_t> MagicVector;
-        typedef std::vector<uint32_t> FreeVector;
+        typedef std::vector<HandleBackingType> MagicVector;
+        typedef std::vector<HandleBackingType> FreeVector;
         
         uint32_t    maxLimit_;
         DataVector  data_;

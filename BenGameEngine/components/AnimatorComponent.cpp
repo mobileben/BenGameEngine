@@ -17,6 +17,7 @@
 #include "BoundingBoxComponent.h"
 
 uint32_t BGE::AnimatorComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::AnimatorComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::AnimatorComponent::type_index_ = typeid(BGE::AnimatorComponent);
 
 std::shared_ptr<BGE::AnimatorComponent> BGE::AnimatorComponent::create(ObjectId componentId) {

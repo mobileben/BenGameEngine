@@ -9,6 +9,7 @@
 #include "LineRenderComponent.h"
 
 uint32_t BGE::LineRenderComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::LineRenderComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::LineRenderComponent::type_index_ = typeid(BGE::LineRenderComponent);
 
 std::shared_ptr<BGE::LineRenderComponent> BGE::LineRenderComponent::create(ObjectId componentId) {

@@ -10,6 +10,7 @@
 #include "Game.h"
 
 uint32_t BGE::TextComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::TextComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::TextComponent::type_index_ = typeid(BGE::TextComponent);
 
 std::shared_ptr<BGE::TextComponent> BGE::TextComponent::create(ObjectId componentId) {

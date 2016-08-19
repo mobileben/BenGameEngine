@@ -9,6 +9,7 @@
 #include "FrameAnimatorComponent.h"
 
 uint32_t BGE::FrameAnimatorComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::FrameAnimatorComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::FrameAnimatorComponent::type_index_ = typeid(BGE::FrameAnimatorComponent);
 
 std::shared_ptr<BGE::FrameAnimatorComponent> BGE::FrameAnimatorComponent::create(ObjectId componentId) {

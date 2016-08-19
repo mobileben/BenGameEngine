@@ -25,30 +25,45 @@
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
 
+bool BGE::ComponentService::componentsRegistered_ = false;
+std::vector<std::function<void *(uint32_t, uint32_t)>> BGE::ComponentService::handleServiceCreators_;
+
 void BGE::ComponentService::registerComponents() {
-    Component::registerBitmask<AnimationChannelComponent>();
-    Component::registerBitmask<AnimationSequenceComponent>();
-    Component::registerBitmask<AnimatorComponent>();
-    Component::registerBitmask<ChannelFrameAnimatorComponent>();
-    Component::registerBitmask<ColorMatrixComponent>();
-    Component::registerBitmask<ColorTransformComponent>();
-    Component::registerBitmask<FlatRectRenderComponent>();
-    Component::registerBitmask<FrameAnimatorComponent>();
-    Component::registerBitmask<LineRenderComponent>();
-    Component::registerBitmask<SpriteRenderComponent>();
-    Component::registerBitmask<TextComponent>();
-    Component::registerBitmask<TransformComponent>();
-    Component::registerBitmask<ButtonComponent>();
-    Component::registerBitmask<MaskComponent>();
-    Component::registerBitmask<TextureMaskComponent>();
-    Component::registerBitmask<InputTouchComponent>();
-    Component::registerBitmask<BoundingBoxComponent>();
+    if (!ComponentService::componentsRegistered_) {
+        registerComponent<TransformComponent, TransformComponentHandle>();
+        registerComponent<BoundingBoxComponent, BoundingBoxComponentHandle>();
+        registerComponent<AnimationChannelComponent, AnimationChannelComponentHandle>();
+        registerComponent<AnimationSequenceComponent, AnimationSequenceComponentHandle>();
+        registerComponent<AnimatorComponent, AnimatorComponentHandle>();
+        registerComponent<ChannelFrameAnimatorComponent, ChannelFrameAnimatorComponentHandle>();
+        registerComponent<ColorMatrixComponent, ColorMatrixComponentHandle>();
+        registerComponent<ColorTransformComponent, ColorTransformComponentHandle>();
+        registerComponent<FrameAnimatorComponent, FrameAnimatorComponentHandle>();
+        registerComponent<SpriteRenderComponent, SpriteRenderComponentHandle>();
+        registerComponent<TextComponent, TextComponentHandle>();
+        registerComponent<ButtonComponent, ButtonComponentHandle>();
+        registerComponent<InputTouchComponent, InputTouchComponentHandle>();
+        registerComponent<LineRenderComponent, LineRenderComponentHandle>();
+        registerComponent<FlatRectRenderComponent, FlatRectRenderComponentHandle>();
+        registerComponent<MaskComponent, MaskComponentHandle>();
+        registerComponent<TextureMaskComponent, TextureMaskComponentHandle>();
+    }
+    
+    componentsRegistered_ = true;
 }
 
-BGE::ComponentService::ComponentService() {
+BGE::ComponentService::ComponentService() : Service(), foo_(10, 10) {
+    for (auto &creator : handleServiceCreators_) {
+        componentHandleServices_.push_back(static_cast<void *>(creator(120, 120)));
+        
+        componentHandles_.push_back(std::vector<ComponentHandle>());
+    }
 }
 
-BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : spaceHandle_(spaceHandle) {
+BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : Service(), foo_(10, 10), spaceHandle_(spaceHandle) {
+    if (!ComponentService::componentsRegistered_) {
+        ComponentService::registerComponents();
+    }
 }
 
 BGE::ComponentService::~ComponentService() {

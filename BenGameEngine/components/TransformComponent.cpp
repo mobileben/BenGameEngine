@@ -11,10 +11,16 @@
 #include <cassert>
 
 uint32_t BGE::TransformComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::TransformComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComponent);
 
 std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::create(ObjectId componentId) {
     return std::make_shared<TransformComponent>(private_key{}, componentId);
+}
+
+BGE::TransformComponent::TransformComponent() : Component(), visible_(true),
+bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0), transformDirty_(false), speed_(1), paused_(false) {
+    Matrix4MakeIdentify(matrix_);
 }
 
 BGE::TransformComponent::TransformComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), visible_(true),

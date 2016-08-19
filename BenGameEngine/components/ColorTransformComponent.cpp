@@ -9,6 +9,7 @@
 #include "ColorTransformComponent.h"
 
 uint32_t BGE::ColorTransformComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::ColorTransformComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ColorTransformComponent::type_index_ = typeid(BGE::ColorTransformComponent);
 
 std::shared_ptr<BGE::ColorTransformComponent> BGE::ColorTransformComponent::create(ObjectId componentId) {

@@ -52,7 +52,7 @@ namespace BGE {
     public:
         FixedArray() : array_(nullptr), size_(0) {}
         
-        FixedArray(size_t size) : array_(nullptr), size_(size) {
+        FixedArray(int32_t size) : array_(nullptr), size_(size) {
             if (size > 0) {
                 array_ = new T[size_];
             }

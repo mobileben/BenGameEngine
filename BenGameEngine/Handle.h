@@ -14,29 +14,32 @@
 #include <cassert>
 
 namespace BGE {
+    using HandleBackingType = uint32_t;
+    class TransformComponent;
+    
     template <typename TAG>
     class Handle {
     public:
-        static const uint32_t NUM_INDEX_BITS = 18;
-        static const uint32_t NUM_MAGIC_BITS = 14;
-        static const uint32_t MAX_INDEX = (1 << NUM_INDEX_BITS) - 1;
-        static const uint32_t MAX_MAGIC = (1 << NUM_MAGIC_BITS) - 1;
+        static const HandleBackingType NUM_INDEX_BITS = 18;
+        static const HandleBackingType NUM_MAGIC_BITS = 14;
+        static const HandleBackingType MAX_INDEX = (1 << NUM_INDEX_BITS) - 1;
+        static const HandleBackingType MAX_MAGIC = (1 << NUM_MAGIC_BITS) - 1;
 
         Handle() : handle_(0) {}
-        Handle(uint32_t h) : handle_(h) {
+        Handle(HandleBackingType h) : handle_(h) {
         }
 
-        uint32_t getIndex() const { return index_; }
-        uint32_t getMagic() const { return magic_; }
-        uint32_t getHandle() const { return handle_; }
+        HandleBackingType getIndex() const { return index_; }
+        HandleBackingType getMagic() const { return magic_; }
+        HandleBackingType getHandle() const { return handle_; }
         
         bool isNull() const { return !handle_; }
         
-        inline void init(uint32_t index) {
+        inline void init(HandleBackingType index) {
             assert(isNull());
             assert(index < MAX_INDEX);
             
-            static uint32_t autoMagic = 0;
+            static HandleBackingType autoMagic = 0;
             
             if (++autoMagic > MAX_MAGIC) {
                 autoMagic = 1;
@@ -53,10 +56,10 @@ namespace BGE {
     private:
         union {
             struct {
-                uint32_t index_ : NUM_INDEX_BITS;
-                uint32_t magic_: NUM_MAGIC_BITS;
+                HandleBackingType index_ : NUM_INDEX_BITS;
+                HandleBackingType magic_: NUM_MAGIC_BITS;
             };
-            uint32_t handle_;
+            HandleBackingType handle_;
         };
     };
 
@@ -92,6 +95,64 @@ namespace BGE {
     
     struct TextureAtlasTag {};
     using TextureAtlasHandle = Handle<TextureAtlasTag>;
+    
+    struct AnimationChannelComponentTag {};
+    using AnimationChannelComponentHandle = Handle<AnimationChannelComponentTag>;
+    
+    struct AnimationSequenceComponentTag {};
+    using AnimationSequenceComponentHandle = Handle<AnimationSequenceComponentTag>;
+    
+    struct AnimatorComponentTag {};
+    using AnimatorComponentHandle = Handle<AnimatorComponentTag>;
+    
+    struct BoundingBoxComponentTag {};
+    using BoundingBoxComponentHandle = Handle<BoundingBoxComponentTag>;
+    
+    struct ButtonComponentTag {};
+    using ButtonComponentHandle = Handle<ButtonComponentTag>;
+    
+    struct ChannelFrameAnimatorComponentTag {};
+    using ChannelFrameAnimatorComponentHandle = Handle<ChannelFrameAnimatorComponentTag>;
+    
+    struct ColorMatrixComponentTag {};
+    using ColorMatrixComponentHandle = Handle<ColorMatrixComponentTag>;
+    
+    struct ColorTransformComponentTag {};
+    using ColorTransformComponentHandle = Handle<ColorTransformComponentTag>;
+    
+    struct FlatRectRenderComponentTag {};
+    using FlatRectRenderComponentHandle = Handle<FlatRectRenderComponentTag>;
+    
+    struct FrameAnimatorComponentTag {};
+    using FrameAnimatorComponentHandle = Handle<FrameAnimatorComponentTag>;
+    
+    struct InputTouchComponentTag {};
+    using InputTouchComponentHandle = Handle<InputTouchComponentTag>;
+    
+    struct LineRenderComponentTag {};
+    using LineRenderComponentHandle = Handle<LineRenderComponentTag>;
+    
+    struct MaskComponentTag {};
+    using MaskComponentHandle = Handle<MaskComponentTag>;
+    
+    struct SpriteRenderComponentTag {};
+    using SpriteRenderComponentHandle = Handle<SpriteRenderComponentTag>;
+    
+    struct TextComponentTag {};
+    using TextComponentHandle = Handle<TextComponentTag>;
+    
+    struct TextureMaskComponentTag {};
+    using TextureMaskComponentHandle = Handle<TextureMaskComponentTag>;
+    
+    struct TransformComponentTag {};
+    using TransformComponentHandle = Handle<TransformComponentTag>;
+    
+    using TransformComponent2Handle = Handle<TransformComponent>;
+    
+    struct ComponentHandle {
+        uint32_t            bitmask;
+        HandleBackingType   handle;
+    };
 }
 
 template<typename TAG>

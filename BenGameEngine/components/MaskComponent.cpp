@@ -10,6 +10,7 @@
 #include "Game.h"
 
 uint32_t BGE::MaskComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::MaskComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::MaskComponent::type_index_ = typeid(BGE::MaskComponent);
 
 std::shared_ptr<BGE::MaskComponent> BGE::MaskComponent::create(ObjectId componentId) {

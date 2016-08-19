@@ -14,6 +14,7 @@
 #include "BoundingBoxComponent.h"
 
 uint32_t BGE::AnimationChannelComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::AnimationChannelComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::AnimationChannelComponent::type_index_ = typeid(BGE::AnimationChannelComponent);
 
 std::shared_ptr<BGE::AnimationChannelComponent> BGE::AnimationChannelComponent::create(ObjectId componentId) {
@@ -119,9 +120,9 @@ void BGE::AnimationChannelComponent::updateReference() {
         }
     } else {
         if (this->channel) {
-            NSLog(@"You fail %x %x %x", gameObj, this->channel, this->channel->referenceData);
+            NSLog(@"You fail %lx %lx %lx", (unsigned long) gameObj, (unsigned long) this->channel, (unsigned long) this->channel->referenceData);
         } else {
-            NSLog(@"You fail %x", gameObj);
+            NSLog(@"You fail %lx", (unsigned long)  gameObj);
         }
     }
 }

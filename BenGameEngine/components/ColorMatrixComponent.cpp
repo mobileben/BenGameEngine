@@ -9,6 +9,7 @@
 #include "ColorMatrixComponent.h"
 
 uint32_t BGE::ColorMatrixComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::ColorMatrixComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ColorMatrixComponent::type_index_ = typeid(BGE::ColorMatrixComponent);
 
 std::shared_ptr<BGE::ColorMatrixComponent> BGE::ColorMatrixComponent::create(ObjectId componentId) {

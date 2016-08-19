@@ -64,6 +64,23 @@ namespace BGE {
         
         const GameObjectService::GameObjectVector& getGameObjects() const { return gameObjectService_->getGameObjects(); }
         
+        template <typename COMPONENT, typename HANDLE, typename... Args> COMPONENT *createComponentNew(Args&& ...args) {
+            auto component = componentService_->createComponentNew<COMPONENT, HANDLE>(std::forward<Args>(args)...);
+            
+            if (component) {
+                component->setSpaceHandle(componentService_->getSpaceHandle());
+            }
+            
+            return component;
+        }
+        
+        TransformComponent * doThis() {
+            auto foo = componentService_->tryThis<TransformComponent>();
+            
+            printf("Foo is %x\n", foo);
+            
+            return foo;
+        }
         template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
             auto component = componentService_->createComponent<T>(std::forward<Args>(args)...);
             
@@ -73,6 +90,12 @@ namespace BGE {
             
             return component;
         }
+        
+#ifdef NOT_YET
+        template <typename T> T *getComponent(ComponentHandle handle) {
+            return componentService_->getComponent(ComponentHandle handle);
+        }
+#endif
         
         template <typename T> std::shared_ptr<T> getComponent(ObjectId componentId) {
             return componentService_->getComponent<T>(componentId);

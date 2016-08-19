@@ -9,6 +9,7 @@
 #include "BoundingBoxComponent.h"
 
 uint32_t BGE::BoundingBoxComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::BoundingBoxComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::BoundingBoxComponent::type_index_ = typeid(BGE::BoundingBoxComponent);
 
 std::shared_ptr<BGE::BoundingBoxComponent> BGE::BoundingBoxComponent::create(ObjectId componentId) {

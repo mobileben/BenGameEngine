@@ -35,7 +35,7 @@ namespace BGE {
         inline bool isActive() const { return active_; }
         inline void setActive(bool active) { active_ = active; }
 
-        inline Space *getSpace() const;
+        Space *getSpace() const;
         inline SpaceHandle getSpaceHandle() const { return spaceHandle_; }
         
         template <typename T> std::shared_ptr<T> getComponent() {
@@ -59,6 +59,14 @@ namespace BGE {
             component->setGameObjectHandle(getHandle());
         }
         
+        template <typename T> void addComponent(T *component) {
+            assert(!component->hasGameObject());
+            ComponentHandle handle{T::bitmask_, component->getRawHandle()};
+            componentBitmask_ |= T::bitmask_;
+            componentsNew_.push_back(handle);
+            component->setGameObjectHandle(getHandle());
+        }
+        
         template <typename T>
         void removeComponent() {
             if (hasComponent<T>()) {
@@ -66,7 +74,9 @@ namespace BGE {
                 
                 removeComponentFromSpace(typeId);
                 
-                componentBitmask_ &= ~ComponentBitmask::bitmaskForTypeIndex(typeId);
+//                componentBitmask_ &= ~ComponentBitmask::bitmaskForTypeIndex(typeId);
+                componentBitmask_ &= ~Component::getBitmask<T>();
+                
                 components_.erase(typeId);
             }
         }
@@ -96,6 +106,7 @@ namespace BGE {
         GameObjectHandle        handle_;
         SpaceHandle             spaceHandle_;
         std::unordered_map<std::type_index, std::shared_ptr<Component>> components_;
+        std::vector<ComponentHandle>    componentsNew_;
         
         void removeComponentFromSpace(std::type_index typeIndex);
         void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }

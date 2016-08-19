@@ -16,6 +16,12 @@
 #include "FlatRectRenderComponent.h"
 #include "SpriteRenderComponent.h"
 
+#include "TextureMaskComponent.h"
+#include "InputTouchComponent.h"
+#include "BoundingBoxComponent.h"
+#include "AnimationChannelComponent.h"
+#include <typeindex>
+
 @interface ViewController ()<GLKViewDelegate>
 
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderContextOpenGLES2> renderContext;
@@ -127,6 +133,12 @@
                                         }
                                         auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
                                         
+                                        auto test = space->createComponentNew<BGE::AnimationChannelComponent, BGE::AnimationChannelComponentHandle>();
+                                        NSLog(@"Test is %x", test);
+                                        
+                                        auto foo = space->doThis();
+                                        NSLog(@"FOO is %x", foo);
+                                        
                                         auto gameObj = space->createSprite("SaleBkg");
                                         auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
                                         
@@ -139,6 +151,7 @@
                                         gameObj->setName("Object1");
                                         
                                         gameObj->setActive(true);
+                                        gameObj->addComponent(test);
                                         
                                         gameObj = space->createText("CashText");
                                         transformComponent = gameObj->getComponent<BGE::TransformComponent>();
@@ -262,24 +275,46 @@
 
             startTime = [[NSDate date] timeIntervalSince1970];
             
+            uint32_t v1, v2, v3;
+            std::type_index t1 = typeid(BGE::TextureMaskComponent);
+            std::type_index t2 = typeid(BGE::InputTouchComponent);
+            std::type_index t3 = typeid(BGE::BoundingBoxComponent);
+            
+            loops = 10000;
+            
             for (auto i=0;i<loops;i++) {
-                for (auto gObj : tObjs) {
-                    auto count = 0;
-                    
-#if 1
-                    if (gObj->getComponent<BGE::TransformComponent>()) {
-                        count++;
-                    }
-                    if (gObj->getComponent<BGE::SpriteRenderComponent>()) {
-                        count++;
-                    }
-                    assert(count == 2);
-#endif
-                }
+                v1 = BGE::ComponentBitmask::bitmaskForTypeIndex(t1);
+                v2 = BGE::ComponentBitmask::bitmaskForTypeIndex(t2);
+                v3 = BGE::ComponentBitmask::bitmaskForTypeIndex(t3);
             }
 
             endTime = [[NSDate date] timeIntervalSince1970];
 
+            componentTime = endTime - startTime;
+            
+            NSLog(@"Time interval getComponent %f", endTime - startTime);
+            
+            NSLog(@"Diff between component and bitmask = %f (%f)", componentTime - bitmaskTime, componentTime/bitmaskTime);
+            // Test access by bitmask
+            startTime = [[NSDate date] timeIntervalSince1970];
+            
+            for (auto i=0;i<loops;i++) {
+                v1 = BGE::ComponentBitmask::getBitmask<BGE::TextureMaskComponent>();
+                v2 = BGE::ComponentBitmask::getBitmask<BGE::InputTouchComponent>();
+                v3 = BGE::ComponentBitmask::getBitmask<BGE::BoundingBoxComponent>();
+            }
+            
+            endTime = [[NSDate date] timeIntervalSince1970];
+            
+            NSLog(@"Time interval bitmaskForTypeIndex %f", endTime - startTime);
+            
+            startTime = [[NSDate date] timeIntervalSince1970];
+            
+            for (auto i=0;i<loops;i++) {
+            }
+            
+            endTime = [[NSDate date] timeIntervalSince1970];
+            
             componentTime = endTime - startTime;
             
             NSLog(@"Time interval getComponent %f", endTime - startTime);

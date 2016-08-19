@@ -17,6 +17,7 @@
 #include <type_traits>
 #include "Service.h"
 #include "Component.h"
+#include "HandleService.h"
 #include "GameObject.h"
 
 namespace BGE {
@@ -44,7 +45,9 @@ namespace BGE {
         SpaceHandle getSpaceHandle(void) const { return spaceHandle_; }
         
         template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
+#if DEBUG
             static_assert(std::is_base_of<Component, T>::value, "Not Component");
+#endif
             ObjectId objId = getIdAndIncrement();
             std::shared_ptr<T> component = T::create(objId, std::forward<Args>(args)...);
             
@@ -54,6 +57,34 @@ namespace BGE {
             component->created();
             
             return component;
+        }
+        
+        template <typename T> T *tryThis() {
+            Handle<T> handle;
+            T *foo = foo_.allocate(handle);
+            
+            return foo;
+        }
+        
+        template <typename COMPONENT, typename HANDLE, typename... Args> COMPONENT *createComponentNew(Args&& ...args) {
+            HandleService<COMPONENT, HANDLE> *handleService = static_cast<HandleService<COMPONENT, HANDLE> *>(componentHandleServices_[COMPONENT::typeId_]);
+            
+            if (handleService) {
+                HANDLE componentHandle;
+                COMPONENT *component = handleService->allocate(componentHandle);
+                auto &handles = componentHandles_[COMPONENT::typeId_];
+                ComponentHandle handle{COMPONENT::bitmask_, componentHandle.getHandle()};
+                component->initialize(handle.handle);
+                
+                handles.push_back(handle);
+                return component;
+            }
+            
+            return nullptr;
+        }
+        
+        template <typename T> T *getComponent(ComponentHandle handle) {
+            
         }
         
         template <typename T> std::shared_ptr<T> getComponent(ObjectId componentId);
@@ -88,8 +119,15 @@ namespace BGE {
         typedef std::unordered_map<std::type_index, void *> ComponentPoolMap;
         typedef std::unordered_map<std::type_index, size_t> ComponentPoolSize;
         
+        static bool componentsRegistered_;
+        static std::vector<std::function<void *(uint32_t, uint32_t)>> handleServiceCreators_;
+        
         SpaceHandle spaceHandle_;
         ComponentMap components_;
+        std::vector<std::vector<ComponentHandle>>   componentHandles_;
+        std::vector<void *>                         componentHandleServices_;
+        
+        HandleService<TransformComponent, TransformComponent2Handle> foo_;
         
         GameObject *getComponentGameObject(Component *, GameObjectHandle gameObjHandle);
         
@@ -104,6 +142,11 @@ namespace BGE {
                 ComponentVector components = { component };
                 components_[index] = components;
             }
+        }
+        
+        template <typename COMPONENT, typename HANDLE> static void registerComponent() {
+            Component::registerBitmask<COMPONENT>();
+            handleServiceCreators_.push_back(std::bind(&HandleService<COMPONENT, HANDLE>::createService, std::placeholders::_1, std::placeholders::_2));
         }
     };
 }

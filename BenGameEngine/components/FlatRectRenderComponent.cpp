@@ -10,6 +10,7 @@
 #include "Game.h"
 
 uint32_t BGE::FlatRectRenderComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::FlatRectRenderComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::FlatRectRenderComponent::type_index_ = typeid(BGE::FlatRectRenderComponent);
 
 std::shared_ptr<BGE::FlatRectRenderComponent> BGE::FlatRectRenderComponent::create(ObjectId componentId) {
