@@ -8,6 +8,7 @@
 
 #include "Space.h"
 #include "Game.h"
+#include "GameObjectService.h"
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
 
@@ -32,6 +33,37 @@ void BGE::Space::initialize(SpaceHandle handle, ObjectId spaceId, std::string na
     componentService_->setSpaceHandle(spaceHandle_);
 }
 
+BGE::GameObject *BGE::Space::createGameObject(std::string name ) {
+    return gameObjectService_->createGameObject(name);
+}
+
+BGE::GameObjectHandle BGE::Space::getGameObjectHandle(ObjectId objId) {
+    return gameObjectService_->getGameObjectHandle(objId);
+}
+
+BGE::GameObjectHandle BGE::Space::getGameObjectHandle(std::string name) {
+    return gameObjectService_->getGameObjectHandle(name);
+}
+
+BGE::GameObject *BGE::Space::getGameObject(ObjectId objId) {
+    return gameObjectService_->getGameObject(objId);
+}
+
+BGE::GameObject *BGE::Space::getGameObject(std::string name) {
+    return gameObjectService_->getGameObject(name);
+}
+
+BGE::GameObject *BGE::Space::getGameObject(GameObjectHandle handle) {
+    return gameObjectService_->getGameObject(handle);
+}
+
+void BGE::Space::removeGameObject(GameObjectHandle handle) {
+    gameObjectService_->removeGameObject(handle);
+}
+
+const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
+    return gameObjectService_->getGameObjects();
+}
 
 BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
@@ -450,7 +482,7 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
             }
         }
         
-        std::shared_ptr<TransformComponent> rootXform;
+        TransformComponent *rootXform = nullptr;
         
         if (root) {
             rootXform = root->getComponent<TransformComponent>();

@@ -454,7 +454,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
 
 void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
     if (gameObject) {
-        std::shared_ptr<FlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<FlatRectRenderComponent>(gameObject->getComponent<FlatRectRenderComponent>());
+        auto flatRect = gameObject->getComponent<FlatRectRenderComponent>();
         
         if (flatRect) {
             Vertex *const vertices = flatRect->getVertices();
@@ -486,7 +486,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
 
 void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
     if (gameObject) {
-        std::shared_ptr<MaskComponent> maskRect = std::dynamic_pointer_cast<MaskComponent>(gameObject->getComponent<MaskComponent>());
+        auto maskRect = gameObject->getComponent<MaskComponent>();
         
         if (maskRect) {
             Vertex *const vertices = maskRect->getVertices();
@@ -594,7 +594,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
 
 void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
     if (gameObject) {
-        std::shared_ptr<SpriteRenderComponent> sprite = std::dynamic_pointer_cast<SpriteRenderComponent>(gameObject->getComponent<SpriteRenderComponent>());
+        auto sprite = gameObject->getComponent<SpriteRenderComponent>();
         
         if (sprite) {
             VertexTex *const vertices = sprite->getVertices();
@@ -781,7 +781,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
             return maskValue;
         }
 
-        auto parent = transformComponent->getParent().lock();
+        auto parent = transformComponent->getParent();
 
         if (root && parent) {
             return maskValue;
@@ -830,7 +830,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         } else if (gameObj->hasComponent<SpriteRenderComponent>()) {
             drawSprite(gameObj);
         } else if (gameObj->hasComponent<TextComponent>()) {
-            std::shared_ptr<TextComponent> text = gameObj->getComponent<TextComponent>();
+            auto text = gameObj->getComponent<TextComponent>();
             Font *font = Game::getInstance()->getFontService()->getFont(text->getFontHandle());
             
             if (font) {

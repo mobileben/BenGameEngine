@@ -17,13 +17,6 @@ uint32_t BGE::AnimationChannelComponent::bitmask_ = Component::InvalidBitmask;
 uint32_t BGE::AnimationChannelComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::AnimationChannelComponent::type_index_ = typeid(BGE::AnimationChannelComponent);
 
-std::shared_ptr<BGE::AnimationChannelComponent> BGE::AnimationChannelComponent::create(ObjectId componentId) {
-    return std::make_shared<AnimationChannelComponent>(private_key{}, componentId);
-}
-
-BGE::AnimationChannelComponent::AnimationChannelComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), channel(nullptr) {
-}
-
 void BGE::AnimationChannelComponent::setGameObjectHandle(GameObjectHandle handle) {
     Component::setGameObjectHandle(handle);
     

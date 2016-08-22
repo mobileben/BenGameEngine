@@ -30,37 +30,37 @@ std::vector<std::function<void *(uint32_t, uint32_t)>> BGE::ComponentService::ha
 
 void BGE::ComponentService::registerComponents() {
     if (!ComponentService::componentsRegistered_) {
-        registerComponent<TransformComponent, TransformComponentHandle>();
-        registerComponent<BoundingBoxComponent, BoundingBoxComponentHandle>();
-        registerComponent<AnimationChannelComponent, AnimationChannelComponentHandle>();
-        registerComponent<AnimationSequenceComponent, AnimationSequenceComponentHandle>();
-        registerComponent<AnimatorComponent, AnimatorComponentHandle>();
-        registerComponent<ChannelFrameAnimatorComponent, ChannelFrameAnimatorComponentHandle>();
-        registerComponent<ColorMatrixComponent, ColorMatrixComponentHandle>();
-        registerComponent<ColorTransformComponent, ColorTransformComponentHandle>();
-        registerComponent<FrameAnimatorComponent, FrameAnimatorComponentHandle>();
-        registerComponent<SpriteRenderComponent, SpriteRenderComponentHandle>();
-        registerComponent<TextComponent, TextComponentHandle>();
-        registerComponent<ButtonComponent, ButtonComponentHandle>();
-        registerComponent<InputTouchComponent, InputTouchComponentHandle>();
-        registerComponent<LineRenderComponent, LineRenderComponentHandle>();
-        registerComponent<FlatRectRenderComponent, FlatRectRenderComponentHandle>();
-        registerComponent<MaskComponent, MaskComponentHandle>();
-        registerComponent<TextureMaskComponent, TextureMaskComponentHandle>();
+        registerComponent<TransformComponent>();
+        registerComponent<BoundingBoxComponent>();
+        registerComponent<AnimationChannelComponent>();
+        registerComponent<AnimationSequenceComponent>();
+        registerComponent<AnimatorComponent>();
+        registerComponent<ChannelFrameAnimatorComponent>();
+        registerComponent<ColorMatrixComponent>();
+        registerComponent<ColorTransformComponent>();
+        registerComponent<FrameAnimatorComponent>();
+        registerComponent<SpriteRenderComponent>();
+        registerComponent<TextComponent>();
+        registerComponent<ButtonComponent>();
+        registerComponent<InputTouchComponent>();
+        registerComponent<LineRenderComponent>();
+        registerComponent<FlatRectRenderComponent>();
+        registerComponent<MaskComponent>();
+        registerComponent<TextureMaskComponent>();
     }
     
     componentsRegistered_ = true;
 }
 
-BGE::ComponentService::ComponentService() : Service(), foo_(10, 10) {
+BGE::ComponentService::ComponentService() : Service() {
     for (auto &creator : handleServiceCreators_) {
-        componentHandleServices_.push_back(static_cast<void *>(creator(120, 120)));
+        componentHandleServices_.push_back(static_cast<void *>(creator(480, 480)));
         
         componentHandles_.push_back(std::vector<ComponentHandle>());
     }
 }
 
-BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : Service(), foo_(10, 10), spaceHandle_(spaceHandle) {
+BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : Service(), spaceHandle_(spaceHandle) {
     if (!ComponentService::componentsRegistered_) {
         ComponentService::registerComponents();
     }
@@ -69,60 +69,57 @@ BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : Service(), fo
 BGE::ComponentService::~ComponentService() {
 }
 
-template <typename T>
-std::shared_ptr<T> BGE::ComponentService::getComponent(ObjectId componentId) {
-    std::type_index index(typeid(T));
-    ComponentMapIterator it = components_.find(index);
-    
-    if (it != components_.end()) {
-        for (auto component : it->second) {
-            if (component->getInstanceId() == componentId) {
-                return component;
-            }
-        }
-    }
-    
-    return nullptr;
-}
-
-template <typename T>
-void BGE::ComponentService::removeComponent(ObjectId componentId) {
-    std::type_index index(typeid(T));
-    ComponentMapIterator it = components_.find(index);
-    
-    if (it != components_.end()) {
-        ComponentVector vec = it->second;
-        
-        for (ComponentVectorIterator vit=vec.begin();vit != vec.end();vit++) {
-            if ((*vit)->getInstanceId() == componentId) {
-                vec.erase(vit);
-                return;
-            }
-        }
-    }
-}
-
-template <typename T>
-void BGE::ComponentService::removeAllComponents() {
-    components_.erase(typeid(T));
-}
-
-void BGE::ComponentService::removeComponent(std::type_index typeIndex, ObjectId componentId) {
-    ComponentMapIterator it = components_.find(typeIndex);
-    
-    if (it != components_.end()) {
-        ComponentVector vec = it->second;
-        
-        for (ComponentVectorIterator vit=vec.begin();vit != vec.end();vit++) {
-            if ((*vit)->getInstanceId() == componentId) {
-                vec.erase(vit);
-                return;
-            }
-        }
-    }
-}
-
 BGE::GameObject *BGE::ComponentService::getComponentGameObject(Component *component, GameObjectHandle gameObjHandle) {
     return component->getSpace()->getGameObject(gameObjHandle);
+}
+
+void BGE::ComponentService::removeComponent(ComponentHandle handle) {
+    auto typeId = handle.typeId;
+    auto &handles = componentHandles_[typeId];
+    
+    for (auto h=handles.begin();h!=handles.end();++h) {
+        if (h->handle == handle.handle) {
+            if (typeId == TransformComponent::typeId_) {
+                releaseComponentHandle<TransformComponent>(handle);
+            } else if (typeId == BoundingBoxComponent::typeId_) {
+                releaseComponentHandle<BoundingBoxComponent>(handle);
+            } else if (typeId == AnimationChannelComponent::typeId_) {
+                releaseComponentHandle<AnimationChannelComponent>(handle);
+            } else if (typeId == AnimationSequenceComponent::typeId_) {
+                releaseComponentHandle<AnimationSequenceComponent>(handle);
+            } else if (typeId == AnimatorComponent::typeId_) {
+                releaseComponentHandle<AnimatorComponent>(handle);
+            } else if (typeId == ChannelFrameAnimatorComponent::typeId_) {
+                releaseComponentHandle<ChannelFrameAnimatorComponent>(handle);
+            } else if (typeId == ColorMatrixComponent::typeId_) {
+                releaseComponentHandle<ColorMatrixComponent>(handle);
+            } else if (typeId == ColorTransformComponent::typeId_) {
+                releaseComponentHandle<ColorTransformComponent>(handle);
+            } else if (typeId == FrameAnimatorComponent::typeId_) {
+                releaseComponentHandle<FrameAnimatorComponent>(handle);
+            } else if (typeId == SpriteRenderComponent::typeId_) {
+                releaseComponentHandle<SpriteRenderComponent>(handle);
+            } else if (typeId == TextComponent::typeId_) {
+                releaseComponentHandle<TextComponent>(handle);
+            } else if (typeId == ButtonComponent::typeId_) {
+                releaseComponentHandle<ButtonComponent>(handle);
+            } else if (typeId == InputTouchComponent::typeId_) {
+                releaseComponentHandle<InputTouchComponent>(handle);
+            } else if (typeId == LineRenderComponent::typeId_) {
+                releaseComponentHandle<LineRenderComponent>(handle);
+            } else if (typeId == FlatRectRenderComponent::typeId_) {
+                releaseComponentHandle<FlatRectRenderComponent>(handle);
+            } else if (typeId == MaskComponent::typeId_) {
+                releaseComponentHandle<MaskComponent>(handle);
+            } else if (typeId == TextureMaskComponent::typeId_) {
+                releaseComponentHandle<TextureMaskComponent>(handle);
+            } else {
+                assert(false);
+            }
+
+            handles.erase(h);
+            return;
+        }
+    }
 }
 

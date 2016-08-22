@@ -26,7 +26,7 @@
 
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderContextOpenGLES2> renderContext;
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderWindow> renderWindow;
-@property (nonatomic, assign) std::shared_ptr<BGE::LineRenderComponent> buttonBounds;
+@property (nonatomic, assign) BGE::LineRenderComponent *buttonBounds;
 @property (nonatomic, weak) BGEView *glView;
 @property (nonatomic, assign) BOOL once;
 @property (nonatomic, assign) BGE::SpaceHandle spaceHandle;
@@ -133,11 +133,8 @@
                                         }
                                         auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
                                         
-                                        auto test = space->createComponentNew<BGE::AnimationChannelComponent, BGE::AnimationChannelComponentHandle>();
+                                        auto test = space->createComponent<BGE::AnimationChannelComponent>();
                                         NSLog(@"Test is %x", test);
-                                        
-                                        auto foo = space->doThis();
-                                        NSLog(@"FOO is %x", foo);
                                         
                                         auto gameObj = space->createSprite("SaleBkg");
                                         auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
@@ -229,7 +226,7 @@
             
             // Create test objects
             std::vector<BGE::GameObject *> tObjs;
-            auto numGameObjs = 1000;
+            auto numGameObjs = 100;
             for (auto i=0;i<numGameObjs;i++) {
                 auto gObj = tSpace->createGameObject();
                 auto xform = tSpace->createComponent<BGE::TransformComponent>();
@@ -413,7 +410,7 @@
             auto bbox = button->getBoundingBox();
             if (bbox) {
                 auto xform = button->getTransform();
-                auto parent = xform->getParent().lock();
+                auto parent = xform->getParent();
                 BGE::Matrix4 matrix;
                 BGE::Vector2 point;
                 std::vector<BGE::Vector2> points;

@@ -58,7 +58,7 @@ namespace BGE {
     struct InputButtonHandler {
         GameObjectHandle                    gameObjHandle;
         SpaceHandle                         spaceHandle;
-        std::shared_ptr<ButtonComponent>    buttonComponent;
+        ButtonComponentHandle               buttonComponentHandle;
         TouchType                           touchType;
         bool                                inBounds;
     };

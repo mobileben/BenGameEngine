@@ -22,19 +22,12 @@ namespace BGE {
     
     class TransformComponent : public Component
     {
-    private:
-        struct private_key {};
-        friend Component;
-        
     public:
         static std::type_index  type_index_;
         static uint32_t         typeId_;
         static uint32_t         bitmask_;
         
-        static std::shared_ptr<TransformComponent> create(ObjectId componentId);
-
         TransformComponent();
-        TransformComponent(struct private_key const& key, ObjectId componentId);
         ~TransformComponent() {}
         
         bool isVisible() const { return visible_; }
@@ -79,21 +72,31 @@ namespace BGE {
         void getLocalMatrix(Matrix4 &matrix);
         const float *getLocalMatrixRaw();
         
-        std::weak_ptr<TransformComponent> getParent() { return parent_; }
-        std::vector<std::shared_ptr<TransformComponent>> getChildren() { return children_; }
-        uint32_t getNumChildren() const { return (uint32_t) children_.size(); }
+        TransformComponentHandle getParentHandle() const { return parentHandle_; }
+        TransformComponent *getParent() const;
         
-        virtual void addChild(std::shared_ptr<TransformComponent> child);
-        virtual void removeAllChildren();
-        virtual void removeFromParent();
+        std::vector<TransformComponentHandle> getChildrenHandles() { return childrenHandles_; }
+        std::vector<TransformComponent *> getChildren();
         
-        virtual void insertChild(std::shared_ptr<TransformComponent> child, uint32_t index);
-        virtual void moveToParent(std::shared_ptr<TransformComponent> parent);
+        uint32_t getNumChildren() const { return (uint32_t) childrenHandles_.size(); }
         
-        virtual std::shared_ptr<TransformComponent> childAtIndex(uint32_t index);
+        void addChildHandle(TransformComponentHandle handle);
+        void addChild(TransformComponent *child);
+        void removeAllChildren();
+        void removeFromParent();
         
-        virtual bool hasChild(std::shared_ptr<TransformComponent> child, bool descend=false);
-        virtual bool inParentHierarchy(std::shared_ptr<TransformComponent> parent);
+        void insertChildHandle(TransformComponentHandle handle, uint32_t index);
+        void insertChild(TransformComponent *child, uint32_t index);
+        void moveToParentHandle(TransformComponentHandle handle);
+        void moveToParent(TransformComponent *parentHandle);
+        
+        TransformComponent *childAtIndex(uint32_t index);
+        TransformComponentHandle childHandleAtIndex(uint32_t index);
+        
+        bool hasChildHandle(TransformComponentHandle handle, bool descend=false);
+        bool hasChild(TransformComponent *child, bool descend=false);
+        bool inParentHandleHierarchy(TransformComponentHandle handle);
+        bool inParentHierarchy(TransformComponent *parent);
         
     protected:
         friend ComponentService;
@@ -122,15 +125,15 @@ namespace BGE {
         bool            transformDirty_; // Indicates that components and matrix are out of sync
         
         // Hierarchy
-        std::weak_ptr<TransformComponent> parent_;
-        std::vector<std::shared_ptr<TransformComponent>> children_;
+        TransformComponentHandle                parentHandle_;
+        std::vector<TransformComponentHandle>   childrenHandles_;
         
         // Control
         // TODO: Support?
         float           speed_;
         bool            paused_;
         
-        void setGameObjectHandle(GameObjectHandle handle);
+        void setGameObjectHandle(GameObjectHandle handle) override;
         void updateMatrix();
     };
 }

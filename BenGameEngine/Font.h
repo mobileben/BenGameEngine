@@ -84,7 +84,7 @@ namespace BGE {
         // TODO: Determine if font rendering should be done else where, like in the renderer versus the font.
         // TODO: We will want to cache the width/height of the string. So this is probably not the best place for the drawString to exist
         // TODO: Move to renderer
-        virtual void drawString(std::string str, std::shared_ptr<TransformComponent> transform, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        virtual void drawString(std::string str, TransformComponent *transform, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
         virtual void drawString(std::string str, Vector2 &position, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
         
     protected:

@@ -20,11 +20,7 @@ uint32_t BGE::ButtonComponent::bitmask_ = Component::InvalidBitmask;
 uint32_t BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent);
 
-std::shared_ptr<BGE::ButtonComponent> BGE::ButtonComponent::create(ObjectId componentId) {
-    return std::make_shared<ButtonComponent>(private_key{}, componentId);
-}
-
-BGE::ButtonComponent::ButtonComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted(true), toggleable(false), toggleOn(false) {
+BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted(true), toggleable(false), toggleOn(false) {
 }
 
 void BGE::ButtonComponent::setButtonReference(ButtonReference *buttonRef) {
@@ -148,7 +144,7 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
     }
 }
 
-std::shared_ptr<BGE::BoundingBoxComponent> BGE::ButtonComponent::getBoundingBox() {
+BGE::BoundingBoxComponent *BGE::ButtonComponent::getBoundingBox() {
     auto currentButton = getSpace()->getGameObject(currentButtonHandle);
     
     if (currentButton) {
@@ -161,7 +157,7 @@ std::shared_ptr<BGE::BoundingBoxComponent> BGE::ButtonComponent::getBoundingBox(
     }
 }
 
-std::shared_ptr<BGE::TransformComponent> BGE::ButtonComponent::getTransform() {
+BGE::TransformComponent *BGE::ButtonComponent::getTransform() {
     auto currentButton = getSpace()->getGameObject(currentButtonHandle);
     
     if (currentButton) {

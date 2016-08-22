@@ -16,18 +16,13 @@ uint32_t BGE::Component::bitmask_ = InvalidBitmask;
 uint32_t BGE::Component::typeId_ = InvalidTypeId;
 std::type_index BGE::Component::type_index_ = typeid(BGE::Component);
 
-std::shared_ptr<BGE::Component> BGE::Component::create(ObjectId componentId) {
-    return std::make_shared<Component>(private_key(), componentId);
-}
-
-BGE::Component::Component(struct private_key const& key, ObjectId componentId) : Object(componentId), handle_(0) {
-}
-
 BGE::Component::Component(ObjectId componentId) : Object(componentId) {
 }
 
-void BGE::Component::initialize(HandleBackingType handle) {
+void BGE::Component::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
     handle_ = handle;
+    spaceHandle_ = spaceHandle;
+    gameObjectHandle_ = GameObjectHandle();
 }
 
 BGE::Space *BGE::Component::getSpace() const {

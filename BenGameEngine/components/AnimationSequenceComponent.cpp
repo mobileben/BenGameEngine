@@ -16,11 +16,7 @@ uint32_t BGE::AnimationSequenceComponent::bitmask_ = Component::InvalidBitmask;
 uint32_t BGE::AnimationSequenceComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::AnimationSequenceComponent::type_index_ = typeid(BGE::AnimationSequenceComponent);
 
-std::shared_ptr<BGE::AnimationSequenceComponent> BGE::AnimationSequenceComponent::create(ObjectId componentId) {
-    return std::make_shared<AnimationSequenceComponent>(private_key{}, componentId);
-}
-
-BGE::AnimationSequenceComponent::AnimationSequenceComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), frameRate(0), totalFrames(0), numChannels(0), numBounds(0) {
+BGE::AnimationSequenceComponent::AnimationSequenceComponent() : Component(), frameRate(0), totalFrames(0), numChannels(0), numBounds(0) {
 }
 
 BGE::AnimationSequenceComponent::~AnimationSequenceComponent() {
@@ -33,7 +29,9 @@ BGE::AnimationSequenceComponent::~AnimationSequenceComponent() {
     }
 }
 
-void BGE::AnimationSequenceComponent::created() {
+void BGE::AnimationSequenceComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    Component::initialize(handle, spaceHandle);
+    
     auto space = getSpace();
     
     assert(space);

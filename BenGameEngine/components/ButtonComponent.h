@@ -30,18 +30,12 @@ namespace BGE {
     
     class ButtonComponent : public Component
     {
-    private:
-        struct private_key {};
-        friend Component;
-        
     public:
         static std::type_index  type_index_;
         static uint32_t         typeId_;
         static uint32_t         bitmask_;
 
-        static std::shared_ptr<ButtonComponent> create(ObjectId componentId);
-        
-        ButtonComponent(struct private_key const& key, ObjectId componentId);
+        ButtonComponent();
         ~ButtonComponent() {}
         
         void setButtonReference(ButtonReference *buttonRef);
@@ -49,8 +43,8 @@ namespace BGE {
 
         // This may be considered unconventional in that we are allowing us to get another component from this, however it allows us to properly
         // get the most updated BBOX info
-        std::shared_ptr<BoundingBoxComponent> getBoundingBox();
-        std::shared_ptr<TransformComponent> getTransform();
+        BoundingBoxComponent *getBoundingBox();
+        TransformComponent *getTransform();
         
         bool isAnimating() const;
         void setAnimate(bool animate);

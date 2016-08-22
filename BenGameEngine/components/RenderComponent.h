@@ -42,7 +42,7 @@ namespace BGE {
         void setMaterials(std::vector<MaterialHandle> materials);
         
     protected:
-        RenderComponent(ObjectId componentId);
+        RenderComponent();
         
         bool getGlobalBoundsDirty() const { return globalBoundsDirty_; }
         void setGlobalBoundsDirty(bool dirty) { globalBoundsDirty_ = dirty; }

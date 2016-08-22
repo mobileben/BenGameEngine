@@ -21,20 +21,16 @@ namespace BGE {
     
     class AnimationSequenceComponent : public Component
     {
-    private:
-        struct private_key {};
-        friend Component;
-
     public:
         static std::type_index  type_index_;
         static uint32_t         typeId_;
         static uint32_t         bitmask_;
         
-        static std::shared_ptr<AnimationSequenceComponent> create(ObjectId componentId);
-        
-        AnimationSequenceComponent(struct private_key const& key, ObjectId componentId);
+        AnimationSequenceComponent();
         ~AnimationSequenceComponent();
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) override;
+
         void setAnimationSequenceReference(AnimationSequenceReference *animSeqRef);
         void setAnimationSequenceReference(const AnimationSequenceReference& animSeqRef);
 
@@ -56,8 +52,8 @@ namespace BGE {
         friend GameObject;
         friend ComponentService;
         
-        void setGameObjectHandle(GameObjectHandle handle);
-        void created();
+        void setGameObjectHandle(GameObjectHandle handle) override;
+        void initialize(HandleBackingType handle);
     };
 }
 

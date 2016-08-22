@@ -32,32 +32,12 @@ void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameO
     spaceHandle_ = spaceHandle;
 }
 
-void BGE::GameObject::removeComponentFromSpace(std::type_index typeIndex) {
-    auto space = getSpace();
-    
-    if (space) {
-#if DEBUG
-        auto component = components_.find(typeIndex);
-      
-        assert(component != components_.end());
-        
-        if (component != components_.end()) {
-            space->removeComponent(typeIndex, component->second->getInstanceId());
-        }
-#else
-        auto component = components_[typeIndex];
-        space->removeComponent(typeIndex, component->second->getInstanceId());
-#endif
-    }
-}
-
 void BGE::GameObject::removeAllComponents() {
     auto space = getSpace();
     
     if (space) {
         for (auto component : components_) {
-            const std::type_info& typeId = typeid(component.second);
-            removeComponentFromSpace(typeId);
+            space->removeComponent(component);
         }
     }
     

@@ -13,11 +13,7 @@ uint32_t BGE::MaskComponent::bitmask_ = Component::InvalidBitmask;
 uint32_t BGE::MaskComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::MaskComponent::type_index_ = typeid(BGE::MaskComponent);
 
-std::shared_ptr<BGE::MaskComponent> BGE::MaskComponent::create(ObjectId componentId) {
-    return std::make_shared<MaskComponent>(private_key{}, componentId);
-}
-
-BGE::MaskComponent::MaskComponent(struct private_key const& key, ObjectId componentId) : RenderComponent(componentId) {
+BGE::MaskComponent::MaskComponent() : RenderComponent() {
     Color color = { 1, 0, 1, 1 };
     auto handle = Game::getInstance()->getMaterialService()->createMaterial(color);
     setMaterials({handle});

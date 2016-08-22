@@ -16,10 +16,6 @@
 namespace BGE {
     class BoundingBoxComponent : public Component
     {
-    private:
-        struct private_key {};
-        friend Component;
-        
     public:
         static std::type_index  type_index_;
         static uint32_t         typeId_;
@@ -35,9 +31,7 @@ namespace BGE {
         float aabbMaxX;
         float aabbMaxY;
         
-        static std::shared_ptr<BoundingBoxComponent> create(ObjectId componentId);
-        
-        BoundingBoxComponent(struct private_key const& key, ObjectId componentId);
+        BoundingBoxComponent();
         ~BoundingBoxComponent() {}
         
         void computeAABB(Matrix4 &transform);

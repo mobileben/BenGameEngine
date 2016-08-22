@@ -20,11 +20,7 @@ uint32_t BGE::AnimatorComponent::bitmask_ = Component::InvalidBitmask;
 uint32_t BGE::AnimatorComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::AnimatorComponent::type_index_ = typeid(BGE::AnimatorComponent);
 
-std::shared_ptr<BGE::AnimatorComponent> BGE::AnimatorComponent::create(ObjectId componentId) {
-    return std::make_shared<AnimatorComponent>(private_key{}, componentId);
-}
-
-BGE::AnimatorComponent::AnimatorComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), state(AnimState::Done), currentFrame(0), iterations(1), frameRemainderTime(0), secPerFrame(1.0/30.0), speed(1), forward(true) {
+BGE::AnimatorComponent::AnimatorComponent() : Component(), state(AnimState::Done), currentFrame(0), iterations(1), frameRemainderTime(0), secPerFrame(1.0/30.0), speed(1), forward(true) {
 }
 
 void BGE::AnimatorComponent::reset() {

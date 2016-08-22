@@ -25,10 +25,6 @@ namespace BGE {
 
     class AnimatorComponent : public Component
     {
-    private:
-        struct private_key {};
-        friend Component;
-
     public:
         static std::type_index  type_index_;
         static uint32_t         typeId_;
@@ -36,9 +32,7 @@ namespace BGE {
         
         static const int32_t AnimPlayForever = -1;
         
-        static std::shared_ptr<AnimatorComponent> create(ObjectId componentId);
-        
-        AnimatorComponent(struct private_key const& key, ObjectId componentId);
+        AnimatorComponent();
         ~AnimatorComponent() {}
         
         AnimState   state;

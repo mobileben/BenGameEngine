@@ -8,22 +8,14 @@
 
 #include "TransformComponent.h"
 #include "ComponentBitmask.h"
+#include "Space.h"
 #include <cassert>
 
 uint32_t BGE::TransformComponent::bitmask_ = Component::InvalidBitmask;
 uint32_t BGE::TransformComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComponent);
 
-std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::create(ObjectId componentId) {
-    return std::make_shared<TransformComponent>(private_key{}, componentId);
-}
-
 BGE::TransformComponent::TransformComponent() : Component(), visible_(true),
-bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0), transformDirty_(false), speed_(1), paused_(false) {
-    Matrix4MakeIdentify(matrix_);
-}
-
-BGE::TransformComponent::TransformComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), visible_(true),
 bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0), transformDirty_(false), speed_(1), paused_(false) {
     Matrix4MakeIdentify(matrix_);
 }
@@ -43,7 +35,7 @@ void BGE::TransformComponent::updateMatrix() {
     Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
     localMatrix_ = mat1 * localMatrix_;
     
-    auto parent = getParent().lock();
+    auto parent = getParent();
     
     if (parent) {
         parent->getMatrix(mat1);
@@ -95,87 +87,170 @@ const float *BGE::TransformComponent::getLocalMatrixRaw() {
     return localMatrix_.m;
 }
 
-void BGE::TransformComponent::addChild(std::shared_ptr<TransformComponent> child) {
+BGE::TransformComponent *BGE::TransformComponent::getParent() const {
+    auto space = getSpace();
+    
+    return space->getComponent<TransformComponent>(parentHandle_.getHandle());
+}
+
+std::vector<BGE::TransformComponent *> BGE::TransformComponent::getChildren() {
+    auto space = getSpace();
+    std::vector<TransformComponent *> children;
+    
+    for (auto handle : childrenHandles_) {
+        auto xform = space->getComponent<TransformComponent>(handle.getHandle());
+        
+        if (xform) {
+            children.push_back(xform);
+        }
+    }
+    
+    return children;
+}
+
+void BGE::TransformComponent::addChildHandle(TransformComponentHandle handle) {
+    auto space = getSpace();
+    auto child = space->getComponent<TransformComponent>(handle.getHandle());
     assert(child);
-    assert(child->getParent().expired());
+    assert(!child->getParent());
+
+    if  (child) {
+        childrenHandles_.push_back(handle);
+        child->parentHandle_ = getHandle<TransformComponent>();
+    }
+}
+
+void BGE::TransformComponent::addChild(TransformComponent *child) {
+    assert(child);
+    assert(!child->getParent());    // Child cannot already have a parent
     
     if (child) {
-        children_.push_back(child);
-        child->parent_ = derived_shared_from_this<TransformComponent>();
+        auto handle = child->getHandle<TransformComponent>();
+        childrenHandles_.push_back(handle);
+        child->parentHandle_ = getHandle<TransformComponent>();
         
         // TODO: Update hierarchy
     }
 }
 
 void BGE::TransformComponent::removeAllChildren() {
-    for (auto child : children_) {
+    auto space = getSpace();
+    
+    for (auto handle : childrenHandles_) {
+        auto child = space->getComponent<TransformComponent>(handle.getHandle());
         // Remove parent from all children
-        child->parent_.reset();
+        child->parentHandle_ = TransformComponentHandle();
     }
     
-    children_.clear();
+    childrenHandles_.clear();
 }
 
 void BGE::TransformComponent::removeFromParent() {
-    if (!parent_.expired()) {
-        std::shared_ptr<TransformComponent> parent = parent_.lock();
-        std::vector<std::shared_ptr<TransformComponent>>::iterator it;
-        
-        it = std::find(parent->children_.begin(), parent->children_.end(), derived_shared_from_this<TransformComponent>());
-        
-        if (it != parent->children_.end()) {
-            parent->children_.erase(it);
+    auto space = getSpace();
+    auto parent = space->getComponent<TransformComponent>(parentHandle_.getHandle());
+
+    if (parent) {
+        for (auto it = parent->childrenHandles_.begin();it != parent->childrenHandles_.end();++it) {
+            if (it->getHandle() == getRawHandle()) {
+                parent->childrenHandles_.erase(it);
+                break;
+            }
         }
         
-        parent_.reset();
+        parentHandle_ = TransformComponentHandle();
     } else {
-        parent_.reset();
+        parentHandle_ = TransformComponentHandle();
     }
 }
 
-void BGE::TransformComponent::insertChild(std::shared_ptr<TransformComponent> child, uint32_t index) {
+void BGE::TransformComponent::insertChildHandle(TransformComponentHandle handle, uint32_t index) {
+    auto space = getSpace();
+    auto child = space->getComponent<TransformComponent>(handle.getHandle());
+    
     assert(child);
-    assert(child->getParent().expired());
-
+    assert(!child->getParent());    // Child cannot already have a parent
+    
     if (child) {
-        if (index < children_.size()) {
-            children_.insert(children_.begin() + index, child);
+        if (index < childrenHandles_.size()) {
+            childrenHandles_.insert(childrenHandles_.begin() + index, child->getHandle<TransformComponent>());
         } else {
-            children_.push_back(child);
+            childrenHandles_.push_back(child->getHandle<TransformComponent>());
         }
         
-        child->parent_ = derived_shared_from_this<TransformComponent>();
+        child->parentHandle_ = getHandle<TransformComponent>();
     }
 }
 
-void BGE::TransformComponent::moveToParent(std::shared_ptr<TransformComponent> parent) {
+void BGE::TransformComponent::insertChild(TransformComponent *child, uint32_t index) {
+    assert(child);
+    assert(!child->getParent());
+    
+    if (child) {
+        if (index < childrenHandles_.size()) {
+            childrenHandles_.insert(childrenHandles_.begin() + index, child->getHandle<TransformComponent>());
+        } else {
+            childrenHandles_.push_back(child->getHandle<TransformComponent>());
+        }
+        
+        child->parentHandle_ = getHandle<TransformComponent>();
+    }
+}
+
+void BGE::TransformComponent::moveToParentHandle(TransformComponentHandle handle) {
+    auto space = getSpace();
+    auto parent = space->getComponent<TransformComponent>(handle.getHandle());
+    
     assert(parent);
     
     if (parent) {
         removeFromParent();
         
-        parent->addChild(derived_shared_from_this<TransformComponent>());
+        parent->addChild(this);
     }
 }
 
-std::shared_ptr<BGE::TransformComponent> BGE::TransformComponent::childAtIndex(uint32_t index) {
-    if (index < children_.size()) {
-        return children_.at(index);
+void BGE::TransformComponent::moveToParent(TransformComponent *parent) {
+    assert(parent);
+    
+    if (parent) {
+        removeFromParent();
+        
+        parent->addChild(this);
+    }
+}
+
+BGE::TransformComponent *BGE::TransformComponent::childAtIndex(uint32_t index) {
+    if (index < childrenHandles_.size()) {
+        auto handle = childrenHandles_.at(index);
+        auto space = getSpace();
+        return space->getComponent<TransformComponent>(handle.getHandle());
     } else {
         return nullptr;
     }
 }
 
-bool BGE::TransformComponent::hasChild(std::shared_ptr<TransformComponent> child, bool descend) {
+BGE::TransformComponentHandle BGE::TransformComponent::childHandleAtIndex(uint32_t index) {
+    if (index < childrenHandles_.size()) {
+        return childrenHandles_.at(index);
+    } else {
+        return TransformComponentHandle();
+    }
+}
+
+bool BGE::TransformComponent::hasChildHandle(TransformComponentHandle handle, bool descend) {
+    auto space = getSpace();
+    auto child = space->getComponent<TransformComponent>(handle.getHandle());
+    
     assert(child);
     
     if (child) {
         if (descend) {
-            for (auto transform : children_) {
-                if (transform == child) {
+            for (auto xformHandle : childrenHandles_) {
+                if (xformHandle == handle) {
                     return true;
                 } else {
-                    bool found = transform->hasChild(child, descend);
+                    auto xform = space->getComponent<TransformComponent>(xformHandle.getHandle());
+                    bool found = xform->hasChild(child, descend);
                     
                     if (found) {
                         return found;
@@ -185,18 +260,61 @@ bool BGE::TransformComponent::hasChild(std::shared_ptr<TransformComponent> child
             
             return false;
         } else {
-            return std::find(children_.begin(), children_.end(), child) != children_.end();
+            return std::find(childrenHandles_.begin(), childrenHandles_.end(), handle) != childrenHandles_.end();
         }
     } else {
         return false;
     }
 }
 
-bool BGE::TransformComponent::inParentHierarchy(std::shared_ptr<TransformComponent> parent) {
+bool BGE::TransformComponent::hasChild(TransformComponent *child, bool descend) {
+    auto space = getSpace();
+    auto handle = getHandle<TransformComponent>();
+    
+    assert(child);
+    
+    if (child) {
+        if (descend) {
+            for (auto xformHandle : childrenHandles_) {
+                if (xformHandle == handle) {
+                    return true;
+                } else {
+                    auto xform = space->getComponent<TransformComponent>(xformHandle.getHandle());
+                    bool found = xform->hasChild(child, descend);
+                    
+                    if (found) {
+                        return found;
+                    }
+                }
+            }
+            
+            return false;
+        } else {
+            return std::find(childrenHandles_.begin(), childrenHandles_.end(), handle) != childrenHandles_.end();
+        }
+    } else {
+        return false;
+    }
+}
+
+bool BGE::TransformComponent::inParentHandleHierarchy(TransformComponentHandle handle) {
+    auto space = getSpace();
+    auto parent = space->getComponent<TransformComponent>(handle.getHandle());
+
     assert(parent);
     
     if (parent) {
-        return parent->hasChild(derived_shared_from_this<TransformComponent>(), true);
+        return parent->hasChild(this, true);
+    } else {
+        return false;
+    }
+}
+
+bool BGE::TransformComponent::inParentHierarchy(TransformComponent *parent) {
+    assert(parent);
+    
+    if (parent) {
+        return parent->hasChild(this, true);
     } else {
         return false;
     }

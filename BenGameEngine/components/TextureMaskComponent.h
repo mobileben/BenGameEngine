@@ -18,18 +18,12 @@
 namespace BGE {
     class TextureMaskComponent : public RenderComponent
     {
-    private:
-        struct private_key {};
-        friend Component;
-        
     public:
         static std::type_index  type_index_;
         static uint32_t         typeId_;
         static uint32_t         bitmask_;
         
-        static std::shared_ptr<TextureMaskComponent> create(ObjectId componentId);
-        
-        TextureMaskComponent(struct private_key const& key, ObjectId componentId);
+        TextureMaskComponent();
         ~TextureMaskComponent() {}
         
         TextureHandle getTextureHandle();

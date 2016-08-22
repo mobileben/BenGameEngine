@@ -15,18 +15,12 @@
 
 namespace BGE {
     class ColorMatrixComponent : public Component {
-    private:
-        struct private_key {};
-        friend Component;
-
     public:
         static std::type_index  type_index_;
         static uint32_t         typeId_;
         static uint32_t         bitmask_;
         
-        static std::shared_ptr<ColorMatrixComponent> create(ObjectId componentId);
-        
-        ColorMatrixComponent(struct private_key const& key, ObjectId componentId);
+        ColorMatrixComponent();
         ~ColorMatrixComponent() {}
 
         ColorMatrix matrix;

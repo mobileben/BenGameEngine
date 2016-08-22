@@ -22,10 +22,6 @@ namespace BGE {
     
     class Component : public Object
     {
-    private:
-        struct private_key {};
-        
-        
     public:
         static uint32_t InvalidBitmask;
         static uint32_t InvalidTypeId;
@@ -38,15 +34,12 @@ namespace BGE {
         static uint32_t         typeId_;         // Sub-classes must implement
         static uint32_t         bitmask_;       // Sub-classes must implement
         
-        static std::shared_ptr<Component> create(ObjectId componentId);
-        
-        Component(struct private_key const& key, ObjectId componentId);
         Component() : Object(), handle_(0) {
         }
         
         virtual ~Component() {}
         
-        void initialize(HandleBackingType handle);
+        virtual void initialize(HandleBackingType handle, SpaceHandle spaceHandle);
         
         inline std::type_index getTypeIndex() const { return type_index_; }
         inline uint32_t getTypeId() const { return typeId_; }
@@ -58,8 +51,7 @@ namespace BGE {
         Space *getSpace() const;
         inline SpaceHandle getSpaceHandle() const { return spaceHandle_; }
 
-        template <typename T>
-        static uint32_t getBitmask() {
+        template <typename T> inline static uint32_t getBitmask() {
 #if DEBUG
             if (!validateComponent<T>()) {
                 assert(false);
@@ -69,8 +61,7 @@ namespace BGE {
             return T::bitmask_;
         }
         
-        template <typename T>
-        static uint32_t getTypeId() {
+        template <typename T> inline static uint32_t getTypeId() {
 #if DEBUG
             if (!validateComponent<T>()) {
                 assert(false);
@@ -80,19 +71,13 @@ namespace BGE {
             return T::typeId_;
         }
 
-        template <typename T>
-        static inline std::type_index getTypeIndex() { return T::type_index_; }
+        template <typename T> static inline std::type_index getTypeIndex() { return T::type_index_; }
 
-        template <typename T>
-        inline T getHandle() const { return T(handle_); }
+        template <typename T> inline Handle<T> getHandle() const { return Handle<T>(handle_); }
 
         inline HandleBackingType getRawHandle() const { return handle_; }
         
     protected:
-#ifdef NOT_YET
-        Component() = delete;
-        Component(Component const&) = delete;
-#endif
         Component(ObjectId componentId);
         
         template <typename T>
@@ -114,7 +99,7 @@ namespace BGE {
             return T::bitmask_ != Component::InvalidBitmask && T::type_index_ != Component::type_index_;
         }
         
-        inline void setGameObjectHandle(GameObjectHandle gameObjectHandle) { gameObjectHandle_ = gameObjectHandle; }
+        virtual void setGameObjectHandle(GameObjectHandle gameObjectHandle) { gameObjectHandle_ = gameObjectHandle; }
         inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
 
         virtual void created() {}

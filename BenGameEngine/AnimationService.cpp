@@ -42,7 +42,7 @@ void BGE::AnimationService::update(double deltaTime) {
     }
 }
 
-void BGE::AnimationService::animateSequence(Space *space, std::shared_ptr<AnimationSequenceComponent> seq, std::shared_ptr<AnimatorComponent> animator, float deltaTime) {
+void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceComponent *seq, AnimatorComponent *animator, float deltaTime) {
     if (seq && animator) {
         if (animator->state == AnimState::Playing) {
             int32_t origFrame = animator->currentFrame;
@@ -182,16 +182,16 @@ void BGE::AnimationService::animateChannel(GameObject *gameObj, int32_t frame) {
             Material *material = nullptr;
             
             if (gameObj->getComponent<LineRenderComponent>()) {
-                std::shared_ptr<LineRenderComponent> render = gameObj->getComponent<LineRenderComponent>();
+                auto render = gameObj->getComponent<LineRenderComponent>();
                 material = render->getMaterial();
             } else if (gameObj->getComponent<FlatRectRenderComponent>()) {
-                std::shared_ptr<FlatRectRenderComponent> render = gameObj->getComponent<FlatRectRenderComponent>();
+                auto render = gameObj->getComponent<FlatRectRenderComponent>();
                 material = render->getMaterial();
             } else if (gameObj->getComponent<SpriteRenderComponent>()) {
-                std::shared_ptr<SpriteRenderComponent> render = gameObj->getComponent<SpriteRenderComponent>();
+                auto render = gameObj->getComponent<SpriteRenderComponent>();
                 material = render->getMaterial();
             } else if (gameObj->getComponent<TextComponent>()) {
-                std::shared_ptr<TextComponent> render = gameObj->getComponent<TextComponent>();
+                auto render = gameObj->getComponent<TextComponent>();
                 material = render->getMaterial();
             }
             
@@ -282,7 +282,7 @@ void BGE::AnimationService::animateChannel(GameObject *gameObj, int32_t frame) {
     }
 }
 
-void BGE::AnimationService::animateSequenceByFrame(Space *space, std::shared_ptr<AnimationSequenceComponent> seq, std::shared_ptr<FrameAnimatorComponent> animator, int32_t frame) {
+void BGE::AnimationService::animateSequenceByFrame(Space *space, AnimationSequenceComponent *seq, FrameAnimatorComponent *animator, int32_t frame) {
     if (true || frame != animator->currentFrame) {
         animator->currentFrame = frame;
         
@@ -293,7 +293,7 @@ void BGE::AnimationService::animateSequenceByFrame(Space *space, std::shared_ptr
     }
 }
 
-int32_t BGE::AnimationService::handleEndOfAnim(std::shared_ptr<AnimatorComponent> animator, int32_t startFrame, int32_t lastFrame) {
+int32_t BGE::AnimationService::handleEndOfAnim(AnimatorComponent *animator, int32_t startFrame, int32_t lastFrame) {
     int32_t frame = lastFrame;
     bool reset = false;
     

@@ -9,7 +9,7 @@
 #include "RenderComponent.h"
 #include "Game.h"
 
-BGE::RenderComponent::RenderComponent(ObjectId componentId) : Component(componentId), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
+BGE::RenderComponent::RenderComponent() : Component(), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
     
 }
 

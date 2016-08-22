@@ -15,6 +15,23 @@
 
 namespace BGE {
     using HandleBackingType = uint32_t;
+    
+    class AnimationChannelComponent;
+    class AnimationSequenceComponent;
+    class AnimatorComponent;
+    class BoundingBoxComponent;
+    class ButtonComponent;
+    class ChannelFrameAnimatorComponent;
+    class ColorMatrixComponent;
+    class ColorTransformComponent;
+    class FlatRectRenderComponent;
+    class FrameAnimatorComponent;
+    class InputTouchComponent;
+    class LineRenderComponent;
+    class MaskComponent;
+    class SpriteRenderComponent;
+    class TextComponent;
+    class TextureMaskComponent;
     class TransformComponent;
     
     template <typename TAG>
@@ -33,7 +50,7 @@ namespace BGE {
         HandleBackingType getMagic() const { return magic_; }
         HandleBackingType getHandle() const { return handle_; }
         
-        bool isNull() const { return !handle_; }
+        inline bool isNull() const { return !handle_; }
         
         inline void init(HandleBackingType index) {
             assert(isNull());
@@ -96,61 +113,26 @@ namespace BGE {
     struct TextureAtlasTag {};
     using TextureAtlasHandle = Handle<TextureAtlasTag>;
     
-    struct AnimationChannelComponentTag {};
-    using AnimationChannelComponentHandle = Handle<AnimationChannelComponentTag>;
-    
-    struct AnimationSequenceComponentTag {};
-    using AnimationSequenceComponentHandle = Handle<AnimationSequenceComponentTag>;
-    
-    struct AnimatorComponentTag {};
-    using AnimatorComponentHandle = Handle<AnimatorComponentTag>;
-    
-    struct BoundingBoxComponentTag {};
-    using BoundingBoxComponentHandle = Handle<BoundingBoxComponentTag>;
-    
-    struct ButtonComponentTag {};
-    using ButtonComponentHandle = Handle<ButtonComponentTag>;
-    
-    struct ChannelFrameAnimatorComponentTag {};
-    using ChannelFrameAnimatorComponentHandle = Handle<ChannelFrameAnimatorComponentTag>;
-    
-    struct ColorMatrixComponentTag {};
-    using ColorMatrixComponentHandle = Handle<ColorMatrixComponentTag>;
-    
-    struct ColorTransformComponentTag {};
-    using ColorTransformComponentHandle = Handle<ColorTransformComponentTag>;
-    
-    struct FlatRectRenderComponentTag {};
-    using FlatRectRenderComponentHandle = Handle<FlatRectRenderComponentTag>;
-    
-    struct FrameAnimatorComponentTag {};
-    using FrameAnimatorComponentHandle = Handle<FrameAnimatorComponentTag>;
-    
-    struct InputTouchComponentTag {};
-    using InputTouchComponentHandle = Handle<InputTouchComponentTag>;
-    
-    struct LineRenderComponentTag {};
-    using LineRenderComponentHandle = Handle<LineRenderComponentTag>;
-    
-    struct MaskComponentTag {};
-    using MaskComponentHandle = Handle<MaskComponentTag>;
-    
-    struct SpriteRenderComponentTag {};
-    using SpriteRenderComponentHandle = Handle<SpriteRenderComponentTag>;
-    
-    struct TextComponentTag {};
-    using TextComponentHandle = Handle<TextComponentTag>;
-    
-    struct TextureMaskComponentTag {};
-    using TextureMaskComponentHandle = Handle<TextureMaskComponentTag>;
-    
-    struct TransformComponentTag {};
-    using TransformComponentHandle = Handle<TransformComponentTag>;
-    
-    using TransformComponent2Handle = Handle<TransformComponent>;
+    using AnimationChannelComponentHandle = Handle<AnimationChannelComponent>;
+    using AnimationSequenceComponentHandle = Handle<AnimationSequenceComponent>;
+    using AnimatorComponentHandle = Handle<AnimatorComponent>;
+    using BoundingBoxComponentHandle = Handle<BoundingBoxComponent>;
+    using ButtonComponentHandle = Handle<ButtonComponent>;
+    using ChannelFrameAnimatorComponentHandle = Handle<ChannelFrameAnimatorComponent>;
+    using ColorMatrixComponentHandle = Handle<ColorMatrixComponent>;
+    using ColorTransformComponentHandle = Handle<ColorTransformComponent>;
+    using FlatRectRenderComponentHandle = Handle<FlatRectRenderComponent>;
+    using FrameAnimatorComponentHandle = Handle<FrameAnimatorComponent>;
+    using InputTouchComponentHandle = Handle<InputTouchComponent>;
+    using LineRenderComponentHandle = Handle<LineRenderComponent>;
+    using MaskComponentHandle = Handle<MaskComponent>;
+    using SpriteRenderComponentHandle = Handle<SpriteRenderComponent>;
+    using TextComponentHandle = Handle<TextComponent>;
+    using TextureMaskComponentHandle = Handle<TextureMaskComponent>;
+    using TransformComponentHandle = Handle<TransformComponent>;
     
     struct ComponentHandle {
-        uint32_t            bitmask;
+        uint32_t            typeId;
         HandleBackingType   handle;
     };
 }

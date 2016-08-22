@@ -15,18 +15,12 @@
 namespace BGE {
     class LineRenderComponent : public RenderComponent
     {
-    private:
-        struct private_key {};
-        friend Component;
-
     public:
         static std::type_index  type_index_;
         static uint32_t         typeId_;
         static uint32_t         bitmask_;
         
-        static std::shared_ptr<LineRenderComponent> create(ObjectId componentId);
-        
-        LineRenderComponent(struct private_key const& key, ObjectId componentId);
+        LineRenderComponent();
         ~LineRenderComponent() {}
         
         const std::vector<Vector2>& getPoints() const;

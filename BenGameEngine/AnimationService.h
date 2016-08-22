@@ -35,10 +35,10 @@ namespace BGE {
         void update(double deltaTime);
         
     private:
-        void animateSequence(Space *space, std::shared_ptr<AnimationSequenceComponent> seq, std::shared_ptr<AnimatorComponent> animator, float deltaTime);
+        void animateSequence(Space *space, AnimationSequenceComponent *seq, AnimatorComponent *animator, float deltaTime);
         void animateChannel(GameObject *gameObj, int32_t frame);
-        void animateSequenceByFrame(Space *space, std::shared_ptr<AnimationSequenceComponent> seq, std::shared_ptr<FrameAnimatorComponent> animator, int32_t frame);
-        int32_t handleEndOfAnim(std::shared_ptr<AnimatorComponent> animator, int32_t startFrame, int32_t lastFrame);
+        void animateSequenceByFrame(Space *space, AnimationSequenceComponent *seq, FrameAnimatorComponent *animator, int32_t frame);
+        int32_t handleEndOfAnim(AnimatorComponent *animator, int32_t startFrame, int32_t lastFrame);
     };
 }
 
