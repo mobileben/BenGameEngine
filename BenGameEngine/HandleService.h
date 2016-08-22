@@ -18,11 +18,11 @@
 #include <type_traits>
 
 namespace BGE {
+    static const uint32_t HandleServiceNoMaxLimit = 0;
+    
     template <typename DATA, typename HANDLE>
     class HandleService : public Service {
     public:
-        static const uint32_t NoMaxLimit = 0;
-        
         HandleService(uint32_t reserve, uint32_t maxLimit) : maxLimit_(maxLimit) {
 #if UNIT_TESTING
             if (reserve == 0) {
@@ -31,7 +31,7 @@ namespace BGE {
                 throw std::exception();
             }
 #else
-            assert(reserve > 0 && (maxLimit == 0 || maxLimit >= reserve));
+            assert(reserve > 0 && (maxLimit == HandleServiceNoMaxLimit || maxLimit >= reserve));
 #endif
             
             data_.reserve(reserve);
@@ -41,10 +41,6 @@ namespace BGE {
         
         HandleService() = delete;
         ~HandleService() {}
-        
-        static HandleService<DATA, HANDLE> *createService(uint32_t reserve, uint32_t maxLimit) {
-            return new HandleService<DATA, HANDLE>(reserve, maxLimit);
-        }
         
         void initialize() {}
         void reset() {}
@@ -60,7 +56,7 @@ namespace BGE {
             
             if (freeSlots_.empty()) {
                 // We have no free slots, so create a new one if we are not at our limit
-                if (maxLimit_ && data_.size() >= maxLimit_) {
+                if (maxLimit_ != HandleServiceNoMaxLimit && data_.size() >= maxLimit_) {
                     handle.nullify();
                     return nullptr;
                 }

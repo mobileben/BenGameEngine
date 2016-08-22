@@ -8,7 +8,7 @@
 
 #include "MaterialService.h"
 
-BGE::MaterialService::MaterialService() :  handleService_(InitialMaterialReserve, MaterialHandleService::NoMaxLimit) {
+BGE::MaterialService::MaterialService() :  handleService_(InitialMaterialReserve, HandleServiceNoMaxLimit) {
 }
 
 BGE::MaterialService::~MaterialService() {

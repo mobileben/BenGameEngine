@@ -16,9 +16,6 @@ uint32_t BGE::Component::bitmask_ = InvalidBitmask;
 uint32_t BGE::Component::typeId_ = InvalidTypeId;
 std::type_index BGE::Component::type_index_ = typeid(BGE::Component);
 
-BGE::Component::Component(ObjectId componentId) : Object(componentId) {
-}
-
 void BGE::Component::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
     handle_ = handle;
     spaceHandle_ = spaceHandle;

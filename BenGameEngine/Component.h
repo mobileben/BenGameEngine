@@ -34,9 +34,7 @@ namespace BGE {
         static uint32_t         typeId_;         // Sub-classes must implement
         static uint32_t         bitmask_;       // Sub-classes must implement
         
-        Component() : Object(), handle_(0) {
-        }
-        
+        Component() : Object(), handle_(0) {}
         virtual ~Component() {}
         
         virtual void initialize(HandleBackingType handle, SpaceHandle spaceHandle);
@@ -78,8 +76,6 @@ namespace BGE {
         inline HandleBackingType getRawHandle() const { return handle_; }
         
     protected:
-        Component(ObjectId componentId);
-        
         template <typename T>
         static void registerBitmask() {
             if (T::bitmask_ == Component::InvalidBitmask) {

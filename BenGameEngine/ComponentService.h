@@ -106,20 +106,19 @@ namespace BGE {
         typedef std::unordered_map<std::type_index, void *> ComponentPoolMap;
         typedef std::unordered_map<std::type_index, size_t> ComponentPoolSize;
         
-        static bool componentsRegistered_;
-        static std::vector<std::function<void *(uint32_t, uint32_t)>> handleServiceCreators_;
+        static bool                 componentsRegistered_;
+        static std::vector<void *>  componentHandleServices_;
         
-        SpaceHandle spaceHandle_;
+        SpaceHandle                                 spaceHandle_;
         std::vector<std::vector<ComponentHandle>>   componentHandles_;
-        std::vector<void *>                         componentHandleServices_;
         
         GameObject *getComponentGameObject(Component *, GameObjectHandle gameObjHandle);
         
-        template <typename T> static void registerComponent() {
+        template <typename T> static void registerComponent(uint32_t reserve, uint32_t maxLimit) {
             using HANDLE = Handle<T>;
             
             Component::registerBitmask<T>();
-            handleServiceCreators_.push_back(std::bind(&HandleService<T, HANDLE>::createService, std::placeholders::_1, std::placeholders::_2));
+            componentHandleServices_.push_back(new HandleService<T, HANDLE>(reserve, maxLimit));
         }
         
         template <typename T> void releaseComponentHandle(ComponentHandle handle) {

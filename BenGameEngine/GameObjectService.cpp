@@ -10,7 +10,7 @@
 #include "GameObject.h"
 #include "Game.h"
 
-BGE::GameObjectService::GameObjectService() : handleService_(InitialGameObjectReserve, GameObjectHandleService::NoMaxLimit) {
+BGE::GameObjectService::GameObjectService() : handleService_(InitialGameObjectReserve, HandleServiceNoMaxLimit) {
 }
 
 BGE::GameObjectService::~GameObjectService() {

@@ -10,7 +10,7 @@
 #include "Game.h"
 #include "InputTouchComponent.h"
 
-BGE::InputService::InputService() :  handleService_(InitialInputReserve, InputHandleService::NoMaxLimit) {
+BGE::InputService::InputService() :  handleService_(InitialInputReserve, HandleServiceNoMaxLimit) {
     inputs_.reserve(InitialInputReserve);
 }
 
@@ -124,7 +124,7 @@ void BGE::InputService::process() {
                     // Compute collision if exists
                     auto bbox = touch->getBoundingBox();
                     auto xform = touch->getTransform();
-                    auto parent = xform->getParent();
+
                     Matrix4 matrix;
                     bool inBounds = false;
                     

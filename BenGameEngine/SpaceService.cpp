@@ -9,7 +9,7 @@
 #include "SpaceService.h"
 #include "Game.h"
 
-BGE::SpaceService::SpaceService() : handleService_(InitialSpaceReserve, SpaceHandleService::NoMaxLimit){
+BGE::SpaceService::SpaceService() : handleService_(InitialSpaceReserve, HandleServiceNoMaxLimit){
 }
 
 BGE::SpaceService::~SpaceService() {

@@ -465,7 +465,6 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
 
                 GLint positionLocation = glShader->locationForAttribute("Position");
                 GLint projectionLocation = glShader->locationForUniform("Projection");
-                GLint modelLocation = glShader->locationForUniform("ModelView");
                 GLint colorLocation = glShader->locationForUniform("Color");
                 
                 glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
@@ -656,8 +655,14 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                                        GL_UNSIGNED_BYTE, &Indices[0]);
                     }
                 }
+            } else {
+                NSLog(@"INDEED");
             }
+        } else {
+            NSLog(@"HWY");
         }
+    } else {
+        NSLog(@"HWY");
     }
 }
 

@@ -17,12 +17,6 @@ void BGE::RenderComponent::getGlobalBounds(Rect& bounds) {
     
 }
 
-BGE::RenderComponent::~RenderComponent() {
-    for (auto handle : materialHandles_) {
-        Game::getInstance()->getMaterialService()->removeMaterial(handle);
-    }
-}
-
 BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) {
     if (index < materialHandles_.size()) {
         return materialHandles_[index];

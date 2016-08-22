@@ -15,12 +15,6 @@
 #include "ColorMatrixComponent.h"
 #include "ColorTransformComponent.h"
 
-BGE::AnimationService::AnimationService() {
-}
-
-BGE::AnimationService::~AnimationService() {
-}
-
 void BGE::AnimationService::update(double deltaTime) {
     float dt = (float)deltaTime;
 

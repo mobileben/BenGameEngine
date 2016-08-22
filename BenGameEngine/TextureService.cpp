@@ -8,7 +8,7 @@
 
 #include "TextureService.h"
 
-BGE::TextureService::TextureService(EAGLContext *context) : Service(), textureHandleService_(InitialTextureReserve, TextureHandleService::NoMaxLimit), textureAtlasHandleService_(InitialTextureAtlasReserve, TextureAtlasHandleService::NoMaxLimit) {
+BGE::TextureService::TextureService(EAGLContext *context) : Service(), textureHandleService_(InitialTextureReserve, HandleServiceNoMaxLimit), textureAtlasHandleService_(InitialTextureAtlasReserve, HandleServiceNoMaxLimit) {
     textureLoader_ = [[GLKTextureLoader alloc] initWithSharegroup:context.sharegroup];
 }
 

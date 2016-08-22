@@ -32,7 +32,7 @@ void BGE::FontService::mapBundles(std::string bundleName)
     }
 }
 
-BGE::FontService::FontService(std::map<std::string, std::string> resources) : handleService_(InitialFontReserve, FontHandleService::NoMaxLimit) {
+BGE::FontService::FontService(std::map<std::string, std::string> resources) : handleService_(InitialFontReserve, HandleServiceNoMaxLimit) {
     FontService::mapBundles("BenGameEngineBundle");
 
     std::vector<std::string> assets;

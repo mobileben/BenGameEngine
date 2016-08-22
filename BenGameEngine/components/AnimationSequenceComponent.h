@@ -27,7 +27,7 @@ namespace BGE {
         static uint32_t         bitmask_;
         
         AnimationSequenceComponent();
-        ~AnimationSequenceComponent();
+        ~AnimationSequenceComponent() {}
         
         void initialize(HandleBackingType handle, SpaceHandle spaceHandle) override;
 

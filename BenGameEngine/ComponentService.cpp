@@ -26,36 +26,39 @@
 #include "BoundingBoxComponent.h"
 
 bool BGE::ComponentService::componentsRegistered_ = false;
-std::vector<std::function<void *(uint32_t, uint32_t)>> BGE::ComponentService::handleServiceCreators_;
+std::vector<void *> BGE::ComponentService::componentHandleServices_;
 
 void BGE::ComponentService::registerComponents() {
     if (!ComponentService::componentsRegistered_) {
-        registerComponent<TransformComponent>();
-        registerComponent<BoundingBoxComponent>();
-        registerComponent<AnimationChannelComponent>();
-        registerComponent<AnimationSequenceComponent>();
-        registerComponent<AnimatorComponent>();
-        registerComponent<ChannelFrameAnimatorComponent>();
-        registerComponent<ColorMatrixComponent>();
-        registerComponent<ColorTransformComponent>();
-        registerComponent<FrameAnimatorComponent>();
-        registerComponent<SpriteRenderComponent>();
-        registerComponent<TextComponent>();
-        registerComponent<ButtonComponent>();
-        registerComponent<InputTouchComponent>();
-        registerComponent<LineRenderComponent>();
-        registerComponent<FlatRectRenderComponent>();
-        registerComponent<MaskComponent>();
-        registerComponent<TextureMaskComponent>();
+        registerComponent<TransformComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<BoundingBoxComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<AnimationChannelComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<AnimationSequenceComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<AnimatorComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<ChannelFrameAnimatorComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<ColorMatrixComponent>(120, HandleServiceNoMaxLimit);
+        registerComponent<ColorTransformComponent>(120, HandleServiceNoMaxLimit);
+        registerComponent<FrameAnimatorComponent>(120, HandleServiceNoMaxLimit);
+        registerComponent<SpriteRenderComponent>(120, HandleServiceNoMaxLimit);
+        registerComponent<TextComponent>(120, HandleServiceNoMaxLimit);
+        registerComponent<ButtonComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<InputTouchComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<LineRenderComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<FlatRectRenderComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<MaskComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<TextureMaskComponent>(1024, HandleServiceNoMaxLimit);
     }
     
     componentsRegistered_ = true;
 }
 
 BGE::ComponentService::ComponentService() : Service() {
-    for (auto &creator : handleServiceCreators_) {
-        componentHandleServices_.push_back(static_cast<void *>(creator(480, 480)));
-        
+    if (!ComponentService::componentsRegistered_) {
+        ComponentService::registerComponents();
+    }
+    
+    // Create our componentHandle vectors
+    for (auto it=componentHandleServices_.begin();it!=componentHandleServices_.end();++it) {
         componentHandles_.push_back(std::vector<ComponentHandle>());
     }
 }
@@ -63,6 +66,11 @@ BGE::ComponentService::ComponentService() : Service() {
 BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : Service(), spaceHandle_(spaceHandle) {
     if (!ComponentService::componentsRegistered_) {
         ComponentService::registerComponents();
+    }
+    
+    // Create our componentHandle vectors
+    for (auto it=componentHandleServices_.begin();it!=componentHandleServices_.end();++it) {
+        componentHandles_.push_back(std::vector<ComponentHandle>());
     }
 }
 

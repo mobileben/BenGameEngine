@@ -10,7 +10,7 @@
 #include "Game.h"
 #import <Foundation/Foundation.h>
 
-BGE::ScenePackageService::ScenePackageService() : handleService_(InitialScenePackageReserve, ScenePackageHandleService::NoMaxLimit) {
+BGE::ScenePackageService::ScenePackageService() : handleService_(InitialScenePackageReserve, HandleServiceNoMaxLimit) {
 }
 
 void BGE::ScenePackageService::packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback) {

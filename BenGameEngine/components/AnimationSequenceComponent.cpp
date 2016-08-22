@@ -19,16 +19,6 @@ std::type_index BGE::AnimationSequenceComponent::type_index_ = typeid(BGE::Anima
 BGE::AnimationSequenceComponent::AnimationSequenceComponent() : Component(), frameRate(0), totalFrames(0), numChannels(0), numBounds(0) {
 }
 
-BGE::AnimationSequenceComponent::~AnimationSequenceComponent() {
-    // Remove all channels
-    
-    auto space = getSpace();
-    
-    if (space) {
-        space->removeGameObject(sequenceRootHandle);
-    }
-}
-
 void BGE::AnimationSequenceComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
     Component::initialize(handle, spaceHandle);
     

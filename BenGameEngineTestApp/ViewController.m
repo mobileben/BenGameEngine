@@ -133,9 +133,6 @@
                                         }
                                         auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
                                         
-                                        auto test = space->createComponent<BGE::AnimationChannelComponent>();
-                                        NSLog(@"Test is %x", test);
-                                        
                                         auto gameObj = space->createSprite("SaleBkg");
                                         auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
                                         
@@ -148,7 +145,6 @@
                                         gameObj->setName("Object1");
                                         
                                         gameObj->setActive(true);
-                                        gameObj->addComponent(test);
                                         
                                         gameObj = space->createText("CashText");
                                         transformComponent = gameObj->getComponent<BGE::TransformComponent>();

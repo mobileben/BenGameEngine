@@ -22,8 +22,8 @@ namespace BGE {
     class AnimationService : public Service
     {
     public:
-        AnimationService();
-        ~AnimationService();
+        AnimationService() {}
+        ~AnimationService() {}
         
         void initialize() {}
         void reset() {}
