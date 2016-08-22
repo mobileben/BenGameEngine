@@ -72,8 +72,8 @@ namespace BGE {
 #endif
         ~Texture();
         
-        void initialize(TextureHandle handle, ObjectId texId, std::string name);
-        void initialize(TextureHandle handle, ObjectId texId, std::string name, GLKTextureInfo *texInfo);
+        void initialize(TextureHandle handle, std::string name);
+        void initialize(TextureHandle handle, std::string name, GLKTextureInfo *texInfo);
 
         inline TextureAlphaState getAlphaState() const { return alphaState_; }
         inline TextureFormat getFormat() const { return format_; }

@@ -60,7 +60,7 @@ namespace BGE {
         Font(std::string name, uint32_t pixelSize);
         virtual ~Font();
         
-        void initialize(FontHandle handle, ObjectId fontId, std::string name, uint32_t pixelSize);
+        void initialize(FontHandle handle, std::string name, uint32_t pixelSize);
         
         FontHandle getHandle() const { return handle_; }
         uint32_t getGlyphW() const { return glyphW_; }
@@ -106,12 +106,6 @@ namespace BGE {
         TextureAtlasHandle                                  textureAtlasHandle_;
         std::map<uint16_t, FontGlyph>                       glyphs_;
         std::map<std::pair<uint16_t, uint16_t>, int32_t>    kerning_;
-        
-        template <typename T>
-        std::shared_ptr<T> derived_shared_from_this()
-        {
-            return std::static_pointer_cast<T>(Object::shared_from_this());
-        }
 
         void drawString(std::string str, const float *rawMatrix, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
 

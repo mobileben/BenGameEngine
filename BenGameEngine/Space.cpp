@@ -21,9 +21,8 @@ BGE::Space::Space(ObjectId spaceId) : NamedObject(spaceId), visible_(false), ord
 BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true) {
 }
 
-void BGE::Space::initialize(SpaceHandle handle, ObjectId spaceId, std::string name) {
+void BGE::Space::initialize(SpaceHandle handle, std::string name) {
     spaceHandle_ = handle;
-    setInstanceId(spaceId);
     setName(name);
 
     gameObjectService_ = std::make_shared<GameObjectService>();

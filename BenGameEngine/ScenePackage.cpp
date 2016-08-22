@@ -40,9 +40,8 @@ void BGE::ScenePackage::reset() {
     animationSequences_.clear();
 }
 
-void BGE::ScenePackage::initialize(ScenePackageHandle handle, ObjectId scenePackageId, std::string name) {
+void BGE::ScenePackage::initialize(ScenePackageHandle handle, std::string name) {
     handle_ = handle;
-    setInstanceId(scenePackageId);
     setName(name);
 }
 

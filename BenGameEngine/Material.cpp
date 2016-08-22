@@ -24,9 +24,8 @@ BGE::Material::Material() : Object(), colorDirty_(false)  {
     colorMatrix_.offset.a = 0;
 }
 
-void BGE::Material::initialize(MaterialHandle handle, ObjectId matId) {
+void BGE::Material::initialize(MaterialHandle handle) {
     handle_ = handle;
-    setInstanceId(matId);
 }
 
 void BGE::Material::getColorMatrix(ColorMatrix& colorMatrix) const {

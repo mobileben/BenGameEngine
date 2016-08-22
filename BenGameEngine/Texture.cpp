@@ -56,9 +56,8 @@ BGE::Texture::~Texture() {
     glDeleteTextures(1, &name);
 }
 
-void BGE::Texture::initialize(TextureHandle handle, ObjectId texId, std::string name) {
+void BGE::Texture::initialize(TextureHandle handle, std::string name) {
     handle_ = handle;
-    setInstanceId(texId);
     setName(name);
 
     valid_ = false;
@@ -75,8 +74,8 @@ void BGE::Texture::initialize(TextureHandle handle, ObjectId texId, std::string 
     isSubTexture_ = false;
 }
 
-void BGE::Texture::initialize(TextureHandle handle, ObjectId texId, std::string name, GLKTextureInfo *texInfo) {
-    initialize(handle, texId, name);
+void BGE::Texture::initialize(TextureHandle handle, std::string name, GLKTextureInfo *texInfo) {
+    initialize(handle, name);
     
     if (texInfo) {
         // TODO: Can we ascertain the right format?

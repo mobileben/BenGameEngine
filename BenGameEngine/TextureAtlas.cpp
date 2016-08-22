@@ -38,11 +38,10 @@ void BGE::TextureAtlas::reset() {
     subTextures_.clear();
 }
 
-void BGE::TextureAtlas::initialize(TextureAtlasHandle handle, ObjectId texId, std::string name) {
+void BGE::TextureAtlas::initialize(TextureAtlasHandle handle, std::string name) {
     reset();
     
     handle_ = handle;
-    setInstanceId(texId);
     setName(name);
 }
 

@@ -16,6 +16,8 @@
 namespace BGE {
     using HandleBackingType = uint32_t;
     
+    class GameObject;
+    
     class AnimationChannelComponent;
     class AnimationSequenceComponent;
     class AnimatorComponent;
@@ -92,8 +94,7 @@ namespace BGE {
     struct FontTag {};
     using FontHandle = Handle<FontTag>;
     
-    struct GameObjectTag {};
-    using GameObjectHandle = Handle<GameObjectTag>;
+    using GameObjectHandle = Handle<GameObject>;
     
     struct InputTag {};
     using InputHandle = Handle<InputTag>;

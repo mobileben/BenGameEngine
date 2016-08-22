@@ -35,7 +35,7 @@ namespace BGE {
         TextureAtlas(ObjectId objId, std::string name);
         ~TextureAtlas();
         
-        void initialize(TextureAtlasHandle handle, ObjectId texId, std::string name);
+        void initialize(TextureAtlasHandle handle, std::string name);
 
         inline bool isValid() const { return valid_; }
 

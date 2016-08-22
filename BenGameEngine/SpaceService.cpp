@@ -20,10 +20,8 @@ BGE::SpaceHandle BGE::SpaceService::createSpace(std::string name) {
     Space *space = handleService_.allocate(handle);
     
     if (space) {
-        ObjectId spaceId = getIdAndIncrement();
-        
-        space->initialize(handle, spaceId, name);
-        spaces_[spaceId] = handle;
+        space->initialize(handle, name);
+        spaces_[space->getInstanceId()] = handle;
     }
     
     return handle;

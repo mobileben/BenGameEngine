@@ -336,9 +336,7 @@ void BGE::TextureService::createTextureFromFile(std::string name, std::string fi
             texture = textureHandleService_.allocate(textureHandle);
             
             if (texture) {
-                uint32_t texId = getIdAndIncrement();
-
-                texture->initialize(textureHandle, texId, name, textureInfo);
+                texture->initialize(textureHandle, name, textureInfo);
             } else {
                 std::string domain = [error.domain UTF8String];
                 int32_t code = (uint32_t) error.code;
@@ -373,9 +371,7 @@ void BGE::TextureService::createTextureFromBuffer(std::string name, void *buffer
     texture = textureHandleService_.allocate(textureHandle);
 
     if (texture) {
-        uint32_t texId = getIdAndIncrement();
-
-        texture->initialize(textureHandle, texId, name);
+        texture->initialize(textureHandle, name);
 
         texture->createFromBuffer(buffer, format, width, height, [this, textureHandle, callback](Texture *newTexture, std::shared_ptr<Error> error) -> void {
             if (!newTexture) {
@@ -524,9 +520,7 @@ void BGE::TextureService::createTextureAtlasFromFile(std::string name, std::stri
     atlas = textureAtlasHandleService_.allocate(atlasHandle);
     
     if (atlas) {
-        uint32_t texId = getIdAndIncrement();
-
-        atlas->initialize(atlasHandle, texId, name);
+        atlas->initialize(atlasHandle, name);
         
         atlas->createFromFile(filename, subTextureDefs, [this, atlasHandle, callback](TextureAtlas * atlas, std::shared_ptr<Error> error) -> void {
             if (!atlas) {
@@ -555,9 +549,7 @@ void BGE::TextureService::createTextureAtlasFromBuffer(std::string name, void *b
     atlas = textureAtlasHandleService_.allocate(atlasHandle);
     
     if (atlas) {
-        uint32_t texId = getIdAndIncrement();
-
-        atlas->initialize(atlasHandle, texId, name);
+        atlas->initialize(atlasHandle, name);
         
         atlas->createFromBuffer(buffer, format, width, height, subTextureDefs, [this, atlasHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
             if (!atlas) {
@@ -604,9 +596,7 @@ BGE::Texture *BGE::TextureService::createSubTexture(std::string name, TextureAtl
     texture = textureHandleService_.allocate(textureHandle);
     
     if (texture) {
-        uint32_t texId = getIdAndIncrement();
-
-        texture->initialize(textureHandle, texId, name);
+        texture->initialize(textureHandle, name);
 
         auto error = texture->createSubTexture(atlas, x, y, width, height, rotated);
         

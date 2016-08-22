@@ -26,7 +26,7 @@ namespace BGE {
         Material(ObjectId matId);
         ~Material() {}
         
-        void initialize(MaterialHandle handle, ObjectId matId);
+        void initialize(MaterialHandle handle);
         
         MaterialHandle getHandle() const { return handle_; }
         

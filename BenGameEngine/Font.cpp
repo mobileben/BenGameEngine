@@ -34,9 +34,8 @@ BGE::Font::~Font() {
     Game::getInstance()->getTextureService()->removeTextureAtlas(getHandle(), textureAtlasHandle_);
 }
 
-void BGE::Font::initialize(FontHandle handle, ObjectId fontId, std::string name, uint32_t pixelSize) {
+void BGE::Font::initialize(FontHandle handle, std::string name, uint32_t pixelSize) {
     setName(name);
-    setInstanceId(fontId);
     handle_ = handle;
     pixelSize_ = pixelSize;
     status_ = FontStatus::Invalid;

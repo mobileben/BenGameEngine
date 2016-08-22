@@ -31,7 +31,7 @@ namespace BGE {
 
         virtual ~Space() {}
         
-        void initialize(SpaceHandle handle, ObjectId spaceId, std::string name);
+        void initialize(SpaceHandle handle, std::string name);
 
         inline SpaceHandle getHandle() const { return spaceHandle_; }
         

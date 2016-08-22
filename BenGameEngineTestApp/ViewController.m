@@ -406,7 +406,6 @@
             auto bbox = button->getBoundingBox();
             if (bbox) {
                 auto xform = button->getTransform();
-                auto parent = xform->getParent();
                 BGE::Matrix4 matrix;
                 BGE::Vector2 point;
                 std::vector<BGE::Vector2> points;

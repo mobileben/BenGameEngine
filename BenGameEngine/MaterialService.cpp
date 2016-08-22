@@ -27,9 +27,7 @@ BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color) {
     Material *material = handleService_.allocate(handle);
     
     if (material) {
-        ObjectId objId = getIdAndIncrement();
-        
-        material->initialize(handle, objId);
+        material->initialize(handle);
         material->setColor(color);
         addMaterial(handle);
     }
@@ -42,9 +40,7 @@ BGE::MaterialHandle BGE::MaterialService::createMaterial(TextureHandle textureHa
     Material *material = handleService_.allocate(handle);
     
     if (material) {
-        ObjectId objId = getIdAndIncrement();
-        
-        material->initialize(handle, objId);
+        material->initialize(handle);
         material->setTextureHandle(textureHandle);
         addMaterial(handle);
     }
@@ -57,9 +53,7 @@ BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color, Texture
     Material *material = handleService_.allocate(handle);
     
     if (material) {
-        ObjectId objId = getIdAndIncrement();
-        
-        material->initialize(handle, objId);
+        material->initialize(handle);
         material->setColor(color);
         material->setTextureHandle(textureHandle);
         addMaterial(handle);

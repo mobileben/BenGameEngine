@@ -313,9 +313,7 @@ void BGE::FontService::createFont(std::string name, uint32_t pxSize, std::functi
                 Font *tFont = handleService_.allocate(handle);
                 
                 if (tFont) {
-                    ObjectId fontId = getIdAndIncrement();
-                    
-                    tFont->initialize(handle, fontId, name, pxSize);
+                    tFont->initialize(handle, name, pxSize);
                     tFont->status_ = FontStatus::Loading;
                     
                     info->fonts[pxSize] = handle;

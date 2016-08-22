@@ -39,8 +39,7 @@ void BGE::ScenePackageService::packageFromJSONFile(std::string filename, std::st
             NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
             
             // The loading system relies on having the package initalized with handle
-            ObjectId objId = this->getIdAndIncrement();
-            package->initialize(handle, objId, name);
+            package->initialize(handle, name);
             
             package->load(jsonDict, [this, handle, name, callback](ScenePackage * package) {
                 auto tHandle = handle;
