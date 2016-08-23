@@ -95,7 +95,7 @@
         path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
         
         if (path) {
-            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "Common", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile(self.spaceHandle, [path UTF8String], "Common", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                 BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                 
                 if (package) {
@@ -105,7 +105,7 @@
                 NSString *path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
                 
                 if (path) {
-                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "CommonLobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile(self.spaceHandle, [path UTF8String], "CommonLobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                         BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                         
                         if (package) {
@@ -115,7 +115,7 @@
                         NSString *path = [[NSBundle mainBundle] pathForResource:@"CommonHUD-iPh6" ofType:@"json"];
                         
                         if (path) {
-                            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "CommonHUD", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile(self.spaceHandle, [path UTF8String], "CommonHUD", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                                 BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                                 
                                 if (package) {
@@ -125,7 +125,7 @@
                                 NSString *path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
                                 
                                 if (path) {
-                                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile([path UTF8String], "Lobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile(self.spaceHandle, [path UTF8String], "Lobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                                         BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                                         
                                         if (package) {

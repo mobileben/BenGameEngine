@@ -32,6 +32,9 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name) {
     componentService_->setSpaceHandle(spaceHandle_);
 }
 
+void BGE::Space::destroy() {
+}
+
 BGE::GameObject *BGE::Space::createGameObject(std::string name ) {
     return gameObjectService_->createGameObject(name);
 }
@@ -534,3 +537,19 @@ void BGE::Space::createFont(std::string name, uint32_t pxSize, std::function<voi
         }
     });
 }
+
+void BGE::Space::scenePackageAdded(ScenePackageHandle handle) {
+    bool found = false;
+    
+    for (auto package : scenePackages_) {
+        if (package == handle) {
+            found = true;
+            break;
+        }
+    }
+    
+    if (!found) {
+        scenePackages_.push_back(handle);
+    }
+}
+

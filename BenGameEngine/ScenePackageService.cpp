@@ -13,13 +13,27 @@
 BGE::ScenePackageService::ScenePackageService() : handleService_(InitialScenePackageReserve, HandleServiceNoMaxLimit) {
 }
 
-void BGE::ScenePackageService::packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback) {
-    for (auto it : scenePackages_) {
-        auto package = getScenePackage(it.first);
+void BGE::ScenePackageService::packageFromJSONFile(SpaceHandle spaceHandle, std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback) {
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
         if (package && package->getName() == name) {
+            // Check if our spaceHandle is in the refernce list, if not add it
+            bool found = false;
+            
+            for (auto &ref : packageRef.references) {
+                if (ref == spaceHandle) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                packageRef.references.push_back(spaceHandle);
+            }
+            
             if (callback) {
-                callback(it.second, nullptr);
+                callback(packageRef.handle, nullptr);
             }
             
             return;
@@ -41,11 +55,30 @@ void BGE::ScenePackageService::packageFromJSONFile(std::string filename, std::st
             // The loading system relies on having the package initalized with handle
             package->initialize(handle, name);
             
-            package->load(jsonDict, [this, handle, name, callback](ScenePackage * package) {
+            package->load(jsonDict, [this, spaceHandle, handle, name, callback](ScenePackage * package) {
                 auto tHandle = handle;
                 
                 if (package) {
-                    scenePackages_[package->getInstanceId()] = tHandle;
+#if DEBUG
+                    auto found = false;
+                    
+                    for (auto &packageRef : scenePackages_) {
+                        if (packageRef.handle == tHandle) {
+                            found = true;
+                        }
+                    }
+                    
+                    assert(!found);
+#endif
+                    ScenePackageReference ref{ tHandle, { spaceHandle }};
+                    
+                    scenePackages_.push_back(ref);
+                    
+                    auto space = Game::getInstance()->getSpaceService()->getSpace(spaceHandle);
+                    
+                    if (space) {
+                        space->scenePackageAdded(tHandle);
+                    }
                 } else {
                     // There is no package, so we need to release this
                     handleService_.release(tHandle);
@@ -67,23 +100,23 @@ void BGE::ScenePackageService::packageFromJSONFile(std::string filename, std::st
 }
 
 BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(ObjectId scenePackageId) {
-    auto it = scenePackages_.find(scenePackageId);
-    
-    if (it != scenePackages_.end()) {
-        return it->second;
-    } else {
-        return ScenePackageHandle();
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
+        
+        if (package && package->getInstanceId() == scenePackageId) {
+            return package->getHandle();
+        }
     }
+    
+    return ScenePackageHandle();
 }
 
 BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::string name) {
-    for (auto it : scenePackages_) {
-        auto package = getScenePackage(it.second);
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
-        if (package) {
-            if (package->getName() == name) {
-                return it.second;
-            }
+        if (package && package->getName() == name) {
+            return package->getHandle();
         }
     }
     
@@ -106,33 +139,76 @@ BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(ScenePackageHandle 
     return handleService_.dereference(handle);
 }
 
-void BGE::ScenePackageService::removePackage(ObjectId scenePackageId) {
-    auto it = scenePackages_.find(scenePackageId);
-    
-    if (it != scenePackages_.end()) {
-        handleService_.release(it->second);
-        scenePackages_.erase(it->first);
-    }
-}
-
-void BGE::ScenePackageService::removePackage(std::string name) {
-    for (auto it : scenePackages_) {
-        auto package = getScenePackage(it.second);
+void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, ObjectId scenePackageId) {
+    for (auto it=scenePackages_.begin(); it!=scenePackages_.end(); ++it) {
+        auto package = getScenePackage(it->handle);
         
-        if (package) {
-            if (package->getName() == name) {
-                removePackage(it.first);
-                return;
+        if (package && package->getInstanceId() == scenePackageId) {
+            auto &refs = it->references;
+            
+            for (auto hIt=refs.begin(); hIt!=refs.end();++hIt) {
+                if (*hIt == spaceHandle) {
+                    refs.erase(hIt);
+                    break;
+                }
             }
+            
+            // We have no more references, so delete the scene
+            if (refs.size() == 0) {
+                releasePackage(package);
+                scenePackages_.erase(it);
+            }
+            
+            break;
         }
     }
 }
 
-void BGE::ScenePackageService::removePackage(ScenePackageHandle handle) {
-    for (auto it : scenePackages_) {
-        if (it.second == handle) {
-            removePackage(it.first);
-            return;
+void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, std::string name) {
+    for (auto it=scenePackages_.begin(); it!=scenePackages_.end(); ++it) {
+        auto package = getScenePackage(it->handle);
+        
+        if (package && package->getName() == name) {
+            auto &refs = it->references;
+            
+            for (auto hIt=refs.begin(); hIt!=refs.end();++hIt) {
+                if (*hIt == spaceHandle) {
+                    refs.erase(hIt);
+                    break;
+                }
+            }
+            
+            // We have no more references, so delete the scene
+            if (refs.size() == 0) {
+                releasePackage(package);
+                scenePackages_.erase(it);
+            }
+            
+            break;
+        }
+    }
+}
+
+void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, ScenePackageHandle handle) {
+    for (auto it=scenePackages_.begin(); it!=scenePackages_.end(); ++it) {
+        if (it->handle == handle) {
+            auto package = getScenePackage(handle);
+            auto &refs = it->references;
+            
+            for (auto hIt=refs.begin(); hIt!=refs.end();++hIt) {
+                if (*hIt == spaceHandle) {
+                    refs.erase(hIt);
+                    break;
+                }
+            }
+            
+            // We have no more references, so delete the scene
+            if (refs.size() == 0) {
+                releasePackage(package);
+                scenePackages_.erase(it);
+            }
+            
+            break;
         }
     }
 }
@@ -144,13 +220,20 @@ void BGE::ScenePackageService::resetPackage(ScenePackageHandle handle) {
     
 }
 
+void BGE::ScenePackageService::releasePackage(ScenePackage *package) {
+    if (package) {
+        auto handle = package->getHandle();
+        
+        package->destroy();
+        handleService_.release(handle);
+    }
+}
 
 void BGE::ScenePackageService::link() {
     // TODO: Build dependency lists
-    for (auto const &ent : scenePackages_) {
-        ScenePackageHandle handle = ent.second;
-        auto package = handleService_.dereference(handle);
-        
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
+
         if (package) {
             package->link();
         }
@@ -158,9 +241,8 @@ void BGE::ScenePackageService::link() {
 }
 
 BGE::ButtonReference *BGE::ScenePackageService::getButtonReference(std::string name) {
-    for (auto const &ent : scenePackages_) {
-        ScenePackageHandle handle = ent.second;
-        auto package = handleService_.dereference(handle);
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
         if (package) {
             auto button = package->getButtonReference(name);
@@ -175,9 +257,8 @@ BGE::ButtonReference *BGE::ScenePackageService::getButtonReference(std::string n
 }
 
 BGE::MaskReference *BGE::ScenePackageService::getMaskReference(std::string name) {
-    for (auto const &ent : scenePackages_) {
-        ScenePackageHandle handle = ent.second;
-        auto package = handleService_.dereference(handle);
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
         if (package) {
             auto mask = package->getMaskReference(name);
@@ -192,9 +273,8 @@ BGE::MaskReference *BGE::ScenePackageService::getMaskReference(std::string name)
 }
 
 BGE::PlacementReference *BGE::ScenePackageService::getPlacementReference(std::string name) {
-    for (auto const &ent : scenePackages_) {
-        ScenePackageHandle handle = ent.second;
-        auto package = handleService_.dereference(handle);
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
         if (package) {
             auto placement = package->getPlacementReference(name);
@@ -209,9 +289,8 @@ BGE::PlacementReference *BGE::ScenePackageService::getPlacementReference(std::st
 }
 
 BGE::TextureReference *BGE::ScenePackageService::getTextureReference(std::string name) {
-    for (auto const &ent : scenePackages_) {
-        ScenePackageHandle handle = ent.second;
-        auto package = handleService_.dereference(handle);
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
         if (package) {
             auto texture = package->getTextureReference(name);
@@ -226,9 +305,8 @@ BGE::TextureReference *BGE::ScenePackageService::getTextureReference(std::string
 }
 
 BGE::TextReference *BGE::ScenePackageService::getTextReference(std::string name) {
-    for (auto const &ent : scenePackages_) {
-        ScenePackageHandle handle = ent.second;
-        auto package = handleService_.dereference(handle);
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
         if (package) {
             auto text = package->getTextReference(name);
@@ -243,9 +321,8 @@ BGE::TextReference *BGE::ScenePackageService::getTextReference(std::string name)
 }
 
 BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceReference(std::string name) {
-    for (auto const &ent : scenePackages_) {
-        ScenePackageHandle handle = ent.second;
-        auto package = handleService_.dereference(handle);
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
         if (package) {
             auto animSeq = package->getAnimationSequenceReference(name);
@@ -255,14 +332,13 @@ BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceR
             }
         }
     }
-
+    
     return nullptr;
 }
 
 BGE::ExternalPackageReference *BGE::ScenePackageService::getExternalReference(std::string name) {
-    for (auto const &ent : scenePackages_) {
-        ScenePackageHandle handle = ent.second;
-        auto package = handleService_.dereference(handle);
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
         if (package) {
             auto extRef = package->getExternalReference(name);
@@ -277,9 +353,8 @@ BGE::ExternalPackageReference *BGE::ScenePackageService::getExternalReference(st
 }
 
 BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string name) {
-    for (auto const &ent : scenePackages_) {
-        ScenePackageHandle handle = ent.second;
-        auto package = handleService_.dereference(handle);
+    for (auto &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
         
         if (package) {
             auto type = package->getReferenceType(name);

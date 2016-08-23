@@ -32,7 +32,8 @@ namespace BGE {
         virtual ~Space() {}
         
         void initialize(SpaceHandle handle, std::string name);
-
+        void destroy();
+        
         inline SpaceHandle getHandle() const { return spaceHandle_; }
         
         GameObject *createGameObject(std::string name = "");
@@ -95,15 +96,19 @@ namespace BGE {
 
         void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
 
+        // TODO: Add method for space to create/get scene package as well as removal
+        void scenePackageAdded(ScenePackageHandle handle);
+        
     protected:
         SpaceHandle spaceHandle_;
         
     private:
         friend SpaceService;
         
-        std::shared_ptr<GameObjectService> gameObjectService_;
-        std::shared_ptr<ComponentService> componentService_;
+        std::shared_ptr<GameObjectService>  gameObjectService_;
+        std::shared_ptr<ComponentService>   componentService_;
         
+        std::vector<ScenePackageHandle>     scenePackages_;
         std::vector<FontHandle>             fonts_;
         std::vector<TextureHandle>          textures_;
         std::vector<TextureAtlasHandle>     textureAtlases_;

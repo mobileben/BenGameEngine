@@ -46,7 +46,7 @@ namespace BGE {
         void destroy() {}
         void update(double deltaTime) {}
         
-        void packageFromJSONFile(std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback);
+        void packageFromJSONFile(SpaceHandle spaceHandle, std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback);
         
         ScenePackageHandle getScenePackageHandle(ObjectId scenePackageId);
         ScenePackageHandle getScenePackageHandle(std::string name);
@@ -55,9 +55,9 @@ namespace BGE {
         ScenePackage *getScenePackage(std::string name);
         ScenePackage *getScenePackage(ScenePackageHandle handle);
 
-        void removePackage(ObjectId scenePackageId);
-        void removePackage(std::string name);
-        void removePackage(ScenePackageHandle handle);
+        void removePackage(SpaceHandle spaceHandle, ObjectId scenePackageId);
+        void removePackage(SpaceHandle spaceHandle, std::string name);
+        void removePackage(SpaceHandle spaceHandle, ScenePackageHandle handle);
         
         void resetPackage(std::string name);
         void resetPackage(ScenePackageHandle handle);
@@ -80,11 +80,16 @@ namespace BGE {
         static const uint32_t InitialScenePackageReserve = 32;
         
         using ScenePackageHandleService = HandleService<ScenePackage, ScenePackageHandle>;
-        using ScenePackagesMap = std::unordered_map<ObjectId, ScenePackageHandle>;
-        using ScenePackagesMapIterator = ScenePackagesMap::iterator;
         
-        ScenePackageHandleService   handleService_;
-        ScenePackagesMap            scenePackages_;
+        struct ScenePackageReference {
+            ScenePackageHandle          handle;
+            std::vector<SpaceHandle>    references;
+        };
+        
+        ScenePackageHandleService           handleService_;
+        std::vector<ScenePackageReference>  scenePackages_;
+        
+        void releasePackage(ScenePackage *package);
     };
 }
 

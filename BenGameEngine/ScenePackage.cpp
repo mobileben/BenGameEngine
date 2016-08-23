@@ -45,6 +45,9 @@ void BGE::ScenePackage::initialize(ScenePackageHandle handle, std::string name) 
     setName(name);
 }
 
+void BGE::ScenePackage::destroy() {
+}
+
 BGE::AutoDisplayElementReference *BGE::ScenePackage::getAutoDisplayList() const {
     return autoDisplayElementRefs_.baseAddress();
 }

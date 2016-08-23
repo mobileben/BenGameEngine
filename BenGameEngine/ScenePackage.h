@@ -28,6 +28,7 @@ namespace BGE {
         ~ScenePackage();
         
         void initialize(ScenePackageHandle handle, std::string name);
+        void destroy();
         
         void link();
         
