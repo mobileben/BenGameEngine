@@ -93,6 +93,8 @@ namespace BGE {
         
         void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate);
 
+        void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+
     protected:
         SpaceHandle spaceHandle_;
         
@@ -101,6 +103,10 @@ namespace BGE {
         
         std::shared_ptr<GameObjectService> gameObjectService_;
         std::shared_ptr<ComponentService> componentService_;
+        
+        std::vector<FontHandle>             fonts_;
+        std::vector<TextureHandle>          textures_;
+        std::vector<TextureAtlasHandle>     textureAtlases_;
         
         bool        visible_;
         uint32_t    order_;

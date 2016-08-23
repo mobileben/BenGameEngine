@@ -41,9 +41,6 @@ namespace BGE {
         void destroy() {}
         void update(double deltaTime) {}
 
-        void createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
-        void createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
-
         void removeFont(FontHandle handle, ScenePackageHandle scenePackageHandle);
         void removeFont(FontHandle handle, SpaceHandle spaceHandle);
 
@@ -66,8 +63,14 @@ namespace BGE {
         std::vector<std::shared_ptr<FontInfo>>                          fontInfo_;
         
         std::string pathForAsset(std::string asset);
-        
+
+        void createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+        void createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+
     private:
+        friend class ScenePackage;
+        friend class Space;
+        
         static const uint32_t InitialFontReserve = 32;
 
         using FontHandleService = HandleService<Font, FontHandle>;
