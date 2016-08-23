@@ -56,11 +56,10 @@ namespace BGE {
     private:
         friend Space;
         
-        static const uint32_t InitialGameObjectReserve = 1024;
-        
         using GameObjectHandleService = HandleService<GameObject, GameObjectHandle>;
-        
-        GameObjectHandleService handleService_;
+
+        static const uint32_t InitialGameObjectReserve = 1024;
+        static GameObjectHandleService handleService_;
         
         SpaceHandle         spaceHandle_;
         GameObjectVector    gameObjects_;
