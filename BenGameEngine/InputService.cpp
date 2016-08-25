@@ -109,8 +109,8 @@ void BGE::InputService::process() {
     
     inputButtonHandlers_.clear();
     
-    for (auto input : inputs_) {
-        for (auto handle : Game::getInstance()->getSpaceService()->getSpaces()) {
+    for (auto const &input : inputs_) {
+        for (auto const &handle : Game::getInstance()->getSpaceService()->getSpaces()) {
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space->isVisible()) {
@@ -118,7 +118,7 @@ void BGE::InputService::process() {
                 std::vector<ButtonComponent *> touchComponents;
                 space->getComponents<ButtonComponent>(touchComponents);
                 
-                for (auto touch : touchComponents) {
+                for (auto const &touch : touchComponents) {
                     auto gameObjHandle = touch->getGameObjectHandle();
                     
                     // Compute collision if exists
@@ -159,7 +159,7 @@ void BGE::InputService::process() {
     
     auto eventService = Game::getInstance()->getEventService();
     
-    for (auto buttonHandler : inputButtonHandlers_) {
+    for (auto const &buttonHandler : inputButtonHandlers_) {
         auto space = Game::getInstance()->getSpaceService()->getSpace(buttonHandler.spaceHandle);
         auto gameObj = space->getGameObject(buttonHandler.gameObjHandle);
         
@@ -170,10 +170,10 @@ void BGE::InputService::process() {
             auto it = inputEventHandlers_.find(event);
             
             if (it != inputEventHandlers_.end()) {
-                auto &handles = it->second;
+                auto const &handles = it->second;
                 auto gameObjName = gameObj->getName();
                 
-                for (auto handle : handles) {
+                for (auto const &handle : handles) {
                     auto handler = eventService->getEventHandler(handle);
                     
                     if (handler) {

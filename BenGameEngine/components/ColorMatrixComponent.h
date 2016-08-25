@@ -22,6 +22,12 @@ namespace BGE {
         
         ColorMatrixComponent();
         ~ColorMatrixComponent() {}
+        
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            Component::initialize(handle, spaceHandle);
+            
+            ColorMatrixMakeIdentify(matrix);
+        }
 
         ColorMatrix matrix;
     };

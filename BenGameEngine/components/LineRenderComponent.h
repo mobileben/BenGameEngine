@@ -23,6 +23,21 @@ namespace BGE {
         LineRenderComponent();
         ~LineRenderComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            RenderComponent::initialize(handle, spaceHandle);
+            
+            thickness_ = 1;
+            closedLoop_ = false;
+        }
+        
+        void destroy() final {
+            thickness_ = 1;
+            points_.clear();
+            
+            // RenderComponent::destroy last
+            RenderComponent::destroy();
+        }
+
         const std::vector<Vector2>& getPoints() const;
         void setPoints(const std::vector<Vector2>& points, bool lineLoop=false);
         bool isLineLoop() const { return closedLoop_; }

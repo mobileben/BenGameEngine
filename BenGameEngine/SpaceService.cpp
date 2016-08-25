@@ -46,7 +46,7 @@ void BGE::SpaceService::removeSpace(ObjectId objId) {
 }
 
 void BGE::SpaceService::removeSpace(std::string name) {
-    for (auto sp : spaces_) {
+    for (auto const &sp : spaces_) {
         auto space = getSpace(sp.second);
         
         if (space) {
@@ -73,7 +73,7 @@ BGE::Space *BGE::SpaceService::getSpace(ObjectId objId) {
 }
 
 BGE::Space *BGE::SpaceService::getSpace(std::string name) {
-    for (auto sp : spaces_) {
+    for (auto const &sp : spaces_) {
         auto space = getSpace(sp.second);
         
         if (space) {

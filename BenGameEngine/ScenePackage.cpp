@@ -43,9 +43,126 @@ void BGE::ScenePackage::reset() {
 void BGE::ScenePackage::initialize(ScenePackageHandle handle, std::string name) {
     handle_ = handle;
     setName(name);
+    
+    fontsLoaded_ = false;
+    texturesLoaded_ = false;
+    hasExternal_ = false;
 }
 
 void BGE::ScenePackage::destroy() {
+    source_ = "";
+
+    fontsLoaded_ = false;
+    texturesLoaded_ = false;
+    hasExternal_ = false;
+    
+    strings_.clear();
+    textures_.clear();
+    text_.clear();
+    animationSequences_.clear();
+    placements_.clear();
+    masks_.clear();
+    textureMasks_.clear();
+    buttons_.clear();
+    buttonStates_.clear();
+    externalPackages_.clear();
+    autoDisplayElements_.clear();
+    
+    rects_.clear();
+    colorTransforms_.clear();
+    colorMatrices_.clear();
+    vector2s_.clear();
+    
+    bounds_.clear();
+    keyframes_.clear();
+    channels_.clear();
+
+    subTextures_.clear();
+    
+    textureCount_ = 0;
+    textureQueue_.clear();
+    
+    fontCount_ = 0;
+    fontQueue_.clear();
+
+    textureNames_.clear();
+    textureIndices_.clear();
+    textureRefs_.clear();
+    
+    textNames_.clear();
+    textIndices_.clear();
+    textRefs_.clear();
+    
+    boundsRefs_.clear();
+    
+    animSeqNames_.clear();
+    animSeqIndices_.clear();
+    animSeqRefs_.clear();
+    
+    animChannelNames_.clear();
+    animChannelIndices_.clear();
+    animChannelRefs_.clear();
+    
+    animKeyframeNames_.clear();
+    animKeyframeIndices_.clear();
+    animKeyframeRefs_.clear();
+    
+    animChannelKeyframes_.clear();
+    
+    placementNames_.clear();
+    placementIndices_.clear();
+    placementRefs_.clear();
+    
+    maskNames_.clear();
+    maskIndices_.clear();
+    maskRefs_.clear();
+    
+    textureMaskNames_.clear();
+    textureMaskIndices_.clear();
+    textureMaskRefs_.clear();
+    
+    buttonStateRefs_.clear();
+    
+    buttonNames_.clear();
+    buttonIndices_.clear();
+    buttonRefs_.clear();
+    
+    externalPackageNames_.clear();
+    externalPackageIndices_.clear();
+    externalPackageRefs_.clear();
+    
+    autoDisplayElementRefs_.clear();
+    
+    referenceTypes_.clear();
+
+    // Destroy all fonts
+    auto fontService = Game::getInstance()->getFontService();
+    
+    for (auto const &font : loadedFonts_) {
+        fontService->removeFont(handle_, font);
+    }
+    
+    loadedFonts_.clear();
+    
+    // Destroy all texture atlases
+    auto textureService = Game::getInstance()->getTextureService();
+    
+    for (auto const &atlas : loadedTextureAtlases_) {
+        textureService->removeTextureAtlas(handle_, atlas);
+    }
+    
+    loadedTextureAtlases_.clear();
+    
+    // Destory all textures
+    for (auto const &texture : loadedTextures_) {
+        textureService->removeTexture(handle_, texture);
+        
+    }
+    
+    loadedTextures_.clear();
+    
+    // Resetting of the handle must be done at the end
+    handle_ = ScenePackageHandle();
 }
 
 BGE::AutoDisplayElementReference *BGE::ScenePackage::getAutoDisplayList() const {
@@ -568,7 +685,7 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             // Make sure
             bool found = false;
             
-            for (auto f : fontQueue_) {
+            for (auto const &f : fontQueue_) {
                 if (f.first == fontName && f.second == size) {
                     found = true;
                     break;
@@ -1097,7 +1214,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
     if (textureQueue_.size() > 0) {
         textureCount_->store(0);
         
-        for (auto &tex : textureQueue_) {
+        for (auto const &tex : textureQueue_) {
             // Do we have subtextures affiliated with this?
             auto it = subTextures_.find(tex.first);
             
@@ -1105,7 +1222,11 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
                 Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.first, tex.second, it->second, [this, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
-                    NSLog(@"Loaded atlas %s (%d)", atlas->getName().c_str(), (int)val);
+                    if (atlas) {
+                        loadedTextureAtlases_.push_back(atlas->getHandle());
+                        NSLog(@"Loaded atlas %s (%d)", atlas->getName().c_str(), (int)val);
+                    }
+                    
                     if (val == textureQueue_.size()) {
                         if (callback) {
                             callback();
@@ -1116,7 +1237,10 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
                 Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), tex.first, tex.second, [this, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
-                    NSLog(@"Loaded %s (%d)", texture->getName().c_str(), (int)val);
+                    if (texture) {
+                        loadedTextures_.push_back(texture->getHandle());
+                        NSLog(@"Loaded %s (%d)", texture->getName().c_str(), (int)val);
+                    }
                     if (val == textureQueue_.size()) {
                         if (callback) {
                             callback();
@@ -1134,9 +1258,13 @@ void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
     if (fontQueue_.size() > 0) {
         fontCount_->store(0);
         
-        for (auto &font : fontQueue_) {
+        for (auto const &font : fontQueue_) {
             Game::getInstance()->getFontService()->createFont(font.first, font.second, handle_, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
                 int val = fontCount_->fetch_add(1) + 1;
+                
+                if (!font.isNull()) {
+                    loadedFonts_.push_back(font);
+                }
                 
                 if (val == fontQueue_.size()) {
                     if (callback) {

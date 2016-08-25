@@ -26,6 +26,19 @@ namespace BGE {
         ChannelFrameAnimatorComponent() : Component(), currKeyframe(0) {}
         ~ChannelFrameAnimatorComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            Component::initialize(handle, spaceHandle);
+            
+            currKeyframe = 0;
+        }
+        
+        void destroy() final {
+            currKeyframe = 0;
+            
+            // Component::destroy last
+            Component::destroy();
+        }
+
         // TODO: Move to controller
         int32_t     currKeyframe;
     };

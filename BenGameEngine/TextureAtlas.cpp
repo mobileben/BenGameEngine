@@ -78,7 +78,7 @@ void BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubText
                 this->target_ = texture->getTarget();
 
                 if (subTextures.size() > 0) {
-                    for (auto& st : subTextures) {
+                    for (auto const &st : subTextures) {
                         std::string key = st.name;
                         auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
                         
@@ -131,7 +131,7 @@ void BGE::TextureAtlas::createFromBuffer(void *buffer, TextureFormat format, uin
                 this->target_ = texture->getTarget();
                 
                 if (subTextures.size() > 0) {
-                    for (auto& st : subTextures) {
+                    for (auto const &st : subTextures) {
                         std::string key = st.name;
                         auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
                         

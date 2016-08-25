@@ -26,6 +26,19 @@ namespace BGE {
     public:
         virtual ~RenderComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) override {
+            Component::initialize(handle, spaceHandle);
+            
+            enabled_= true;
+            globalBoundsDirty_ = true;
+            localBounds_.x = 0;
+            localBounds_.y = 0;
+            localBounds_.w = 0;
+            localBounds_.h = 0;
+        }
+        
+        void destroy() override;
+
         float getLocalWidth() { return localBounds_.w; }
         float getLocalHeight() { return localBounds_.h; }
         float getGlobalWidth() { return globalBounds_.w; }

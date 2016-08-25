@@ -23,6 +23,12 @@ namespace BGE {
         ColorTransformComponent();
         ~ColorTransformComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            Component::initialize(handle, spaceHandle);
+            
+            ColorTransformMakeIdentity(transform);
+        }
+
         ColorTransform transform;
     };
 }

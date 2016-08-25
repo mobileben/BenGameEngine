@@ -38,6 +38,7 @@ namespace BGE {
         virtual ~Component() {}
         
         virtual void initialize(HandleBackingType handle, SpaceHandle spaceHandle);
+        virtual void destroy();
         
         inline std::type_index getTypeIndex() const { return type_index_; }
         inline uint32_t getTypeId() const { return typeId_; }

@@ -12,7 +12,36 @@ uint32_t BGE::BoundingBoxComponent::bitmask_ = Component::InvalidBitmask;
 uint32_t BGE::BoundingBoxComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::BoundingBoxComponent::type_index_ = typeid(BGE::BoundingBoxComponent);
 
-BGE::BoundingBoxComponent::BoundingBoxComponent() : Component(), x(0), y(0), width(0), height(0) {
+BGE::BoundingBoxComponent::BoundingBoxComponent() : Component(), x(0), y(0), width(0), height(0), aabbMinX(0), aabbMinY(0), aabbMaxX(0), aabbMaxY(0) {
+}
+
+void BGE::BoundingBoxComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    Component::initialize(handle, spaceHandle);
+    
+    x = 0;
+    y = 0;
+    width = 0;
+    height = 0;
+    
+    aabbMinX = 0;
+    aabbMinY = 0;
+    aabbMaxX = 0;
+    aabbMaxY = 0;
+}
+
+void BGE::BoundingBoxComponent::destroy() {
+    x = 0;
+    y = 0;
+    width = 0;
+    height = 0;
+    
+    aabbMinX = 0;
+    aabbMinY = 0;
+    aabbMaxX = 0;
+    aabbMaxY = 0;
+
+    // Component::destroy last
+    Component::destroy();
 }
 
 void BGE::BoundingBoxComponent::computeAABB(Matrix4 &transform) {

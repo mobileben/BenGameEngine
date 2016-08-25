@@ -139,7 +139,7 @@ void BGE::TextureService::removeTexture(ScenePackageHandle scenePackageHandle, T
     auto scenePackage = sceneTextures_.find(scenePackageHandle);
     
     if (scenePackage != sceneTextures_.end()) {
-        for (auto sceneTex : scenePackage->second) {
+        for (auto const &sceneTex : scenePackage->second) {
             if (sceneTex.second == handle) {
                 textureHandleService_.release(handle);
                 scenePackage->second.erase(sceneTex.first);
@@ -153,7 +153,7 @@ void BGE::TextureService::removeTexture(SpaceHandle spaceHandle, TextureHandle h
     auto space = spaceTextures_.find(spaceHandle);
     
     if (space != spaceTextures_.end()) {
-        for (auto spaceTex : space->second) {
+        for (auto const &spaceTex : space->second) {
             if (spaceTex.second == handle) {
                 textureHandleService_.release(handle);
                 space->second.erase(spaceTex.first);
@@ -167,7 +167,7 @@ void BGE::TextureService::removeTextureAtlas(ScenePackageHandle scenePackageHand
     auto scenePackage = sceneTextureAtlases_.find(scenePackageHandle);
     
     if (scenePackage != sceneTextureAtlases_.end()) {
-        for (auto sceneTex : scenePackage->second) {
+        for (auto const &sceneTex : scenePackage->second) {
             if (sceneTex.second == handle) {
                 textureAtlasHandleService_.release(handle);
                 scenePackage->second.erase(sceneTex.first);
@@ -181,7 +181,7 @@ void BGE::TextureService::removeTextureAtlas(SpaceHandle spaceHandle, TextureAtl
     auto space = spaceTextureAtlases_.find(spaceHandle);
     
     if (space != spaceTextureAtlases_.end()) {
-        for (auto spaceTex : space->second) {
+        for (auto const &spaceTex : space->second) {
             if (spaceTex.second == handle) {
                 textureAtlasHandleService_.release(handle);
                 space->second.erase(spaceTex.first);
@@ -195,7 +195,7 @@ void BGE::TextureService::removeTextureAtlas(FontHandle fontHandle, TextureAtlas
     auto font = fontTextureAtlases_.find(fontHandle);
     
     if (font != fontTextureAtlases_.end()) {
-        for (auto fontTex : font->second) {
+        for (auto const &fontTex : font->second) {
             if (fontTex.second == handle) {
                 textureAtlasHandleService_.release(handle);
                 font->second.erase(fontTex.first);

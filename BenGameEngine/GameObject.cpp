@@ -32,11 +32,20 @@ void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameO
     spaceHandle_ = spaceHandle;
 }
 
+void BGE::GameObject::destroy() {
+    active_ = false;
+
+    removeAllComponents();
+    
+    handle_ = GameObjectHandle();
+    spaceHandle_ = SpaceHandle();
+}
+
 void BGE::GameObject::removeAllComponents() {
     auto space = getSpace();
     
     if (space) {
-        for (auto component : components_) {
+        for (auto const &component : components_) {
             space->removeComponent(component);
         }
     }

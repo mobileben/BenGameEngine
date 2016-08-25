@@ -61,7 +61,7 @@ namespace BGE {
 
         template <typename T>
         static uint32_t getBitmask() {
-            auto &elem = masks_[T::typeId_];
+            auto const &elem = masks_[T::typeId_];
             
             return elem.typeMask;
         }

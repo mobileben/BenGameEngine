@@ -23,7 +23,7 @@ void BGE::AnimationService::update(double deltaTime) {
         auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
         
         if (space) {
-            for (auto handle : space->getGameObjects()) {
+            for (auto const &handle : space->getGameObjects()) {
                 auto obj = space->getGameObject(handle);
                 auto animSeq = obj->getComponent<AnimationSequenceComponent>();
                 auto animator = obj->getComponent<AnimatorComponent>();
@@ -110,7 +110,7 @@ void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceCompo
                 // We need to update frames
                 animator->currentFrame = frame;
                 
-                for (auto childHandle : seq->channels) {
+                for (auto const &childHandle : seq->channels) {
                     auto childObj = space->getGameObject(childHandle);
                     
                     animateChannel(childObj, frame);
@@ -280,7 +280,7 @@ void BGE::AnimationService::animateSequenceByFrame(Space *space, AnimationSequen
     if (true || frame != animator->currentFrame) {
         animator->currentFrame = frame;
         
-        for (auto childHandle : seq->channels) {
+        for (auto const &childHandle : seq->channels) {
             auto child = space->getGameObject(childHandle);
             animateChannel(child, frame);
         }

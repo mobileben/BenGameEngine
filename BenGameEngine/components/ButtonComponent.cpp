@@ -23,6 +23,59 @@ std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent)
 BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted(true), toggleable(false), toggleOn(false) {
 }
 
+void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    Component::initialize(handle, spaceHandle);
+    
+    state = ButtonStateNormal;
+    animate = false;
+    enabled = true;
+    showHighlighted = true;
+    
+    toggleable = false;
+    toggleOn = false;
+    
+    disabledButtonHandle = GameObjectHandle();
+    disabledAnimButtonHandle = GameObjectHandle();
+    normalButtonHandle = GameObjectHandle();
+    normalAnimButtonHandle = GameObjectHandle();
+    highlightedButtonHandle = GameObjectHandle();
+    highlightedAnimButtonHandle = GameObjectHandle();
+    currentButtonHandle = GameObjectHandle();
+}
+
+void BGE::ButtonComponent::destroy() {
+    state = ButtonStateNormal;
+    animate = false;
+    enabled = false;
+    showHighlighted = false;
+    
+    toggleable = false;
+    toggleOn = false;
+    
+    auto space = getSpace();
+    
+    if (space) {
+        space->removeGameObject(disabledButtonHandle);
+        space->removeGameObject(disabledAnimButtonHandle);
+        space->removeGameObject(normalButtonHandle);
+        space->removeGameObject(normalAnimButtonHandle);
+        space->removeGameObject(highlightedButtonHandle);
+        space->removeGameObject(highlightedAnimButtonHandle);
+        space->removeGameObject(currentButtonHandle);
+    }
+    
+    disabledButtonHandle = GameObjectHandle();
+    disabledAnimButtonHandle = GameObjectHandle();
+    normalButtonHandle = GameObjectHandle();
+    normalAnimButtonHandle = GameObjectHandle();
+    highlightedButtonHandle = GameObjectHandle();
+    highlightedAnimButtonHandle = GameObjectHandle();
+    currentButtonHandle = GameObjectHandle();
+
+    // Component::destroy last
+    Component::destroy();
+}
+
 void BGE::ButtonComponent::setButtonReference(ButtonReference *buttonRef) {
     if (buttonRef) {
         setButtonReference(*buttonRef);

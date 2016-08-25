@@ -20,6 +20,39 @@ bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0
     Matrix4MakeIdentify(matrix_);
 }
 
+void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    Component::initialize(handle, spaceHandle);
+
+    visible_ = true;
+    
+    bounds_.x = 0;
+    bounds_.y = 0;
+    bounds_.w = 0;
+    bounds_.h = 0;
+    position_.x = 0;
+    position_.y = 0;
+    scale_.x = 1;
+    scale_.y = 1;
+    skew_.x = 0;
+    skew_.y = 0;
+    rotation_ = 0;
+    transformDirty_ = false;
+    speed_ = 1;
+    paused_ = false;
+    
+    Matrix4MakeIdentify(matrix_);
+}
+
+void BGE::TransformComponent::destroy() {
+    visible_ = false;
+    
+    parentHandle_ = TransformComponentHandle();
+    childrenHandles_.clear();
+
+    // Component::destroy last
+    Component::destroy();
+}
+
 void BGE::TransformComponent::setGameObjectHandle(GameObjectHandle handle) {
     Component::setGameObjectHandle(handle);
 }

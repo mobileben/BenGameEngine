@@ -86,6 +86,7 @@ void BGE::MaterialService::removeMaterial(MaterialHandle handle) {
         MaterialMapIterator it = materials_.find(material->getInstanceId());
         
         if (it != materials_.end()) {
+            material->destroy();
             handleService_.release(handle);
             materials_.erase(material->getInstanceId());
         }
@@ -96,6 +97,9 @@ void BGE::MaterialService::removeMaterial(ObjectId matId) {
     MaterialMapIterator it = materials_.find(matId);
     
     if (it != materials_.end()) {
+        auto material = getMaterial(it->second);
+        
+        material->destroy();
         handleService_.release(it->second);
         materials_.erase(matId);
     }

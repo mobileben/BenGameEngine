@@ -22,6 +22,11 @@ BGE::AnimationSequenceComponent::AnimationSequenceComponent() : Component(), fra
 void BGE::AnimationSequenceComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
     Component::initialize(handle, spaceHandle);
     
+    frameRate = 0;
+    totalFrames = 0;
+    numChannels = 0;
+    numBounds = 0;
+
     auto space = getSpace();
     
     assert(space);
@@ -34,6 +39,28 @@ void BGE::AnimationSequenceComponent::initialize(HandleBackingType handle, Space
         sequenceRoot->addComponent(xform);
         sequenceRoot->setActive(true);
     }
+}
+
+void BGE::AnimationSequenceComponent::destroy() {
+    auto space = getSpace();
+
+    for (auto const &channel : channels) {
+        space->removeGameObject(channel);
+    }
+
+    channels.clear();
+
+    space->removeGameObject(sequenceRootHandle);
+    sequenceRootHandle = GameObjectHandle();
+    bounds = nullptr;
+
+    frameRate = 0;
+    totalFrames = 0;
+    numChannels = 0;
+    numBounds = 0;
+
+    // Component::destroy last
+    Component::destroy();
 }
 
 void BGE::AnimationSequenceComponent::setAnimationSequenceReference(AnimationSequenceReference *animSeqRef) {

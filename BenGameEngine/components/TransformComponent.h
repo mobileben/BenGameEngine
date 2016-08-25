@@ -30,6 +30,9 @@ namespace BGE {
         TransformComponent();
         ~TransformComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final;
+        void destroy() final;
+        
         bool isVisible() const { return visible_; }
         void setVisibility(bool visible) { visible_ = visible; }
         

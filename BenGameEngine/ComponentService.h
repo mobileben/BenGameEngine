@@ -76,12 +76,12 @@ namespace BGE {
         
         template <typename T> void getComponents(std::vector<T *> &components) {
             auto typeId = T::typeId_;
-            auto &handles = componentHandles_[typeId];
+            auto const &handles = componentHandles_[typeId];
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
             
             components.clear();
 
-            for (auto handle : handles) {
+            for (auto const &handle : handles) {
                 auto component = handleService->dereference(Handle<T>(handle.handle));
                 
                 if (component) {
@@ -97,10 +97,14 @@ namespace BGE {
             auto &handles = componentHandles_[typeId];
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
             
-            for (auto h : handles) {
-                handleService->release(Handle<T>(h.handle));
+            for (auto const &h : handles) {
+                removeComponent(h);
             }
+            
+            handles.clear();
         }
+        
+        void removeAllComponents();
         
     private:
         typedef std::unordered_map<std::type_index, void *> ComponentPoolMap;
@@ -124,6 +128,9 @@ namespace BGE {
         template <typename T> void releaseComponentHandle(ComponentHandle handle) {
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
             auto tHandle = Handle<T>(handle.handle);
+            auto component = getComponent<T>(handle.handle);
+            
+            component->destroy();
             handleService->release(tHandle);
         }
     };

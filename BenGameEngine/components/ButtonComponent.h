@@ -38,6 +38,9 @@ namespace BGE {
         ButtonComponent();
         ~ButtonComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final;
+        void destroy() final;
+
         void setButtonReference(ButtonReference *buttonRef);
         void setButtonReference(const ButtonReference &buttonRef);
 

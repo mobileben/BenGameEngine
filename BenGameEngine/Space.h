@@ -37,12 +37,17 @@ namespace BGE {
         inline SpaceHandle getHandle() const { return spaceHandle_; }
         
         GameObject *createGameObject(std::string name = "");
+        
         GameObjectHandle getGameObjectHandle(ObjectId objId);
         GameObjectHandle getGameObjectHandle(std::string name);
+        
         GameObject *getGameObject(ObjectId objId);
         GameObject *getGameObject(std::string name);
         GameObject *getGameObject(GameObjectHandle handle);
+        
         void removeGameObject(GameObjectHandle handle);
+        void removeGameObject(GameObject *object);
+        
         const std::vector<GameObjectHandle>& getGameObjects() const;
         
         template <typename T, typename... Args> T *createComponent(Args&& ...args) {

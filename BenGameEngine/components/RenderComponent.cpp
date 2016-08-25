@@ -10,7 +10,21 @@
 #include "Game.h"
 
 BGE::RenderComponent::RenderComponent() : Component(), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
+}
+
+void BGE::RenderComponent::destroy() {
+    enabled_ = false;
     
+    auto materialService = Game::getInstance()->getMaterialService();
+    
+    for (auto const &material : materialHandles_) {
+        materialService->removeMaterial(material);
+    }
+    
+    materialHandles_.clear();
+    
+    // Component::destroy last
+    Component::destroy();
 }
 
 void BGE::RenderComponent::getGlobalBounds(Rect& bounds) {
@@ -35,7 +49,7 @@ BGE::Material *BGE::RenderComponent::getMaterial(uint32_t index) {
 }
 
 void BGE::RenderComponent::setMaterials(std::vector<MaterialHandle> materials) {
-    for (auto handle : materialHandles_) {
+    for (auto const &handle : materialHandles_) {
         if (std::find(materials.begin(), materials.end(), handle) == materials.end()) {
             // Make sure handle is not in materials
             Game::getInstance()->getMaterialService()->removeMaterial(handle);
@@ -44,7 +58,7 @@ void BGE::RenderComponent::setMaterials(std::vector<MaterialHandle> materials) {
 
     materialHandles_.clear();
     
-    for (auto material : materials) {
+    for (auto const &material : materials) {
         materialHandles_.push_back(material);
     }
     

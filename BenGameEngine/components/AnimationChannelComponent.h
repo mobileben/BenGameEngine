@@ -28,6 +28,19 @@ namespace BGE {
         AnimationChannelComponent() : Component(), channel(nullptr) {}        
         ~AnimationChannelComponent() {}
         
+        inline void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            Component::initialize(handle, spaceHandle);
+            
+            channel = nullptr;
+        }
+        
+        inline void destroy() final {
+            channel = nullptr;
+            
+            // Component::destroy last
+            Component::destroy();
+        }
+        
         void setAnimationChannelReference(const AnimationChannelReference *animChanRef);
         
         void updateReference();

@@ -22,6 +22,12 @@ void BGE::Component::initialize(HandleBackingType handle, SpaceHandle spaceHandl
     gameObjectHandle_ = GameObjectHandle();
 }
 
+void BGE::Component::destroy() {
+    handle_ = 0;
+    gameObjectHandle_ = GameObjectHandle();
+    spaceHandle_ = SpaceHandle();
+}
+
 BGE::Space *BGE::Component::getSpace() const {
     return Game::getInstance()->getSpaceService()->getSpace(spaceHandle_);
 }

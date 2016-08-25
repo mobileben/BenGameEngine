@@ -31,7 +31,7 @@ BGE::GameObject *BGE::GameObjectService::createGameObject(std::string name) {
 }
 
 BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(ObjectId objId) {
-    for (auto handle : gameObjects_) {
+    for (auto const &handle : gameObjects_) {
         auto obj = getGameObject(handle);
         
         if (obj) {
@@ -45,7 +45,7 @@ BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(ObjectId objId
 }
 
 BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(std::string name) {
-    for (auto handle : gameObjects_) {
+    for (auto const &handle : gameObjects_) {
         auto obj = getGameObject(handle);
         
         if (obj) {
@@ -58,25 +58,31 @@ BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(std::string na
     return GameObjectHandle();
 }
 
-BGE::GameObject *BGE::GameObjectService::getGameObject(ObjectId objId) {
-    return handleService_.dereference(getGameObjectHandle(objId));
-}
-
-BGE::GameObject *BGE::GameObjectService::getGameObject(std::string name) {
-    return handleService_.dereference(getGameObjectHandle(name));
-}
-
-BGE::GameObject *BGE::GameObjectService::getGameObject(GameObjectHandle handle) {
-    return handleService_.dereference(handle);
-}
-
 void BGE::GameObjectService::removeGameObject(GameObjectHandle handle) {
     for (auto it = gameObjects_.begin();it != gameObjects_.end();++it) {
         if (*it == handle) {
-            handleService_.release(handle);
+            releaseObject(handle);
             gameObjects_.erase(it);
             return;
         }
+    }
+}
+
+void BGE::GameObjectService::removeAllGameObjects() {
+    for (auto const &handle : gameObjects_) {
+        releaseObject(handle);
+    }
+    
+    gameObjects_.clear();
+}
+
+
+void BGE::GameObjectService::releaseObject(GameObjectHandle handle) {
+    auto obj = getGameObject(handle);
+
+    if (obj) {
+        obj->destroy();
+        handleService_.release(handle);
     }
 }
 

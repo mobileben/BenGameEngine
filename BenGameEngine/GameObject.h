@@ -30,6 +30,7 @@ namespace BGE {
         ~GameObject();
         
         void initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, std::string name);
+        void destroy();
         
         inline GameObjectHandle getHandle() const { return handle_; }
         
@@ -53,7 +54,7 @@ namespace BGE {
             if (hasComponent<T>()) {
                 auto typeId = T::typeId_;
                 
-                for (auto handle : components_) {
+                for (auto const &handle : components_) {
                     if (handle.typeId == typeId) {
                         auto space = getSpace();
                         

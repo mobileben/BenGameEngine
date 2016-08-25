@@ -14,6 +14,7 @@
 #include <vector>
 #include "Component.h"
 #include "GraphicFormats.h"
+#include "Space.h"
 
 namespace BGE {
 
@@ -29,7 +30,8 @@ namespace BGE {
         AnimationSequenceComponent();
         ~AnimationSequenceComponent() {}
         
-        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) override;
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final;
+        void destroy() final;
 
         void setAnimationSequenceReference(AnimationSequenceReference *animSeqRef);
         void setAnimationSequenceReference(const AnimationSequenceReference& animSeqRef);

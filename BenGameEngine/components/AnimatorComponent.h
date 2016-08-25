@@ -35,6 +35,9 @@ namespace BGE {
         AnimatorComponent();
         ~AnimatorComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final;
+        void destroy() final;
+        
         AnimState   state;
         int32_t     currentFrame;
         int32_t     iterations;

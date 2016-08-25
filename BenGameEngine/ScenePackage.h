@@ -151,6 +151,10 @@ namespace BGE {
 
         std::unordered_map<std::string, GfxReferenceType>   referenceTypes_;
         
+        std::vector<TextureHandle>                          loadedTextures_;
+        std::vector<TextureAtlasHandle>                     loadedTextureAtlases_;
+        std::vector<FontHandle>                             loadedFonts_;
+        
         void loadTextures(std::function<void()> callback);
         void loadFonts(std::function<void()> callback);
         

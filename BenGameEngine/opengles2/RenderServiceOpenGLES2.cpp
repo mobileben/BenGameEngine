@@ -151,7 +151,7 @@ std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgr
         
         glUseProgram(glProgram->getProgram());
         
-        for (auto &kv: glProgram->getAttributes()) {
+        for (auto const &kv: glProgram->getAttributes()) {
             
         }
     }
@@ -540,7 +540,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
 
             uint32_t index = 0;
             
-            for (auto pt : points) {
+            for (auto const &pt : points) {
                 vertices[index].x = pt.x;
                 vertices[index].y = pt.y;
                 vertices[index].z = 0;
@@ -755,11 +755,11 @@ void BGE::RenderServiceOpenGLES2::render()
         std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
         
         
-        for (auto handle : spaceHandles) {
+        for (auto const &handle : spaceHandles) {
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space && space->isVisible()) {
-                for (auto objHandle : space->getGameObjects()) {
+                for (auto const &objHandle : space->getGameObjects()) {
                     auto obj = space->getGameObject(objHandle);
                     
                     renderGameObject(obj, true);

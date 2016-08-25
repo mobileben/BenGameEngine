@@ -131,3 +131,14 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
     }
 }
 
+void BGE::ComponentService::removeAllComponents() {
+    for (auto &handles : componentHandles_) {
+        for (auto const &handle : handles) {
+            removeComponent(handle);
+        }
+        
+        handles.clear();
+    }
+}
+
+

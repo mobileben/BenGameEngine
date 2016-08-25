@@ -41,8 +41,8 @@ namespace BGE {
         void destroy() {}
         void update(double deltaTime) {}
 
-        void removeFont(FontHandle handle, ScenePackageHandle scenePackageHandle);
-        void removeFont(FontHandle handle, SpaceHandle spaceHandle);
+        void removeFont(ScenePackageHandle scenePackageHandle, FontHandle handle);
+        void removeFont(SpaceHandle spaceHandle, FontHandle handle);
 
         FontHandle getFontHandle(std::string name, uint32_t pixelSize);
         

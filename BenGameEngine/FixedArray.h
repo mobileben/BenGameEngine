@@ -95,7 +95,7 @@ namespace BGE {
         FixedArray(const std::vector<const std::vector<T> *>& vec) : array_(nullptr), size_(0) {
             int32_t total = 0;
             
-            for (auto v : vec) {
+            for (auto const &v : vec) {
                 total += v.size();
             }
             
@@ -106,14 +106,14 @@ namespace BGE {
                 if (std::is_pod<T>::value) {
                     auto span = 0;
                     
-                    for (auto v : vec) {
+                    for (auto const &v : vec) {
                         memcpy(&array_[span], v.begin(), sizeof(T) * v.size());
                         span += v.size();
                     }
                 } else {
                     auto span = 0;
                     
-                    for (auto v : vec) {
+                    for (auto const &v : vec) {
                         std::copy(v.begin(), v.end(), &array_[span]);
                         span += v.size();
                     }

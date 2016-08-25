@@ -45,11 +45,26 @@ namespace BGE {
         
         GameObjectHandle getGameObjectHandle(ObjectId objId);
         GameObjectHandle getGameObjectHandle(std::string name);
-        GameObject *getGameObject(ObjectId objId);
-        GameObject *getGameObject(std::string name);
-        GameObject *getGameObject(GameObjectHandle handle);
-
+        inline GameObject *getGameObject(ObjectId objId){
+            return handleService_.dereference(getGameObjectHandle(objId));
+        }
+        
+        inline GameObject *getGameObject(std::string name) {
+            return handleService_.dereference(getGameObjectHandle(name));
+        }
+        
+        inline GameObject *getGameObject(GameObjectHandle handle) {
+            return handleService_.dereference(handle);
+        }
+        
         void removeGameObject(GameObjectHandle handle);
+        inline void removeGameObject(GameObject *object) {
+            if (object) {
+                removeGameObject(object->getHandle());
+            }
+        }
+        
+        void removeAllGameObjects();
         
         inline const GameObjectVector& getGameObjects() const { return gameObjects_; }
         
@@ -63,6 +78,8 @@ namespace BGE {
         
         SpaceHandle         spaceHandle_;
         GameObjectVector    gameObjects_;
+        
+        void releaseObject(GameObjectHandle handle);
     };
 }
 

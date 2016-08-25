@@ -34,6 +34,9 @@ namespace BGE {
         BoundingBoxComponent();
         ~BoundingBoxComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final;
+        void destroy() final;
+
         void computeAABB(Matrix4 &transform);
     };
 }

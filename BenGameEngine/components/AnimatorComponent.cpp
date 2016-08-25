@@ -23,6 +23,29 @@ std::type_index BGE::AnimatorComponent::type_index_ = typeid(BGE::AnimatorCompon
 BGE::AnimatorComponent::AnimatorComponent() : Component(), state(AnimState::Done), currentFrame(0), iterations(1), frameRemainderTime(0), secPerFrame(1.0/30.0), speed(1), forward(true) {
 }
 
+void BGE::AnimatorComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    Component::initialize(handle, spaceHandle);
+    
+    state = AnimState::Done;
+    currentFrame = 0;
+    iterations = 0;
+    frameRemainderTime = 0;
+    speed = 1;
+    forward = true;
+}
+
+void BGE::AnimatorComponent::destroy() {
+    state = AnimState::Done;
+    currentFrame = 0;
+    iterations = 0;
+    frameRemainderTime = 0;
+    speed = 1;
+    forward = true;
+
+    // Component::destroy last
+    Component::destroy();
+}
+
 void BGE::AnimatorComponent::reset() {
     setFrame(0, true);
     iterations = 1;

@@ -215,6 +215,7 @@
                 
             });
             
+#ifdef NOT_YET
             auto tSpaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("TestSpace");
             auto tSpace = BGE::Game::getInstance()->getSpaceService()->getSpace(tSpaceHandle);
             
@@ -313,6 +314,7 @@
             NSLog(@"Time interval getComponent %f", endTime - startTime);
             
             NSLog(@"Diff between component and bitmask = %f (%f)", componentTime - bitmaskTime, componentTime/bitmaskTime);
+#endif
         }
     }
     

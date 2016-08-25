@@ -33,6 +33,50 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name) {
 }
 
 void BGE::Space::destroy() {
+    visible_ = false;
+    order_ = 0;
+    updatable_ = true;
+    
+    // Destroy all scenePackages
+    auto packageService = Game::getInstance()->getScenePackageService();
+    
+    for (auto const &package : scenePackages_) {
+        packageService->removePackage(spaceHandle_, package);
+    }
+    
+    scenePackages_.clear();
+    
+    // Destroy all game objects
+    gameObjectService_->removeAllGameObjects();
+    
+    // Destroy all components
+    componentService_->removeAllComponents();
+    
+    // Destroy all fonts
+    auto fontService = Game::getInstance()->getFontService();
+    
+    for (auto const &font : fonts_) {
+        fontService->removeFont(spaceHandle_, font);
+    }
+    
+    fonts_.clear();
+    
+    // Destroy all texture atlases
+    auto textureService = Game::getInstance()->getTextureService();
+    
+    for (auto const &atlas : textureAtlases_) {
+        textureService->removeTextureAtlas(spaceHandle_, atlas);
+    }
+    
+    textureAtlases_.clear();
+    
+    // Destory all textures
+    for (auto const &texture : textures_) {
+        textureService->removeTexture(spaceHandle_, texture);
+        
+    }
+    
+    textures_.clear();
 }
 
 BGE::GameObject *BGE::Space::createGameObject(std::string name ) {
@@ -61,6 +105,10 @@ BGE::GameObject *BGE::Space::getGameObject(GameObjectHandle handle) {
 
 void BGE::Space::removeGameObject(GameObjectHandle handle) {
     gameObjectService_->removeGameObject(handle);
+}
+
+void BGE::Space::removeGameObject(GameObject *object) {
+    gameObjectService_->removeGameObject(object);
 }
 
 const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
@@ -476,7 +524,7 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
                 }
                 
                 if (callback) {
-                    for (auto itemHandle : itemHandles) {
+                    for (auto const &itemHandle : itemHandles) {
                         auto item = getGameObject(itemHandle);
                         callback(item);
                     }
@@ -490,7 +538,7 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
             rootXform = root->getComponent<TransformComponent>();
         }
         
-        for (auto objHandle : rootObjHandles) {
+        for (auto const &objHandle : rootObjHandles) {
             auto obj = getGameObject(objHandle);
             
             if (rootXform) {
@@ -519,7 +567,7 @@ void BGE::Space::createFont(std::string name, uint32_t pxSize, std::function<voi
     auto fontHandle = font->getHandle();
     
     // Now search to see if our handle exists already
-    for (auto handle : fonts_) {
+    for (auto const &handle : fonts_) {
         if (handle == fontHandle) {
             if (callback) {
                 callback(handle, nullptr);
@@ -541,7 +589,7 @@ void BGE::Space::createFont(std::string name, uint32_t pxSize, std::function<voi
 void BGE::Space::scenePackageAdded(ScenePackageHandle handle) {
     bool found = false;
     
-    for (auto package : scenePackages_) {
+    for (auto const &package : scenePackages_) {
         if (package == handle) {
             found = true;
             break;
