@@ -11,9 +11,6 @@
 BGE::MaterialService::MaterialService() :  handleService_(InitialMaterialReserve, HandleServiceNoMaxLimit) {
 }
 
-BGE::MaterialService::~MaterialService() {
-}
-
 void BGE::MaterialService::initialize() {}
 void BGE::MaterialService::reset() {}
 void BGE::MaterialService::enteringBackground() {}
@@ -125,5 +122,21 @@ BGE::Material *BGE::MaterialService::getMaterial(ObjectId matId) {
     }
 
     return nullptr;
+}
+
+uint32_t BGE::MaterialService::numMaterials() const {
+    return handleService_.numUsedHandles();
+}
+
+size_t BGE::MaterialService::usedHandleMemory() const {
+    return handleService_.usedMemory();
+}
+
+size_t BGE::MaterialService::unusedHandleMemory() const {
+    return handleService_.unusedMemory();
+}
+
+size_t BGE::MaterialService::totalHandleMemory() const {
+    return handleService_.totalMemory();
 }
 

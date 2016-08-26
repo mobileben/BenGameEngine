@@ -32,14 +32,20 @@ namespace BGE {
         FontService(std::map<std::string, std::string> resources = std::map<std::string, std::string>());
         ~FontService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
+
+        uint32_t numFonts() const;
+        
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
 
         void removeFont(ScenePackageHandle scenePackageHandle, FontHandle handle);
         void removeFont(SpaceHandle spaceHandle, FontHandle handle);

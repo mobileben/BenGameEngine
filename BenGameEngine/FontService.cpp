@@ -106,6 +106,32 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
     }
 }
 
+uint32_t BGE::FontService::numFonts() const {
+    uint32_t num = 0;
+    
+    for (auto const &fontInfo : fontInfo_) {
+        for (auto const &it : fontInfo->fonts) {
+            if (handleService_.dereference(it.second)) {
+                num++;
+            }
+        }
+    }
+    
+    return num;
+}
+
+size_t BGE::FontService::usedHandleMemory() const {
+    return handleService_.usedMemory();
+}
+
+size_t BGE::FontService::unusedHandleMemory() const {
+    return handleService_.unusedMemory();
+}
+
+size_t BGE::FontService::totalHandleMemory() const {
+    return handleService_.totalMemory();
+}
+
 // TODO: Move to file service
 std::string BGE::FontService::pathForAsset(std::string asset) {
     // Find our fullpath
@@ -268,6 +294,12 @@ void BGE::FontService::removeFont(FontHandle handle) {
     for (auto const &fontInfo : fontInfo_) {
         for (auto const &it : fontInfo->fonts) {
             if (it.second == handle) {
+                auto font = getFont(it.second);
+                
+                if (font) {
+                    font->destroy();
+                }
+                
                 handleService_.release(it.second);
                 fontInfo->fonts.erase(it.first);
                 return;
@@ -333,8 +365,10 @@ void BGE::FontService::createFont(std::string name, uint32_t pxSize, std::functi
                                     
                                     if (tFont) {
                                         if (tFont->status_ == FontStatus::Loading) {
-                                            info->fonts.erase(pxSize);
+                                            tFont->destroy();
                                             handleService_.release(f->second);
+
+                                            info->fonts.erase(pxSize);
                                         }
                                     }
                                 }

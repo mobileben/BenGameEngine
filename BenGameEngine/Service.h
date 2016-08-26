@@ -29,6 +29,22 @@ namespace BGE {
         virtual void destroy() =0;
         virtual void update(double deltaTime) =0;
         
+        virtual size_t usedHandleMemory() const {
+            return 0;
+        }
+        
+        virtual size_t unusedHandleMemory() const {
+            return 0;
+        }
+        
+        virtual size_t totalHandleMemory() const {
+            return 0;
+        }
+        
+        virtual size_t overheadMemory() const {
+            return 0;
+        }
+        
     protected:
         ObjectId getIdAndIncrement();
         

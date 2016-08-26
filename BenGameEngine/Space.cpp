@@ -83,23 +83,23 @@ BGE::GameObject *BGE::Space::createGameObject(std::string name ) {
     return gameObjectService_->createGameObject(name);
 }
 
-BGE::GameObjectHandle BGE::Space::getGameObjectHandle(ObjectId objId) {
+BGE::GameObjectHandle BGE::Space::getGameObjectHandle(ObjectId objId) const {
     return gameObjectService_->getGameObjectHandle(objId);
 }
 
-BGE::GameObjectHandle BGE::Space::getGameObjectHandle(std::string name) {
+BGE::GameObjectHandle BGE::Space::getGameObjectHandle(std::string name) const {
     return gameObjectService_->getGameObjectHandle(name);
 }
 
-BGE::GameObject *BGE::Space::getGameObject(ObjectId objId) {
+BGE::GameObject *BGE::Space::getGameObject(ObjectId objId) const {
     return gameObjectService_->getGameObject(objId);
 }
 
-BGE::GameObject *BGE::Space::getGameObject(std::string name) {
+BGE::GameObject *BGE::Space::getGameObject(std::string name) const {
     return gameObjectService_->getGameObject(name);
 }
 
-BGE::GameObject *BGE::Space::getGameObject(GameObjectHandle handle) {
+BGE::GameObject *BGE::Space::getGameObject(GameObjectHandle handle) const {
     return gameObjectService_->getGameObject(handle);
 }
 

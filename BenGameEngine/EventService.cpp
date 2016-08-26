@@ -29,5 +29,11 @@ BGE::EventHandler *BGE::EventService::getEventHandler(EventHandlerHandle handle)
 }
 
 void BGE::EventService::removeEventHandler(EventHandlerHandle handle) {
+    auto eventHandler = getEventHandler(handle);
+    
+    if (eventHandler) {
+        eventHandler->destroy();
+    }
+    
     handleService_.release(handle);
 }

@@ -12,10 +12,6 @@
 
 std::string BGE::RenderWindow::DefaultRenderViewName = "DefaultRenderView";
 
-BGE::RenderWindow::~RenderWindow()
-{
-}
-
 void BGE::RenderWindow::setView(BGEView *view) {
     if (view != this->view_) {
         this->view_ = view;

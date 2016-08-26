@@ -58,9 +58,10 @@ namespace BGE {
         Font();
         Font(ObjectId fontId);
         Font(std::string name, uint32_t pixelSize);
-        virtual ~Font();
+        virtual ~Font() {}
         
         void initialize(FontHandle handle, std::string name, uint32_t pixelSize);
+        void destroy();
         
         FontHandle getHandle() const { return handle_; }
         uint32_t getGlyphW() const { return glyphW_; }
@@ -73,7 +74,7 @@ namespace BGE {
         
         std::string getNameAsKey() const;
         
-        bool isValid(void) const { return valid_; }
+        bool isValid(void) const { return status_ == FontStatus::Valid; }
         bool hasKerning() const { return hasKerning_; }
         int32_t kerningForPair(uint16_t prev, uint16_t curr);
         uint32_t getStringWidth(std::string str, bool minimum=true);
@@ -93,9 +94,6 @@ namespace BGE {
         std::string style_;
         FontHandle  handle_;
         FontStatus  status_;
-        
-        // TODO: Remove valid
-        bool valid_;
         
         uint32_t glyphW_;   // Max width of glyphs
         uint32_t glyphH_;   // Max height of glyphs

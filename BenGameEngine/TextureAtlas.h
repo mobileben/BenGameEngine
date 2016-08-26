@@ -33,10 +33,11 @@ namespace BGE {
         TextureAtlas();
         TextureAtlas(ObjectId fontId);
         TextureAtlas(ObjectId objId, std::string name);
-        ~TextureAtlas();
+        ~TextureAtlas() {}
         
         void initialize(TextureAtlasHandle handle, std::string name);
-
+        void destroy();
+        
         inline bool isValid() const { return valid_; }
 
         inline TextureAtlasHandle getHandle() const { return handle_; }
@@ -64,10 +65,13 @@ namespace BGE {
         std::string atlasTextureKey() const;
         TextureHandle getSubTextureHandle(std::string name);
         
+        size_t getMemoryUsage() const;
+
         void createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         
     private:
+        // TODO: valid_ needs to become state or status
         bool                    valid_;
         TextureAtlasHandle      handle_;
         TextureHandle           textureHandle_;

@@ -25,7 +25,7 @@ namespace BGE {
     public:
         ScenePackage();
         ScenePackage(ObjectId sceneId);
-        ~ScenePackage();
+        ~ScenePackage() {}
         
         void initialize(ScenePackageHandle handle, std::string name);
         void destroy();

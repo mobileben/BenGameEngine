@@ -44,18 +44,6 @@ BGE::Texture::Texture(uint32_t texId, std::string name, GLKTextureInfo *textureI
 }
 #endif
 
-BGE::Texture::~Texture() {
-    GLuint name;
-    
-    if (textureInfo_) {
-        name = textureInfo_.name;
-    } else {
-        name = hwId_;
-    }
-    
-    glDeleteTextures(1, &name);
-}
-
 void BGE::Texture::initialize(TextureHandle handle, std::string name) {
     handle_ = handle;
     setName(name);
@@ -90,6 +78,27 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, GLKTexture
         updateUVs();
         updateXYs();
     }
+}
+
+void BGE::Texture::destroy() {
+    valid_ = false;
+    textureInfo_ = nil;
+    
+    if (!isSubTexture_) {
+        // Only non-subtextures can be freed, since the atlas is freed separately
+        GLuint name;
+        
+        if (textureInfo_) {
+            name = textureInfo_.name;
+        } else {
+            name = hwId_;
+        }
+        
+        glDeleteTextures(1, &name);
+    }
+    
+    handle_ = TextureHandle();
+    atlasHandle_ = TextureAtlasHandle();
 }
 
 void BGE::Texture::updateUVs(bool rotated) {

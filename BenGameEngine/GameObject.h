@@ -27,7 +27,7 @@ namespace BGE {
     public:
         GameObject();
         GameObject(ObjectId objId);
-        ~GameObject();
+        ~GameObject() {}
         
         void initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, std::string name);
         void destroy();

@@ -74,9 +74,6 @@ BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : Service(), sp
     }
 }
 
-BGE::ComponentService::~ComponentService() {
-}
-
 BGE::GameObject *BGE::ComponentService::getComponentGameObject(Component *component, GameObjectHandle gameObjHandle) {
     return component->getSpace()->getGameObject(gameObjHandle);
 }
@@ -141,4 +138,216 @@ void BGE::ComponentService::removeAllComponents() {
     }
 }
 
+uint32_t BGE::ComponentService::totalNumComponent() const {
+    uint32_t total = 0;
+    
+    total += numComponents<TransformComponent>();
+    total += numComponents<BoundingBoxComponent>();
+    total += numComponents<AnimationChannelComponent>();
+    total += numComponents<AnimatorComponent>();
+    total += numComponents<AnimationSequenceComponent>();
+    total += numComponents<ChannelFrameAnimatorComponent>();
+    total += numComponents<ColorMatrixComponent>();
+    total += numComponents<ColorTransformComponent>();
+    total += numComponents<FrameAnimatorComponent>();
+    total += numComponents<SpriteRenderComponent>();
+    total += numComponents<TextComponent>();
+    total += numComponents<ButtonComponent>();
+    total += numComponents<InputTouchComponent>();
+    total += numComponents<LineRenderComponent>();
+    total += numComponents<FlatRectRenderComponent>();
+    total += numComponents<MaskComponent>();
+    total += numComponents<TextureMaskComponent>();
+    
+    return total;
+}
+
+size_t BGE::ComponentService::usedHandleMemory() const {
+    size_t mem = 0;
+    
+    for (auto i=0;i<componentHandleServices_.size();i++) {
+        if (i == TransformComponent::typeId_) {
+            auto handleService = static_cast<HandleService<TransformComponent, TransformComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == BoundingBoxComponent::typeId_) {
+            auto handleService = static_cast<HandleService<BoundingBoxComponent, BoundingBoxComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == AnimationChannelComponent::typeId_) {
+            auto handleService = static_cast<HandleService<AnimationChannelComponent, AnimationChannelComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == AnimationSequenceComponent::typeId_) {
+            auto handleService = static_cast<HandleService<AnimationSequenceComponent, AnimationSequenceComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == AnimatorComponent::typeId_) {
+            auto handleService = static_cast<HandleService<AnimatorComponent, AnimatorComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == ChannelFrameAnimatorComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ChannelFrameAnimatorComponent, ChannelFrameAnimatorComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == ColorMatrixComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ColorMatrixComponent, ColorMatrixComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == ColorTransformComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ColorTransformComponent, ColorTransformComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == FrameAnimatorComponent::typeId_) {
+            auto handleService = static_cast<HandleService<FrameAnimatorComponent, FrameAnimatorComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == SpriteRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<SpriteRenderComponent, SpriteRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == TextComponent::typeId_) {
+            auto handleService = static_cast<HandleService<TextComponent, TextComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == ButtonComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ButtonComponent, ButtonComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == InputTouchComponent::typeId_) {
+            auto handleService = static_cast<HandleService<InputTouchComponent, InputTouchComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == LineRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<LineRenderComponent, LineRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == FlatRectRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<FlatRectRenderComponent, FlatRectRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == MaskComponent::typeId_) {
+            auto handleService = static_cast<HandleService<MaskComponent, MaskComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else if (i == TextureMaskComponent::typeId_) {
+            auto handleService = static_cast<HandleService<TextureMaskComponent, TextureMaskComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
+        } else {
+            assert(false);
+        }
+    }
+    
+    return mem;
+}
+
+size_t BGE::ComponentService::unusedHandleMemory() const {
+    size_t mem = 0;
+    
+    for (auto i=0;i<componentHandleServices_.size();i++) {
+        if (i == TransformComponent::typeId_) {
+            auto handleService = static_cast<HandleService<TransformComponent, TransformComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == BoundingBoxComponent::typeId_) {
+            auto handleService = static_cast<HandleService<BoundingBoxComponent, BoundingBoxComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == AnimationChannelComponent::typeId_) {
+            auto handleService = static_cast<HandleService<AnimationChannelComponent, AnimationChannelComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == AnimationSequenceComponent::typeId_) {
+            auto handleService = static_cast<HandleService<AnimationSequenceComponent, AnimationSequenceComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == AnimatorComponent::typeId_) {
+            auto handleService = static_cast<HandleService<AnimatorComponent, AnimatorComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == ChannelFrameAnimatorComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ChannelFrameAnimatorComponent, ChannelFrameAnimatorComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == ColorMatrixComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ColorMatrixComponent, ColorMatrixComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == ColorTransformComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ColorTransformComponent, ColorTransformComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == FrameAnimatorComponent::typeId_) {
+            auto handleService = static_cast<HandleService<FrameAnimatorComponent, FrameAnimatorComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == SpriteRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<SpriteRenderComponent, SpriteRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == TextComponent::typeId_) {
+            auto handleService = static_cast<HandleService<TextComponent, TextComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == ButtonComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ButtonComponent, ButtonComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == InputTouchComponent::typeId_) {
+            auto handleService = static_cast<HandleService<InputTouchComponent, InputTouchComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == LineRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<LineRenderComponent, LineRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == FlatRectRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<FlatRectRenderComponent, FlatRectRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == MaskComponent::typeId_) {
+            auto handleService = static_cast<HandleService<MaskComponent, MaskComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == TextureMaskComponent::typeId_) {
+            auto handleService = static_cast<HandleService<TextureMaskComponent, TextureMaskComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else {
+            assert(false);
+        }
+    }
+    
+    return mem;
+}
+
+size_t BGE::ComponentService::totalHandleMemory() const {
+    size_t mem = 0;
+    
+    for (auto i=0;i<componentHandleServices_.size();i++) {
+        if (i == TransformComponent::typeId_) {
+            auto handleService = static_cast<HandleService<TransformComponent, TransformComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == BoundingBoxComponent::typeId_) {
+            auto handleService = static_cast<HandleService<BoundingBoxComponent, BoundingBoxComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == AnimationChannelComponent::typeId_) {
+            auto handleService = static_cast<HandleService<AnimationChannelComponent, AnimationChannelComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == AnimationSequenceComponent::typeId_) {
+            auto handleService = static_cast<HandleService<AnimationSequenceComponent, AnimationSequenceComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == AnimatorComponent::typeId_) {
+            auto handleService = static_cast<HandleService<AnimatorComponent, AnimatorComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == ChannelFrameAnimatorComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ChannelFrameAnimatorComponent, ChannelFrameAnimatorComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == ColorMatrixComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ColorMatrixComponent, ColorMatrixComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == ColorTransformComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ColorTransformComponent, ColorTransformComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == FrameAnimatorComponent::typeId_) {
+            auto handleService = static_cast<HandleService<FrameAnimatorComponent, FrameAnimatorComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == SpriteRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<SpriteRenderComponent, SpriteRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == TextComponent::typeId_) {
+            auto handleService = static_cast<HandleService<TextComponent, TextComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == ButtonComponent::typeId_) {
+            auto handleService = static_cast<HandleService<ButtonComponent, ButtonComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == InputTouchComponent::typeId_) {
+            auto handleService = static_cast<HandleService<InputTouchComponent, InputTouchComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == LineRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<LineRenderComponent, LineRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == FlatRectRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<FlatRectRenderComponent, FlatRectRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == MaskComponent::typeId_) {
+            auto handleService = static_cast<HandleService<MaskComponent, MaskComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else if (i == TextureMaskComponent::typeId_) {
+            auto handleService = static_cast<HandleService<TextureMaskComponent, TextureMaskComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
+        } else {
+            assert(false);
+        }
+    }
+    
+    return mem;
+}
 

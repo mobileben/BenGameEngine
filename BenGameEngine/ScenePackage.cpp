@@ -25,10 +25,6 @@ BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), frameR
     fontCount_ = std::make_shared<std::atomic_int>(0);
 }
 
-BGE::ScenePackage::~ScenePackage() {
-    reset();
-}
-
 void BGE::ScenePackage::reset() {
     // Release all textures
     

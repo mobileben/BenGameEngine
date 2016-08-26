@@ -29,7 +29,7 @@ namespace BGE {
         Space(ObjectId spaceId);
         Space(ObjectId spaceId, std::string name);
 
-        virtual ~Space() {}
+        ~Space() {}
         
         void initialize(SpaceHandle handle, std::string name);
         void destroy();
@@ -38,12 +38,12 @@ namespace BGE {
         
         GameObject *createGameObject(std::string name = "");
         
-        GameObjectHandle getGameObjectHandle(ObjectId objId);
-        GameObjectHandle getGameObjectHandle(std::string name);
+        GameObjectHandle getGameObjectHandle(ObjectId objId) const;
+        GameObjectHandle getGameObjectHandle(std::string name) const;
         
-        GameObject *getGameObject(ObjectId objId);
-        GameObject *getGameObject(std::string name);
-        GameObject *getGameObject(GameObjectHandle handle);
+        GameObject *getGameObject(ObjectId objId) const;
+        GameObject *getGameObject(std::string name) const;
+        GameObject *getGameObject(GameObjectHandle handle) const;
         
         void removeGameObject(GameObjectHandle handle);
         void removeGameObject(GameObject *object);
@@ -60,15 +60,15 @@ namespace BGE {
             return component;
         }
         
-        template <typename T> inline T *getComponent(ComponentHandle handle) {
+        template <typename T> inline T *getComponent(ComponentHandle handle) const {
             return getComponent<T>(handle.handle);
         }
         
-        template <typename T> inline T *getComponent(HandleBackingType handle) {
+        template <typename T> inline T *getComponent(HandleBackingType handle) const {
             return componentService_->getComponent<T>(handle);
         }
 
-        template <typename T> inline void getComponents(std::vector<T *> &components) {
+        template <typename T> inline void getComponents(std::vector<T *> &components) const {
             componentService_->getComponents<T>(components);
         }
         

@@ -14,10 +14,6 @@ BGE::InputService::InputService() :  handleService_(InitialInputReserve, HandleS
     inputs_.reserve(InitialInputReserve);
 }
 
-BGE::InputService::~InputService() {
-}
-
-
 BGE::Input *BGE::InputService::createInput() {
     InputHandle handle;
     Input *input = handleService_.allocate(handle);
@@ -152,6 +148,7 @@ void BGE::InputService::process() {
             }
         }
         
+        input->destroy();
         handleService_.release(input->getHandle().getHandle());
     }
     

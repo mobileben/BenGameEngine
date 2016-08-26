@@ -20,9 +20,6 @@ BGE::TextureAtlas::TextureAtlas(ObjectId texId) : NamedObject(texId), valid_(fal
 BGE::TextureAtlas::TextureAtlas(ObjectId texId, std::string name) : NamedObject(texId, name), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0), hwId_(0), target_(GL_TEXTURE_2D) {
 }
 
-BGE::TextureAtlas::~TextureAtlas() {
-}
-
 void BGE::TextureAtlas::reset() {
     valid_ = false;
     handle_ = TextureAtlasHandle();
@@ -45,6 +42,24 @@ void BGE::TextureAtlas::initialize(TextureAtlasHandle handle, std::string name) 
     setName(name);
 }
 
+void BGE::TextureAtlas::destroy() {
+    auto textureService = Game::getInstance()->getTextureService();
+    
+    valid_ = false;
+    
+    for (auto const &it : subTextures_) {
+        textureService->removeTexture(handle_, it.second);
+    }
+    
+    subTextures_.clear();
+    
+    // Now remove underlying texture
+    textureService->removeTexture(handle_, textureHandle_);
+    
+    handle_ = TextureAtlasHandle();
+    textureHandle_ = TextureHandle();
+}
+
 std::string BGE::TextureAtlas::atlasTextureKey() const {
     return "__" + getName() + "_texture";
 }
@@ -57,6 +72,17 @@ BGE::TextureHandle BGE::TextureAtlas::getSubTextureHandle(std::string name) {
     } else {
         return TextureHandle();
     }
+}
+
+
+size_t BGE::TextureAtlas::getMemoryUsage() const {
+    auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle_);
+    
+    if (texture) {
+        return texture->getMemoryUsage();
+    }
+    
+    return 0;
 }
 
 void BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {

@@ -12,9 +12,6 @@
 BGE::SpaceService::SpaceService() : handleService_(InitialSpaceReserve, HandleServiceNoMaxLimit){
 }
 
-BGE::SpaceService::~SpaceService() {
-}
-
 BGE::SpaceHandle BGE::SpaceService::createSpace(std::string name) {
     SpaceHandle handle;
     Space *space = handleService_.allocate(handle);
@@ -40,6 +37,12 @@ void BGE::SpaceService::removeSpace(ObjectId objId) {
     auto it = spaces_.find(objId);
     
     if (it != spaces_.end()) {
+        auto space = getSpace(it->second);
+        
+        if (space) {
+            space->destroy();
+        }
+        
         handleService_.release(it->second);
         spaces_.erase(objId);
     }

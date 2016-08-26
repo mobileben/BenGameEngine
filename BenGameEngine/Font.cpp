@@ -21,17 +21,13 @@ static const int NumSupportedCharacters = 256 - InitialSupportedCharacterOffset;
 
 const std::string BGE::Font::ErrorDomain = "Font";
 
-BGE::Font::Font() : NamedObject(), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), valid_(false), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
+BGE::Font::Font() : NamedObject(), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
 }
 
-BGE::Font::Font(ObjectId fontId) : NamedObject(fontId), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), valid_(false), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
+BGE::Font::Font(ObjectId fontId) : NamedObject(fontId), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
 }
 
-BGE::Font::Font(std::string name, uint32_t pixelSize) : NamedObject(0, name), handle_(FontHandle()), pixelSize_(pixelSize), status_(FontStatus::Invalid), valid_(false), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
-}
-
-BGE::Font::~Font() {
-    Game::getInstance()->getTextureService()->removeTextureAtlas(getHandle(), textureAtlasHandle_);
+BGE::Font::Font(std::string name, uint32_t pixelSize) : NamedObject(0, name), handle_(FontHandle()), pixelSize_(pixelSize), status_(FontStatus::Invalid), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
 }
 
 void BGE::Font::initialize(FontHandle handle, std::string name, uint32_t pixelSize) {
@@ -39,12 +35,26 @@ void BGE::Font::initialize(FontHandle handle, std::string name, uint32_t pixelSi
     handle_ = handle;
     pixelSize_ = pixelSize;
     status_ = FontStatus::Invalid;
-    valid_ = false;
-    
+    glyphW_ = 0;
+    glyphH_ = 0;
+    baseline_ = 0;
+    hasKerning_ = false;
     Game::getInstance()->getTextureService()->removeTextureAtlas(getHandle(), textureAtlasHandle_);
     
     textureAtlasHandle_ = TextureAtlasHandle();
-    hasKerning_ = false;
+}
+
+void BGE::Font::destroy() {
+    status_ = FontStatus::Invalid;
+
+    Game::getInstance()->getTextureService()->removeTextureAtlas(handle_, textureAtlasHandle_);
+    
+    family_.clear();
+    style_.clear();
+    glyphs_.clear();
+    kerning_.clear();
+    
+    textureAtlasHandle_ = TextureAtlasHandle();
 }
 
 #ifdef NOT_YET
@@ -363,7 +373,6 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                         free(atlasBuffer);
                         
                         if (callback) {
-                            valid_ = true;
                             status_ = FontStatus::Valid;
                             callback(handle_, nullptr);
                         }

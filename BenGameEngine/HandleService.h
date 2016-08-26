@@ -33,10 +33,11 @@ namespace BGE {
 #else
             assert(reserve > 0 && (maxLimit == HandleServiceNoMaxLimit || maxLimit >= reserve));
 #endif
-            
             data_.reserve(reserve);
             magic_.reserve(reserve);
             freeSlots_.reserve(reserve);
+            
+            initialCapacity_ = (uint32_t) data_.capacity();
         }
         
         HandleService() = delete;
@@ -66,6 +67,10 @@ namespace BGE {
                 
                 data_.push_back(DATA());
                 magic_.push_back(handle.getMagic());
+                
+                if (data_.capacity() != initialCapacity_) {
+                    numResizes_++;
+                }
             } else {
                 index = freeSlots_.back();
                 handle.init(index);
@@ -101,7 +106,7 @@ namespace BGE {
             freeSlots_.push_back(index);
         }
         
-        DATA* dereference(HANDLE handle) {
+        DATA *dereference(HANDLE handle) const {
             if (handle.isNull()) {
                 return nullptr;
             }
@@ -112,11 +117,7 @@ namespace BGE {
                 return nullptr;
             }
             
-            return &data_[index];
-        }
-        
-        const DATA* dereference(HANDLE handle) const {
-            return (const_cast<HandleService<DATA, HANDLE>*>(this)->dereference(handle));
+            return const_cast<DATA *>(&data_[index]);
         }
         
         uint32_t numUsedHandles() const {
@@ -125,6 +126,26 @@ namespace BGE {
         
         uint32_t capacity() const {
             return (uint32_t) data_.capacity();
+        }
+        
+        uint32_t initialCapacity() const {
+            return initialCapacity_;
+        }
+        
+        uint32_t numResizes() const {
+            return numResizes_;
+        }
+        
+        size_t usedMemory() const {
+            return numUsedHandles() * sizeof(DATA);
+        }
+        
+        size_t unusedMemory() const {
+            return capacity() * sizeof(DATA) - usedMemory();
+        }
+        
+        size_t totalMemory() const {
+            return capacity() * sizeof(DATA);
         }
         
 #if UNIT_TESTING
@@ -151,6 +172,8 @@ namespace BGE {
         typedef std::vector<HandleBackingType> MagicVector;
         typedef std::vector<HandleBackingType> FreeVector;
         
+        uint32_t    initialCapacity_;
+        uint32_t    numResizes_;
         uint32_t    maxLimit_;
         DataVector  data_;
         MagicVector magic_;

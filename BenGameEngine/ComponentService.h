@@ -28,19 +28,34 @@ namespace BGE {
     public:
         ComponentService();
         ComponentService(SpaceHandle spaceHandle);
-        ~ComponentService();
+        ~ComponentService() {}
         
         static void registerComponents();
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
 
+        template <typename T> uint32_t numComponents() const {
+            uint32_t num = 0;
+
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            num = handleService->numUsedHandles();
+            
+            return num;
+        }
+        
+        uint32_t totalNumComponent() const;
+        
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
+        
         inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
         inline SpaceHandle getSpaceHandle(void) const { return spaceHandle_; }
         

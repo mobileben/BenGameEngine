@@ -17,10 +17,6 @@ BGE::GameObject::GameObject() : NamedObject(), active_(false), componentBitmask_
 BGE::GameObject::GameObject(ObjectId objId) : NamedObject(objId), active_(false), componentBitmask_(0) {
 }
 
-BGE::GameObject::~GameObject() {
-    removeAllComponents();
-}
-
 void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, std::string name) {
     setName(name);
 

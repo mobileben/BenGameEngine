@@ -15,7 +15,28 @@ BGE::GameObjectService::GameObjectHandleService BGE::GameObjectService::handleSe
 BGE::GameObjectService::GameObjectService() : Service() {
 }
 
-BGE::GameObjectService::~GameObjectService() {
+uint32_t BGE::GameObjectService::numGameObjects () const {
+    uint32_t num = 0;
+    
+    for (auto &handle : gameObjects_) {
+        if (handleService_.dereference(handle)) {
+            num++;
+        }
+    }
+    
+    return num;
+}
+
+size_t BGE::GameObjectService::usedHandleMemory() const {
+    return handleService_.usedMemory();
+}
+
+size_t BGE::GameObjectService::unusedHandleMemory() const {
+    return handleService_.unusedMemory();
+}
+
+size_t BGE::GameObjectService::totalHandleMemory() const {
+    return handleService_.totalMemory();
 }
 
 BGE::GameObject *BGE::GameObjectService::createGameObject(std::string name) {
@@ -30,7 +51,7 @@ BGE::GameObject *BGE::GameObjectService::createGameObject(std::string name) {
     return obj;
 }
 
-BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(ObjectId objId) {
+BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(ObjectId objId) const {
     for (auto const &handle : gameObjects_) {
         auto obj = getGameObject(handle);
         
@@ -44,7 +65,7 @@ BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(ObjectId objId
     return GameObjectHandle();
 }
 
-BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(std::string name) {
+BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(std::string name) const {
     for (auto const &handle : gameObjects_) {
         auto obj = getGameObject(handle);
         

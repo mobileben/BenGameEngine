@@ -18,7 +18,7 @@ namespace BGE {
     {
     public:
         RenderView(std::shared_ptr<RenderWindow> window, float x, float y, float width, float height);
-        ~RenderView();
+        ~RenderView() {}
         
         float getX();
         float getY();

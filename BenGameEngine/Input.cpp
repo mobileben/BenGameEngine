@@ -21,3 +21,10 @@ void BGE::Input::initialize(InputHandle handle) {
     y = 0;
     tapCount = 0;
 }
+
+void BGE::Input::destroy() {
+    type = TouchType::None;
+    touch = nil;
+    
+    handle_ = InputHandle();
+}

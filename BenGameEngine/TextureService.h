@@ -27,38 +27,46 @@ namespace BGE {
     {
     public:
         TextureService(EAGLContext *context);
-        ~TextureService();
+        ~TextureService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
         void update(double deltaTime) {}
+        
+        uint32_t numTextures() const;   // Texture count includes subtextures
+        uint32_t numSubTextures() const;
+        uint32_t numTextureAtlases() const;
+        
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
 
-        TextureHandle getTextureHandle(ScenePackageHandle scenePackageHandle, std::string name);
-        TextureHandle getTextureHandle(SpaceHandle spaceHandle, std::string name);
-        TextureHandle getTextureHandle(TextureAtlasHandle atlasHandle, std::string name);
+        size_t totalTextureMemory() const;
         
-        TextureAtlasHandle getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, std::string name);
-        TextureAtlasHandle getTextureAtlasHandle(SpaceHandle spaceHandle, std::string name);
-        TextureAtlasHandle getTextureAtlasHandle(FontHandle fontHandle, std::string name);
+        TextureHandle getTextureHandle(ScenePackageHandle scenePackageHandle, std::string name) const;
+        TextureHandle getTextureHandle(SpaceHandle spaceHandle, std::string name) const;
+        TextureHandle getTextureHandle(TextureAtlasHandle atlasHandle, std::string name)const ;
         
-        Texture *getTexture(ScenePackageHandle scenePackageHandle, std::string name);
-        Texture *getTexture(SpaceHandle spaceHandle, std::string name);
-        Texture *getTexture(TextureAtlasHandle atlasHandle, std::string name);
-        
-        TextureAtlas *getTextureAtlas(ScenePackageHandle scenePackageHandle, std::string name);
-        TextureAtlas *getTextureAtlas(SpaceHandle spaceHandle, std::string name);
-        TextureAtlas *getTextureAtlas(FontHandle fontHandle, std::string name);
+        TextureAtlasHandle getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, std::string name) const;
+        TextureAtlasHandle getTextureAtlasHandle(SpaceHandle spaceHandle, std::string name) const;
+        TextureAtlasHandle getTextureAtlasHandle(FontHandle fontHandle, std::string name) const;
 
-        Texture *getTexture(TextureHandle handle) {
-            return textureHandleService_.dereference(handle);            
+        Texture *getTexture(ScenePackageHandle scenePackageHandle, std::string name) const;
+        Texture *getTexture(SpaceHandle spaceHandle, std::string name) const;
+        Texture *getTexture(TextureAtlasHandle atlasHandle, std::string name) const;
+        inline Texture *getTexture(TextureHandle handle) const {
+            return textureHandleService_.dereference(handle);
         }
-        
-        TextureAtlas *getTextureAtlas(TextureAtlasHandle handle) {
+
+        TextureAtlas *getTextureAtlas(ScenePackageHandle scenePackageHandle, std::string name) const;
+        TextureAtlas *getTextureAtlas(SpaceHandle spaceHandle, std::string name) const;
+        TextureAtlas *getTextureAtlas(FontHandle fontHandle, std::string name) const;
+        inline TextureAtlas *getTextureAtlas(TextureAtlasHandle handle) const {
             return textureAtlasHandleService_.dereference(handle);
         }
 
@@ -108,11 +116,11 @@ namespace BGE {
         
         GLKTextureLoader            *textureLoader_;
         
-        std::unordered_map<ScenePackageHandle, std::unordered_map<std::string, TextureHandle>> sceneTextures_;
+        std::unordered_map<ScenePackageHandle, std::unordered_map<std::string, TextureHandle>> packageTextures_;
         std::unordered_map<SpaceHandle, std::unordered_map<std::string, TextureHandle>> spaceTextures_;
         std::unordered_map<TextureAtlasHandle, std::unordered_map<std::string, TextureHandle>> atlasTextures_;
         
-        std::unordered_map<ScenePackageHandle, std::unordered_map<std::string, TextureAtlasHandle>> sceneTextureAtlases_;
+        std::unordered_map<ScenePackageHandle, std::unordered_map<std::string, TextureAtlasHandle>> packageTextureAtlases_;
         std::unordered_map<SpaceHandle, std::unordered_map<std::string, TextureAtlasHandle>> spaceTextureAtlases_;
         std::unordered_map<FontHandle, std::unordered_map<std::string, TextureAtlasHandle>> fontTextureAtlases_;
 
@@ -122,6 +130,11 @@ namespace BGE {
         void createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         void createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         BGE::Texture *createSubTexture(std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated);
+        
+        void removeTexture(TextureAtlasHandle atlasHandle, TextureHandle handle);
+
+        void releaseTexture(Texture *texture);
+        void releaseTextureAtlas(TextureAtlas *atlas);
     };
 }
 

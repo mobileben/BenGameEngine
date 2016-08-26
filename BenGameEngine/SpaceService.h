@@ -21,7 +21,7 @@ namespace BGE {
     class SpaceService : public Service {
     public:
         SpaceService();
-        ~SpaceService();
+        ~SpaceService() {}
         
         void initialize() {}
         void reset() {}
