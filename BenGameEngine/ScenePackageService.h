@@ -37,23 +37,23 @@ namespace BGE {
         ScenePackageService();
         ~ScenePackageService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
         
         void packageFromJSONFile(SpaceHandle spaceHandle, std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback);
         
-        ScenePackageHandle getScenePackageHandle(ObjectId scenePackageId);
-        ScenePackageHandle getScenePackageHandle(std::string name);
+        ScenePackageHandle getScenePackageHandle(ObjectId scenePackageId) const;
+        ScenePackageHandle getScenePackageHandle(std::string name) const;
         
-        ScenePackage *getScenePackage(ObjectId scenePackageId);
-        ScenePackage *getScenePackage(std::string name);
-        ScenePackage *getScenePackage(ScenePackageHandle handle);
+        ScenePackage *getScenePackage(ObjectId scenePackageId) const;
+        ScenePackage *getScenePackage(std::string name) const;
+        ScenePackage *getScenePackage(ScenePackageHandle handle) const;
 
         void removePackage(SpaceHandle spaceHandle, ObjectId scenePackageId);
         void removePackage(SpaceHandle spaceHandle, std::string name);
@@ -62,16 +62,16 @@ namespace BGE {
         void resetPackage(std::string name);
         void resetPackage(ScenePackageHandle handle);
 
-        AnimationSequenceReference *getAnimationSequenceReference(std::string name);
-        ButtonReference *getButtonReference(std::string name);
-        MaskReference *getMaskReference(std::string name);
-        PlacementReference *getPlacementReference(std::string name);
-        TextureReference *getTextureReference(std::string name);
-        TextReference *getTextReference(std::string name);
-        ExternalPackageReference *getExternalReference(std::string name);
+        AnimationSequenceReference *getAnimationSequenceReference(std::string name) const;
+        ButtonReference *getButtonReference(std::string name) const;
+        MaskReference *getMaskReference(std::string name) const;
+        PlacementReference *getPlacementReference(std::string name) const;
+        TextureReference *getTextureReference(std::string name) const;
+        TextReference *getTextReference(std::string name) const;
+        ExternalPackageReference *getExternalReference(std::string name) const;
         
         // TODO: Remove this as this is a hack
-        GfxReferenceType getReferenceType(std::string name);
+        GfxReferenceType getReferenceType(std::string name) const;
         
         void link();
         void link(ScenePackageHandle handle);

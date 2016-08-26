@@ -48,10 +48,10 @@ namespace BGE {
         void removeMaterial(MaterialHandle handle);
         void removeMaterial(ObjectId matId);
         
-        MaterialHandle getMaterialHandle(ObjectId matId);
+        MaterialHandle getMaterialHandle(ObjectId matId) const;
         
-        Material *getMaterial(MaterialHandle handle);
-        Material *getMaterial(ObjectId matId);
+        Material *getMaterial(MaterialHandle handle) const;
+        Material *getMaterial(ObjectId matId) const;
         
     private:
         static const uint32_t InitialMaterialReserve = 1024;

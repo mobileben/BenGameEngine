@@ -217,7 +217,7 @@ void BGE::FontService::buildFontInfoForAsset(std::string asset) {
     }
 }
 
-BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) {
+BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) const {
     auto f = fontTable_.find(name);
     
     if (f != fontTable_.end()) {
@@ -232,7 +232,7 @@ BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixel
     return FontHandle();
 }
 
-BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
+BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) const {
     auto f = fontTable_.find(name);
     
     if (f != fontTable_.end()) {
@@ -247,7 +247,7 @@ BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
     return nullptr;
 }
 
-BGE::Font *BGE::FontService::getFont(FontHandle handle) {
+BGE::Font *BGE::FontService::getFont(FontHandle handle) const {
     return handleService_.dereference(handle);
 }
 

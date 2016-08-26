@@ -82,14 +82,14 @@ namespace BGE {
             return nullptr;
         }
         
-        template <typename T> T *getComponent(HandleBackingType handle) {
+        template <typename T> T *getComponent(HandleBackingType handle) const {
             auto typeId = T::typeId_;
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
             auto tHandle = Handle<T>(handle);
             return handleService->dereference(tHandle);
         }
         
-        template <typename T> void getComponents(std::vector<T *> &components) {
+        template <typename T> void getComponents(std::vector<T *> &components) const {
             auto typeId = T::typeId_;
             auto const &handles = componentHandles_[typeId];
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
@@ -131,7 +131,7 @@ namespace BGE {
         SpaceHandle                                 spaceHandle_;
         std::vector<std::vector<ComponentHandle>>   componentHandles_;
         
-        GameObject *getComponentGameObject(Component *, GameObjectHandle gameObjHandle);
+        GameObject *getComponentGameObject(Component *, GameObjectHandle gameObjHandle) const;
         
         template <typename T> static void registerComponent(uint32_t reserve, uint32_t maxLimit) {
             using HANDLE = Handle<T>;

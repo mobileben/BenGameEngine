@@ -25,14 +25,14 @@ namespace BGE {
         AnimationService() {}
         ~AnimationService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime);
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final;
         
     private:
         void animateSequence(Space *space, AnimationSequenceComponent *seq, AnimatorComponent *animator, float deltaTime);

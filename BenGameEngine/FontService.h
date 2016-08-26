@@ -50,10 +50,10 @@ namespace BGE {
         void removeFont(ScenePackageHandle scenePackageHandle, FontHandle handle);
         void removeFont(SpaceHandle spaceHandle, FontHandle handle);
 
-        FontHandle getFontHandle(std::string name, uint32_t pixelSize);
+        FontHandle getFontHandle(std::string name, uint32_t pixelSize) const;
         
-        Font *getFont(std::string name, uint32_t pixelSize);
-        Font *getFont(FontHandle handle);
+        Font *getFont(std::string name, uint32_t pixelSize) const;
+        Font *getFont(FontHandle handle) const;
  
     protected:
         // TODO: For now this is Mac/iOS specific

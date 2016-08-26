@@ -74,7 +74,7 @@ BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : Service(), sp
     }
 }
 
-BGE::GameObject *BGE::ComponentService::getComponentGameObject(Component *component, GameObjectHandle gameObjHandle) {
+BGE::GameObject *BGE::ComponentService::getComponentGameObject(Component *component, GameObjectHandle gameObjHandle) const {
     return component->getSpace()->getGameObject(gameObjHandle);
 }
 

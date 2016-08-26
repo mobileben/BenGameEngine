@@ -22,18 +22,18 @@ namespace BGE {
         
         EventHandlerHandle createEventHandlerHandle(std::string name, Event event, EventHandlerFunction function);
         
-        EventHandler *getEventHandler(EventHandlerHandle handle);
+        EventHandler *getEventHandler(EventHandlerHandle handle) const;
         
         void removeEventHandler(EventHandlerHandle handle);
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
         
     protected:
         

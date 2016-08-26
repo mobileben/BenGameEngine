@@ -99,7 +99,7 @@ void BGE::ScenePackageService::packageFromJSONFile(SpaceHandle spaceHandle, std:
     });
 }
 
-BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(ObjectId scenePackageId) {
+BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(ObjectId scenePackageId) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -111,7 +111,7 @@ BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(ObjectId
     return ScenePackageHandle();
 }
 
-BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::string name) {
+BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -123,19 +123,19 @@ BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::str
     return ScenePackageHandle();
 }
 
-BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(ObjectId scenePackageId) {
+BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(ObjectId scenePackageId)const  {
     auto handle = getScenePackageHandle(scenePackageId);
     
     return getScenePackage(handle);
 }
 
-BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(std::string name) {
+BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(std::string name) const {
     auto handle = getScenePackageHandle(name);
     
     return getScenePackage(handle);
 }
 
-BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(ScenePackageHandle handle) {
+BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(ScenePackageHandle handle) const {
     return handleService_.dereference(handle);
 }
 
@@ -240,7 +240,7 @@ void BGE::ScenePackageService::link() {
     }
 }
 
-BGE::ButtonReference *BGE::ScenePackageService::getButtonReference(std::string name) {
+BGE::ButtonReference *BGE::ScenePackageService::getButtonReference(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -256,7 +256,7 @@ BGE::ButtonReference *BGE::ScenePackageService::getButtonReference(std::string n
     return nullptr;
 }
 
-BGE::MaskReference *BGE::ScenePackageService::getMaskReference(std::string name) {
+BGE::MaskReference *BGE::ScenePackageService::getMaskReference(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -272,7 +272,7 @@ BGE::MaskReference *BGE::ScenePackageService::getMaskReference(std::string name)
     return nullptr;
 }
 
-BGE::PlacementReference *BGE::ScenePackageService::getPlacementReference(std::string name) {
+BGE::PlacementReference *BGE::ScenePackageService::getPlacementReference(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -288,7 +288,7 @@ BGE::PlacementReference *BGE::ScenePackageService::getPlacementReference(std::st
     return nullptr;
 }
 
-BGE::TextureReference *BGE::ScenePackageService::getTextureReference(std::string name) {
+BGE::TextureReference *BGE::ScenePackageService::getTextureReference(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -304,7 +304,7 @@ BGE::TextureReference *BGE::ScenePackageService::getTextureReference(std::string
     return nullptr;
 }
 
-BGE::TextReference *BGE::ScenePackageService::getTextReference(std::string name) {
+BGE::TextReference *BGE::ScenePackageService::getTextReference(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -320,7 +320,7 @@ BGE::TextReference *BGE::ScenePackageService::getTextReference(std::string name)
     return nullptr;
 }
 
-BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceReference(std::string name) {
+BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceReference(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -336,7 +336,7 @@ BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceR
     return nullptr;
 }
 
-BGE::ExternalPackageReference *BGE::ScenePackageService::getExternalReference(std::string name) {
+BGE::ExternalPackageReference *BGE::ScenePackageService::getExternalReference(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -352,7 +352,7 @@ BGE::ExternalPackageReference *BGE::ScenePackageService::getExternalReference(st
     return nullptr;
 }
 
-BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string name) {
+BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         

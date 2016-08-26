@@ -61,11 +61,11 @@ void BGE::SpaceService::removeSpace(std::string name) {
     }
 }
 
-BGE::Space *BGE::SpaceService::getSpace(SpaceHandle spaceHandle) {
+BGE::Space *BGE::SpaceService::getSpace(SpaceHandle spaceHandle) const {
     return handleService_.dereference(spaceHandle);
 }
 
-BGE::Space *BGE::SpaceService::getSpace(ObjectId objId) {
+BGE::Space *BGE::SpaceService::getSpace(ObjectId objId) const {
     auto it = spaces_.find(objId);
     
     if (it != spaces_.end()) {
@@ -75,7 +75,7 @@ BGE::Space *BGE::SpaceService::getSpace(ObjectId objId) {
     return nullptr;
 }
 
-BGE::Space *BGE::SpaceService::getSpace(std::string name) {
+BGE::Space *BGE::SpaceService::getSpace(std::string name) const {
     for (auto const &sp : spaces_) {
         auto space = getSpace(sp.second);
         
@@ -89,7 +89,7 @@ BGE::Space *BGE::SpaceService::getSpace(std::string name) {
     return nullptr;
 }
 
-std::vector<BGE::SpaceHandle> BGE::SpaceService::getSpaces() {
+std::vector<BGE::SpaceHandle> BGE::SpaceService::getSpaces() const {
     std::vector<SpaceHandle> spaces;
     
     for(auto kv : spaces_) {

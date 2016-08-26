@@ -28,14 +28,14 @@ namespace BGE {
         GameObjectService();
         ~GameObjectService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
         
         uint32_t numGameObjects () const;
         

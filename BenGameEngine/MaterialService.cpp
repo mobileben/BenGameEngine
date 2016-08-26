@@ -102,20 +102,22 @@ void BGE::MaterialService::removeMaterial(ObjectId matId) {
     }
 }
 
-BGE::MaterialHandle BGE::MaterialService::getMaterialHandle(ObjectId matId) {
-    if (materials_.find(matId) != materials_.end()) {
-        return materials_[matId];
+BGE::MaterialHandle BGE::MaterialService::getMaterialHandle(ObjectId matId) const {
+    auto it = materials_.find(matId);
+
+    if (it != materials_.end()) {
+        return it->second;
     } else {
         return MaterialHandle();
     }
 }
 
-BGE::Material *BGE::MaterialService::getMaterial(MaterialHandle handle) {
+BGE::Material *BGE::MaterialService::getMaterial(MaterialHandle handle) const {
     return handleService_.dereference(handle);
 }
 
-BGE::Material *BGE::MaterialService::getMaterial(ObjectId matId) {
-    MaterialMapIterator it = materials_.find(matId);
+BGE::Material *BGE::MaterialService::getMaterial(ObjectId matId) const {
+    auto it = materials_.find(matId);
     
     if (it != materials_.end()) {
         return handleService_.dereference(it->second);

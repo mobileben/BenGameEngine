@@ -24,7 +24,7 @@ BGE::EventHandlerHandle BGE::EventService::createEventHandlerHandle(std::string 
     return handle;
 }
 
-BGE::EventHandler *BGE::EventService::getEventHandler(EventHandlerHandle handle) {
+BGE::EventHandler *BGE::EventService::getEventHandler(EventHandlerHandle handle) const {
     return handleService_.dereference(handle);
 }
 

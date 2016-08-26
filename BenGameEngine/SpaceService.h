@@ -23,14 +23,14 @@ namespace BGE {
         SpaceService();
         ~SpaceService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
 
         SpaceHandle createSpace(std::string name);
         
@@ -38,11 +38,11 @@ namespace BGE {
         void removeSpace(ObjectId objId);
         void removeSpace(std::string name);
 
-        Space *getSpace(SpaceHandle spaceHandle);
-        Space *getSpace(ObjectId objId);
-        Space *getSpace(std::string name);
+        Space *getSpace(SpaceHandle spaceHandle) const;
+        Space *getSpace(ObjectId objId) const;
+        Space *getSpace(std::string name) const;
         
-        std::vector<SpaceHandle> getSpaces();
+        std::vector<SpaceHandle> getSpaces() const;
         
     private:
         static const uint32_t InitialSpaceReserve = 32;
