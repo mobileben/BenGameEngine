@@ -20,6 +20,8 @@
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
 #include "AnimationChannelComponent.h"
+#include "ButtonComponent.h"
+
 #include <typeindex>
 
 @interface ViewController ()<GLKViewDelegate>
@@ -50,6 +52,7 @@
     self.renderWindow->setView((BGEView *) self.view);
     
     BGE::Game::getInstance()->getRenderService()->bindRenderWindow(self.renderContext, self.renderWindow);
+    
     self.spaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
     
     NSLog(@"DIDLOAD view is %f %f %f %f", self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
@@ -72,249 +75,73 @@
         
         BGE::Game::getInstance()->provide(std::make_shared<BGE::TextureService>(self.renderContext->getContext()));
         
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"sample" ofType:@"png"];
-        
-#ifdef NOT_YET
-        if (path) {
-            typedef void (*func)(id, SEL, std::shared_ptr<BGE::Texture>, std::shared_ptr<BGE::Error>);
-            func impl = (func)[self methodForSelector:@selector(racer:error:)];
-            std::function<void(std::shared_ptr<BGE::Texture>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
-            BGE::Game::getInstance()->getTextureService()->createTextureFromFile("sample", [path UTF8String], fnc);
-        }
-        
-        path = [[NSBundle mainBundle] pathForResource:@"item_powerup_fish" ofType:@"png"];
-        
-        if (path) {
-            typedef void (*func)(id, SEL, std::shared_ptr<BGE::Texture>, std::shared_ptr<BGE::Error>);
-            func impl = (func)[self methodForSelector:@selector(racer:error:)];
-            std::function<void(std::shared_ptr<BGE::Texture>, std::shared_ptr<BGE::Error> error)> fnc = std::bind(impl, self, @selector(racer:error:), std::placeholders::_1, std::placeholders::_2);
-            BGE::Game::getInstance()->getTextureService()->createTextureFromFile("fish", [path UTF8String], nullptr);
-        }
-#endif
+        BGE::Game::getInstance()->outputResourceBreakdown();
+
+        NSString *path;
         
         path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
         
         if (path) {
-            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile(self.spaceHandle, [path UTF8String], "Common", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                 BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                 
                 if (package) {
                     package->link();
                 }
-
-                NSString *path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
                 
-                if (path) {
-                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile(self.spaceHandle, [path UTF8String], "CommonLobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                        BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-                        
-                        if (package) {
-                            package->link();
-                        }
-                        
-                        NSString *path = [[NSBundle mainBundle] pathForResource:@"CommonHUD-iPh6" ofType:@"json"];
-                        
-                        if (path) {
-                            BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile(self.spaceHandle, [path UTF8String], "CommonHUD", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-                                
-                                if (package) {
-                                    package->link();
-                                }
-                                
-                                NSString *path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
-                                
-                                if (path) {
-                                    BGE::Game::getInstance()->getScenePackageService()->packageFromJSONFile(self.spaceHandle, [path UTF8String], "Lobby", [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                                        BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-                                        
-                                        if (package) {
-                                            package->link();
-                                        }
-                                        auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
-                                        
-                                        auto gameObj = space->createSprite("SaleBkg");
-                                        auto transformComponent = gameObj->getComponent<BGE::TransformComponent>();
-                                        
-                                        BGE::Vector2 pos = { 700, 700 };
-                                        BGE::Vector2 scale = { 2, 1 };
-                                        transformComponent->setPosition(pos);
-                                        transformComponent->setScale(scale);
-                                        transformComponent->setRotation(M_PI/16);
-                                        
-                                        gameObj->setName("Object1");
-                                        
-                                        gameObj->setActive(true);
-                                        
-                                        gameObj = space->createText("CashText");
-                                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
-                                        
-                                        transformComponent->setX(200);
-                                        transformComponent->setY(1200);
-                                        gameObj->setName("Object2");
-                                        gameObj->setActive(true);
-                                        
-                                        gameObj = space->createAnimSequence("SaleGlowAnim");
-                                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
-                                        auto animator = gameObj->getComponent<BGE::AnimatorComponent>();
-                                        
-                                        transformComponent->setX(200);
-                                        transformComponent->setY(1000);
-                                        
-                                        gameObj->setName("Object3");
-                                        animator->reset();
-                                        
-                                        animator->play(BGE::AnimatorComponent::AnimPlayForever, true, 1 );
-                                        gameObj->setActive(true);
-                                        
-                                        // Spaces are not visible by default
-                                        space->setVisible(true);
-                                        
-                                        gameObj = space->createAnimSequence("BuyButtonObject");
-                                        transformComponent = gameObj->getComponent<BGE::TransformComponent>();
-                                        animator = gameObj->getComponent<BGE::AnimatorComponent>();
-                                        animator->reset();
-                                        
-                                        transformComponent->setX(600);
-                                        transformComponent->setY(1000);
-                                        transformComponent->setRotation(0);
-                                        
-                                        gameObj->setName("Object4");
-                                        gameObj->setActive(true);
-                                        
-                                        // Spaces are not visible by default
-                                        space->setVisible(true);
-                                        
-                                        // Now create auto display objects
-                                        BGE::SceneObjectCreatedDelegate delegate;
-
-                                        space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
-                                        
-                                        gameObj = space->createGameObject();
-                                        transformComponent = space->createComponent<BGE::TransformComponent>();
-                                        gameObj->addComponent(transformComponent);
-                                        auto line = space->createComponent<BGE::LineRenderComponent>();
-                                        BGE::Color color = { 1, 0, 1, 1 };
-                                        auto material = BGE::Game::getInstance()->getMaterialService()->createMaterial(color);
-                                        line->setMaterials({material});
-                                        gameObj->addComponent(line);
-                                        gameObj->setActive(true);
-                                        
-                                        self.buttonBounds = line;
-                                        
-                                        typedef void (*func)(id, SEL, BGE::SpaceHandle, BGE::GameObjectHandle, BGE::Event);
-                                        func impl = (func)[self methodForSelector:@selector(handleInput:gameObjectHandle:event:)];
-                                        std::function<void(BGE::SpaceHandle, BGE::GameObjectHandle, BGE::Event)> fnc = std::bind(impl, self, @selector(handleInput:gameObjectHandle:event:), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                                        BGE::Game::getInstance()->getInputService()->registerEventHandler("settings_button", BGE::Event::TouchUpInside, fnc);
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-                
+                BGE::Game::getInstance()->outputResourceBreakdown();
             });
-            
-#ifdef NOT_YET
-            auto tSpaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("TestSpace");
-            auto tSpace = BGE::Game::getInstance()->getSpaceService()->getSpace(tSpaceHandle);
-            
-            tSpace->setVisible(false);
-            
-            // Create test objects
-            std::vector<BGE::GameObject *> tObjs;
-            auto numGameObjs = 100;
-            for (auto i=0;i<numGameObjs;i++) {
-                auto gObj = tSpace->createGameObject();
-                auto xform = tSpace->createComponent<BGE::TransformComponent>();
-                auto sprite = tSpace->createComponent<BGE::SpriteRenderComponent>();
+        }
+        
+        path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
+        
+        if (path) {
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                 
-                gObj->addComponent<BGE::TransformComponent>(xform);
-                gObj->addComponent<BGE::SpriteRenderComponent>(sprite);
-                gObj->setActive(true);
-                tObjs.push_back(gObj);
-            }
-            
-            auto loops = 500;
-            
-            // Test access by getComponent
-            NSTimeInterval componentTime;
-            NSTimeInterval startTime, endTime;
-            
-            
-            // Test access by bitmask
-            startTime = [[NSDate date] timeIntervalSince1970];
-            
-            for (auto i=0;i<loops;i++) {
-                for (auto gObj : tObjs) {
-                    auto count = 0;
-                    
-#if 1
-                    if (gObj->getComponentBitmask() & BGE::Component::getBitmask<BGE::TransformComponent>()) {
-                        count++;
-                    }
-                    if (gObj->getComponentBitmask() & BGE::Component::getBitmask<BGE::SpriteRenderComponent>()) {
-                        count++;
-                    }
-                    assert(count == 2);
-#endif
+                if (package) {
+                    package->link();
                 }
-            }
-            
-            endTime = [[NSDate date] timeIntervalSince1970];
-            
-            NSTimeInterval bitmaskTime = endTime - startTime;
-            
-            NSLog(@"Time interval bitmask %f", endTime - startTime);
-
-            startTime = [[NSDate date] timeIntervalSince1970];
-            
-            uint32_t v1, v2, v3;
-            std::type_index t1 = typeid(BGE::TextureMaskComponent);
-            std::type_index t2 = typeid(BGE::InputTouchComponent);
-            std::type_index t3 = typeid(BGE::BoundingBoxComponent);
-            
-            loops = 10000;
-            
-            for (auto i=0;i<loops;i++) {
-                v1 = BGE::ComponentBitmask::bitmaskForTypeIndex(t1);
-                v2 = BGE::ComponentBitmask::bitmaskForTypeIndex(t2);
-                v3 = BGE::ComponentBitmask::bitmaskForTypeIndex(t3);
-            }
-
-            endTime = [[NSDate date] timeIntervalSince1970];
-
-            componentTime = endTime - startTime;
-            
-            NSLog(@"Time interval getComponent %f", endTime - startTime);
-            
-            NSLog(@"Diff between component and bitmask = %f (%f)", componentTime - bitmaskTime, componentTime/bitmaskTime);
-            // Test access by bitmask
-            startTime = [[NSDate date] timeIntervalSince1970];
-            
-            for (auto i=0;i<loops;i++) {
-                v1 = BGE::ComponentBitmask::getBitmask<BGE::TextureMaskComponent>();
-                v2 = BGE::ComponentBitmask::getBitmask<BGE::InputTouchComponent>();
-                v3 = BGE::ComponentBitmask::getBitmask<BGE::BoundingBoxComponent>();
-            }
-            
-            endTime = [[NSDate date] timeIntervalSince1970];
-            
-            NSLog(@"Time interval bitmaskForTypeIndex %f", endTime - startTime);
-            
-            startTime = [[NSDate date] timeIntervalSince1970];
-            
-            for (auto i=0;i<loops;i++) {
-            }
-            
-            endTime = [[NSDate date] timeIntervalSince1970];
-            
-            componentTime = endTime - startTime;
-            
-            NSLog(@"Time interval getComponent %f", endTime - startTime);
-            
-            NSLog(@"Diff between component and bitmask = %f (%f)", componentTime - bitmaskTime, componentTime/bitmaskTime);
-#endif
+                
+                BGE::Game::getInstance()->outputResourceBreakdown();
+            });
+        }
+        
+        path = [[NSBundle mainBundle] pathForResource:@"CommonHUD-iPh6" ofType:@"json"];
+        
+        if (path) {
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                
+                if (package) {
+                    package->link();
+                }
+                
+                BGE::Game::getInstance()->outputResourceBreakdown();
+            });
+        }
+        
+        path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
+        
+        if (path) {
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                
+                if (package) {
+                    package->link();
+                }
+                
+                auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+                
+                // Now create auto display objects
+                BGE::SceneObjectCreatedDelegate delegate;
+                
+                space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
+                
+                // Spaces are not visible by default
+                space->setVisible(true);
+                BGE::Game::getInstance()->outputResourceBreakdown();
+            });
         }
     }
     
@@ -397,6 +224,7 @@
 
 - (void) glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
+#ifdef NOT_YET
     auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
     
     auto gameObj = space->getGameObject("settings_button");
@@ -437,6 +265,8 @@
             }
         }
     }
+#endif
+    
     BGE::Game::getInstance()->getRenderService()->render();
 }
 

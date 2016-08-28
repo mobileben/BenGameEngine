@@ -20,18 +20,19 @@
 #include "Service.h"
 #include "Space.h"
 #include "ScenePackage.h"
-
-// TODO: Remove?
-#include "TransformComponent.h"
-#include "LineRenderComponent.h"
-#include "FlatRectRenderComponent.h"
-#include "SpriteRenderComponent.h"
-#include "TextComponent.h"
-#include "AnimationSequenceComponent.h"
-#include "ButtonComponent.h"
-#include "MaskComponent.h"
+#include "Queue.h"
+#include <thread>
 
 namespace BGE {
+    using ScenePackageLoadCompletionHandler = std::function<void(ScenePackageHandle, std::shared_ptr<Error>)>;
+    
+    struct ScenePackageLoadItem {
+        SpaceHandle spaceHandle;
+        std::string name;
+        std::string filename;
+        ScenePackageLoadCompletionHandler completionHandler;
+    };
+    
     class ScenePackageService : public Service {
     public:
         ScenePackageService();
@@ -48,7 +49,7 @@ namespace BGE {
         
         uint32_t numScenePackages() const;
         
-        void packageFromJSONFile(SpaceHandle spaceHandle, std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback);
+        void createPackage(SpaceHandle spaceHandle, std::string name, std::string filename, ScenePackageLoadCompletionHandler callback);
         
         ScenePackageHandle getScenePackageHandle(std::string name) const;
         
@@ -85,9 +86,15 @@ namespace BGE {
             std::vector<SpaceHandle>    references;
         };
         
+        std::thread                         loadThread_;
         ScenePackageHandleService           handleService_;
         std::vector<ScenePackageReference>  scenePackages_;
+        Queue<ScenePackageLoadItem>         queuedLoadItems_;
         
+        void loadThreadFunction();
+        void createPackage(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback);
+        void createPackageFromJSON(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback);
+        void createPackageFromSPKG(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback);
         void releasePackage(ScenePackage *package);
     };
 }

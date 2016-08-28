@@ -11,6 +11,11 @@
 #include "GameObjectService.h"
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
+#include "ButtonComponent.h"
+#include "MaskComponent.h"
+#include "SpriteRenderComponent.h"
+#include "TransformComponent.h"
+#include "TextComponent.h"
 
 BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true) {
 }

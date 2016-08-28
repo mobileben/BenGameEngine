@@ -21,8 +21,22 @@
 #include "MathTypes.h"
 
 namespace BGE {
+    enum class ScenePackageStatus {
+        Invalid,
+        Loading,
+        Valid
+    };
+    
+    enum class ScenePackageError : int32_t {
+        UnsupportedFormat = 0,
+        DoesNotExist,
+        Loading
+    };
+
     class ScenePackage : public NamedObject {
     public:
+        static const std::string ErrorDomain;
+        
         ScenePackage();
         ScenePackage(ObjectId sceneId);
         ~ScenePackage() {}
@@ -38,6 +52,7 @@ namespace BGE {
             return hasExternal_;
         }
         
+        inline bool isValid() const { return status_ == ScenePackageStatus::Valid; }
         inline ScenePackageHandle getHandle() const { return handle_; }
         
         AutoDisplayElementReference *getAutoDisplayList() const;
@@ -55,8 +70,8 @@ namespace BGE {
         GfxReferenceType getReferenceType(std::string name);
         
     protected:
-        void reset();
-        void load(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback);
+        void setStatus(ScenePackageStatus status) { status_ = status; }
+        void create(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback);
 
     private:
         friend class ScenePackageService;
@@ -66,7 +81,8 @@ namespace BGE {
             std::string     filename;
             TextureFormat   format;
         };
-
+        
+        ScenePackageStatus  status_;
         ScenePackageHandle  handle_;
         std::string         source_;
         float               frameRate_;

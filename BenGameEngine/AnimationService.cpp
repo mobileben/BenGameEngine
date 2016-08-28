@@ -14,6 +14,11 @@
 #include "AnimatorComponent.h"
 #include "ColorMatrixComponent.h"
 #include "ColorTransformComponent.h"
+#include "TransformComponent.h"
+#include "FlatRectRenderComponent.h"
+#include "SpriteRenderComponent.h"
+#include "TextComponent.h"
+#include "LineRenderComponent.h"
 
 void BGE::AnimationService::update(double deltaTime) {
     float dt = (float)deltaTime;

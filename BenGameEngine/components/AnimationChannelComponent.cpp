@@ -12,6 +12,9 @@
 #include "SpriteRenderComponent.h"
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
+#include "ButtonComponent.h"
+#include "TextComponent.h"
+#include "MaskComponent.h"
 
 uint32_t BGE::AnimationChannelComponent::bitmask_ = Component::InvalidBitmask;
 uint32_t BGE::AnimationChannelComponent::typeId_ = Component::InvalidTypeId;

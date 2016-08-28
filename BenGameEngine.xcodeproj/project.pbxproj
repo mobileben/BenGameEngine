@@ -183,6 +183,7 @@
 		B51A56891D56AC34005AA9AB /* CommonHUD-iPh6_atlas_0@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CommonHUD-iPh6_atlas_0@2x.png"; path = "testPackage/commonhud/CommonHUD-iPh6_atlas_0@2x.png"; sourceTree = "<group>"; };
 		B51A568B1D57F590005AA9AB /* CommonLobby-iPh6_atlas_0@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CommonLobby-iPh6_atlas_0@2x.png"; path = "testPackage/commlobby/CommonLobby-iPh6_atlas_0@2x.png"; sourceTree = "<group>"; };
 		B51A568D1D57F5F3005AA9AB /* Common-iPh6_atlas_0@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Common-iPh6_atlas_0@2x.png"; path = "testPackage/common/Common-iPh6_atlas_0@2x.png"; sourceTree = "<group>"; };
+		B51A56E21D72717E005AA9AB /* Queue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Queue.h; sourceTree = "<group>"; };
 		B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleGothic.ttf; sourceTree = "<group>"; };
 		B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBenGameEngine.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B525E36B1C8957A700C691C0 /* BenGameEngineTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BenGameEngineTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -498,6 +499,7 @@
 				B5C388E41D28635500137CEC /* NamedObject.h */,
 				B508CDAA1CB4DE8E00127B97 /* Object.h */,
 				B571F1741C928BA5007F5A90 /* opengles2 */,
+				B51A56E21D72717E005AA9AB /* Queue.h */,
 				B525E3911C89587000C691C0 /* RenderContext.cpp */,
 				B525E3921C89587000C691C0 /* RenderContext.h */,
 				B525E3951C89587000C691C0 /* RenderService.cpp */,

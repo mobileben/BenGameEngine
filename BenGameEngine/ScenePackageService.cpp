@@ -9,8 +9,11 @@
 #include "ScenePackageService.h"
 #include "Game.h"
 #import <Foundation/Foundation.h>
+#include <future>
+#include <functional>
 
 BGE::ScenePackageService::ScenePackageService() : handleService_(InitialScenePackageReserve, HandleServiceNoMaxLimit) {
+    loadThread_ = std::thread(&ScenePackageService::loadThreadFunction, this);
 }
 
 uint32_t BGE::ScenePackageService::numScenePackages() const {
@@ -27,90 +30,119 @@ uint32_t BGE::ScenePackageService::numScenePackages() const {
     return num;
 }
 
-void BGE::ScenePackageService::packageFromJSONFile(SpaceHandle spaceHandle, std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback) {
+void BGE::ScenePackageService::createPackage(SpaceHandle spaceHandle, std::string name, std::string filename, ScenePackageLoadCompletionHandler callback) {
+    ScenePackageLoadItem loadable{spaceHandle, name, filename, callback};
+    
+    queuedLoadItems_.push(loadable);
+}
+
+void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
     for (auto &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
-        if (package && package->getName() == name) {
+        if (package && package->getName() == loadable.name) {
             // Check if our spaceHandle is in the refernce list, if not add it
             bool found = false;
             
             for (auto const &ref : packageRef.references) {
-                if (ref == spaceHandle) {
+                if (ref == loadable.spaceHandle) {
                     found = true;
                     break;
                 }
             }
             
             if (!found) {
-                packageRef.references.push_back(spaceHandle);
+                packageRef.references.push_back(loadable.spaceHandle);
             }
             
             if (callback) {
                 callback(packageRef.handle, nullptr);
             }
-            
             return;
         }
     }
     
-    // Does not exist, to load
-    // For now we are doing this via iOS methods for faster dev
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSFileManager *defaultMgr = [NSFileManager defaultManager];
-        ScenePackageHandle handle;
-        ScenePackage *package = handleService_.allocate(handle);
+    auto found = loadable.filename.find_last_of('.');
+    
+    if (found != std::string::npos) {
+        auto ext = loadable.filename.substr(found + 1);
         
-        if (package) {
-            NSData *data = [defaultMgr contentsAtPath:[[NSString alloc] initWithCString:filename.c_str() encoding:NSUTF8StringEncoding]];
-            NSError *err = nil;
-            NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
-            
-            // The loading system relies on having the package initalized with handle
-            package->initialize(handle, name);
-            
-            package->load(jsonDict, [this, spaceHandle, handle, name, callback](ScenePackage * package) {
-                auto tHandle = handle;
-                
-                if (package) {
-#if DEBUG
-                    auto found = false;
-                    
-                    for (auto const &packageRef : scenePackages_) {
-                        if (packageRef.handle == tHandle) {
-                            found = true;
-                        }
-                    }
-                    
-                    assert(!found);
-#endif
-                    ScenePackageReference ref{ tHandle, { spaceHandle }};
-                    
-                    scenePackages_.push_back(ref);
-                    
-                    auto space = Game::getInstance()->getSpaceService()->getSpace(spaceHandle);
-                    
-                    if (space) {
-                        space->scenePackageAdded(tHandle);
-                    }
-                } else {
-                    // There is no package, so we need to release this
-                    handleService_.release(tHandle);
-                    
-                    // Reset handle
-                    tHandle.nullify();
-                }
-                
-                if (callback) {
-                    callback(tHandle, nullptr);
-                }
-            });
+        std::transform(ext.begin(), ext.end(), ext.begin(), std::tolower);
+        
+        if (ext == "json") {
+            createPackageFromJSON(loadable, callback);
+        } else if (ext == "spkg") {
+            createPackageFromSPKG(loadable, callback);
         } else {
+            assert(false);
+            
             if (callback) {
-                callback(handle, nullptr);
+                callback(ScenePackageHandle(), std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::UnsupportedFormat)));
             }
         }
-    });
+    } else {
+        assert(false);
+        
+        if (callback) {
+            callback(ScenePackageHandle(), std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::UnsupportedFormat)));
+        }
+    }
+}
+
+void BGE::ScenePackageService::createPackageFromJSON(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
+    // Does not exist, to load
+    // For now we are doing this via iOS methods for faster dev
+    NSFileManager *defaultMgr = [NSFileManager defaultManager];
+    ScenePackageHandle handle;
+    ScenePackage *package = handleService_.allocate(handle);
+    
+    if (package) {
+        package->initialize(handle, loadable.name);
+        package->setStatus(ScenePackageStatus::Loading);
+        
+        // Now create an entry for this
+        ScenePackageReference ref{ handle, { loadable.spaceHandle }};
+        scenePackages_.push_back(ref);
+        
+        NSData *data = [defaultMgr contentsAtPath:[[NSString alloc] initWithCString:loadable.filename.c_str() encoding:NSUTF8StringEncoding]];
+        NSError *err = nil;
+        NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
+        
+        // The loading system relies on having the package initalized with handle
+        package->create(jsonDict, [this, loadable, callback, handle](ScenePackage * package) {
+            auto tHandle = handle;
+            std::shared_ptr<Error> error = nullptr;
+            
+            if (package) {
+                package->setStatus(ScenePackageStatus::Valid);
+
+                auto space = Game::getInstance()->getSpaceService()->getSpace(loadable.spaceHandle);
+                
+                if (space) {
+                    space->scenePackageAdded(tHandle);
+                }
+            } else {
+                error = std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::Loading));
+
+                // There is no package, so we need to release this
+                removePackage(loadable.spaceHandle, tHandle);
+                
+                // Reset handle
+                tHandle.nullify();
+            }
+            
+            if (callback) {
+                callback(tHandle, error);
+            }
+        });
+    } else {
+        if (callback) {
+            callback(handle, nullptr);
+        }
+    }
+}
+
+void BGE::ScenePackageService::createPackageFromSPKG(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
 }
 
 BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::string name) const {
@@ -328,6 +360,31 @@ BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string nam
     }
 
     return GfxReferenceTypeUnknown;
+}
+
+void BGE::ScenePackageService::loadThreadFunction() {
+    std::mutex                      mutex;
+    std::condition_variable         cond;
+    std::unique_lock<std::mutex>    lck(mutex);
+    
+    while (true) {
+        printf("XXXX: loadThreadFunction Top 'o loop\n");
+        
+        auto loadable = queuedLoadItems_.pop();
+        
+        printf("XXXX: Processing item %s\n", loadable.name.c_str());
+        auto f = std::async(std::launch::async, static_cast<void(ScenePackageService::*)(ScenePackageLoadItem, ScenePackageLoadCompletionHandler)>(&ScenePackageService::createPackage), this, loadable, [&cond, loadable](ScenePackageHandle packageHandle, std::shared_ptr<Error> error) {
+            if (loadable.completionHandler) {
+                loadable.completionHandler(packageHandle, error);
+            }
+            cond.notify_all();
+        });
+        
+        cond.wait(lck);
+        
+        printf("BITCHY\n");
+    }
+    
 }
 
 

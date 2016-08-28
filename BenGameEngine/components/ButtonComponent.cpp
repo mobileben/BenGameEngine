@@ -8,6 +8,8 @@
 
 #include "ButtonComponent.h"
 #include "Game.h"
+#include "TransformComponent.h"
+#include "BoundingBoxComponent.h"
 
 static const char *ButtonStateDisabledString = "disabled";
 static const char *ButtonStateDisabledAnimString = "disabled-anim";

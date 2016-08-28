@@ -19,6 +19,8 @@
 #include "ColorMatrixComponent.h"
 #include "ColorTransformComponent.h"
 #include "TextureMaskComponent.h"
+#include "MaskComponent.h"
+#include "TransformComponent.h"
 
 const GLubyte Indices[] = {
     0, 1, 2,

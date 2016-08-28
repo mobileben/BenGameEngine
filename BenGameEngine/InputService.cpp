@@ -9,6 +9,9 @@
 #include "InputService.h"
 #include "Game.h"
 #include "InputTouchComponent.h"
+#include "ButtonComponent.h"
+#include "TransformComponent.h"
+#include "BoundingBoxComponent.h"
 
 BGE::InputService::InputService() :  handleService_(InitialInputReserve, HandleServiceNoMaxLimit) {
     inputs_.reserve(InitialInputReserve);
