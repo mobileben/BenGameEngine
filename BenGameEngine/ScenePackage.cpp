@@ -43,6 +43,9 @@ void BGE::ScenePackage::initialize(ScenePackageHandle handle, std::string name) 
     fontsLoaded_ = false;
     texturesLoaded_ = false;
     hasExternal_ = false;
+
+    textureCount_ = std::make_shared<std::atomic_int>(0);
+    fontCount_ = std::make_shared<std::atomic_int>(0);
 }
 
 void BGE::ScenePackage::destroy() {
@@ -159,6 +162,74 @@ void BGE::ScenePackage::destroy() {
     
     // Resetting of the handle must be done at the end
     handle_ = ScenePackageHandle();
+}
+
+void BGE::ScenePackage::outputResourceBreakdown(uint32_t numTabs) const {
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("ScenePackage (%s):\n", getName().c_str());
+
+    numTabs++;
+    
+    auto textureService = Game::getInstance()->getTextureService();
+    auto fontService = Game::getInstance()->getFontService();
+    
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+
+    printf("Num TextureAtlas: %ld\n", loadedTextureAtlases_.size());
+    
+    for (auto const &handle : loadedTextureAtlases_) {
+        auto atlas = textureService->getTextureAtlas(handle);
+        
+        if (atlas) {
+            for (auto i=0;i<numTabs + 1;i++) {
+                printf("\t");
+            }
+            
+            printf("%s\n", atlas->getName().c_str());
+        }
+    }
+    
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Num Texture: %ld\n", loadedTextures_.size());
+    
+    for (auto const &handle : loadedTextures_) {
+        auto texture = textureService->getTexture(handle);
+        
+        if (texture) {
+            for (auto i=0;i<numTabs + 1;i++) {
+                printf("\t");
+            }
+            
+            printf("%s\n", texture->getName().c_str());
+        }
+    }
+    
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Num Font: %ld\n", loadedFonts_.size());
+    
+    for (auto const &handle : loadedFonts_) {
+        auto font = fontService->getFont(handle);
+        
+        if (font) {
+            for (auto i=0;i<numTabs + 1;i++) {
+                printf("\t");
+            }
+            
+            printf("%s\n", font->getNameAsKey().c_str());
+            
+        }
+    }
 }
 
 BGE::AutoDisplayElementReference *BGE::ScenePackage::getAutoDisplayList() const {
@@ -624,7 +695,9 @@ void BGE::ScenePackage::load(NSDictionary *jsonDict, std::function<void(ScenePac
             NSString* filename = [[NSBundle mainBundle] pathForResource:texDict[@"filename"] ofType:nil];
             
             if (filename) {
-                textureQueue_.push_back(std::make_pair<std::string, std::string>(name, [filename UTF8String]));
+                TextureQueueItem item{name, [filename UTF8String], TextureFormat::RGBA8888};
+                
+                textureQueue_.push_back(item);
             }
         }
     }
@@ -1212,10 +1285,10 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
         
         for (auto const &tex : textureQueue_) {
             // Do we have subtextures affiliated with this?
-            auto it = subTextures_.find(tex.first);
+            auto it = subTextures_.find(tex.name);
             
             if (it != subTextures_.end()) {
-                Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.first, tex.second, it->second, [this, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
+                Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.name, tex.filename, it->second, tex.format, [this, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
                     if (atlas) {
@@ -1230,7 +1303,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
                     }
                 });
             } else {
-                Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), tex.first, tex.second, [this, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
+                Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), tex.name, tex.filename, tex.format, [this, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
                     if (texture) {

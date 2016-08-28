@@ -13,6 +13,20 @@
 BGE::ScenePackageService::ScenePackageService() : handleService_(InitialScenePackageReserve, HandleServiceNoMaxLimit) {
 }
 
+uint32_t BGE::ScenePackageService::numScenePackages() const {
+    uint32_t num = 0;
+    
+    for (auto const &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
+        
+        if (package) {
+            num++;
+        }
+    }
+    
+    return num;
+}
+
 void BGE::ScenePackageService::packageFromJSONFile(SpaceHandle spaceHandle, std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback) {
     for (auto &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
@@ -99,18 +113,6 @@ void BGE::ScenePackageService::packageFromJSONFile(SpaceHandle spaceHandle, std:
     });
 }
 
-BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(ObjectId scenePackageId) const {
-    for (auto const &packageRef : scenePackages_) {
-        auto package = getScenePackage(packageRef.handle);
-        
-        if (package && package->getInstanceId() == scenePackageId) {
-            return package->getHandle();
-        }
-    }
-    
-    return ScenePackageHandle();
-}
-
 BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
@@ -123,12 +125,6 @@ BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::str
     return ScenePackageHandle();
 }
 
-BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(ObjectId scenePackageId)const  {
-    auto handle = getScenePackageHandle(scenePackageId);
-    
-    return getScenePackage(handle);
-}
-
 BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(std::string name) const {
     auto handle = getScenePackageHandle(name);
     
@@ -139,52 +135,12 @@ BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(ScenePackageHandle 
     return handleService_.dereference(handle);
 }
 
-void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, ObjectId scenePackageId) {
-    for (auto it=scenePackages_.begin(); it!=scenePackages_.end(); ++it) {
-        auto package = getScenePackage(it->handle);
-        
-        if (package && package->getInstanceId() == scenePackageId) {
-            auto &refs = it->references;
-            
-            for (auto hIt=refs.begin(); hIt!=refs.end();++hIt) {
-                if (*hIt == spaceHandle) {
-                    refs.erase(hIt);
-                    break;
-                }
-            }
-            
-            // We have no more references, so delete the scene
-            if (refs.size() == 0) {
-                releasePackage(package);
-                scenePackages_.erase(it);
-            }
-            
-            break;
-        }
-    }
-}
-
 void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, std::string name) {
     for (auto it=scenePackages_.begin(); it!=scenePackages_.end(); ++it) {
         auto package = getScenePackage(it->handle);
         
         if (package && package->getName() == name) {
-            auto &refs = it->references;
-            
-            for (auto hIt=refs.begin(); hIt!=refs.end();++hIt) {
-                if (*hIt == spaceHandle) {
-                    refs.erase(hIt);
-                    break;
-                }
-            }
-            
-            // We have no more references, so delete the scene
-            if (refs.size() == 0) {
-                releasePackage(package);
-                scenePackages_.erase(it);
-            }
-            
-            break;
+            removePackage(spaceHandle, it->handle);
         }
     }
 }
@@ -197,6 +153,12 @@ void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, ScenePacka
             
             for (auto hIt=refs.begin(); hIt!=refs.end();++hIt) {
                 if (*hIt == spaceHandle) {
+                    auto space = Game::getInstance()->getSpaceService()->getSpace(spaceHandle);
+                    
+                    if (space) {
+                        space->scenePackageRemoved(package->getHandle());
+                    }
+                    
                     refs.erase(hIt);
                     break;
                 }

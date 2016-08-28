@@ -119,6 +119,20 @@ namespace BGE {
             
             return const_cast<DATA *>(&data_[index]);
         }
+
+        std::vector<DATA *> activePointers() const {
+            std::vector<DATA *> pointers;
+        
+            for (auto i=0;i<data_.size();i++) {
+                if (magic_[i] != 0) {
+                    DATA *ptr = const_cast<DATA *>(&data_[i]);
+                    
+                    pointers.push_back(ptr);
+                }
+            }
+            
+            return pointers;
+        }
         
         uint32_t numUsedHandles() const {
             return (uint32_t) (magic_.size() - freeSlots_.size());

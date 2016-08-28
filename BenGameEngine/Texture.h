@@ -47,8 +47,8 @@ namespace BGE {
         Premultiplied
     };
     
-    enum class TextureFormat {
-        Undefined,
+    enum class TextureFormat : uint32_t {
+        Undefined = 0,
         Alpha,
         RGB565,
         RGB888,
@@ -72,8 +72,8 @@ namespace BGE {
 #endif
         ~Texture() {}
         
-        void initialize(TextureHandle handle, std::string name);
-        void initialize(TextureHandle handle, std::string name, GLKTextureInfo *texInfo);
+        void initialize(TextureHandle handle, std::string name, TextureFormat format);
+        void initialize(TextureHandle handle, std::string name, TextureFormat format, GLKTextureInfo *texInfo);
         void destroy();
         
         inline TextureAlphaState getAlphaState() const { return alphaState_; }
@@ -165,6 +165,8 @@ namespace BGE {
         void createTextureFromRGBA5551Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
         void createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
         void createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
+        
+        size_t computeMemoryUsage(TextureFormat format, uint32_t width, uint32_t height);
     };
 }
 

@@ -45,6 +45,9 @@ namespace BGE {
             return 0;
         }
         
+        virtual void outputResourceBreakdown(uint32_t numTabs) const {};
+        virtual void outputMemoryBreakdown(uint32_t numTabs) const {};
+        
     protected:
         ObjectId getIdAndIncrement();
         

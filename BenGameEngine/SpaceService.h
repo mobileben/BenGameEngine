@@ -32,14 +32,16 @@ namespace BGE {
         void destroy() final {}
         void update(double deltaTime) final {}
 
+        uint32_t numSpaces() const;
+        
+        void outputResourceBreakdown(uint32_t numTabs) const final;
+
         SpaceHandle createSpace(std::string name);
         
         void removeSpace(SpaceHandle spaceHandle);
-        void removeSpace(ObjectId objId);
         void removeSpace(std::string name);
 
         Space *getSpace(SpaceHandle spaceHandle) const;
-        Space *getSpace(ObjectId objId) const;
         Space *getSpace(std::string name) const;
         
         std::vector<SpaceHandle> getSpaces() const;
@@ -51,8 +53,8 @@ namespace BGE {
         using SpacesMap = std::unordered_map<uint32_t, SpaceHandle>;
         using SpacesMapIterator = SpacesMap::iterator;
 
-        SpaceHandleService  handleService_;
-        SpacesMap           spaces_;
+        SpaceHandleService          handleService_;
+        std::vector<SpaceHandle>    spaces_;
         
         // TODO: Should just create sorted vector here each time space is removed or added, but also must think how to handle order change
     };

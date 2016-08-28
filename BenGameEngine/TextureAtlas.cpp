@@ -85,8 +85,8 @@ size_t BGE::TextureAtlas::getMemoryUsage() const {
     return 0;
 }
 
-void BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
-    Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), atlasTextureKey(), filename, [this, &subTextures, callback](Texture *texture, std::shared_ptr<Error> error) {
+void BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+    Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), atlasTextureKey(), filename, format, [this, &subTextures, callback](Texture *texture, std::shared_ptr<Error> error) {
         if (!error) {
             std::shared_ptr<Error> bgeError;
             TextureAtlas *atlas = this;

@@ -67,7 +67,7 @@ namespace BGE {
         
         size_t getMemoryUsage() const;
 
-        void createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
+        void createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         
     private:

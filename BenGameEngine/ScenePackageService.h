@@ -46,16 +46,15 @@ namespace BGE {
         void destroy() final {}
         void update(double deltaTime) final {}
         
+        uint32_t numScenePackages() const;
+        
         void packageFromJSONFile(SpaceHandle spaceHandle, std::string filename, std::string name, std::function<void(ScenePackageHandle, std::shared_ptr<Error>)> callback);
         
-        ScenePackageHandle getScenePackageHandle(ObjectId scenePackageId) const;
         ScenePackageHandle getScenePackageHandle(std::string name) const;
         
-        ScenePackage *getScenePackage(ObjectId scenePackageId) const;
         ScenePackage *getScenePackage(std::string name) const;
         ScenePackage *getScenePackage(ScenePackageHandle handle) const;
 
-        void removePackage(SpaceHandle spaceHandle, ObjectId scenePackageId);
         void removePackage(SpaceHandle spaceHandle, std::string name);
         void removePackage(SpaceHandle spaceHandle, ScenePackageHandle handle);
         

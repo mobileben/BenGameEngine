@@ -73,10 +73,128 @@ void BGE::Space::destroy() {
     // Destory all textures
     for (auto const &texture : textures_) {
         textureService->removeTexture(spaceHandle_, texture);
-        
     }
     
     textures_.clear();
+}
+
+void BGE::Space::outputResourceBreakdown(uint32_t numTabs) const {
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Space (%s):\n", getName().c_str());
+    
+    // Now breakdown resources
+    
+    // Game objects
+    uint32_t num = 0;
+    
+    for (auto const &objHandle : gameObjectService_->getGameObjects()) {
+        auto obj = getGameObject(objHandle);
+        
+        if (obj) {
+            num++;
+        }
+    }
+    
+    numTabs++;
+    
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Num GameObject: %d\n", num);
+    
+    num = 0;
+    
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Num Component: %d\n", componentService_->totalNumComponents());
+    
+    componentService_->outputResourceBreakdown(numTabs + 1);
+
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Num ScenePackage: %ld\n", scenePackages_.size());
+
+    auto scenePackageService = Game::getInstance()->getScenePackageService();
+    
+    for (auto const &handle : scenePackages_) {
+        auto scenePackage = scenePackageService->getScenePackage(handle);
+        
+        if (scenePackage) {
+            scenePackage->outputResourceBreakdown(numTabs + 1);
+        }
+    }
+    
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Num Material: %d\n", componentService_->numMaterials());
+    
+    auto textureService = Game::getInstance()->getTextureService();
+    auto fontService = Game::getInstance()->getFontService();
+    
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Num TextureAtlas: %ld\n", textureAtlases_.size());
+    
+    for (auto const &handle : textureAtlases_) {
+        auto atlas = textureService->getTextureAtlas(handle);
+        
+        if (atlas) {
+            for (auto i=0;i<numTabs + 1;i++) {
+                printf("\t");
+            }
+            
+            printf("%s\n", atlas->getName().c_str());
+        }
+    }
+
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Num Texture: %ld\n", textures_.size());
+
+    for (auto const &handle : textures_) {
+        auto texture = textureService->getTexture(handle);
+        
+        if (texture) {
+            for (auto i=0;i<numTabs + 1;i++) {
+                printf("\t");
+            }
+            
+            printf("%s\n", texture->getName().c_str());
+        }
+    }
+    
+    for (auto i=0;i<numTabs;i++) {
+        printf("\t");
+    }
+    
+    printf("Num Font: %ld\n", fonts_.size());
+
+    for (auto const &handle : fonts_) {
+        auto font = fontService->getFont(handle);
+        
+        if (font) {
+            for (auto i=0;i<numTabs + 1;i++) {
+                printf("\t");
+            }
+            
+            printf("%s\n", font->getNameAsKey().c_str());
+
+        }
+    }
 }
 
 BGE::GameObject *BGE::Space::createGameObject(std::string name ) {
@@ -598,6 +716,15 @@ void BGE::Space::scenePackageAdded(ScenePackageHandle handle) {
     
     if (!found) {
         scenePackages_.push_back(handle);
+    }
+}
+
+void BGE::Space::scenePackageRemoved(ScenePackageHandle handle) {
+    for (auto it=scenePackages_.begin();it!=scenePackages_.end();++it) {
+        if (*it == handle) {
+            scenePackages_.erase(it);
+            return;
+        }
     }
 }
 

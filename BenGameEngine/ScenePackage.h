@@ -30,6 +30,8 @@ namespace BGE {
         void initialize(ScenePackageHandle handle, std::string name);
         void destroy();
         
+        void outputResourceBreakdown(uint32_t numTabs) const;
+
         void link();
         
         bool hasExternalPackages() const {
@@ -59,6 +61,12 @@ namespace BGE {
     private:
         friend class ScenePackageService;
         
+        struct TextureQueueItem {
+            std::string     name;
+            std::string     filename;
+            TextureFormat   format;
+        };
+
         ScenePackageHandle  handle_;
         std::string         source_;
         float               frameRate_;
@@ -96,7 +104,7 @@ namespace BGE {
         std::unordered_map<std::string, std::vector<SubTextureDef>> subTextures_;
         
         std::shared_ptr<std::atomic_int>                    textureCount_;
-        std::vector<std::pair<std::string, std::string>>    textureQueue_;
+        std::vector<TextureQueueItem>                       textureQueue_;
         std::shared_ptr<std::atomic_int>                    fontCount_;
         std::vector<std::pair<std::string, uint32_t>>       fontQueue_;
         

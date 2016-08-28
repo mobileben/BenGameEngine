@@ -31,7 +31,7 @@ void BGE::RenderComponent::getGlobalBounds(Rect& bounds) {
     
 }
 
-BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) {
+BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) const {
     if (index < materialHandles_.size()) {
         return materialHandles_[index];
     } else {
@@ -39,13 +39,32 @@ BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) {
     }
 }
 
-BGE::Material *BGE::RenderComponent::getMaterial(uint32_t index) {
+BGE::Material *BGE::RenderComponent::getMaterial(uint32_t index) const {
     if (index < materialHandles_.size()) {
         auto handle = materialHandles_[index];
         return Game::getInstance()->getMaterialService()->getMaterial(handle);
     }
     
     return nullptr;
+}
+
+std::vector<BGE::MaterialHandle> BGE::RenderComponent::getMaterialHandles() const {
+    return materialHandles_;
+}
+
+std::vector<BGE::Material *> BGE::RenderComponent::getMaterials() const {
+    std::vector<Material *> materials;
+    auto materialService = Game::getInstance()->getMaterialService();
+    
+    for (auto const &handle : materialHandles_) {
+        auto material = materialService->getMaterial(handle);
+        
+        if (material) {
+            materials.push_back(material);
+        }
+    }
+    
+    return materials;
 }
 
 void BGE::RenderComponent::setMaterials(std::vector<MaterialHandle> materials) {

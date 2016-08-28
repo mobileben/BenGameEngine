@@ -50,26 +50,36 @@ namespace BGE {
         std::shared_ptr<EventService> getEventService() { return eventService_ ; }
         
         // Service functions
-        void initialize();
-        void reset();
-        void enteringBackground();
-        void enteringForeground();
-        void pause();
-        void resume();
-        void destroy();
-        void update(double deltaTime);
+        void initialize() override;
+        void reset() override;
+        void enteringBackground() override;
+        void enteringForeground() override;
+        void pause() override;
+        void resume() override;
+        void destroy() override;
+        void update(double deltaTime) override;
         
+        void outputResourceUsage() const;
+        void outputMemoryUsage() const;
+
+        void outputResourceBreakdown(uint32_t numTabs=0) const final;
+
     protected:
-        std::shared_ptr<RenderService> renderService_;
-        std::shared_ptr<TextureService> textureService_;
-        std::shared_ptr<FontService> fontService_;
-        std::shared_ptr<HeartbeatService> heartbeatService_;
-        std::shared_ptr<MaterialService> materialService_;
-        std::shared_ptr<ScenePackageService> scenePackageService_;
-        std::shared_ptr<AnimationService> animationService_;
-        std::shared_ptr<SpaceService> spaceService_;
-        std::shared_ptr<InputService> inputService_;
-        std::shared_ptr<EventService> eventService_;
+        std::shared_ptr<RenderService>          renderService_;
+        std::shared_ptr<TextureService>         textureService_;
+        std::shared_ptr<FontService>            fontService_;
+        std::shared_ptr<HeartbeatService>       heartbeatService_;
+        std::shared_ptr<MaterialService>        materialService_;
+        std::shared_ptr<ScenePackageService>    scenePackageService_;
+        std::shared_ptr<AnimationService>       animationService_;
+        std::shared_ptr<SpaceService>           spaceService_;
+        std::shared_ptr<InputService>           inputService_;
+        std::shared_ptr<EventService>           eventService_;
+        
+    private:
+        // Used to access resources metrics
+        std::shared_ptr<ComponentService>       componentService_;
+        std::shared_ptr<GameObjectService>      gameObjectService_;
     };
 }
 

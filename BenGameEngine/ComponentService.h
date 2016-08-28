@@ -49,13 +49,16 @@ namespace BGE {
             
             return num;
         }
-        
-        uint32_t totalNumComponent() const;
+
+        uint32_t totalNumComponents() const;
+        uint32_t numMaterials() const;
         
         size_t usedHandleMemory() const final;
         size_t unusedHandleMemory() const final;
         size_t totalHandleMemory() const final;
-        
+
+        void outputResourceBreakdown(uint32_t numTabs) const final;
+
         inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
         inline SpaceHandle getSpaceHandle(void) const { return spaceHandle_; }
         
@@ -139,7 +142,18 @@ namespace BGE {
             Component::registerBitmask<T>();
             componentHandleServices_.push_back(new HandleService<T, HANDLE>(reserve, maxLimit));
         }
-        
+
+        template <typename T> void outputComponentResourceBreakdown(uint32_t numTabs) const {
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            auto pointers = handleService->activePointers();
+            
+            for (auto i=0;i<numTabs;i++) {
+                printf("\t");
+            }
+            
+            printf("%s: %ld\n", typeid(T).name(), pointers.size());
+        }
+
         template <typename T> void releaseComponentHandle(ComponentHandle handle) {
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
             auto tHandle = Handle<T>(handle.handle);

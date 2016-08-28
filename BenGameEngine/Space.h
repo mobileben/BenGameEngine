@@ -34,6 +34,8 @@ namespace BGE {
         void initialize(SpaceHandle handle, std::string name);
         void destroy();
         
+        void outputResourceBreakdown(uint32_t numTabs) const;
+        
         inline SpaceHandle getHandle() const { return spaceHandle_; }
         
         GameObject *createGameObject(std::string name = "");
@@ -103,6 +105,7 @@ namespace BGE {
 
         // TODO: Add method for space to create/get scene package as well as removal
         void scenePackageAdded(ScenePackageHandle handle);
+        void scenePackageRemoved(ScenePackageHandle handle);
         
     protected:
         SpaceHandle spaceHandle_;

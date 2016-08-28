@@ -257,6 +257,7 @@ void BGE::FontService::removeFont(ScenePackageHandle scenePackageHandle, FontHan
     if (sceneIt != fontScenePackages_.end()) {
         for (auto scene=sceneIt->second.begin();scene != sceneIt->second.end();scene++) {
             if (*scene == scenePackageHandle) {
+                // Need to erase prior to checking if the font has anymore references
                 sceneIt->second.erase(scene);
                 
                 if (!fontHasReferences(handle)) {
@@ -276,6 +277,7 @@ void BGE::FontService::removeFont(SpaceHandle spaceHandle, FontHandle handle) {
     if (spaceIt != fontSpaces_.end()) {
         for (auto space=spaceIt->second.begin();space != spaceIt->second.end();space++) {
             if (*space == spaceHandle) {
+                // Need to erase prior to checking if the font has anymore references
                 spaceIt->second.erase(space);
                 
                 if (!fontHasReferences(handle)) {
@@ -311,14 +313,18 @@ void BGE::FontService::removeFont(FontHandle handle) {
 bool BGE::FontService::fontHasReferences(FontHandle fontHandle) {
     auto sceneIt = fontScenePackages_.find(fontHandle);
     
-    if (sceneIt->second.size() > 0) {
-        return true;
+    if (sceneIt != fontScenePackages_.end()) {
+        if (sceneIt->second.size() > 0) {
+            return true;
+        }
     }
 
     auto spaceIt = fontSpaces_.find(fontHandle);
-    
-    if (spaceIt->second.size() > 0) {
-        return true;
+
+    if (spaceIt != fontSpaces_.end()) {
+        if (spaceIt->second.size() > 0) {
+            return true;
+        }
     }
     
     return false;

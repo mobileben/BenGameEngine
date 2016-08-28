@@ -138,7 +138,7 @@ void BGE::ComponentService::removeAllComponents() {
     }
 }
 
-uint32_t BGE::ComponentService::totalNumComponent() const {
+uint32_t BGE::ComponentService::totalNumComponents() const {
     uint32_t total = 0;
     
     total += numComponents<TransformComponent>();
@@ -160,6 +160,70 @@ uint32_t BGE::ComponentService::totalNumComponent() const {
     total += numComponents<TextureMaskComponent>();
     
     return total;
+}
+
+uint32_t BGE::ComponentService::numMaterials() const {
+    uint32_t num = 0;
+    
+    for (auto i=0;i<componentHandleServices_.size();i++) {
+        if (i == SpriteRenderComponent::typeId_) {
+            auto const &handles = componentHandles_[i];
+            for (auto const &handle : handles) {
+                auto component = getComponent<SpriteRenderComponent>(handle.handle);
+                
+                if (component) {
+                    num += component->getMaterialHandles().size();
+                }
+            }
+        } else if (i == TextComponent::typeId_) {
+            auto const &handles = componentHandles_[i];
+            for (auto const &handle : handles) {
+                auto component = getComponent<TextComponent>(handle.handle);
+                
+                if (component) {
+                    num += component->getMaterialHandles().size();
+                }
+            }
+        } else if (i == LineRenderComponent::typeId_) {
+            auto const &handles = componentHandles_[i];
+            for (auto const &handle : handles) {
+                auto component = getComponent<LineRenderComponent>(handle.handle);
+                
+                if (component) {
+                    num += component->getMaterialHandles().size();
+                }
+            }
+        } else if (i == FlatRectRenderComponent::typeId_) {
+            auto const &handles = componentHandles_[i];
+            for (auto const &handle : handles) {
+                auto component = getComponent<FlatRectRenderComponent>(handle.handle);
+                
+                if (component) {
+                    num += component->getMaterialHandles().size();
+                }
+            }
+        } else if (i == MaskComponent::typeId_) {
+            auto const &handles = componentHandles_[i];
+            for (auto const &handle : handles) {
+                auto component = getComponent<MaskComponent>(handle.handle);
+                
+                if (component) {
+                    num += component->getMaterialHandles().size();
+                }
+            }
+        } else if (i == TextureMaskComponent::typeId_) {
+            auto const &handles = componentHandles_[i];
+            for (auto const &handle : handles) {
+                auto component = getComponent<TextureMaskComponent>(handle.handle);
+                
+                if (component) {
+                    num += component->getMaterialHandles().size();
+                }
+            }
+        }
+    }
+
+    return num;
 }
 
 size_t BGE::ComponentService::usedHandleMemory() const {
@@ -350,4 +414,47 @@ size_t BGE::ComponentService::totalHandleMemory() const {
     
     return mem;
 }
+
+void BGE::ComponentService::outputResourceBreakdown(uint32_t numTabs) const {
+    for (auto i=0;i<componentHandleServices_.size();i++) {
+        if (i == TransformComponent::typeId_) {
+            outputComponentResourceBreakdown<TransformComponent>(numTabs);
+        } else if (i == BoundingBoxComponent::typeId_) {
+            outputComponentResourceBreakdown<BoundingBoxComponent>(numTabs);
+        } else if (i == AnimationChannelComponent::typeId_) {
+            outputComponentResourceBreakdown<AnimationChannelComponent>(numTabs);
+        } else if (i == AnimationSequenceComponent::typeId_) {
+            outputComponentResourceBreakdown<AnimationSequenceComponent>(numTabs);
+        } else if (i == AnimatorComponent::typeId_) {
+            outputComponentResourceBreakdown<AnimatorComponent>(numTabs);
+        } else if (i == ChannelFrameAnimatorComponent::typeId_) {
+            outputComponentResourceBreakdown<ChannelFrameAnimatorComponent>(numTabs);
+        } else if (i == ColorMatrixComponent::typeId_) {
+            outputComponentResourceBreakdown<ColorMatrixComponent>(numTabs);
+        } else if (i == ColorTransformComponent::typeId_) {
+            outputComponentResourceBreakdown<ColorTransformComponent>(numTabs);
+        } else if (i == FrameAnimatorComponent::typeId_) {
+            outputComponentResourceBreakdown<FrameAnimatorComponent>(numTabs);
+        } else if (i == SpriteRenderComponent::typeId_) {
+            outputComponentResourceBreakdown<SpriteRenderComponent>(numTabs);
+        } else if (i == TextComponent::typeId_) {
+            outputComponentResourceBreakdown<TextComponent>(numTabs);
+        } else if (i == ButtonComponent::typeId_) {
+            outputComponentResourceBreakdown<ButtonComponent>(numTabs);
+        } else if (i == InputTouchComponent::typeId_) {
+            outputComponentResourceBreakdown<InputTouchComponent>(numTabs);
+        } else if (i == LineRenderComponent::typeId_) {
+            outputComponentResourceBreakdown<LineRenderComponent>(numTabs);
+        } else if (i == FlatRectRenderComponent::typeId_) {
+            outputComponentResourceBreakdown<FlatRectRenderComponent>(numTabs);
+        } else if (i == MaskComponent::typeId_) {
+            outputComponentResourceBreakdown<MaskComponent>(numTabs);
+        } else if (i == TextureMaskComponent::typeId_) {
+            outputComponentResourceBreakdown<TextureMaskComponent>(numTabs);
+        } else {
+            assert(false);
+        }
+    }
+}
+
 

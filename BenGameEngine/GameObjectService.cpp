@@ -16,15 +16,9 @@ BGE::GameObjectService::GameObjectService() : Service() {
 }
 
 uint32_t BGE::GameObjectService::numGameObjects () const {
-    uint32_t num = 0;
+    auto pointers = handleService_.activePointers();
     
-    for (auto &handle : gameObjects_) {
-        if (handleService_.dereference(handle)) {
-            num++;
-        }
-    }
-    
-    return num;
+    return (uint32_t) pointers.size();
 }
 
 size_t BGE::GameObjectService::usedHandleMemory() const {

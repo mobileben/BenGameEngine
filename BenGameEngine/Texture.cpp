@@ -44,12 +44,12 @@ BGE::Texture::Texture(uint32_t texId, std::string name, GLKTextureInfo *textureI
 }
 #endif
 
-void BGE::Texture::initialize(TextureHandle handle, std::string name) {
+void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFormat format) {
     handle_ = handle;
     setName(name);
 
     valid_ = false;
-    format_ = TextureFormat::Undefined;
+    format_ = format;
     alphaState_ = TextureAlphaState::None;
     x_ = 0;
     y_ = 0;
@@ -60,15 +60,14 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name) {
 
     atlasHandle_ = TextureAtlasHandle();
     isSubTexture_ = false;
+
+    memoryUsage_ = computeMemoryUsage(format_, width_, height_);
 }
 
-void BGE::Texture::initialize(TextureHandle handle, std::string name, GLKTextureInfo *texInfo) {
-    initialize(handle, name);
+void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFormat format, GLKTextureInfo *texInfo) {
+    initialize(handle, name, format);
     
     if (texInfo) {
-        // TODO: Can we ascertain the right format?
-        format_ = TextureFormat::RGBA8888;
-
         valid_ = true;
         hwId_ = texInfo.name;
         target_ = texInfo.target;
@@ -77,6 +76,8 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, GLKTexture
         
         updateUVs();
         updateXYs();
+        
+        memoryUsage_ = computeMemoryUsage(format_, width_, height_);
     }
 }
 
@@ -268,6 +269,9 @@ void BGE::Texture::createFromBuffer(void *buffer, TextureFormat format, uint32_t
                 
                 this->updateUVs();
                 this->updateXYs();
+                
+                // Compute texture memory usage
+                memoryUsage_ = computeMemoryUsage(format, width, height);
             }
         }
         
@@ -297,6 +301,7 @@ void BGE::Texture::createFromBuffer(void *buffer, TextureFormat format, uint32_t
             break;
             
         default:
+            assert(false);  // Unsupported
             break;
     }
 }
@@ -328,6 +333,9 @@ std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, 
             
             updateUVs(rotated);
             updateXYs();
+            
+            // Memory usage is considered 0 since the underlying texture of the atlas tracks memory usage
+            memoryUsage_ = 0;
             
             NSLog(@"Created Subtexture %s", getName().c_str());
         }
@@ -411,5 +419,28 @@ void BGE::Texture::createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32
     if (callback) {
         callback(error);
     }
+}
+
+size_t BGE::Texture::computeMemoryUsage(TextureFormat format, uint32_t width, uint32_t height) {
+    switch (format) {
+        case TextureFormat::Alpha:
+            return width * height;
+            
+        case TextureFormat::RGB565:
+        case TextureFormat::RGBA5551:
+        case TextureFormat::RGBA4444:
+            return width * height * 2;
+            
+        case TextureFormat::RGB888:
+            return width * height * 3;
+            
+        case TextureFormat::RGBA8888:
+            return width * height * 4;
+            
+        default:
+            assert(false);
+    }
+    
+    return 0;
 }
 

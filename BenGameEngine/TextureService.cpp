@@ -14,7 +14,7 @@ BGE::TextureService::TextureService(EAGLContext *context) : Service(), textureHa
 }
 
 uint32_t BGE::TextureService::numTextures() const {
-    uint32_t num = 0;
+    std::vector<TextureHandle> textures;
     auto packageService = Game::getInstance()->getScenePackageService();
     auto spaceService = Game::getInstance()->getSpaceService();
     
@@ -26,7 +26,9 @@ uint32_t BGE::TextureService::numTextures() const {
                 auto tex = getTexture(texIt.second);
                 
                 if (tex) {
-                    num++;
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
                 }
             }
         }
@@ -40,7 +42,9 @@ uint32_t BGE::TextureService::numTextures() const {
                 auto tex = getTexture(texIt.second);
                 
                 if (tex) {
-                    num++;
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
                 }
             }
         }
@@ -54,17 +58,19 @@ uint32_t BGE::TextureService::numTextures() const {
                 auto tex = getTexture(texIt.second);
                 
                 if (tex) {
-                    num++;
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
                 }
             }
         }
     }
     
-    return num;
+    return (uint32_t) textures.size();
 }
 
 uint32_t BGE::TextureService::numSubTextures() const {
-    uint32_t num = 0;
+    std::vector<TextureHandle> textures;
     auto packageService = Game::getInstance()->getScenePackageService();
     auto spaceService = Game::getInstance()->getSpaceService();
     
@@ -76,7 +82,9 @@ uint32_t BGE::TextureService::numSubTextures() const {
                 auto tex = getTexture(texIt.second);
                 
                 if (tex && tex->isSubTexture()) {
-                    num++;
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
                 }
             }
         }
@@ -90,7 +98,9 @@ uint32_t BGE::TextureService::numSubTextures() const {
                 auto tex = getTexture(texIt.second);
                 
                 if (tex && tex->isSubTexture()) {
-                    num++;
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
                 }
             }
         }
@@ -104,17 +114,19 @@ uint32_t BGE::TextureService::numSubTextures() const {
                 auto tex = getTexture(texIt.second);
                 
                 if (tex && tex->isSubTexture()) {
-                    num++;
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
                 }
             }
         }
     }
-
-    return num;
+    
+    return (uint32_t) textures.size();
 }
 
 uint32_t BGE::TextureService::numTextureAtlases() const {
-    uint32_t num = 0;
+    std::vector<TextureAtlasHandle> atlases;
     auto packageService = Game::getInstance()->getScenePackageService();
     auto spaceService = Game::getInstance()->getSpaceService();
     auto fontService = Game::getInstance()->getFontService();
@@ -127,7 +139,9 @@ uint32_t BGE::TextureService::numTextureAtlases() const {
                 auto atlas = getTextureAtlas(atlasIt.second);
                 
                 if (atlas) {
-                    num++;
+                    if (std::find(atlases.begin(), atlases.end(), atlasIt.second) == atlases.end()) {
+                        atlases.push_back(atlasIt.second);
+                    }
                 }
             }
         }
@@ -141,7 +155,9 @@ uint32_t BGE::TextureService::numTextureAtlases() const {
                 auto atlas = getTextureAtlas(atlasIt.second);
                 
                 if (atlas) {
-                    num++;
+                    if (std::find(atlases.begin(), atlases.end(), atlasIt.second) == atlases.end()) {
+                        atlases.push_back(atlasIt.second);
+                    }
                 }
             }
         }
@@ -155,13 +171,15 @@ uint32_t BGE::TextureService::numTextureAtlases() const {
                 auto atlas = getTextureAtlas(atlasIt.second);
                 
                 if (atlas) {
-                    num++;
+                    if (std::find(atlases.begin(), atlases.end(), atlasIt.second) == atlases.end()) {
+                        atlases.push_back(atlasIt.second);
+                    }
                 }
             }
         }
     }
     
-    return num;
+    return (uint32_t) atlases.size();
 }
 
 size_t BGE::TextureService::usedHandleMemory() const {
@@ -177,7 +195,8 @@ size_t BGE::TextureService::totalHandleMemory() const {
 }
 
 size_t BGE::TextureService::totalTextureMemory() const {
-    size_t num = 0;
+    std::vector<TextureHandle> textures;
+    size_t usage = 0;
     auto packageService = Game::getInstance()->getScenePackageService();
     auto spaceService = Game::getInstance()->getSpaceService();
     
@@ -189,7 +208,9 @@ size_t BGE::TextureService::totalTextureMemory() const {
                 auto tex = getTexture(texIt.second);
                 
                 if (tex) {
-                    num += tex->getMemoryUsage();
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
                 }
             }
         }
@@ -203,7 +224,9 @@ size_t BGE::TextureService::totalTextureMemory() const {
                 auto tex = getTexture(texIt.second);
                 
                 if (tex) {
-                    num += tex->getMemoryUsage();
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
                 }
             }
         }
@@ -217,57 +240,21 @@ size_t BGE::TextureService::totalTextureMemory() const {
                 auto tex = getTexture(texIt.second);
                 
                 if (tex) {
-                    num += tex->getMemoryUsage();
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
                 }
             }
         }
     }
     
-    auto fontService = Game::getInstance()->getFontService();
-    
-    for (auto const &packageIt : packageTextureAtlases_) {
-        auto package = packageService->getScenePackage(packageIt.first);
+    for (auto handle : textures) {
+        auto tex = getTexture(handle);
         
-        if (package) {
-            for (auto &atlasIt : packageIt.second) {
-                auto atlas = getTextureAtlas(atlasIt.second);
-                
-                if (atlas) {
-                    num += atlas->getMemoryUsage();
-                }
-            }
-        }
+        usage += tex->getMemoryUsage();
     }
     
-    for (auto const &spaceIt : spaceTextureAtlases_) {
-        auto space = spaceService->getSpace(spaceIt.first);
-        
-        if (space) {
-            for (auto &atlasIt : spaceIt.second) {
-                auto atlas = getTextureAtlas(atlasIt.second);
-                
-                if (atlas) {
-                    num += atlas->getMemoryUsage();
-                }
-            }
-        }
-    }
-    
-    for (auto const &fontIt : fontTextureAtlases_) {
-        auto font = fontService->getFont(fontIt.first);
-        
-        if (font) {
-            for (auto &atlasIt : fontIt.second) {
-                auto atlas = getTextureAtlas(atlasIt.second);
-                
-                if (atlas) {
-                    num += atlas->getMemoryUsage();
-                }
-            }
-        }
-    }
-    
-    return num;
+    return usage;
 }
 
 BGE::TextureHandle BGE::TextureService::getTextureHandle(ScenePackageHandle scenePackageHandle, std::string name) const {
@@ -486,12 +473,12 @@ void BGE::TextureService::removeTextureAtlas(FontHandle fontHandle, TextureAtlas
     }
 }
 
-void BGE::TextureService::createTextureFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+void BGE::TextureService::createTextureFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
     auto &scenePackage = packageTextures_[scenePackageHandle];
     auto tex = scenePackage.find(name);
     
     if (tex == scenePackage.end()) {
-        createTextureFromFile(name, filename,  [this, name, scenePackageHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
+        createTextureFromFile(name, filename, format, [this, name, scenePackageHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
             if (texture) {
                 auto &scenePackage = packageTextures_[scenePackageHandle];
                 scenePackage[name] = texture->getHandle();
@@ -526,12 +513,12 @@ void BGE::TextureService::createTextureFromBuffer(ScenePackageHandle scenePackag
     }
 }
 
-void BGE::TextureService::createTextureFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+void BGE::TextureService::createTextureFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
     auto &space = spaceTextures_[spaceHandle];
     auto tex = space.find(name);
     
     if (tex == space.end()) {
-        createTextureFromFile(name, filename,  [this, name, spaceHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
+        createTextureFromFile(name, filename, format, [this, name, spaceHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
             if (texture) {
                 auto &space = spaceTextures_[spaceHandle];
                 space[name] = texture->getHandle();
@@ -566,12 +553,12 @@ void BGE::TextureService::createTextureFromBuffer(SpaceHandle spaceHandle, std::
     }
 }
 
-void BGE::TextureService::createTextureFromFile(TextureAtlasHandle atlasHandle, std::string name, std::string filename, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+void BGE::TextureService::createTextureFromFile(TextureAtlasHandle atlasHandle, std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
     auto &atlas = atlasTextures_[atlasHandle];
     auto tex = atlas.find(name);
     
     if (tex == atlas.end()) {
-        createTextureFromFile(name, filename,  [this, name, atlasHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
+        createTextureFromFile(name, filename, format, [this, name, atlasHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
             if (texture) {
                 auto &atlas = atlasTextures_[atlasHandle];
                 atlas[name] = texture->getHandle();
@@ -605,7 +592,7 @@ void BGE::TextureService::createTextureFromBuffer(TextureAtlasHandle atlasHandle
         callback(textureHandleService_.dereference(tex->second), nullptr);
     }}
 
-void BGE::TextureService::createTextureFromFile(std::string name, std::string filename, std::function<void(Texture *, std::shared_ptr<Error>)> callback)
+void BGE::TextureService::createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback)
 {
     [textureLoader_ textureWithContentsOfFile:[[NSString alloc] initWithCString:filename.c_str() encoding:NSUTF8StringEncoding] options:@{ GLKTextureLoaderApplyPremultiplication: @(YES) } queue:nil completionHandler:^(GLKTextureInfo *textureInfo, NSError *error) {
         std::shared_ptr<Error> bgeError;
@@ -617,7 +604,7 @@ void BGE::TextureService::createTextureFromFile(std::string name, std::string fi
             texture = textureHandleService_.allocate(textureHandle);
             
             if (texture) {
-                texture->initialize(textureHandle, name, textureInfo);
+                texture->initialize(textureHandle, name, format, textureInfo);
             } else {
                 std::string domain = [error.domain UTF8String];
                 int32_t code = (uint32_t) error.code;
@@ -652,7 +639,7 @@ void BGE::TextureService::createTextureFromBuffer(std::string name, void *buffer
     texture = textureHandleService_.allocate(textureHandle);
 
     if (texture) {
-        texture->initialize(textureHandle, name);
+        texture->initialize(textureHandle, name, format);
 
         texture->createFromBuffer(buffer, format, width, height, [this, textureHandle, callback](Texture *newTexture, std::shared_ptr<Error> error) -> void {
             if (!newTexture) {
@@ -673,12 +660,12 @@ void BGE::TextureService::createTextureFromBuffer(std::string name, void *buffer
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+void BGE::TextureService::createTextureAtlasFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
     auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
     auto tex = scenePackage.find(name);
     
     if (tex == scenePackage.end()) {
-        createTextureAtlasFromFile(name, filename, subTextureDefs, [this, name, scenePackageHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
+        createTextureAtlasFromFile(name, filename, subTextureDefs, format, [this, name, scenePackageHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
             if (atlas) {
                 auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
                 scenePackage[name] = atlas->getHandle();
@@ -713,12 +700,12 @@ void BGE::TextureService::createTextureAtlasFromBuffer(ScenePackageHandle sceneP
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+void BGE::TextureService::createTextureAtlasFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
     auto &space = spaceTextureAtlases_[spaceHandle];
     auto tex = space.find(name);
     
     if (tex == space.end()) {
-        createTextureAtlasFromFile(name, filename, subTextureDefs, [this, name, spaceHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
+        createTextureAtlasFromFile(name, filename, subTextureDefs, format, [this, name, spaceHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
             if (atlas) {
                 auto &space = spaceTextureAtlases_[spaceHandle];
                 space[name] = atlas->getHandle();
@@ -753,12 +740,12 @@ void BGE::TextureService::createTextureAtlasFromBuffer(SpaceHandle spaceHandle, 
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromFile(FontHandle fontHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+void BGE::TextureService::createTextureAtlasFromFile(FontHandle fontHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
     auto &font = fontTextureAtlases_[fontHandle];
     auto tex = font.find(name);
     
     if (tex == font.end()) {
-        createTextureAtlasFromFile(name, filename, subTextureDefs, [this, name, fontHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
+        createTextureAtlasFromFile(name, filename, subTextureDefs, format, [this, name, fontHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
             if (atlas) {
                 auto &font = fontTextureAtlases_[fontHandle];
                 font[name] = atlas->getHandle();
@@ -793,7 +780,7 @@ void BGE::TextureService::createTextureAtlasFromBuffer(FontHandle fontHandle, st
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+void BGE::TextureService::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
     std::shared_ptr<Error> bgeError;
     TextureAtlasHandle atlasHandle;
     TextureAtlas *atlas;
@@ -803,7 +790,7 @@ void BGE::TextureService::createTextureAtlasFromFile(std::string name, std::stri
     if (atlas) {
         atlas->initialize(atlasHandle, name);
         
-        atlas->createFromFile(filename, subTextureDefs, [this, atlasHandle, callback](TextureAtlas * atlas, std::shared_ptr<Error> error) -> void {
+        atlas->createFromFile(filename, subTextureDefs, format, [this, atlasHandle, callback](TextureAtlas * atlas, std::shared_ptr<Error> error) -> void {
             if (!atlas) {
                 // We had a problem, release the handle
                 textureAtlasHandleService_.release(atlasHandle);
@@ -877,7 +864,7 @@ BGE::Texture *BGE::TextureService::createSubTexture(std::string name, TextureAtl
     texture = textureHandleService_.allocate(textureHandle);
     
     if (texture) {
-        texture->initialize(textureHandle, name);
+        texture->initialize(textureHandle, name, atlas->getFormat());
 
         auto error = texture->createSubTexture(atlas, x, y, width, height, rotated);
         

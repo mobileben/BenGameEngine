@@ -50,8 +50,11 @@ namespace BGE {
         void setEnabled(bool enabled) { enabled_ = enabled; }
         RenderComponentAnchor getAnchor() const { return anchor_; }
         
-        MaterialHandle getMaterialHandle(uint32_t index=0);
-        Material *getMaterial(uint32_t index=0);
+        MaterialHandle getMaterialHandle(uint32_t index=0) const;
+        Material *getMaterial(uint32_t index=0) const;
+        std::vector<MaterialHandle> getMaterialHandles() const;
+        std::vector<Material *> getMaterials() const;
+        
         void setMaterials(std::vector<MaterialHandle> materials);
         
     protected:
