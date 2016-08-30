@@ -764,7 +764,9 @@ void BGE::RenderServiceOpenGLES2::render()
                 for (auto const &objHandle : space->getGameObjects()) {
                     auto obj = space->getGameObject(objHandle);
                     
-                    renderGameObject(obj, true);
+                    if (obj) {
+                        renderGameObject(obj, true);
+                    }
                 }
             }
         }

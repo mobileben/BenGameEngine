@@ -30,6 +30,10 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name) {
     spaceHandle_ = handle;
     setName(name);
 
+    visible_ = false;
+    order_ = 0;
+    updatable_ = true;
+    
     gameObjectService_ = std::make_shared<GameObjectService>();
     gameObjectService_->setSpaceHandle(spaceHandle_);
     
@@ -40,7 +44,7 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name) {
 void BGE::Space::destroy() {
     visible_ = false;
     order_ = 0;
-    updatable_ = true;
+    updatable_ = false;
     
     // Destroy all scenePackages
     auto packageService = Game::getInstance()->getScenePackageService();

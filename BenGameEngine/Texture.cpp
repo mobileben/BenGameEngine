@@ -83,21 +83,24 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFor
 
 void BGE::Texture::destroy() {
     valid_ = false;
-    textureInfo_ = nil;
     
     if (!isSubTexture_) {
         // Only non-subtextures can be freed, since the atlas is freed separately
         GLuint name;
-        
+
         if (textureInfo_) {
             name = textureInfo_.name;
         } else {
             name = hwId_;
         }
         
-        glDeleteTextures(1, &name);
+        // Always delete textures on main thread (for now)
+        dispatch_async(dispatch_get_main_queue(), ^{
+            glDeleteTextures(1, &name);
+        });
     }
     
+    textureInfo_ = nil;
     handle_ = TextureHandle();
     atlasHandle_ = TextureAtlasHandle();
 }

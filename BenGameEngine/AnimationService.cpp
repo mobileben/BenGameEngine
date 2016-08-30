@@ -30,11 +30,14 @@ void BGE::AnimationService::update(double deltaTime) {
         if (space) {
             for (auto const &handle : space->getGameObjects()) {
                 auto obj = space->getGameObject(handle);
-                auto animSeq = obj->getComponent<AnimationSequenceComponent>();
-                auto animator = obj->getComponent<AnimatorComponent>();
                 
-                if (animSeq && animator) {
-                    animateSequence(space, animSeq, animator, dt);
+                if (obj) {
+                    auto animSeq = obj->getComponent<AnimationSequenceComponent>();
+                    auto animator = obj->getComponent<AnimatorComponent>();
+                    
+                    if (animSeq && animator) {
+                        animateSequence(space, animSeq, animator, dt);
+                    }
                 }
             }
         }

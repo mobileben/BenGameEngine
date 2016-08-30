@@ -368,11 +368,8 @@ void BGE::ScenePackageService::loadThreadFunction() {
     std::unique_lock<std::mutex>    lck(mutex);
     
     while (true) {
-        printf("XXXX: loadThreadFunction Top 'o loop\n");
-        
         auto loadable = queuedLoadItems_.pop();
         
-        printf("XXXX: Processing item %s\n", loadable.name.c_str());
         auto f = std::async(std::launch::async, static_cast<void(ScenePackageService::*)(ScenePackageLoadItem, ScenePackageLoadCompletionHandler)>(&ScenePackageService::createPackage), this, loadable, [&cond, loadable](ScenePackageHandle packageHandle, std::shared_ptr<Error> error) {
             if (loadable.completionHandler) {
                 loadable.completionHandler(packageHandle, error);
@@ -381,10 +378,7 @@ void BGE::ScenePackageService::loadThreadFunction() {
         });
         
         cond.wait(lck);
-        
-        printf("BITCHY\n");
     }
-    
 }
 
 

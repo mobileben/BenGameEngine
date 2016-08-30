@@ -28,11 +28,16 @@
 
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderContextOpenGLES2> renderContext;
 @property (nonatomic, assign) std::shared_ptr<BGE::RenderWindow> renderWindow;
-@property (nonatomic, assign) BGE::LineRenderComponent *buttonBounds;
 @property (nonatomic, weak) BGEView *glView;
 @property (nonatomic, assign) BOOL once;
 @property (nonatomic, assign) BGE::SpaceHandle spaceHandle;
+@property (nonatomic, strong) dispatch_queue_t queue;
+@property (nonatomic, strong) dispatch_source_t timer;
+@property (nonatomic, assign) uint32_t stage;
+
 @end
+
+std::vector<BGE::ScenePackageHandle> packageHandles;
 
 @implementation ViewController
 
@@ -53,7 +58,10 @@
     
     BGE::Game::getInstance()->getRenderService()->bindRenderWindow(self.renderContext, self.renderWindow);
     
-    self.spaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
+    self.queue = dispatch_queue_create("com.test", NULL);;
+    self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
+    
+    dispatch_source_set_timer(self.timer,  DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC, 1 * NSEC_PER_SEC);
     
     NSLog(@"DIDLOAD view is %f %f %f %f", self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
     
@@ -77,136 +85,285 @@
         
         BGE::Game::getInstance()->outputResourceBreakdown();
 
-        NSString *path;
-        
-        path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
-        
-        if (path) {
-            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-                
-                if (package) {
-                    package->link();
-                }
-                
-                BGE::Game::getInstance()->outputResourceBreakdown();
-            });
-        }
-        
-        path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
-        
-        if (path) {
-            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-                
-                if (package) {
-                    package->link();
-                }
-                
-                BGE::Game::getInstance()->outputResourceBreakdown();
-            });
-        }
-        
-        path = [[NSBundle mainBundle] pathForResource:@"CommonHUD-iPh6" ofType:@"json"];
-        
-        if (path) {
-            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-                
-                if (package) {
-                    package->link();
-                }
-                
-                BGE::Game::getInstance()->outputResourceBreakdown();
-            });
-        }
-        
-        path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
-        
-        if (path) {
-            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-                
-                if (package) {
-                    package->link();
-                }
-                
-                auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
-                
-                // Now create auto display objects
-                BGE::SceneObjectCreatedDelegate delegate;
-                
-                space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
-                
-                // Spaces are not visible by default
-                space->setVisible(true);
-                BGE::Game::getInstance()->outputResourceBreakdown();
-            });
-        }
+        self.spaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
+
+        [self packageTest3];
     }
     
     [self.glView display];
 }
 
-- (void)handleInput:(BGE::SpaceHandle)spaceHandle gameObjectHandle:(BGE::GameObjectHandle)gameObjectHandle event:(BGE::Event)event {
+- (void)defaultPackageTest
+{
+    NSString *path;
     
+    path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
+    
+    if (path) {
+        BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+            
+            if (package) {
+                package->link();
+            }
+            
+            BGE::Game::getInstance()->outputResourceBreakdown();
+        });
+    }
+    
+    path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
+    
+    if (path) {
+        BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+            
+            if (package) {
+                package->link();
+            }
+            
+            BGE::Game::getInstance()->outputResourceBreakdown();
+        });
+    }
+    
+    path = [[NSBundle mainBundle] pathForResource:@"CommonHUD-iPh6" ofType:@"json"];
+    
+    if (path) {
+        BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+            
+            if (package) {
+                package->link();
+            }
+            
+            BGE::Game::getInstance()->outputResourceBreakdown();
+        });
+    }
+    
+    path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
+    
+    if (path) {
+        BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+            
+            if (package) {
+                package->link();
+            }
+            
+            auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+            
+            // Now create auto display objects
+            BGE::SceneObjectCreatedDelegate delegate;
+            
+            space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
+            
+            // Spaces are not visible by default
+            space->setVisible(true);
+            BGE::Game::getInstance()->outputResourceBreakdown();
+        });
+    }
 }
 
-- (void)racer:(std::shared_ptr<BGE::Texture>)texture error:(std::shared_ptr<BGE::Error>)error {
-    std::shared_ptr<BGE::RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<BGE::RenderServiceOpenGLES2>(BGE::Game::getInstance()->getRenderService());
-    renderer->setGLKTextureInfo(texture->getTextureInfo());
-    BGE::Game::getInstance()->getRenderService()->render();
+- (void)packageTest1
+{
+    self.stage = 0;
     
-#if 0
-    // Let's create and add a game object
-    std::string name = "hello";
-    auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
-    auto gameObj0 = space->createObject<BGE::GameObject>();
-#if 1
-    auto gameObj1 = space->createObject<BGE::GameObject>();
-#endif
-    auto gameObj2 = space->createObject<BGE::GameObject>();
+    __weak typeof(self) weakSelf = self;
     
-    auto materialHandle = BGE::Game::getInstance()->getMaterialService()->createMaterial(texture);
-    auto material = BGE::Game::getInstance()->getMaterialService()->getMaterial(materialHandle);
-    auto transformComponent0 = space->createComponent<BGE::TransformComponent>();
-    auto transformComponent1 = space->createComponent<BGE::TransformComponent>();
-    auto transformComponent2 = space->createComponent<BGE::TransformComponent>();
-    auto lineRenderer = space->createComponent<BGE::LineRenderComponent>();
-    auto flatRect = space->createComponent<BGE::FlatRectRenderComponent>();
-    auto sprite = space->createComponent<BGE::SpriteRenderComponent>();
-    
-    BGE::Color color = { 1, 0, 0, 1 };
-    
-    material->setColor(color);
-    gameObj0->setName("Object0");
-    gameObj0->addComponent(transformComponent0);
-    gameObj0->addComponent(lineRenderer);
-    gameObj0->setActive(true);
+    dispatch_source_set_event_handler(self.timer, ^{
+        __strong typeof(self) strongSelf = weakSelf;
+        
+        if (strongSelf.stage == 0) {
+            strongSelf.stage = 1;
+            
+            NSString *path;
+            
+            path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
+            
+            if (path) {
+                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                    __strong typeof(self) strongSelf = weakSelf;
+                    
+                    packageHandles.push_back(packageHandle);
 
-    lineRenderer->setMaterials({ materialHandle });
-    lineRenderer->setPoints({ { 500, 200 }, { 700, 100 }, { 500, 800 } }, true);
+                    BGE::Game::getInstance()->outputResourceBreakdown();
+                    strongSelf.stage = 2;
+                });
+            }
+        } else if (strongSelf.stage == 2) {
+            BGE::Game::getInstance()->getScenePackageService()->removePackage(strongSelf.spaceHandle, packageHandles[0]);
+            
+            BGE::Game::getInstance()->outputResourceBreakdown();
+            
+            packageHandles.clear();
+            
+            strongSelf.stage = 0;
+        }
+    });
     
-//    NSLog(@"game object name %s", gameObj->getName().c_str());
-#if 1
-    gameObj1->setName("Object1");
-    gameObj1->addComponent(transformComponent1);
-    gameObj1->addComponent(flatRect);
-    gameObj1->setActive(true);
-#endif
-    BGE::Vector2 wh = { 500, 700 };
+    dispatch_resume(self.timer);
+}
+
+- (void)packageTest2
+{
+    self.stage = 0;
+
+    __weak typeof(self) weakSelf = self;
     
-    flatRect->setMaterials({ materialHandle });
-    flatRect->setWidthHeight(wh);
+    dispatch_source_set_event_handler(self.timer, ^{
+        __strong typeof(self) strongSelf = weakSelf;
+        
+        if (strongSelf.stage == 0 ) {
+            strongSelf.stage = 1;
+            
+            NSString *path;
+            
+            path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
+            
+            if (path) {
+                BGE::Game::getInstance()->getScenePackageService()->createPackage(strongSelf.spaceHandle, "Common", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                    packageHandles.push_back(packageHandle);
+                    
+                    BGE::Game::getInstance()->outputResourceBreakdown();
+                });
+            }
+            
+            path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
+            
+            if (path) {
+                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                    __strong typeof(self) strongSelf = weakSelf;
+                    packageHandles.push_back(packageHandle);
+                    
+                    BGE::Game::getInstance()->outputResourceBreakdown();
+                    
+                    strongSelf.stage = 2;
+                });
+            }
+        } else if (strongSelf.stage == 2) {
+            BGE::Game::getInstance()->getScenePackageService()->removePackage(strongSelf.spaceHandle, packageHandles[0]);
+            BGE::Game::getInstance()->outputResourceBreakdown();
+            strongSelf.stage++;
+        } else if (strongSelf.stage == 3) {
+            BGE::Game::getInstance()->getScenePackageService()->removePackage(strongSelf.spaceHandle, packageHandles[1]);
+            BGE::Game::getInstance()->outputResourceBreakdown();
+            packageHandles.clear();
+            strongSelf.stage = 0;
+        }
+    });
     
-    gameObj2->setName("Object2");
-    gameObj2->addComponent(transformComponent2);
-    gameObj2->addComponent(sprite);
-    gameObj2->setActive(true);
+    dispatch_resume(self.timer);
+}
+
+- (void)packageTest3
+{
+    self.stage = 0;
     
-    sprite->setMaterials({materialHandle});
-#endif
+    __weak typeof(self) weakSelf = self;
     
+    dispatch_source_set_event_handler(self.timer, ^{
+        __strong typeof(self) strongSelf = weakSelf;
+        
+        if (strongSelf.stage == 0 ) {
+            // Space handle already exists, so remove it
+            BGE::Game::getInstance()->getSpaceService()->removeSpace(strongSelf.spaceHandle);
+
+            self.spaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
+
+            strongSelf.stage = 1;
+            
+            NSString *path;
+            
+            path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
+            
+            if (path) {
+                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                    BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+
+                    packageHandles.push_back(packageHandle);
+                    
+                    if (package) {
+                        package->link();
+                    }
+                    
+                    BGE::Game::getInstance()->outputResourceBreakdown();
+                });
+            }
+            
+            path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
+            
+            if (path) {
+                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                    BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+
+                    packageHandles.push_back(packageHandle);
+
+                    if (package) {
+                        package->link();
+                    }
+                    
+                    BGE::Game::getInstance()->outputResourceBreakdown();
+                });
+            }
+            
+            path = [[NSBundle mainBundle] pathForResource:@"CommonHUD-iPh6" ofType:@"json"];
+            
+            if (path) {
+                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                    BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                    
+                    packageHandles.push_back(packageHandle);
+
+                    if (package) {
+                        package->link();
+                    }
+                    
+                    BGE::Game::getInstance()->outputResourceBreakdown();
+                });
+            }
+            
+            path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
+            
+            if (path) {
+                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                    __strong typeof(self) strongSelf = weakSelf;
+                    BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                    
+                    packageHandles.push_back(packageHandle);
+
+                    if (package) {
+                        package->link();
+                    }
+                    
+                    auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(strongSelf.spaceHandle);
+                    
+                    // Now create auto display objects
+                    BGE::SceneObjectCreatedDelegate delegate;
+                    
+                    space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
+                    
+                    // Spaces are not visible by default
+                    space->setVisible(true);
+                    BGE::Game::getInstance()->outputResourceBreakdown();
+                    strongSelf.stage = 2;
+                });
+            }
+        } else if (strongSelf.stage == 2) {
+            strongSelf.stage = 3;
+        } else if (strongSelf.stage == 3) {
+            auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(strongSelf.spaceHandle);
+            
+            space->setVisible(false);
+            
+            BGE::Game::getInstance()->getSpaceService()->removeSpace(strongSelf.spaceHandle);
+            
+            BGE::Game::getInstance()->outputResourceBreakdown();
+            packageHandles.clear();
+
+            strongSelf.stage = 0;
+        }
+    });
+    
+    dispatch_resume(self.timer);
 }
 
 - (void)viewDidLayoutSubviews
@@ -224,54 +381,7 @@
 
 - (void) glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-#ifdef NOT_YET
-    auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
-    
-    auto gameObj = space->getGameObject("settings_button");
-    
-    if (gameObj) {
-        auto button = gameObj->getComponent<BGE::ButtonComponent>();
-        
-        if (button) {
-            auto bbox = button->getBoundingBox();
-            if (bbox) {
-                auto xform = button->getTransform();
-                BGE::Matrix4 matrix;
-                BGE::Vector2 point;
-                std::vector<BGE::Vector2> points;
-                
-                xform->getMatrix(matrix);
-                bbox->computeAABB(matrix);
-                
-                point.x = bbox->aabbMinX;
-                point.y = bbox->aabbMinY;
-                points.push_back(point);
-                
-                point.x = bbox->aabbMaxX;
-                point.y = bbox->aabbMinY;
-                points.push_back(point);
-
-                point.x = bbox->aabbMaxX;
-                point.y = bbox->aabbMaxY;
-                points.push_back(point);
-
-                point.x = bbox->aabbMinX;
-                point.y = bbox->aabbMaxY;
-                points.push_back(point);
-                
-                self.buttonBounds->setPoints(points);
-                
-                NSLog(@"GOT YOU BITCHY");
-            }
-        }
-    }
-#endif
-    
     BGE::Game::getInstance()->getRenderService()->render();
 }
 
-void handled()
-{
-    
-}
 @end
