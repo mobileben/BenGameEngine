@@ -22,16 +22,28 @@ namespace BGE {
     
     class TextComponent : public RenderComponent
     {
-    private:
-        struct private_key {};
-        friend Component;
-        static uint32_t         bitmask_;
-        static std::type_index  type_index_;
-
     public:
-        static std::shared_ptr<TextComponent> create(ObjectId componentId);
-        TextComponent(struct private_key const& key, ObjectId componentId);
+        static std::type_index  type_index_;
+        static uint32_t         typeId_;
+        static uint32_t         bitmask_;
+        
+        TextComponent();
         ~TextComponent() {}
+        
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+            RenderComponent::initialize(handle, spaceHandle);
+            
+            text_ = "";
+            fontHandle_ = FontHandle();
+        }
+
+        void destroy() final {
+            text_ = "";
+            fontHandle_ = FontHandle();
+
+            // RenderComponent::destroy last
+            RenderComponent::destroy();
+        }
         
         const std::string& getText() const {
             return text_;

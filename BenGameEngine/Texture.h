@@ -47,8 +47,8 @@ namespace BGE {
         Premultiplied
     };
     
-    enum class TextureFormat {
-        Undefined,
+    enum class TextureFormat : uint32_t {
+        Undefined = 0,
         Alpha,
         RGB565,
         RGB888,
@@ -70,11 +70,12 @@ namespace BGE {
         Texture(ObjectId texId, std::string name);
         Texture(uint32_t texId, std::string name, GLKTextureInfo *textureInfo);
 #endif
-        ~Texture();
+        ~Texture() {}
         
-        void initialize(TextureHandle handle, ObjectId texId, std::string name);
-        void initialize(TextureHandle handle, ObjectId texId, std::string name, GLKTextureInfo *texInfo);
-
+        void initialize(TextureHandle handle, std::string name, TextureFormat format);
+        void initialize(TextureHandle handle, std::string name, TextureFormat format, GLKTextureInfo *texInfo);
+        void destroy();
+        
         inline TextureAlphaState getAlphaState() const { return alphaState_; }
         inline TextureFormat getFormat() const { return format_; }
         
@@ -93,6 +94,8 @@ namespace BGE {
         inline uint32_t getHWTextureId() const { return hwId_; }
         inline GLenum getTarget() const { return target_; }
 
+        inline size_t getMemoryUsage() const { return memoryUsage_; }
+        
         void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
         std::shared_ptr<Error> createSubTexture(TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated=false);
         
@@ -123,6 +126,7 @@ namespace BGE {
     private:
         friend class TextureService;
         
+        // TODO: valid_ needs to become state or status
         bool                valid_;
         TextureHandle       handle_;
         GLuint              hwId_;
@@ -134,6 +138,8 @@ namespace BGE {
         uint32_t            height_;
         uint32_t            x_;
         uint32_t            y_;
+        
+        size_t              memoryUsage_;
         
         bool                isSubTexture_;
         TextureAtlasHandle  atlasHandle_;
@@ -159,6 +165,8 @@ namespace BGE {
         void createTextureFromRGBA5551Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
         void createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
         void createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
+        
+        size_t computeMemoryUsage(TextureFormat format, uint32_t width, uint32_t height);
     };
 }
 

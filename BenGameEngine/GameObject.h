@@ -12,10 +12,11 @@
 #include <stdio.h>
 #include <cassert>
 #include "NamedObject.h"
+#include "Component.h"
+#include "Space.h"
 #include <unordered_map>
 #include <typeindex>
 #include <memory>
-#include "Component.h"
 
 namespace BGE {
     class Space;
@@ -26,48 +27,60 @@ namespace BGE {
     public:
         GameObject();
         GameObject(ObjectId objId);
-        ~GameObject();
+        ~GameObject() {}
         
         void initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, std::string name);
+        void destroy();
         
         inline GameObjectHandle getHandle() const { return handle_; }
         
         inline bool isActive() const { return active_; }
         inline void setActive(bool active) { active_ = active; }
 
-        inline Space *getSpace() const;
+        Space *getSpace() const;
         inline SpaceHandle getSpaceHandle() const { return spaceHandle_; }
         
-        template <typename T> std::shared_ptr<T> getComponent() {
-            std::type_index index = Component::getTypeIndex<T>();
-            
-#if DEBUG
-            if(components_.count(index) != 0) {
-                return std::static_pointer_cast<T>(components_[index]);
-            } else {
-                return nullptr;
-            }
-#else
-            return std::static_pointer_cast<T>(components_[index]);
-#endif
-        }
-        
-        template <typename T> void addComponent(std::shared_ptr<T> component) {
+        template <typename T> void addComponent(T *component) {
             assert(!component->hasGameObject());
-            componentBitmask_ |= Component::getBitmask<T>();
-            components_[typeid(T)] = component;
+            auto bitmask = T::bitmask_;
+            ComponentHandle handle{T::typeId_, component->getRawHandle()};
+            componentBitmask_ |= bitmask;
+            components_.push_back(handle);
+            
             component->setGameObjectHandle(getHandle());
         }
         
-        template <typename T>
-        void removeComponent() {
+        template <typename T> T *getComponent() {
             if (hasComponent<T>()) {
-                std::type_index typeId = Component::getTypeIndex<T>();
+                auto typeId = T::typeId_;
                 
-                removeComponentFromSpace(typeId);
+                for (auto const &handle : components_) {
+                    if (handle.typeId == typeId) {
+                        auto space = getSpace();
+                        
+                        return space->getComponent<T>(handle);
+                    }
+                }
+            }
+            
+            return nullptr;
+        }
+        
+        template <typename T> void removeComponent() {
+            if (hasComponent<T>()) {
+                auto typeId = T::typeId_;
                 
-                componentBitmask_ &= ~ComponentBitmask::bitmaskForTypeIndex(typeId);
-                components_.erase(typeId);
+                for (auto it = components_.begin();it != components_.end();++it) {
+                    if (it->typeId == typeId) {
+                        auto space = getSpace();
+                        
+                        space->removeComponent(*it);
+                        componentBitmask_ &= ~T::bitmask_;
+                        
+                        components_.erase(it);
+                        return;
+                    }
+                }
             }
         }
         
@@ -91,13 +104,12 @@ namespace BGE {
     private:
         friend GameObjectService;
         
-        bool                    active_;
-        uint32_t                componentBitmask_;
-        GameObjectHandle        handle_;
-        SpaceHandle             spaceHandle_;
-        std::unordered_map<std::type_index, std::shared_ptr<Component>> components_;
+        bool                            active_;
+        uint32_t                        componentBitmask_;
+        GameObjectHandle                handle_;
+        SpaceHandle                     spaceHandle_;
+        std::vector<ComponentHandle>    components_;
         
-        void removeComponentFromSpace(std::type_index typeIndex);
         void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
     };
 }

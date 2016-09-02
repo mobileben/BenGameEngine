@@ -24,16 +24,27 @@ namespace BGE {
     {
     public:
         MaterialService();
-        ~MaterialService();
+        ~MaterialService() {}
         
-        void initialize();
-        void reset();
-        void enteringBackground();
-        void enteringForeground();
-        void pause();
-        void resume();
-        void destroy();
-        void update(double deltaTime) {}
+        void initialize() final;
+        void reset() final;
+        void enteringBackground() final;
+        void enteringForeground() final;
+        void pause() final;
+        void resume() final;
+        void destroy() final;
+        void update(double deltaTime) final {}
+        
+        uint32_t numMaterials() const;
+        
+        uint32_t numUsedHandles() const final;
+        uint32_t maxHandles() const final;
+        uint32_t numHandleResizes() const final;
+        uint32_t maxHandlesAllocated() const final;
+        
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
 
         MaterialHandle createMaterial(Vector4& color);
         MaterialHandle createMaterial(TextureHandle textureHandle);
@@ -42,10 +53,10 @@ namespace BGE {
         void removeMaterial(MaterialHandle handle);
         void removeMaterial(ObjectId matId);
         
-        MaterialHandle getMaterialHandle(ObjectId matId);
+        MaterialHandle getMaterialHandle(ObjectId matId) const;
         
-        Material *getMaterial(MaterialHandle handle);
-        Material *getMaterial(ObjectId matId);
+        Material *getMaterial(MaterialHandle handle) const;
+        Material *getMaterial(ObjectId matId) const;
         
     private:
         static const uint32_t InitialMaterialReserve = 1024;

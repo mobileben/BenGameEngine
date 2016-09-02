@@ -20,16 +20,12 @@ namespace BGE {
 
     class MaskComponent : public RenderComponent
     {
-    private:
-        struct private_key {};
-        friend Component;
-        static uint32_t         bitmask_;
-        static std::type_index  type_index_;
-        
     public:
-        static std::shared_ptr<MaskComponent> create(ObjectId componentId);
+        static std::type_index  type_index_;
+        static uint32_t         typeId_;
+        static uint32_t         bitmask_;
         
-        MaskComponent(struct private_key const& key, ObjectId componentId);
+        MaskComponent();
         ~MaskComponent() {}
         
         void setMaskReference(MaskReference *maskRef);

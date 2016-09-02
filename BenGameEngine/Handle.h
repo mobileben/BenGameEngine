@@ -14,29 +14,51 @@
 #include <cassert>
 
 namespace BGE {
+    using HandleBackingType = uint32_t;
+    
+    class GameObject;
+    
+    class AnimationChannelComponent;
+    class AnimationSequenceComponent;
+    class AnimatorComponent;
+    class BoundingBoxComponent;
+    class ButtonComponent;
+    class ChannelFrameAnimatorComponent;
+    class ColorMatrixComponent;
+    class ColorTransformComponent;
+    class FlatRectRenderComponent;
+    class FrameAnimatorComponent;
+    class InputTouchComponent;
+    class LineRenderComponent;
+    class MaskComponent;
+    class SpriteRenderComponent;
+    class TextComponent;
+    class TextureMaskComponent;
+    class TransformComponent;
+    
     template <typename TAG>
     class Handle {
     public:
-        static const uint32_t NUM_INDEX_BITS = 18;
-        static const uint32_t NUM_MAGIC_BITS = 14;
-        static const uint32_t MAX_INDEX = (1 << NUM_INDEX_BITS) - 1;
-        static const uint32_t MAX_MAGIC = (1 << NUM_MAGIC_BITS) - 1;
+        static const HandleBackingType NUM_INDEX_BITS = 18;
+        static const HandleBackingType NUM_MAGIC_BITS = 14;
+        static const HandleBackingType MAX_INDEX = (1 << NUM_INDEX_BITS) - 1;
+        static const HandleBackingType MAX_MAGIC = (1 << NUM_MAGIC_BITS) - 1;
 
         Handle() : handle_(0) {}
-        Handle(uint32_t h) : handle_(h) {
+        Handle(HandleBackingType h) : handle_(h) {
         }
 
-        uint32_t getIndex() const { return index_; }
-        uint32_t getMagic() const { return magic_; }
-        uint32_t getHandle() const { return handle_; }
+        HandleBackingType getIndex() const { return index_; }
+        HandleBackingType getMagic() const { return magic_; }
+        HandleBackingType getHandle() const { return handle_; }
         
-        bool isNull() const { return !handle_; }
+        inline bool isNull() const { return !handle_; }
         
-        inline void init(uint32_t index) {
+        inline void init(HandleBackingType index) {
             assert(isNull());
             assert(index < MAX_INDEX);
             
-            static uint32_t autoMagic = 0;
+            static HandleBackingType autoMagic = 0;
             
             if (++autoMagic > MAX_MAGIC) {
                 autoMagic = 1;
@@ -53,10 +75,10 @@ namespace BGE {
     private:
         union {
             struct {
-                uint32_t index_ : NUM_INDEX_BITS;
-                uint32_t magic_: NUM_MAGIC_BITS;
+                HandleBackingType index_ : NUM_INDEX_BITS;
+                HandleBackingType magic_: NUM_MAGIC_BITS;
             };
-            uint32_t handle_;
+            HandleBackingType handle_;
         };
     };
 
@@ -72,8 +94,7 @@ namespace BGE {
     struct FontTag {};
     using FontHandle = Handle<FontTag>;
     
-    struct GameObjectTag {};
-    using GameObjectHandle = Handle<GameObjectTag>;
+    using GameObjectHandle = Handle<GameObject>;
     
     struct InputTag {};
     using InputHandle = Handle<InputTag>;
@@ -92,6 +113,29 @@ namespace BGE {
     
     struct TextureAtlasTag {};
     using TextureAtlasHandle = Handle<TextureAtlasTag>;
+    
+    using AnimationChannelComponentHandle = Handle<AnimationChannelComponent>;
+    using AnimationSequenceComponentHandle = Handle<AnimationSequenceComponent>;
+    using AnimatorComponentHandle = Handle<AnimatorComponent>;
+    using BoundingBoxComponentHandle = Handle<BoundingBoxComponent>;
+    using ButtonComponentHandle = Handle<ButtonComponent>;
+    using ChannelFrameAnimatorComponentHandle = Handle<ChannelFrameAnimatorComponent>;
+    using ColorMatrixComponentHandle = Handle<ColorMatrixComponent>;
+    using ColorTransformComponentHandle = Handle<ColorTransformComponent>;
+    using FlatRectRenderComponentHandle = Handle<FlatRectRenderComponent>;
+    using FrameAnimatorComponentHandle = Handle<FrameAnimatorComponent>;
+    using InputTouchComponentHandle = Handle<InputTouchComponent>;
+    using LineRenderComponentHandle = Handle<LineRenderComponent>;
+    using MaskComponentHandle = Handle<MaskComponent>;
+    using SpriteRenderComponentHandle = Handle<SpriteRenderComponent>;
+    using TextComponentHandle = Handle<TextComponent>;
+    using TextureMaskComponentHandle = Handle<TextureMaskComponent>;
+    using TransformComponentHandle = Handle<TransformComponent>;
+    
+    struct ComponentHandle {
+        uint32_t            typeId;
+        HandleBackingType   handle;
+    };
 }
 
 template<typename TAG>

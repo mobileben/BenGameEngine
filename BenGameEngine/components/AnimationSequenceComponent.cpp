@@ -13,26 +13,20 @@
 #include "AnimationChannelComponent.h"
 
 uint32_t BGE::AnimationSequenceComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::AnimationSequenceComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::AnimationSequenceComponent::type_index_ = typeid(BGE::AnimationSequenceComponent);
 
-std::shared_ptr<BGE::AnimationSequenceComponent> BGE::AnimationSequenceComponent::create(ObjectId componentId) {
-    return std::make_shared<AnimationSequenceComponent>(private_key{}, componentId);
+BGE::AnimationSequenceComponent::AnimationSequenceComponent() : Component(), frameRate(0), totalFrames(0), numChannels(0), numBounds(0) {
 }
 
-BGE::AnimationSequenceComponent::AnimationSequenceComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), frameRate(0), totalFrames(0), numChannels(0), numBounds(0) {
-}
-
-BGE::AnimationSequenceComponent::~AnimationSequenceComponent() {
-    // Remove all channels
+void BGE::AnimationSequenceComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    Component::initialize(handle, spaceHandle);
     
-    auto space = getSpace();
-    
-    if (space) {
-        space->removeGameObject(sequenceRootHandle);
-    }
-}
+    frameRate = 0;
+    totalFrames = 0;
+    numChannels = 0;
+    numBounds = 0;
 
-void BGE::AnimationSequenceComponent::created() {
     auto space = getSpace();
     
     assert(space);
@@ -45,6 +39,28 @@ void BGE::AnimationSequenceComponent::created() {
         sequenceRoot->addComponent(xform);
         sequenceRoot->setActive(true);
     }
+}
+
+void BGE::AnimationSequenceComponent::destroy() {
+    auto space = getSpace();
+
+    for (auto const &channel : channels) {
+        space->removeGameObject(channel);
+    }
+
+    channels.clear();
+
+    space->removeGameObject(sequenceRootHandle);
+    sequenceRootHandle = GameObjectHandle();
+    bounds = nullptr;
+
+    frameRate = 0;
+    totalFrames = 0;
+    numChannels = 0;
+    numBounds = 0;
+
+    // Component::destroy last
+    Component::destroy();
 }
 
 void BGE::AnimationSequenceComponent::setAnimationSequenceReference(AnimationSequenceReference *animSeqRef) {

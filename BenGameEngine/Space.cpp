@@ -8,8 +8,14 @@
 
 #include "Space.h"
 #include "Game.h"
+#include "GameObjectService.h"
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
+#include "ButtonComponent.h"
+#include "MaskComponent.h"
+#include "SpriteRenderComponent.h"
+#include "TransformComponent.h"
+#include "TextComponent.h"
 
 BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true) {
 }
@@ -20,11 +26,14 @@ BGE::Space::Space(ObjectId spaceId) : NamedObject(spaceId), visible_(false), ord
 BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true) {
 }
 
-void BGE::Space::initialize(SpaceHandle handle, ObjectId spaceId, std::string name) {
+void BGE::Space::initialize(SpaceHandle handle, std::string name) {
     spaceHandle_ = handle;
-    setInstanceId(spaceId);
     setName(name);
 
+    visible_ = false;
+    order_ = 0;
+    updatable_ = true;
+    
     gameObjectService_ = std::make_shared<GameObjectService>();
     gameObjectService_->setSpaceHandle(spaceHandle_);
     
@@ -32,6 +41,167 @@ void BGE::Space::initialize(SpaceHandle handle, ObjectId spaceId, std::string na
     componentService_->setSpaceHandle(spaceHandle_);
 }
 
+void BGE::Space::destroy() {
+    visible_ = false;
+    order_ = 0;
+    updatable_ = false;
+    
+    // Destroy all scenePackages
+    auto packageService = Game::getInstance()->getScenePackageService();
+    
+    for (auto const &package : scenePackages_) {
+        packageService->removePackage(spaceHandle_, package);
+    }
+    
+    scenePackages_.clear();
+    
+    // Destroy all game objects
+    gameObjectService_->removeAllGameObjects();
+    
+    // Destroy all components
+    componentService_->removeAllComponents();
+    
+    // Destroy all fonts
+    auto fontService = Game::getInstance()->getFontService();
+    
+    for (auto const &font : fonts_) {
+        fontService->removeFont(spaceHandle_, font);
+    }
+    
+    fonts_.clear();
+    
+    // Destroy all texture atlases
+    auto textureService = Game::getInstance()->getTextureService();
+    
+    for (auto const &atlas : textureAtlases_) {
+        textureService->removeTextureAtlas(spaceHandle_, atlas);
+    }
+    
+    textureAtlases_.clear();
+    
+    // Destory all textures
+    for (auto const &texture : textures_) {
+        textureService->removeTexture(spaceHandle_, texture);
+    }
+    
+    textures_.clear();
+}
+
+void BGE::Space::outputResourceBreakdown(uint32_t numTabs) const {
+    Game::outputValue(numTabs, "Space (%s):\n", getName().c_str());
+    
+    // Now breakdown resources
+    numTabs++;
+    
+    // Game objects
+    uint32_t num = 0;
+    
+    for (auto const &objHandle : gameObjectService_->getGameObjects()) {
+        auto obj = getGameObject(objHandle);
+        
+        if (obj) {
+            num++;
+        }
+    }
+    
+    Game::outputValue(numTabs, "Num GameObject: %u\n", num);
+    
+    Game::outputValue(numTabs, "Num Component: %u\n", componentService_->totalNumComponents());
+    
+    componentService_->outputResourceBreakdown(numTabs + 1);
+    
+    Game::outputValue(numTabs, "Num ScenePackage: %zd\n", scenePackages_.size());
+
+    auto scenePackageService = Game::getInstance()->getScenePackageService();
+    
+    for (auto const &handle : scenePackages_) {
+        auto scenePackage = scenePackageService->getScenePackage(handle);
+        
+        if (scenePackage) {
+            scenePackage->outputResourceBreakdown(numTabs + 1);
+        }
+    }
+    
+    Game::outputValue(numTabs, "Num Material: %d\n", componentService_->numMaterials());
+    
+    auto textureService = Game::getInstance()->getTextureService();
+    auto fontService = Game::getInstance()->getFontService();
+    
+    Game::outputValue(numTabs, "Num TextureAtlas: %zd\n", textureAtlases_.size());
+    
+    for (auto const &handle : textureAtlases_) {
+        auto atlas = textureService->getTextureAtlas(handle);
+        
+        if (atlas) {
+            Game::outputValue(numTabs, "%s\n", atlas->getName().c_str());
+        }
+    }
+
+    Game::outputValue(numTabs, "Num Texture: %zd\n", textures_.size());
+
+    for (auto const &handle : textures_) {
+        auto texture = textureService->getTexture(handle);
+        
+        if (texture) {
+            Game::outputValue(numTabs, "%s\n", texture->getName().c_str());
+        }
+    }
+    
+    Game::outputValue(numTabs, "Num Font: %zd\n", fonts_.size());
+
+    for (auto const &handle : fonts_) {
+        auto font = fontService->getFont(handle);
+        
+        if (font) {
+            Game::outputValue(numTabs, "%s\n", font->getNameAsKey().c_str());
+        }
+    }
+}
+
+void BGE::Space::outputMemoryBreakdown(uint32_t numTabs) const {
+    Game::outputValue(numTabs, "Space (%s):\n", getName().c_str());
+    
+    // Now breakdown resources
+    numTabs++;
+    
+    componentService_->outputMemoryBreakdown(numTabs);
+}
+
+BGE::GameObject *BGE::Space::createGameObject(std::string name ) {
+    return gameObjectService_->createGameObject(name);
+}
+
+BGE::GameObjectHandle BGE::Space::getGameObjectHandle(ObjectId objId) const {
+    return gameObjectService_->getGameObjectHandle(objId);
+}
+
+BGE::GameObjectHandle BGE::Space::getGameObjectHandle(std::string name) const {
+    return gameObjectService_->getGameObjectHandle(name);
+}
+
+BGE::GameObject *BGE::Space::getGameObject(ObjectId objId) const {
+    return gameObjectService_->getGameObject(objId);
+}
+
+BGE::GameObject *BGE::Space::getGameObject(std::string name) const {
+    return gameObjectService_->getGameObject(name);
+}
+
+BGE::GameObject *BGE::Space::getGameObject(GameObjectHandle handle) const {
+    return gameObjectService_->getGameObject(handle);
+}
+
+void BGE::Space::removeGameObject(GameObjectHandle handle) {
+    gameObjectService_->removeGameObject(handle);
+}
+
+void BGE::Space::removeGameObject(GameObject *object) {
+    gameObjectService_->removeGameObject(object);
+}
+
+const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
+    return gameObjectService_->getGameObjects();
+}
 
 BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
@@ -442,7 +612,7 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
                 }
                 
                 if (callback) {
-                    for (auto itemHandle : itemHandles) {
+                    for (auto const &itemHandle : itemHandles) {
                         auto item = getGameObject(itemHandle);
                         callback(item);
                     }
@@ -450,13 +620,13 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
             }
         }
         
-        std::shared_ptr<TransformComponent> rootXform;
+        TransformComponent *rootXform = nullptr;
         
         if (root) {
             rootXform = root->getComponent<TransformComponent>();
         }
         
-        for (auto objHandle : rootObjHandles) {
+        for (auto const &objHandle : rootObjHandles) {
             auto obj = getGameObject(objHandle);
             
             if (rootXform) {
@@ -476,3 +646,55 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
         }
     }
 }
+
+void BGE::Space::createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback) {
+    // TODO: This needs to be thread safe at some point
+    
+    auto fontService = Game::getInstance()->getFontService();
+    auto font = fontService->getFont(name, pxSize);
+    auto fontHandle = font->getHandle();
+    
+    // Now search to see if our handle exists already
+    for (auto const &handle : fonts_) {
+        if (handle == fontHandle) {
+            if (callback) {
+                callback(handle, nullptr);
+            }
+            
+            return;
+        }
+    }
+    
+    // Not found, so try and allocate it
+    Game::getInstance()->getFontService()->createFont(name, pxSize, spaceHandle_, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
+        fonts_.push_back(font);
+        if (callback) {
+            callback(font, error);
+        }
+    });
+}
+
+void BGE::Space::scenePackageAdded(ScenePackageHandle handle) {
+    bool found = false;
+    
+    for (auto const &package : scenePackages_) {
+        if (package == handle) {
+            found = true;
+            break;
+        }
+    }
+    
+    if (!found) {
+        scenePackages_.push_back(handle);
+    }
+}
+
+void BGE::Space::scenePackageRemoved(ScenePackageHandle handle) {
+    for (auto it=scenePackages_.begin();it!=scenePackages_.end();++it) {
+        if (*it == handle) {
+            scenePackages_.erase(it);
+            return;
+        }
+    }
+}
+

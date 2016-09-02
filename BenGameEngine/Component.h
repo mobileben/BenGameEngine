@@ -22,23 +22,27 @@ namespace BGE {
     
     class Component : public Object
     {
-    private:
-        struct private_key {};
-        
-        /**
-         NOTE: When sub-classing, new sub-classes of Component must support bitmask_ and type_index_. Additionaly register it in
-         ComponentService::registerComponents()
-         */
-        static uint32_t         bitmask_;       // Sub-classes must implement
-        static std::type_index  type_index_;    // Sub-classes must implement
-        
     public:
         static uint32_t InvalidBitmask;
+        static uint32_t InvalidTypeId;
+
+        /**
+         NOTE: When sub-classing, new sub-classes of Component must support bitmask_, type_index_, type_id_. Additionaly register it in
+         ComponentService::registerComponents()
+         */
+        static std::type_index  type_index_;    // Sub-classes must implement
+        static uint32_t         typeId_;         // Sub-classes must implement
+        static uint32_t         bitmask_;       // Sub-classes must implement
         
-        static std::shared_ptr<Component> create(ObjectId componentId);
-        
-        Component(struct private_key const& key, ObjectId componentId);
+        Component() : Object(), handle_(0) {}
         virtual ~Component() {}
+        
+        virtual void initialize(HandleBackingType handle, SpaceHandle spaceHandle);
+        virtual void destroy();
+        
+        inline std::type_index getTypeIndex() const { return type_index_; }
+        inline uint32_t getTypeId() const { return typeId_; }
+        inline uint32_t getBitmaska() const { return bitmask_; }
         
         inline bool hasGameObject() const { return !gameObjectHandle_.isNull(); }
         inline GameObjectHandle getGameObjectHandle() const { return gameObjectHandle_; }
@@ -46,29 +50,39 @@ namespace BGE {
         Space *getSpace() const;
         inline SpaceHandle getSpaceHandle() const { return spaceHandle_; }
 
-        template <typename T>
-        static uint32_t getBitmask() {
+        template <typename T> inline static uint32_t getBitmask() {
 #if DEBUG
             if (!validateComponent<T>()) {
-                T::bitmask_ = ComponentBitmask::createBitmask<T>();
+                assert(false);
             }
 #endif
             
             return T::bitmask_;
         }
+        
+        template <typename T> inline static uint32_t getTypeId() {
+#if DEBUG
+            if (!validateComponent<T>()) {
+                assert(false);
+            }
+#endif
+            
+            return T::typeId_;
+        }
 
-        template <typename T>
-        static inline std::type_index getTypeIndex() { return T::type_index_; }
+        template <typename T> static inline std::type_index getTypeIndex() { return T::type_index_; }
+
+        template <typename T> inline Handle<T> getHandle() const { return Handle<T>(handle_); }
+
+        inline HandleBackingType getRawHandle() const { return handle_; }
         
     protected:
-        Component() = delete;
-        Component(Component const&) = delete;
-        Component(ObjectId componentId);
-
         template <typename T>
         static void registerBitmask() {
             if (T::bitmask_ == Component::InvalidBitmask) {
-                T::bitmask_ = ComponentBitmask::createBitmask<T>();
+                auto results = ComponentBitmask::createBitmask<T>();
+                T::bitmask_ = results.second;
+                T::typeId_ = results.first;
                 T::type_index_ = typeid(T);
             }
         }
@@ -76,12 +90,13 @@ namespace BGE {
         template <typename T>
         static bool validateComponent() {
             assert(T::bitmask_ != Component::InvalidBitmask);
+            assert(T::typeId_ != Component::InvalidTypeId);
             assert(T::type_index_ != Component::type_index_);
             
             return T::bitmask_ != Component::InvalidBitmask && T::type_index_ != Component::type_index_;
         }
         
-        inline void setGameObjectHandle(GameObjectHandle gameObjectHandle) { gameObjectHandle_ = gameObjectHandle; }
+        virtual void setGameObjectHandle(GameObjectHandle gameObjectHandle) { gameObjectHandle_ = gameObjectHandle; }
         inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
 
         virtual void created() {}
@@ -91,6 +106,7 @@ namespace BGE {
         friend GameObject;
         friend Space;
         
+        HandleBackingType   handle_;
         GameObjectHandle    gameObjectHandle_;
         SpaceHandle         spaceHandle_;
     };

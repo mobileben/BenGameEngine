@@ -8,7 +8,7 @@
 
 #include "EventService.h"
 
-BGE::EventService::EventService() : handleService_(InitialEventHandlerReserve, EventHandlerHandleService::NoMaxLimit) {
+BGE::EventService::EventService() : handleService_(InitialEventHandlerReserve, HandleServiceNoMaxLimit) {
 }
 
 BGE::EventHandlerHandle BGE::EventService::createEventHandlerHandle(std::string name, Event event, EventHandlerFunction function) {
@@ -24,10 +24,16 @@ BGE::EventHandlerHandle BGE::EventService::createEventHandlerHandle(std::string 
     return handle;
 }
 
-BGE::EventHandler *BGE::EventService::getEventHandler(EventHandlerHandle handle) {
+BGE::EventHandler *BGE::EventService::getEventHandler(EventHandlerHandle handle) const {
     return handleService_.dereference(handle);
 }
 
 void BGE::EventService::removeEventHandler(EventHandlerHandle handle) {
+    auto eventHandler = getEventHandler(handle);
+    
+    if (eventHandler) {
+        eventHandler->destroy();
+    }
+    
     handleService_.release(handle);
 }

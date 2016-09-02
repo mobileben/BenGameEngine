@@ -17,10 +17,6 @@ BGE::GameObject::GameObject() : NamedObject(), active_(false), componentBitmask_
 BGE::GameObject::GameObject(ObjectId objId) : NamedObject(objId), active_(false), componentBitmask_(0) {
 }
 
-BGE::GameObject::~GameObject() {
-    removeAllComponents();
-}
-
 void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, std::string name) {
     setName(name);
 
@@ -32,32 +28,21 @@ void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameO
     spaceHandle_ = spaceHandle;
 }
 
-void BGE::GameObject::removeComponentFromSpace(std::type_index typeIndex) {
-    auto space = getSpace();
+void BGE::GameObject::destroy() {
+    active_ = false;
+
+    removeAllComponents();
     
-    if (space) {
-#if DEBUG
-        auto component = components_.find(typeIndex);
-      
-        assert(component != components_.end());
-        
-        if (component != components_.end()) {
-            space->removeComponent(typeIndex, component->second->getInstanceId());
-        }
-#else
-        auto component = components_[typeIndex];
-        space->removeComponent(typeIndex, component->second->getInstanceId());
-#endif
-    }
+    handle_ = GameObjectHandle();
+    spaceHandle_ = SpaceHandle();
 }
 
 void BGE::GameObject::removeAllComponents() {
     auto space = getSpace();
     
     if (space) {
-        for (auto component : components_) {
-            const std::type_info& typeId = typeid(component.second);
-            removeComponentFromSpace(typeId);
+        for (auto const &component : components_) {
+            space->removeComponent(component);
         }
     }
     

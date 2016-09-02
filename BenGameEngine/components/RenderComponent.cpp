@@ -9,21 +9,29 @@
 #include "RenderComponent.h"
 #include "Game.h"
 
-BGE::RenderComponent::RenderComponent(ObjectId componentId) : Component(componentId), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
+BGE::RenderComponent::RenderComponent() : Component(), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
+}
+
+void BGE::RenderComponent::destroy() {
+    enabled_ = false;
     
+    auto materialService = Game::getInstance()->getMaterialService();
+    
+    for (auto const &material : materialHandles_) {
+        materialService->removeMaterial(material);
+    }
+    
+    materialHandles_.clear();
+    
+    // Component::destroy last
+    Component::destroy();
 }
 
 void BGE::RenderComponent::getGlobalBounds(Rect& bounds) {
     
 }
 
-BGE::RenderComponent::~RenderComponent() {
-    for (auto handle : materialHandles_) {
-        Game::getInstance()->getMaterialService()->removeMaterial(handle);
-    }
-}
-
-BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) {
+BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) const {
     if (index < materialHandles_.size()) {
         return materialHandles_[index];
     } else {
@@ -31,7 +39,7 @@ BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) {
     }
 }
 
-BGE::Material *BGE::RenderComponent::getMaterial(uint32_t index) {
+BGE::Material *BGE::RenderComponent::getMaterial(uint32_t index) const {
     if (index < materialHandles_.size()) {
         auto handle = materialHandles_[index];
         return Game::getInstance()->getMaterialService()->getMaterial(handle);
@@ -40,8 +48,27 @@ BGE::Material *BGE::RenderComponent::getMaterial(uint32_t index) {
     return nullptr;
 }
 
+std::vector<BGE::MaterialHandle> BGE::RenderComponent::getMaterialHandles() const {
+    return materialHandles_;
+}
+
+std::vector<BGE::Material *> BGE::RenderComponent::getMaterials() const {
+    std::vector<Material *> materials;
+    auto materialService = Game::getInstance()->getMaterialService();
+    
+    for (auto const &handle : materialHandles_) {
+        auto material = materialService->getMaterial(handle);
+        
+        if (material) {
+            materials.push_back(material);
+        }
+    }
+    
+    return materials;
+}
+
 void BGE::RenderComponent::setMaterials(std::vector<MaterialHandle> materials) {
-    for (auto handle : materialHandles_) {
+    for (auto const &handle : materialHandles_) {
         if (std::find(materials.begin(), materials.end(), handle) == materials.end()) {
             // Make sure handle is not in materials
             Game::getInstance()->getMaterialService()->removeMaterial(handle);
@@ -50,7 +77,7 @@ void BGE::RenderComponent::setMaterials(std::vector<MaterialHandle> materials) {
 
     materialHandles_.clear();
     
-    for (auto material : materials) {
+    for (auto const &material : materials) {
         materialHandles_.push_back(material);
     }
     

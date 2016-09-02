@@ -12,16 +12,13 @@
 #include "SpriteRenderComponent.h"
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
+#include "ButtonComponent.h"
+#include "TextComponent.h"
+#include "MaskComponent.h"
 
 uint32_t BGE::AnimationChannelComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::AnimationChannelComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::AnimationChannelComponent::type_index_ = typeid(BGE::AnimationChannelComponent);
-
-std::shared_ptr<BGE::AnimationChannelComponent> BGE::AnimationChannelComponent::create(ObjectId componentId) {
-    return std::make_shared<AnimationChannelComponent>(private_key{}, componentId);
-}
-
-BGE::AnimationChannelComponent::AnimationChannelComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), channel(nullptr) {
-}
 
 void BGE::AnimationChannelComponent::setGameObjectHandle(GameObjectHandle handle) {
     Component::setGameObjectHandle(handle);
@@ -119,9 +116,9 @@ void BGE::AnimationChannelComponent::updateReference() {
         }
     } else {
         if (this->channel) {
-            NSLog(@"You fail %x %x %x", gameObj, this->channel, this->channel->referenceData);
+            NSLog(@"You fail %lx %lx %lx", (unsigned long) gameObj, (unsigned long) this->channel, (unsigned long) this->channel->referenceData);
         } else {
-            NSLog(@"You fail %x", gameObj);
+            NSLog(@"You fail %lx", (unsigned long)  gameObj);
         }
     }
 }

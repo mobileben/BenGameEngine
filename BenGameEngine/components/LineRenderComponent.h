@@ -15,18 +15,29 @@
 namespace BGE {
     class LineRenderComponent : public RenderComponent
     {
-    private:
-        struct private_key {};
-        friend Component;
-        static uint32_t         bitmask_;
-        static std::type_index  type_index_;
-
     public:
-        static std::shared_ptr<LineRenderComponent> create(ObjectId componentId);
+        static std::type_index  type_index_;
+        static uint32_t         typeId_;
+        static uint32_t         bitmask_;
         
-        LineRenderComponent(struct private_key const& key, ObjectId componentId);
+        LineRenderComponent();
         ~LineRenderComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            RenderComponent::initialize(handle, spaceHandle);
+            
+            thickness_ = 1;
+            closedLoop_ = false;
+        }
+        
+        void destroy() final {
+            thickness_ = 1;
+            points_.clear();
+            
+            // RenderComponent::destroy last
+            RenderComponent::destroy();
+        }
+
         const std::vector<Vector2>& getPoints() const;
         void setPoints(const std::vector<Vector2>& points, bool lineLoop=false);
         bool isLineLoop() const { return closedLoop_; }

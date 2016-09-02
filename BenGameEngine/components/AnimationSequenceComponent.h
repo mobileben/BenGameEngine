@@ -14,6 +14,7 @@
 #include <vector>
 #include "Component.h"
 #include "GraphicFormats.h"
+#include "Space.h"
 
 namespace BGE {
 
@@ -21,18 +22,17 @@ namespace BGE {
     
     class AnimationSequenceComponent : public Component
     {
-    private:
-        struct private_key {};
-        friend Component;
-        static uint32_t         bitmask_;
-        static std::type_index  type_index_;
-
     public:
-        static std::shared_ptr<AnimationSequenceComponent> create(ObjectId componentId);
+        static std::type_index  type_index_;
+        static uint32_t         typeId_;
+        static uint32_t         bitmask_;
         
-        AnimationSequenceComponent(struct private_key const& key, ObjectId componentId);
-        ~AnimationSequenceComponent();
+        AnimationSequenceComponent();
+        ~AnimationSequenceComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final;
+        void destroy() final;
+
         void setAnimationSequenceReference(AnimationSequenceReference *animSeqRef);
         void setAnimationSequenceReference(const AnimationSequenceReference& animSeqRef);
 
@@ -54,8 +54,8 @@ namespace BGE {
         friend GameObject;
         friend ComponentService;
         
-        void setGameObjectHandle(GameObjectHandle handle);
-        void created();
+        void setGameObjectHandle(GameObjectHandle handle) override;
+        void initialize(HandleBackingType handle);
     };
 }
 

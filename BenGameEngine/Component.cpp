@@ -11,17 +11,21 @@
 #include "Game.h"
 
 uint32_t BGE::Component::InvalidBitmask = (uint32_t)-1;
+uint32_t BGE::Component::InvalidTypeId = (uint32_t)-1;
 uint32_t BGE::Component::bitmask_ = InvalidBitmask;
+uint32_t BGE::Component::typeId_ = InvalidTypeId;
 std::type_index BGE::Component::type_index_ = typeid(BGE::Component);
 
-std::shared_ptr<BGE::Component> BGE::Component::create(ObjectId componentId) {
-    return std::make_shared<Component>(private_key(), componentId);
+void BGE::Component::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    handle_ = handle;
+    spaceHandle_ = spaceHandle;
+    gameObjectHandle_ = GameObjectHandle();
 }
 
-BGE::Component::Component(struct private_key const& key, ObjectId componentId) : Object(componentId) {
-}
-
-BGE::Component::Component(ObjectId componentId) : Object(componentId) {
+void BGE::Component::destroy() {
+    handle_ = 0;
+    gameObjectHandle_ = GameObjectHandle();
+    spaceHandle_ = SpaceHandle();
 }
 
 BGE::Space *BGE::Component::getSpace() const {

@@ -18,18 +18,27 @@
 namespace BGE {
     class ChannelFrameAnimatorComponent : public Component
     {
-    private:
-        struct private_key {};
-        friend Component;
-        static uint32_t         bitmask_;
-        static std::type_index  type_index_;
-
     public:
-        static std::shared_ptr<ChannelFrameAnimatorComponent> create(ObjectId componentId);
-        
-        ChannelFrameAnimatorComponent(struct private_key const& key, ObjectId componentId);
+        static std::type_index  type_index_;
+        static uint32_t         typeId_;
+        static uint32_t         bitmask_;
+
+        ChannelFrameAnimatorComponent() : Component(), currKeyframe(0) {}
         ~ChannelFrameAnimatorComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            Component::initialize(handle, spaceHandle);
+            
+            currKeyframe = 0;
+        }
+        
+        void destroy() final {
+            currKeyframe = 0;
+            
+            // Component::destroy last
+            Component::destroy();
+        }
+
         // TODO: Move to controller
         int32_t     currKeyframe;
     };

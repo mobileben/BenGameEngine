@@ -21,20 +21,41 @@
 #include "MathTypes.h"
 
 namespace BGE {
+    enum class ScenePackageStatus {
+        Invalid,
+        Loading,
+        Valid
+    };
+    
+    enum class ScenePackageError : int32_t {
+        UnsupportedFormat = 0,
+        DoesNotExist,
+        Loading
+    };
+
     class ScenePackage : public NamedObject {
     public:
+        static const std::string ErrorDomain;
+        
         ScenePackage();
         ScenePackage(ObjectId sceneId);
-        ~ScenePackage();
+        ~ScenePackage() {}
         
-        void initialize(ScenePackageHandle handle, ObjectId scenePackageId, std::string name);
+        void initialize(ScenePackageHandle handle, std::string name);
+        void destroy();
         
+        size_t getMemoryUsage() const;
+        
+        void outputResourceBreakdown(uint32_t numTabs) const;
+        void outputMemoryBreakdown(uint32_t numTabs) const;
+
         void link();
         
         bool hasExternalPackages() const {
             return hasExternal_;
         }
         
+        inline bool isValid() const { return status_ == ScenePackageStatus::Valid; }
         inline ScenePackageHandle getHandle() const { return handle_; }
         
         AutoDisplayElementReference *getAutoDisplayList() const;
@@ -52,12 +73,19 @@ namespace BGE {
         GfxReferenceType getReferenceType(std::string name);
         
     protected:
-        void reset();
-        void load(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback);
+        void setStatus(ScenePackageStatus status) { status_ = status; }
+        void create(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback);
 
     private:
         friend class ScenePackageService;
         
+        struct TextureQueueItem {
+            std::string     name;
+            std::string     filename;
+            TextureFormat   format;
+        };
+        
+        ScenePackageStatus  status_;
         ScenePackageHandle  handle_;
         std::string         source_;
         float               frameRate_;
@@ -71,6 +99,8 @@ namespace BGE {
         int32_t             defaultPositionIndex_;
         int32_t             defaultScaleIndex_;
         
+        size_t                                              memoryUsage_;
+
         FixedArray<char>                                    strings_;
         FixedArray<TextureReferenceIntermediate>            textures_;
         FixedArray<TextReferenceIntermediate>               text_;
@@ -95,7 +125,7 @@ namespace BGE {
         std::unordered_map<std::string, std::vector<SubTextureDef>> subTextures_;
         
         std::shared_ptr<std::atomic_int>                    textureCount_;
-        std::vector<std::pair<std::string, std::string>>    textureQueue_;
+        std::vector<TextureQueueItem>                       textureQueue_;
         std::shared_ptr<std::atomic_int>                    fontCount_;
         std::vector<std::pair<std::string, uint32_t>>       fontQueue_;
         
@@ -150,10 +180,15 @@ namespace BGE {
 
         std::unordered_map<std::string, GfxReferenceType>   referenceTypes_;
         
+        std::vector<TextureHandle>                          loadedTextures_;
+        std::vector<TextureAtlasHandle>                     loadedTextureAtlases_;
+        std::vector<FontHandle>                             loadedFonts_;
+        
         void loadTextures(std::function<void()> callback);
         void loadFonts(std::function<void()> callback);
         
         GfxReferenceType referenceTypeForString(std::string type);
+        void computeMemoryUsage();
     };
     
     class GameObject;

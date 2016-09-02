@@ -18,19 +18,28 @@
 
 namespace BGE {
     class AnimationChannelComponent : public Component {
-    private:
-        struct private_key {};
-        friend Component;
-        static uint32_t         bitmask_;
-        static std::type_index  type_index_;
-
     public:
+        static std::type_index  type_index_;
+        static uint32_t         typeId_;
+        static uint32_t         bitmask_;
+        
         const AnimationChannelReference *channel;
 
-        static std::shared_ptr<AnimationChannelComponent> create(ObjectId componentId);
-        
-        AnimationChannelComponent(struct private_key const& key, ObjectId componentId);
+        AnimationChannelComponent() : Component(), channel(nullptr) {}        
         ~AnimationChannelComponent() {}
+        
+        inline void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            Component::initialize(handle, spaceHandle);
+            
+            channel = nullptr;
+        }
+        
+        inline void destroy() final {
+            channel = nullptr;
+            
+            // Component::destroy last
+            Component::destroy();
+        }
         
         void setAnimationChannelReference(const AnimationChannelReference *animChanRef);
         
@@ -40,7 +49,7 @@ namespace BGE {
         friend ComponentService;
         friend GameObject;
         
-        void setGameObjectHandle(GameObjectHandle handle);
+        void setGameObjectHandle(GameObjectHandle handle) override;
     };
 }
 

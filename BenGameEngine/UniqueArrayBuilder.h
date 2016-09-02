@@ -28,13 +28,13 @@ namespace BGE {
                 assert(false);
             }
             
-            auto index = items_.size();
+            int32_t index = (int32_t) items_.size();
             auto it = indices_.find(item);
             
             if (it == indices_.end()) {
                 U *uitem = (U *)&item;
                 items_.push_back(*uitem);
-                indices_[item] = index;
+                indices_[item] = (int32_t )index;
             } else {
                 index = it->second;
             }
@@ -55,7 +55,7 @@ namespace BGE {
         }
         
         FixedArray<U> createFixedArray() const {
-            return FixedArray<U>((U *)&items_[0], items_.size());
+            return FixedArray<U>((U *)&items_[0], (int32_t) items_.size());
         }
         
         int32_t size() const {
@@ -87,8 +87,8 @@ namespace BGE {
         }
 
     protected:
-        std::vector<U> items_;
-        std::unordered_map<T, int32_t> indices_;
+        std::vector<U>                  items_;
+        std::unordered_map<T, int32_t>  indices_;
     };
 }
 

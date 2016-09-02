@@ -21,28 +21,40 @@ namespace BGE {
     class SpaceService : public Service {
     public:
         SpaceService();
-        ~SpaceService();
+        ~SpaceService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
+
+        uint32_t numUsedHandles() const final;
+        uint32_t maxHandles() const final;
+        uint32_t numHandleResizes() const final;
+        uint32_t maxHandlesAllocated() const final;
+
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
+        
+        uint32_t numSpaces() const;
+        
+        void outputResourceBreakdown(uint32_t numTabs) const final;
+        void outputMemoryBreakdown(uint32_t numTabs) const final;
 
         SpaceHandle createSpace(std::string name);
         
         void removeSpace(SpaceHandle spaceHandle);
-        void removeSpace(ObjectId objId);
         void removeSpace(std::string name);
 
-        Space *getSpace(SpaceHandle spaceHandle);
-        Space *getSpace(ObjectId objId);
-        Space *getSpace(std::string name);
+        Space *getSpace(SpaceHandle spaceHandle) const;
+        Space *getSpace(std::string name) const;
         
-        std::vector<SpaceHandle> getSpaces();
+        std::vector<SpaceHandle> getSpaces() const;
         
     private:
         static const uint32_t InitialSpaceReserve = 32;
@@ -51,8 +63,8 @@ namespace BGE {
         using SpacesMap = std::unordered_map<uint32_t, SpaceHandle>;
         using SpacesMapIterator = SpacesMap::iterator;
 
-        SpaceHandleService  handleService_;
-        SpacesMap           spaces_;
+        SpaceHandleService          handleService_;
+        std::vector<SpaceHandle>    spaces_;
         
         // TODO: Should just create sorted vector here each time space is removed or added, but also must think how to handle order change
     };

@@ -9,14 +9,13 @@
 #include "InputService.h"
 #include "Game.h"
 #include "InputTouchComponent.h"
+#include "ButtonComponent.h"
+#include "TransformComponent.h"
+#include "BoundingBoxComponent.h"
 
-BGE::InputService::InputService() :  handleService_(InitialInputReserve, InputHandleService::NoMaxLimit) {
+BGE::InputService::InputService() :  handleService_(InitialInputReserve, HandleServiceNoMaxLimit) {
     inputs_.reserve(InitialInputReserve);
 }
-
-BGE::InputService::~InputService() {
-}
-
 
 BGE::Input *BGE::InputService::createInput() {
     InputHandle handle;
@@ -109,22 +108,22 @@ void BGE::InputService::process() {
     
     inputButtonHandlers_.clear();
     
-    for (auto input : inputs_) {
-        for (auto handle : Game::getInstance()->getSpaceService()->getSpaces()) {
+    for (auto const &input : inputs_) {
+        for (auto const &handle : Game::getInstance()->getSpaceService()->getSpaces()) {
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space->isVisible()) {
                 // Do buttons first
-                std::vector<std::shared_ptr<ButtonComponent>> touchComponents;
+                std::vector<ButtonComponent *> touchComponents;
                 space->getComponents<ButtonComponent>(touchComponents);
                 
-                for (auto touch : touchComponents) {
+                for (auto const &touch : touchComponents) {
                     auto gameObjHandle = touch->getGameObjectHandle();
                     
                     // Compute collision if exists
                     auto bbox = touch->getBoundingBox();
                     auto xform = touch->getTransform();
-                    auto parent = xform->getParent().lock();
+
                     Matrix4 matrix;
                     bool inBounds = false;
                     
@@ -141,7 +140,7 @@ void BGE::InputService::process() {
                     
                     buttonHandler.gameObjHandle = gameObjHandle;
                     buttonHandler.spaceHandle = handle;
-                    buttonHandler.buttonComponent = touch;
+                    buttonHandler.buttonComponentHandle = touch->getHandle<ButtonComponent>();
                     buttonHandler.touchType = input->type;
                     buttonHandler.inBounds = inBounds;
                     
@@ -152,6 +151,7 @@ void BGE::InputService::process() {
             }
         }
         
+        input->destroy();
         handleService_.release(input->getHandle().getHandle());
     }
     
@@ -159,20 +159,21 @@ void BGE::InputService::process() {
     
     auto eventService = Game::getInstance()->getEventService();
     
-    for (auto buttonHandler : inputButtonHandlers_) {
+    for (auto const &buttonHandler : inputButtonHandlers_) {
         auto space = Game::getInstance()->getSpaceService()->getSpace(buttonHandler.spaceHandle);
         auto gameObj = space->getGameObject(buttonHandler.gameObjHandle);
         
         if (gameObj) {
-            auto event = buttonHandler.buttonComponent->handleInput(buttonHandler.touchType, buttonHandler.inBounds);
+            auto buttonComponent = space->getComponent<ButtonComponent>(buttonHandler.buttonComponentHandle.getHandle());
+            auto event = buttonComponent->handleInput(buttonHandler.touchType, buttonHandler.inBounds);
             // Now if we match an event handler, dispatch that too
             auto it = inputEventHandlers_.find(event);
             
             if (it != inputEventHandlers_.end()) {
-                auto &handles = it->second;
+                auto const &handles = it->second;
                 auto gameObjName = gameObj->getName();
                 
-                for (auto handle : handles) {
+                for (auto const &handle : handles) {
                     auto handler = eventService->getEventHandler(handle);
                     
                     if (handler) {

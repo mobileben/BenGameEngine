@@ -15,18 +15,27 @@
 namespace BGE {
     class FrameAnimatorComponent : public Component
     {
-    private:
-        struct private_key {};
-        friend Component;
-        static uint32_t         bitmask_;
-        static std::type_index  type_index_;
-
     public:
-        static std::shared_ptr<FrameAnimatorComponent> create(ObjectId componentId);
+        static std::type_index  type_index_;
+        static uint32_t         typeId_;
+        static uint32_t         bitmask_;
         
-        FrameAnimatorComponent(struct private_key const& key, ObjectId componentId);
+        FrameAnimatorComponent() : Component(), currentFrame(0) {}
         ~FrameAnimatorComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            Component::initialize(handle, spaceHandle);
+            
+            currentFrame = 0;
+        }
+        
+        void destroy() final {
+            currentFrame = 0;
+        
+            // Component::destroy last
+            Component::destroy();
+        }
+
         // TODO: Move to controller
         int32_t     currentFrame;
     };

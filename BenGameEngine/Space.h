@@ -13,12 +13,13 @@
 #include <memory>
 #include <vector>
 #include "NamedObject.h"
-#include "GameObjectService.h"
 #include "ComponentService.h"
 #include "ScenePackage.h"
 #include "Handle.h"
 
 namespace BGE {
+    class GameObject;
+    class GameObjectService;
     class SpaceService;
     
     class Space : public NamedObject
@@ -28,43 +29,31 @@ namespace BGE {
         Space(ObjectId spaceId);
         Space(ObjectId spaceId, std::string name);
 
-        virtual ~Space() {}
+        ~Space() {}
         
-        void initialize(SpaceHandle handle, ObjectId spaceId, std::string name);
-
+        void initialize(SpaceHandle handle, std::string name);
+        void destroy();
+        
+        void outputResourceBreakdown(uint32_t numTabs) const;
+        void outputMemoryBreakdown(uint32_t numTabs) const;
+        
         inline SpaceHandle getHandle() const { return spaceHandle_; }
         
-        inline GameObject *createGameObject(std::string name = "") {
-            return gameObjectService_->createGameObject(name);
-        }
+        GameObject *createGameObject(std::string name = "");
         
-        inline GameObjectHandle getGameObjectHandle(ObjectId objId) {
-            return gameObjectService_->getGameObjectHandle(objId);
-        }
+        GameObjectHandle getGameObjectHandle(ObjectId objId) const;
+        GameObjectHandle getGameObjectHandle(std::string name) const;
         
-        inline GameObjectHandle getGameObjectHandle(std::string name) {
-            return gameObjectService_->getGameObjectHandle(name);
-        }
+        GameObject *getGameObject(ObjectId objId) const;
+        GameObject *getGameObject(std::string name) const;
+        GameObject *getGameObject(GameObjectHandle handle) const;
         
-        inline GameObject *getGameObject(ObjectId objId) {
-            return gameObjectService_->getGameObject(objId);
-        }
+        void removeGameObject(GameObjectHandle handle);
+        void removeGameObject(GameObject *object);
         
-        inline GameObject *getGameObject(std::string name) {
-            return gameObjectService_->getGameObject(name);
-        }
+        const std::vector<GameObjectHandle>& getGameObjects() const;
         
-        inline GameObject *getGameObject(GameObjectHandle handle) {
-            return gameObjectService_->getGameObject(handle);
-        }
-        
-        inline void removeGameObject(GameObjectHandle handle) {
-            gameObjectService_->removeGameObject(handle);
-        }
-        
-        const GameObjectService::GameObjectVector& getGameObjects() const { return gameObjectService_->getGameObjects(); }
-        
-        template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
+        template <typename T, typename... Args> T *createComponent(Args&& ...args) {
             auto component = componentService_->createComponent<T>(std::forward<Args>(args)...);
             
             if (component) {
@@ -74,32 +63,32 @@ namespace BGE {
             return component;
         }
         
-        template <typename T> std::shared_ptr<T> getComponent(ObjectId componentId) {
-            return componentService_->getComponent<T>(componentId);
+        template <typename T> inline T *getComponent(ComponentHandle handle) const {
+            return getComponent<T>(handle.handle);
+        }
+        
+        template <typename T> inline T *getComponent(HandleBackingType handle) const {
+            return componentService_->getComponent<T>(handle);
         }
 
-        template <typename T> void getComponents(std::vector<std::shared_ptr<T>> &components) {
+        template <typename T> inline void getComponents(std::vector<T *> &components) const {
             componentService_->getComponents<T>(components);
         }
         
-        template <typename T> void removeComponent(ObjectId componentId) {
-            componentService_->removeComponent<T>(componentId);
+        inline void removeComponent(ComponentHandle handle) {
+            componentService_->removeComponent(handle);
         }
         
-        template <typename T> void removeAllComponents()  {
+        template <typename T> inline void removeAllComponents()  {
             componentService_->removeAllComponents<T>();
         }
 
-        void removeComponent(std::type_index typeIndex, ObjectId componentId) {
-            componentService_->removeComponent(typeIndex, componentId);
-        }
-        
-        bool isVisible() const { return visible_; }
-        void setVisible(bool visible) { visible_ = visible; }
-        uint32_t getOrder() const { return order_; }
-        void setOrder(uint32_t order) { order_ = order; }
-        bool isUpdatable() const { return updatable_; }
-        void setUpdatable(bool updatable) { updatable_ = updatable; }
+        inline bool isVisible() const { return visible_; }
+        inline void setVisible(bool visible) { visible_ = visible; }
+        inline uint32_t getOrder() const { return order_; }
+        inline void setOrder(uint32_t order) { order_ = order; }
+        inline bool isUpdatable() const { return updatable_; }
+        inline void setUpdatable(bool updatable) { updatable_ = updatable; }
         
         GameObject *createAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
         GameObject *createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
@@ -113,14 +102,25 @@ namespace BGE {
         
         void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate);
 
+        void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+
+        // TODO: Add method for space to create/get scene package as well as removal
+        void scenePackageAdded(ScenePackageHandle handle);
+        void scenePackageRemoved(ScenePackageHandle handle);
+        
     protected:
         SpaceHandle spaceHandle_;
         
     private:
         friend SpaceService;
         
-        std::shared_ptr<GameObjectService> gameObjectService_;
-        std::shared_ptr<ComponentService> componentService_;
+        std::shared_ptr<GameObjectService>  gameObjectService_;
+        std::shared_ptr<ComponentService>   componentService_;
+        
+        std::vector<ScenePackageHandle>     scenePackages_;
+        std::vector<FontHandle>             fonts_;
+        std::vector<TextureHandle>          textures_;
+        std::vector<TextureAtlasHandle>     textureAtlases_;
         
         bool        visible_;
         uint32_t    order_;

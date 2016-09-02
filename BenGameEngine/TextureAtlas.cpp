@@ -20,9 +20,6 @@ BGE::TextureAtlas::TextureAtlas(ObjectId texId) : NamedObject(texId), valid_(fal
 BGE::TextureAtlas::TextureAtlas(ObjectId texId, std::string name) : NamedObject(texId, name), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0), hwId_(0), target_(GL_TEXTURE_2D) {
 }
 
-BGE::TextureAtlas::~TextureAtlas() {
-}
-
 void BGE::TextureAtlas::reset() {
     valid_ = false;
     handle_ = TextureAtlasHandle();
@@ -38,12 +35,29 @@ void BGE::TextureAtlas::reset() {
     subTextures_.clear();
 }
 
-void BGE::TextureAtlas::initialize(TextureAtlasHandle handle, ObjectId texId, std::string name) {
+void BGE::TextureAtlas::initialize(TextureAtlasHandle handle, std::string name) {
     reset();
     
     handle_ = handle;
-    setInstanceId(texId);
     setName(name);
+}
+
+void BGE::TextureAtlas::destroy() {
+    auto textureService = Game::getInstance()->getTextureService();
+    
+    valid_ = false;
+    
+    for (auto const &it : subTextures_) {
+        textureService->removeTexture(handle_, it.second);
+    }
+    
+    subTextures_.clear();
+    
+    // Now remove underlying texture
+    textureService->removeTexture(handle_, textureHandle_);
+    
+    handle_ = TextureAtlasHandle();
+    textureHandle_ = TextureHandle();
 }
 
 std::string BGE::TextureAtlas::atlasTextureKey() const {
@@ -60,8 +74,19 @@ BGE::TextureHandle BGE::TextureAtlas::getSubTextureHandle(std::string name) {
     }
 }
 
-void BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
-    Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), atlasTextureKey(), filename, [this, &subTextures, callback](Texture *texture, std::shared_ptr<Error> error) {
+
+size_t BGE::TextureAtlas::getMemoryUsage() const {
+    auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle_);
+    
+    if (texture) {
+        return texture->getMemoryUsage();
+    }
+    
+    return 0;
+}
+
+void BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+    Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), atlasTextureKey(), filename, format, [this, &subTextures, callback](Texture *texture, std::shared_ptr<Error> error) {
         if (!error) {
             std::shared_ptr<Error> bgeError;
             TextureAtlas *atlas = this;
@@ -79,7 +104,7 @@ void BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubText
                 this->target_ = texture->getTarget();
 
                 if (subTextures.size() > 0) {
-                    for (auto& st : subTextures) {
+                    for (auto const &st : subTextures) {
                         std::string key = st.name;
                         auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
                         
@@ -132,7 +157,7 @@ void BGE::TextureAtlas::createFromBuffer(void *buffer, TextureFormat format, uin
                 this->target_ = texture->getTarget();
                 
                 if (subTextures.size() > 0) {
-                    for (auto& st : subTextures) {
+                    for (auto const &st : subTextures) {
                         std::string key = st.name;
                         auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
                         

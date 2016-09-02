@@ -47,11 +47,12 @@ namespace BGE {
     bool operator!=(const TextReferenceIntermediate& lhs, const TextReferenceIntermediate& rhs);
     
     struct TextureReferenceIntermediate {
-        int32_t name;
-        int32_t atlasName;
-        float   width;
-        float   height;
-        bool    isAtlas;
+        int32_t         name;
+        int32_t         atlasName;
+        float           width;
+        float           height;
+        bool            isAtlas;
+        TextureFormat   format;
     };
     
     struct TextureReference {

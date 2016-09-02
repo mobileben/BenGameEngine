@@ -52,7 +52,7 @@ namespace BGE {
     public:
         FixedArray() : array_(nullptr), size_(0) {}
         
-        FixedArray(size_t size) : array_(nullptr), size_(size) {
+        FixedArray(int32_t size) : array_(nullptr), size_(size) {
             if (size > 0) {
                 array_ = new T[size_];
             }
@@ -95,7 +95,7 @@ namespace BGE {
         FixedArray(const std::vector<const std::vector<T> *>& vec) : array_(nullptr), size_(0) {
             int32_t total = 0;
             
-            for (auto v : vec) {
+            for (auto const &v : vec) {
                 total += v.size();
             }
             
@@ -106,14 +106,14 @@ namespace BGE {
                 if (std::is_pod<T>::value) {
                     auto span = 0;
                     
-                    for (auto v : vec) {
+                    for (auto const &v : vec) {
                         memcpy(&array_[span], v.begin(), sizeof(T) * v.size());
                         span += v.size();
                     }
                 } else {
                     auto span = 0;
                     
-                    for (auto v : vec) {
+                    for (auto const &v : vec) {
                         std::copy(v.begin(), v.end(), &array_[span]);
                         span += v.size();
                     }
@@ -236,6 +236,8 @@ namespace BGE {
         }
         
         int32_t getSize() const { return size_; }
+        
+        size_t getMemoryUsage() const { return size_ * sizeof(T); }
         
         FixedArrayIterator<T> begin () const {
             return FixedArrayIterator<T>(this, 0);

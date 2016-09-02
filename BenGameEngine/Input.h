@@ -46,6 +46,7 @@ namespace BGE {
         ~Input() {}
         
         void initialize(InputHandle handle);
+        void destroy();
         
         bool operator <(const Input &rhs) const { return timestamp < rhs.timestamp; }
         

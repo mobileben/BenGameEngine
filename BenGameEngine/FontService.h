@@ -32,25 +32,33 @@ namespace BGE {
         FontService(std::map<std::string, std::string> resources = std::map<std::string, std::string>());
         ~FontService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
 
-        void createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
-        void createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
-
-        void removeFont(FontHandle handle, ScenePackageHandle scenePackageHandle);
-        void removeFont(FontHandle handle, SpaceHandle spaceHandle);
-
-        FontHandle getFontHandle(std::string name, uint32_t pixelSize);
+        uint32_t numFonts() const;
         
-        Font *getFont(std::string name, uint32_t pixelSize);
-        Font *getFont(FontHandle handle);
+        uint32_t numUsedHandles() const final;
+        uint32_t maxHandles() const final;
+        uint32_t numHandleResizes() const final;
+        uint32_t maxHandlesAllocated() const final;
+
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
+
+        void removeFont(ScenePackageHandle scenePackageHandle, FontHandle handle);
+        void removeFont(SpaceHandle spaceHandle, FontHandle handle);
+
+        FontHandle getFontHandle(std::string name, uint32_t pixelSize) const;
+        
+        Font *getFont(std::string name, uint32_t pixelSize) const;
+        Font *getFont(FontHandle handle) const;
  
     protected:
         // TODO: For now this is Mac/iOS specific
@@ -66,8 +74,14 @@ namespace BGE {
         std::vector<std::shared_ptr<FontInfo>>                          fontInfo_;
         
         std::string pathForAsset(std::string asset);
-        
+
+        void createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+        void createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+
     private:
+        friend class ScenePackage;
+        friend class Space;
+        
         static const uint32_t InitialFontReserve = 32;
 
         using FontHandleService = HandleService<Font, FontHandle>;

@@ -8,6 +8,8 @@
 
 #include "ButtonComponent.h"
 #include "Game.h"
+#include "TransformComponent.h"
+#include "BoundingBoxComponent.h"
 
 static const char *ButtonStateDisabledString = "disabled";
 static const char *ButtonStateDisabledAnimString = "disabled-anim";
@@ -17,13 +19,63 @@ static const char *ButtonStateHighlightedString = "highlighted";
 static const char *ButtonStateHighlightedAnimString = "highlighted-anim";
 
 uint32_t BGE::ButtonComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent);
 
-std::shared_ptr<BGE::ButtonComponent> BGE::ButtonComponent::create(ObjectId componentId) {
-    return std::make_shared<ButtonComponent>(private_key{}, componentId);
+BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted(true), toggleable(false), toggleOn(false) {
 }
 
-BGE::ButtonComponent::ButtonComponent(struct private_key const& key, ObjectId componentId) : Component(componentId), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted(true), toggleable(false), toggleOn(false) {
+void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    Component::initialize(handle, spaceHandle);
+    
+    state = ButtonStateNormal;
+    animate = false;
+    enabled = true;
+    showHighlighted = true;
+    
+    toggleable = false;
+    toggleOn = false;
+    
+    disabledButtonHandle = GameObjectHandle();
+    disabledAnimButtonHandle = GameObjectHandle();
+    normalButtonHandle = GameObjectHandle();
+    normalAnimButtonHandle = GameObjectHandle();
+    highlightedButtonHandle = GameObjectHandle();
+    highlightedAnimButtonHandle = GameObjectHandle();
+    currentButtonHandle = GameObjectHandle();
+}
+
+void BGE::ButtonComponent::destroy() {
+    state = ButtonStateNormal;
+    animate = false;
+    enabled = false;
+    showHighlighted = false;
+    
+    toggleable = false;
+    toggleOn = false;
+    
+    auto space = getSpace();
+    
+    if (space) {
+        space->removeGameObject(disabledButtonHandle);
+        space->removeGameObject(disabledAnimButtonHandle);
+        space->removeGameObject(normalButtonHandle);
+        space->removeGameObject(normalAnimButtonHandle);
+        space->removeGameObject(highlightedButtonHandle);
+        space->removeGameObject(highlightedAnimButtonHandle);
+        space->removeGameObject(currentButtonHandle);
+    }
+    
+    disabledButtonHandle = GameObjectHandle();
+    disabledAnimButtonHandle = GameObjectHandle();
+    normalButtonHandle = GameObjectHandle();
+    normalAnimButtonHandle = GameObjectHandle();
+    highlightedButtonHandle = GameObjectHandle();
+    highlightedAnimButtonHandle = GameObjectHandle();
+    currentButtonHandle = GameObjectHandle();
+
+    // Component::destroy last
+    Component::destroy();
 }
 
 void BGE::ButtonComponent::setButtonReference(ButtonReference *buttonRef) {
@@ -147,7 +199,7 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
     }
 }
 
-std::shared_ptr<BGE::BoundingBoxComponent> BGE::ButtonComponent::getBoundingBox() {
+BGE::BoundingBoxComponent *BGE::ButtonComponent::getBoundingBox() {
     auto currentButton = getSpace()->getGameObject(currentButtonHandle);
     
     if (currentButton) {
@@ -160,7 +212,7 @@ std::shared_ptr<BGE::BoundingBoxComponent> BGE::ButtonComponent::getBoundingBox(
     }
 }
 
-std::shared_ptr<BGE::TransformComponent> BGE::ButtonComponent::getTransform() {
+BGE::TransformComponent *BGE::ButtonComponent::getTransform() {
     auto currentButton = getSpace()->getGameObject(currentButtonHandle);
     
     if (currentButton) {

@@ -18,12 +18,12 @@
 #include <type_traits>
 
 namespace BGE {
+    static const uint32_t HandleServiceNoMaxLimit = 0;
+    
     template <typename DATA, typename HANDLE>
     class HandleService : public Service {
     public:
-        static const uint32_t NoMaxLimit = 0;
-        
-        HandleService(uint32_t reserve, uint32_t maxLimit) : maxLimit_(maxLimit) {
+        HandleService(uint32_t reserve, uint32_t maxLimit) : numResizes_(0), maxAllocated_(0), maxLimit_(maxLimit) {
 #if UNIT_TESTING
             if (reserve == 0) {
                 throw std::exception();
@@ -31,12 +31,13 @@ namespace BGE {
                 throw std::exception();
             }
 #else
-            assert(reserve > 0 && (maxLimit == 0 || maxLimit >= reserve));
+            assert(reserve > 0 && (maxLimit == HandleServiceNoMaxLimit || maxLimit >= reserve));
 #endif
-            
             data_.reserve(reserve);
             magic_.reserve(reserve);
             freeSlots_.reserve(reserve);
+            
+            initialCapacity_ = (uint32_t) data_.capacity();
         }
         
         HandleService() = delete;
@@ -52,20 +53,28 @@ namespace BGE {
         void update(double deltaTime) {}
 
         DATA* allocate(HANDLE& handle) {
-            uint32_t index;
+            HandleBackingType index;
             
             if (freeSlots_.empty()) {
                 // We have no free slots, so create a new one if we are not at our limit
-                if (maxLimit_ && data_.size() >= maxLimit_) {
+                if (maxLimit_ != HandleServiceNoMaxLimit && data_.size() >= maxLimit_) {
                     handle.nullify();
                     return nullptr;
                 }
                 
-                index = (uint32_t) magic_.size();
+                index = (HandleBackingType) magic_.size();
                 handle.init(index);
                 
                 data_.push_back(DATA());
                 magic_.push_back(handle.getMagic());
+                
+                if (data_.size() > maxAllocated_) {
+                    maxAllocated_ = (uint32_t) data_.size();
+                }
+                
+                if (data_.capacity() != initialCapacity_) {
+                    numResizes_++;
+                }
             } else {
                 index = freeSlots_.back();
                 handle.init(index);
@@ -101,7 +110,7 @@ namespace BGE {
             freeSlots_.push_back(index);
         }
         
-        DATA* dereference(HANDLE handle) {
+        DATA *dereference(HANDLE handle) const {
             if (handle.isNull()) {
                 return nullptr;
             }
@@ -112,11 +121,21 @@ namespace BGE {
                 return nullptr;
             }
             
-            return &data_[index];
+            return const_cast<DATA *>(&data_[index]);
         }
+
+        std::vector<DATA *> activePointers() const {
+            std::vector<DATA *> pointers;
         
-        const DATA* dereference(HANDLE handle) const {
-            return (const_cast<HandleService<DATA, HANDLE>*>(this)->dereference(handle));
+            for (auto i=0;i<data_.size();i++) {
+                if (magic_[i] != 0) {
+                    DATA *ptr = const_cast<DATA *>(&data_[i]);
+                    
+                    pointers.push_back(ptr);
+                }
+            }
+            
+            return pointers;
         }
         
         uint32_t numUsedHandles() const {
@@ -125,6 +144,34 @@ namespace BGE {
         
         uint32_t capacity() const {
             return (uint32_t) data_.capacity();
+        }
+        
+        uint32_t initialCapacity() const {
+            return initialCapacity_;
+        }
+        
+        uint32_t numResizes() const {
+            return numResizes_;
+        }
+        
+        size_t usedMemory() const {
+            return numUsedHandles() * sizeof(DATA);
+        }
+        
+        size_t unusedMemory() const {
+            return capacity() * sizeof(DATA) - usedMemory();
+        }
+        
+        size_t totalMemory() const {
+            return capacity() * sizeof(DATA);
+        }
+        
+        uint32_t getNumResizes() const {
+            return numResizes_;
+        }
+        
+        uint32_t getMaxAllocated() const {
+            return maxAllocated_;
         }
         
 #if UNIT_TESTING
@@ -148,9 +195,12 @@ namespace BGE {
         
     private:
         typedef std::vector<DATA> DataVector;
-        typedef std::vector<uint32_t> MagicVector;
-        typedef std::vector<uint32_t> FreeVector;
+        typedef std::vector<HandleBackingType> MagicVector;
+        typedef std::vector<HandleBackingType> FreeVector;
         
+        uint32_t    initialCapacity_;
+        uint32_t    numResizes_;
+        uint32_t    maxAllocated_;
         uint32_t    maxLimit_;
         DataVector  data_;
         MagicVector magic_;

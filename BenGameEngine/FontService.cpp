@@ -32,7 +32,7 @@ void BGE::FontService::mapBundles(std::string bundleName)
     }
 }
 
-BGE::FontService::FontService(std::map<std::string, std::string> resources) : handleService_(InitialFontReserve, FontHandleService::NoMaxLimit) {
+BGE::FontService::FontService(std::map<std::string, std::string> resources) : handleService_(InitialFontReserve, HandleServiceNoMaxLimit) {
     FontService::mapBundles("BenGameEngineBundle");
 
     std::vector<std::string> assets;
@@ -43,7 +43,7 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
     fontResources_.insert(resources.begin(), resources.end());
     
     // Build FontInfo for all font resources
-    for (auto f : fontResources_) {
+    for (auto const &f : fontResources_) {
         names.push_back(f.first);
         assets.push_back(f.second);
     }
@@ -51,27 +51,27 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
     std::unique(assets.begin(), assets.end());
     
     // Assets will be unique
-    for (auto f : assets) {
+    for (auto const &f : assets) {
         buildFontInfoForAsset(f);
     }
     
     std::unique(fontInfo_.begin(), fontInfo_.end(), fontInfoIsEqual);
     
     // Build font table based on font names/aliases and
-    for (auto fi : fontInfo_) {
+    for (auto const &fi : fontInfo_) {
         names.push_back(fi->name());
     }
     
     std::unique(names.begin(), names.end());
     
-    for (auto name : names) {
+    for (auto const &name : names) {
         auto it = fontResources_.find(name);
         bool found = false;
         
         if (it != fontResources_.end()) {
             // Find the font info with our name it will either an exact match,
             
-            for (auto fi : fontInfo_) {
+            for (auto const &fi : fontInfo_) {
                 if (fi->name() == name) {
                     // This is the right one
                     fontTable_[name] = fi;
@@ -82,7 +82,7 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
             
             if (!found) {
                 // This is probably an alias, so find the non-style version of the asset
-                for (auto fi : fontInfo_) {
+                for (auto const &fi : fontInfo_) {
                     if (fi->asset == it->second && fi->faceIndex == 0) {
                         // This is the right one
                         fontTable_[name] = fi;
@@ -92,7 +92,7 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
                 }
             }
         } else {
-            for (auto fi : fontInfo_) {
+            for (auto const &fi : fontInfo_) {
                 if (fi->name() == name) {
                     // This is the right one
                     fontTable_[name] = fi;
@@ -104,6 +104,48 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
         
         assert(found);
     }
+}
+
+uint32_t BGE::FontService::numFonts() const {
+    uint32_t num = 0;
+    
+    for (auto const &fontInfo : fontInfo_) {
+        for (auto const &it : fontInfo->fonts) {
+            if (handleService_.dereference(it.second)) {
+                num++;
+            }
+        }
+    }
+    
+    return num;
+}
+
+uint32_t BGE::FontService::numUsedHandles() const {
+    return handleService_.numUsedHandles();
+}
+
+uint32_t BGE::FontService::maxHandles() const {
+    return handleService_.capacity();
+}
+
+uint32_t BGE::FontService::numHandleResizes() const {
+    return handleService_.numResizes();
+}
+
+uint32_t BGE::FontService::maxHandlesAllocated() const {
+    return handleService_.getMaxAllocated();
+}
+
+size_t BGE::FontService::usedHandleMemory() const {
+    return handleService_.usedMemory();
+}
+
+size_t BGE::FontService::unusedHandleMemory() const {
+    return handleService_.unusedMemory();
+}
+
+size_t BGE::FontService::totalHandleMemory() const {
+    return handleService_.totalMemory();
 }
 
 // TODO: Move to file service
@@ -191,7 +233,7 @@ void BGE::FontService::buildFontInfoForAsset(std::string asset) {
     }
 }
 
-BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) {
+BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) const {
     auto f = fontTable_.find(name);
     
     if (f != fontTable_.end()) {
@@ -206,7 +248,7 @@ BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixel
     return FontHandle();
 }
 
-BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
+BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) const {
     auto f = fontTable_.find(name);
     
     if (f != fontTable_.end()) {
@@ -221,16 +263,17 @@ BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
     return nullptr;
 }
 
-BGE::Font *BGE::FontService::getFont(FontHandle handle) {
+BGE::Font *BGE::FontService::getFont(FontHandle handle) const {
     return handleService_.dereference(handle);
 }
 
-void BGE::FontService::removeFont(FontHandle handle, ScenePackageHandle scenePackageHandle) {
+void BGE::FontService::removeFont(ScenePackageHandle scenePackageHandle, FontHandle handle) {
     auto sceneIt = fontScenePackages_.find(handle);
     
     if (sceneIt != fontScenePackages_.end()) {
         for (auto scene=sceneIt->second.begin();scene != sceneIt->second.end();scene++) {
             if (*scene == scenePackageHandle) {
+                // Need to erase prior to checking if the font has anymore references
                 sceneIt->second.erase(scene);
                 
                 if (!fontHasReferences(handle)) {
@@ -244,12 +287,13 @@ void BGE::FontService::removeFont(FontHandle handle, ScenePackageHandle scenePac
     }
 }
 
-void BGE::FontService::removeFont(FontHandle handle, SpaceHandle spaceHandle) {
+void BGE::FontService::removeFont(SpaceHandle spaceHandle, FontHandle handle) {
     auto spaceIt = fontSpaces_.find(handle);
     
     if (spaceIt != fontSpaces_.end()) {
         for (auto space=spaceIt->second.begin();space != spaceIt->second.end();space++) {
             if (*space == spaceHandle) {
+                // Need to erase prior to checking if the font has anymore references
                 spaceIt->second.erase(space);
                 
                 if (!fontHasReferences(handle)) {
@@ -265,9 +309,15 @@ void BGE::FontService::removeFont(FontHandle handle, SpaceHandle spaceHandle) {
 
 void BGE::FontService::removeFont(FontHandle handle) {
     
-    for (auto fontInfo : fontInfo_) {
-        for (auto it : fontInfo->fonts) {
+    for (auto const &fontInfo : fontInfo_) {
+        for (auto const &it : fontInfo->fonts) {
             if (it.second == handle) {
+                auto font = getFont(it.second);
+                
+                if (font) {
+                    font->destroy();
+                }
+                
                 handleService_.release(it.second);
                 fontInfo->fonts.erase(it.first);
                 return;
@@ -279,14 +329,18 @@ void BGE::FontService::removeFont(FontHandle handle) {
 bool BGE::FontService::fontHasReferences(FontHandle fontHandle) {
     auto sceneIt = fontScenePackages_.find(fontHandle);
     
-    if (sceneIt->second.size() > 0) {
-        return true;
+    if (sceneIt != fontScenePackages_.end()) {
+        if (sceneIt->second.size() > 0) {
+            return true;
+        }
     }
 
     auto spaceIt = fontSpaces_.find(fontHandle);
-    
-    if (spaceIt->second.size() > 0) {
-        return true;
+
+    if (spaceIt != fontSpaces_.end()) {
+        if (spaceIt->second.size() > 0) {
+            return true;
+        }
     }
     
     return false;
@@ -313,9 +367,7 @@ void BGE::FontService::createFont(std::string name, uint32_t pxSize, std::functi
                 Font *tFont = handleService_.allocate(handle);
                 
                 if (tFont) {
-                    ObjectId fontId = getIdAndIncrement();
-                    
-                    tFont->initialize(handle, fontId, name, pxSize);
+                    tFont->initialize(handle, name, pxSize);
                     tFont->status_ = FontStatus::Loading;
                     
                     info->fonts[pxSize] = handle;
@@ -335,8 +387,10 @@ void BGE::FontService::createFont(std::string name, uint32_t pxSize, std::functi
                                     
                                     if (tFont) {
                                         if (tFont->status_ == FontStatus::Loading) {
-                                            info->fonts.erase(pxSize);
+                                            tFont->destroy();
                                             handleService_.release(f->second);
+
+                                            info->fonts.erase(pxSize);
                                         }
                                     }
                                 }
@@ -366,7 +420,7 @@ void BGE::FontService::createFont(std::string name, uint32_t pxSize, ScenePackag
             auto &scenePackages = fontScenePackages_[fontHandle];
             bool found = false;
             
-            for (auto package : scenePackages) {
+            for (auto const &package : scenePackages) {
                 if (scenePackageHandle == package) {
                     found = true;
                     break;
@@ -391,7 +445,7 @@ void BGE::FontService::createFont(std::string name, uint32_t pxSize, SpaceHandle
             auto &spaces = fontSpaces_[fontHandle];
             bool found = false;
             
-            for (auto space : spaces) {
+            for (auto const &space : spaces) {
                 if (spaceHandle == space) {
                     found = true;
                     break;

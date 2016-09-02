@@ -15,18 +15,20 @@
 
 namespace BGE {
     class ColorTransformComponent : public Component {
-    private:
-        struct private_key {};
-        friend Component;
-        static uint32_t         bitmask_;
-        static std::type_index  type_index_;
-
     public:
-        static std::shared_ptr<ColorTransformComponent> create(ObjectId componentId);
+        static std::type_index  type_index_;
+        static uint32_t         typeId_;
+        static uint32_t         bitmask_;
         
-        ColorTransformComponent(struct private_key const& key, ObjectId componentId);
+        ColorTransformComponent();
         ~ColorTransformComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
+            Component::initialize(handle, spaceHandle);
+            
+            ColorTransformMakeIdentity(transform);
+        }
+
         ColorTransform transform;
     };
 }

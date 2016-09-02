@@ -19,6 +19,8 @@
 #include "ColorMatrixComponent.h"
 #include "ColorTransformComponent.h"
 #include "TextureMaskComponent.h"
+#include "MaskComponent.h"
+#include "TransformComponent.h"
 
 const GLubyte Indices[] = {
     0, 1, 2,
@@ -53,6 +55,51 @@ void BGE::RenderServiceOpenGLES2::enteringForeground() {}
 void BGE::RenderServiceOpenGLES2::pause() {}
 void BGE::RenderServiceOpenGLES2::resume() {}
 void BGE::RenderServiceOpenGLES2::destroy() {}
+
+size_t BGE::RenderServiceOpenGLES2::totalMemory() const {
+    auto view = this->getRenderWindow()->getView();
+    size_t memory = 0;
+    auto area = view.drawableWidth * view.drawableHeight;
+    
+    switch (view.drawableColorFormat) {
+        case GLKViewDrawableColorFormatRGBA8888:
+        case GLKViewDrawableColorFormatSRGBA8888:
+            memory += area * 4;
+            break;
+            
+        case GLKViewDrawableColorFormatRGB565:
+            memory += area * 2;
+            break;
+            
+        default:
+            break;
+    }
+    
+    switch (view.drawableStencilFormat) {
+        case GLKViewDrawableStencilFormat8:
+            memory += area;
+            break;
+            
+        default:
+            break;
+    }
+    
+    switch (view.drawableDepthFormat) {
+        case GLKViewDrawableDepthFormat24:
+            memory += area * 3;
+            break;
+            
+        case GLKViewDrawableDepthFormat16:
+            memory += area * 2;
+            break;
+            
+        default:
+            break;
+    }
+    
+    return memory;
+    
+}
 
 void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D)
 {
@@ -151,7 +198,7 @@ std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgr
         
         glUseProgram(glProgram->getProgram());
         
-        for (auto &kv: glProgram->getAttributes()) {
+        for (auto const &kv: glProgram->getAttributes()) {
             
         }
     }
@@ -454,7 +501,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
 
 void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
     if (gameObject) {
-        std::shared_ptr<FlatRectRenderComponent> flatRect = std::dynamic_pointer_cast<FlatRectRenderComponent>(gameObject->getComponent<FlatRectRenderComponent>());
+        auto flatRect = gameObject->getComponent<FlatRectRenderComponent>();
         
         if (flatRect) {
             Vertex *const vertices = flatRect->getVertices();
@@ -465,7 +512,6 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
 
                 GLint positionLocation = glShader->locationForAttribute("Position");
                 GLint projectionLocation = glShader->locationForUniform("Projection");
-                GLint modelLocation = glShader->locationForUniform("ModelView");
                 GLint colorLocation = glShader->locationForUniform("Color");
                 
                 glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
@@ -486,7 +532,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
 
 void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
     if (gameObject) {
-        std::shared_ptr<MaskComponent> maskRect = std::dynamic_pointer_cast<MaskComponent>(gameObject->getComponent<MaskComponent>());
+        auto maskRect = gameObject->getComponent<MaskComponent>();
         
         if (maskRect) {
             Vertex *const vertices = maskRect->getVertices();
@@ -541,7 +587,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
 
             uint32_t index = 0;
             
-            for (auto pt : points) {
+            for (auto const &pt : points) {
                 vertices[index].x = pt.x;
                 vertices[index].y = pt.y;
                 vertices[index].z = 0;
@@ -594,7 +640,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
 
 void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
     if (gameObject) {
-        std::shared_ptr<SpriteRenderComponent> sprite = std::dynamic_pointer_cast<SpriteRenderComponent>(gameObject->getComponent<SpriteRenderComponent>());
+        auto sprite = gameObject->getComponent<SpriteRenderComponent>();
         
         if (sprite) {
             VertexTex *const vertices = sprite->getVertices();
@@ -656,8 +702,14 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                                        GL_UNSIGNED_BYTE, &Indices[0]);
                     }
                 }
+            } else {
+                NSLog(@"INDEED");
             }
+        } else {
+            NSLog(@"HWY");
         }
+    } else {
+        NSLog(@"HWY");
     }
 }
 
@@ -750,14 +802,16 @@ void BGE::RenderServiceOpenGLES2::render()
         std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
         
         
-        for (auto handle : spaceHandles) {
+        for (auto const &handle : spaceHandles) {
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space && space->isVisible()) {
-                for (auto objHandle : space->getGameObjects()) {
+                for (auto const &objHandle : space->getGameObjects()) {
                     auto obj = space->getGameObject(objHandle);
                     
-                    renderGameObject(obj, true);
+                    if (obj) {
+                        renderGameObject(obj, true);
+                    }
                 }
             }
         }
@@ -781,7 +835,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
             return maskValue;
         }
 
-        auto parent = transformComponent->getParent().lock();
+        auto parent = transformComponent->getParent();
 
         if (root && parent) {
             return maskValue;
@@ -830,7 +884,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         } else if (gameObj->hasComponent<SpriteRenderComponent>()) {
             drawSprite(gameObj);
         } else if (gameObj->hasComponent<TextComponent>()) {
-            std::shared_ptr<TextComponent> text = gameObj->getComponent<TextComponent>();
+            auto text = gameObj->getComponent<TextComponent>();
             Font *font = Game::getInstance()->getFontService()->getFont(text->getFontHandle());
             
             if (font) {

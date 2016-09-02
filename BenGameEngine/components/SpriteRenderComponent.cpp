@@ -11,13 +11,10 @@
 #include "Game.h"
 
 uint32_t BGE::SpriteRenderComponent::bitmask_ = Component::InvalidBitmask;
+uint32_t BGE::SpriteRenderComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::SpriteRenderComponent::type_index_ = typeid(BGE::SpriteRenderComponent);
 
-std::shared_ptr<BGE::SpriteRenderComponent> BGE::SpriteRenderComponent::create(ObjectId componentId) {
-    return std::make_shared<SpriteRenderComponent>(private_key{}, componentId);
-}
-
-BGE::SpriteRenderComponent::SpriteRenderComponent(struct private_key const& key, ObjectId componentId) : RenderComponent(componentId) {
+BGE::SpriteRenderComponent::SpriteRenderComponent() : RenderComponent() {
 }
 
 void BGE::SpriteRenderComponent::setTextureReference(TextureReference *texRef) {

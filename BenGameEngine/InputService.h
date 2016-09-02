@@ -58,7 +58,7 @@ namespace BGE {
     struct InputButtonHandler {
         GameObjectHandle                    gameObjHandle;
         SpaceHandle                         spaceHandle;
-        std::shared_ptr<ButtonComponent>    buttonComponent;
+        ButtonComponentHandle               buttonComponentHandle;
         TouchType                           touchType;
         bool                                inBounds;
     };
@@ -66,16 +66,16 @@ namespace BGE {
     class InputService : public Service {
     public:
         InputService();
-        ~InputService();
+        ~InputService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
         
         void touchEventDown(NSSet* touches, UIView* view);
         void touchEventUp(NSSet* touches, UIView* view);

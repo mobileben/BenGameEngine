@@ -24,8 +24,21 @@ namespace BGE {
     
     class RenderComponent : public Component {
     public:
-        virtual ~RenderComponent();
+        virtual ~RenderComponent() {}
         
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) override {
+            Component::initialize(handle, spaceHandle);
+            
+            enabled_= true;
+            globalBoundsDirty_ = true;
+            localBounds_.x = 0;
+            localBounds_.y = 0;
+            localBounds_.w = 0;
+            localBounds_.h = 0;
+        }
+        
+        void destroy() override;
+
         float getLocalWidth() { return localBounds_.w; }
         float getLocalHeight() { return localBounds_.h; }
         float getGlobalWidth() { return globalBounds_.w; }
@@ -37,12 +50,15 @@ namespace BGE {
         void setEnabled(bool enabled) { enabled_ = enabled; }
         RenderComponentAnchor getAnchor() const { return anchor_; }
         
-        MaterialHandle getMaterialHandle(uint32_t index=0);
-        Material *getMaterial(uint32_t index=0);
+        MaterialHandle getMaterialHandle(uint32_t index=0) const;
+        Material *getMaterial(uint32_t index=0) const;
+        std::vector<MaterialHandle> getMaterialHandles() const;
+        std::vector<Material *> getMaterials() const;
+        
         void setMaterials(std::vector<MaterialHandle> materials);
         
     protected:
-        RenderComponent(ObjectId componentId);
+        RenderComponent();
         
         bool getGlobalBoundsDirty() const { return globalBoundsDirty_; }
         void setGlobalBoundsDirty(bool dirty) { globalBoundsDirty_ = dirty; }

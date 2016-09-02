@@ -26,16 +26,27 @@ namespace BGE {
         using GameObjectVector = std::vector<GameObjectHandle>;
         
         GameObjectService();
-        ~GameObjectService();
+        ~GameObjectService() {}
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
+        
+        uint32_t numGameObjects () const;
+        
+        uint32_t numUsedHandles() const final;
+        uint32_t maxHandles() const final;
+        uint32_t numHandleResizes() const final;
+        uint32_t maxHandlesAllocated() const final;
+
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
         
         inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
         inline SpaceHandle getSpaceHandle() const { return spaceHandle_; }
@@ -43,27 +54,44 @@ namespace BGE {
 
         GameObject *createGameObject(std::string name="");
         
-        GameObjectHandle getGameObjectHandle(ObjectId objId);
-        GameObjectHandle getGameObjectHandle(std::string name);
-        GameObject *getGameObject(ObjectId objId);
-        GameObject *getGameObject(std::string name);
-        GameObject *getGameObject(GameObjectHandle handle);
-
+        GameObjectHandle getGameObjectHandle(ObjectId objId) const;
+        GameObjectHandle getGameObjectHandle(std::string name) const;
+        inline GameObject *getGameObject(ObjectId objId) const {
+            return handleService_.dereference(getGameObjectHandle(objId));
+        }
+        
+        inline GameObject *getGameObject(std::string name) const  {
+            return handleService_.dereference(getGameObjectHandle(name));
+        }
+        
+        inline GameObject *getGameObject(GameObjectHandle handle) const  {
+            return handleService_.dereference(handle);
+        }
+        
         void removeGameObject(GameObjectHandle handle);
+        
+        inline void removeGameObject(GameObject *object) {
+            if (object) {
+                removeGameObject(object->getHandle());
+            }
+        }
+        
+        void removeAllGameObjects();
         
         inline const GameObjectVector& getGameObjects() const { return gameObjects_; }
         
     private:
         friend Space;
         
-        static const uint32_t InitialGameObjectReserve = 1024;
-        
         using GameObjectHandleService = HandleService<GameObject, GameObjectHandle>;
-        
-        GameObjectHandleService handleService_;
+
+        static const uint32_t InitialGameObjectReserve = 1024;
+        static GameObjectHandleService handleService_;
         
         SpaceHandle         spaceHandle_;
         GameObjectVector    gameObjects_;
+        
+        void releaseObject(GameObjectHandle handle);
     };
 }
 

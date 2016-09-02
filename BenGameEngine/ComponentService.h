@@ -17,93 +17,191 @@
 #include <type_traits>
 #include "Service.h"
 #include "Component.h"
-#include "GameObject.h"
+#include "HandleService.h"
 
 namespace BGE {
     class Space;
+    class GameObject;
     
     class ComponentService : public BGE::Service
     {
     public:
         ComponentService();
         ComponentService(SpaceHandle spaceHandle);
-        ~ComponentService();
+        ~ComponentService() {}
         
         static void registerComponents();
         
-        void initialize() {}
-        void reset() {}
-        void enteringBackground() {}
-        void enteringForeground() {}
-        void pause() {}
-        void resume() {}
-        void destroy() {}
-        void update(double deltaTime) {}
+        void initialize() final {}
+        void reset() final {}
+        void enteringBackground() final {}
+        void enteringForeground() final {}
+        void pause() final {}
+        void resume() final {}
+        void destroy() final {}
+        void update(double deltaTime) final {}
 
-        void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
-        SpaceHandle getSpaceHandle(void) const { return spaceHandle_; }
+        template <typename T> uint32_t numComponents() const {
+            uint32_t num = 0;
+
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            num = handleService->numUsedHandles();
+            
+            return num;
+        }
+
+        template <typename T> uint32_t maxComponents() const {
+            uint32_t num = 0;
+    
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            num = handleService->capacity();
+    
+            return num;
+        }
+
+        template <typename T> uint32_t maxHandlesAllocated() const {
+            uint32_t num = 0;
+    
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            num = handleService->getMaxAllocated();
+    
+            return num;
+        }
+
+        template <typename T> uint32_t numResizes() const {
+            uint32_t num = 0;
+    
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            num = handleService->getNumResizes();
+    
+            return num;
+        }
+
+        uint32_t totalNumComponents() const;
+        uint32_t totalNumUsedHandles() const;
+        uint32_t totalMaxHandlesAllocated() const;
+        uint32_t totalMaxHandles() const;
+
+        uint32_t numMaterials() const;
         
-        template <typename T, typename... Args> std::shared_ptr<T> createComponent(Args&& ...args) {
-            static_assert(std::is_base_of<Component, T>::value, "Not Component");
-            ObjectId objId = getIdAndIncrement();
-            std::shared_ptr<T> component = T::create(objId, std::forward<Args>(args)...);
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
+
+        void outputResourceBreakdown(uint32_t numTabs) const final;
+        void outputMemoryBreakdown(uint32_t numTabs) const final;
+
+        inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
+        inline SpaceHandle getSpaceHandle(void) const { return spaceHandle_; }
+        
+        template <typename T, typename... Args> T *createComponent(Args&& ...args) {
+            using HANDLE = Handle<T>;
+            using HANDLESERVICE = HandleService<T, HANDLE>;
+            HANDLESERVICE *handleService = static_cast<HANDLESERVICE *>(componentHandleServices_[T::typeId_]);
             
-            component->setSpaceHandle(spaceHandle_);
-            addComponent(component);
+            if (handleService) {
+                HANDLE componentHandle;
+                T *component = handleService->allocate(componentHandle);
+                auto &handles = componentHandles_[T::typeId_];
+                ComponentHandle handle{T::typeId_, componentHandle.getHandle()};
+                
+                handles.push_back(handle);
+                
+                assert(component);
+                
+                component->initialize(handle.handle, spaceHandle_);
+                
+                return component;
+            }
             
-            component->created();
-            
-            return component;
+            return nullptr;
         }
         
-        template <typename T> std::shared_ptr<T> getComponent(ObjectId componentId);
-        template <typename T> void getComponents(std::vector<std::shared_ptr<T>> &components) {
+        template <typename T> T *getComponent(HandleBackingType handle) const {
+            auto typeId = T::typeId_;
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
+            auto tHandle = Handle<T>(handle);
+            return handleService->dereference(tHandle);
+        }
+        
+        template <typename T> void getComponents(std::vector<T *> &components) const {
+            auto typeId = T::typeId_;
+            auto const &handles = componentHandles_[typeId];
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
+            
             components.clear();
-            
-            ComponentMapIterator it = components_.find(Component::getTypeIndex<T>());
-            
-            if (it != components_.end()) {
-                for (auto component : it->second) {
-                    auto gameObjHandle = component->getGameObjectHandle();
-                    auto gameObj = getComponentGameObject(component.get(), gameObjHandle);
-                    if (gameObj->isActive()) {
-                        auto z = std::static_pointer_cast<T>(component);
-                        components.push_back(z);
-                    }
+
+            for (auto const &handle : handles) {
+                auto component = handleService->dereference(Handle<T>(handle.handle));
+                
+                if (component) {
+                    components.push_back(component);
                 }
             }
         }
         
-        template <typename T> void removeComponent(ObjectId componentId);
-        template <typename T> void removeAllComponents();
+        void removeComponent(ComponentHandle handle);
         
-        void removeComponent(std::type_index typeIndex, ObjectId componentId);
+        template <typename T> void removeAllComponents() {
+            auto typeId = T::typeId_;
+            auto &handles = componentHandles_[typeId];
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
+            
+            for (auto const &h : handles) {
+                removeComponent(h);
+            }
+            
+            handles.clear();
+        }
+        
+        void removeAllComponents();
         
     private:
-        typedef std::vector<std::shared_ptr<Component>> ComponentVector;
-        typedef std::vector<std::shared_ptr<Component>>::iterator ComponentVectorIterator;
-        typedef std::unordered_map<std::type_index, ComponentVector> ComponentMap;
-        typedef std::unordered_map<std::type_index, ComponentVector>::iterator ComponentMapIterator;
-
         typedef std::unordered_map<std::type_index, void *> ComponentPoolMap;
         typedef std::unordered_map<std::type_index, size_t> ComponentPoolSize;
         
-        SpaceHandle spaceHandle_;
-        ComponentMap components_;
+        static bool                 componentsRegistered_;
+        static std::vector<void *>  componentHandleServices_;
         
-        GameObject *getComponentGameObject(Component *, GameObjectHandle gameObjHandle);
+        SpaceHandle                                 spaceHandle_;
+        std::vector<std::vector<ComponentHandle>>   componentHandles_;
         
-        template <typename T> void addComponent(std::shared_ptr<T> component) {
-            std::type_index index = Component::getTypeIndex<T>();
-            ComponentMapIterator it = components_.find(index);
+        GameObject *getComponentGameObject(Component *, GameObjectHandle gameObjHandle) const;
+        
+        template <typename T> static void registerComponent(uint32_t reserve, uint32_t maxLimit) {
+            using HANDLE = Handle<T>;
             
-            if (it != components_.end()) {
-                // We already have a vector of type T
-                it->second.push_back(component);
-            } else {
-                ComponentVector components = { component };
-                components_[index] = components;
-            }
+            Component::registerBitmask<T>();
+            componentHandleServices_.push_back(new HandleService<T, HANDLE>(reserve, maxLimit));
+        }
+
+        void outputBreakdown(uint32_t numTabs, const char *format, ...) const;
+
+        template <typename T> void outputComponentResourceBreakdown(uint32_t numTabs) const {
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            auto pointers = handleService->activePointers();
+            
+            assert(pointers.size() == handleService->numUsedHandles());
+            
+            outputBreakdown(numTabs, "%s: %zd/%d/%d (%d resizes)\n", typeid(T).name(), pointers.size(), handleService->getMaxAllocated(), handleService->capacity(), handleService->getNumResizes());
+        }
+
+        template <typename T> void outputComponentMemoryBreakdown(uint32_t numTabs) const {
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            auto pointers = handleService->activePointers();
+    
+            assert(pointers.size() == handleService->numUsedHandles());
+    
+            outputBreakdown(numTabs, "%s (sizeof=%zd): %zd/%zd bytes\n", typeid(T).name(), sizeof(T), handleService->usedMemory(), handleService->totalMemory());
+        }
+
+        template <typename T> void releaseComponentHandle(ComponentHandle handle) {
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            auto tHandle = Handle<T>(handle.handle);
+            auto component = getComponent<T>(handle.handle);
+            
+            component->destroy();
+            handleService->release(tHandle);
         }
     };
 }

@@ -24,7 +24,7 @@ namespace BGE {
     public:
         static std::string DefaultRenderViewName;
         
-        ~RenderWindow();
+        ~RenderWindow() {}
         
         BGEView *getView() { return view_; }
         void setView(BGEView *view);

@@ -13,10 +13,6 @@ BGE::RenderView::RenderView(std::shared_ptr<RenderWindow> window, float x, float
     
 }
 
-BGE::RenderView::~RenderView()
-{    
-}
-
 float BGE::RenderView::getX()
 {
     return x_;

@@ -58,9 +58,10 @@ namespace BGE {
         Font();
         Font(ObjectId fontId);
         Font(std::string name, uint32_t pixelSize);
-        virtual ~Font();
+        virtual ~Font() {}
         
-        void initialize(FontHandle handle, ObjectId fontId, std::string name, uint32_t pixelSize);
+        void initialize(FontHandle handle, std::string name, uint32_t pixelSize);
+        void destroy();
         
         FontHandle getHandle() const { return handle_; }
         uint32_t getGlyphW() const { return glyphW_; }
@@ -73,7 +74,7 @@ namespace BGE {
         
         std::string getNameAsKey() const;
         
-        bool isValid(void) const { return valid_; }
+        bool isValid(void) const { return status_ == FontStatus::Valid; }
         bool hasKerning() const { return hasKerning_; }
         int32_t kerningForPair(uint16_t prev, uint16_t curr);
         uint32_t getStringWidth(std::string str, bool minimum=true);
@@ -84,7 +85,7 @@ namespace BGE {
         // TODO: Determine if font rendering should be done else where, like in the renderer versus the font.
         // TODO: We will want to cache the width/height of the string. So this is probably not the best place for the drawString to exist
         // TODO: Move to renderer
-        virtual void drawString(std::string str, std::shared_ptr<TransformComponent> transform, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        virtual void drawString(std::string str, TransformComponent *transform, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
         virtual void drawString(std::string str, Vector2 &position, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
         
     protected:
@@ -93,9 +94,6 @@ namespace BGE {
         std::string style_;
         FontHandle  handle_;
         FontStatus  status_;
-        
-        // TODO: Remove valid
-        bool valid_;
         
         uint32_t glyphW_;   // Max width of glyphs
         uint32_t glyphH_;   // Max height of glyphs
@@ -106,12 +104,6 @@ namespace BGE {
         TextureAtlasHandle                                  textureAtlasHandle_;
         std::map<uint16_t, FontGlyph>                       glyphs_;
         std::map<std::pair<uint16_t, uint16_t>, int32_t>    kerning_;
-        
-        template <typename T>
-        std::shared_ptr<T> derived_shared_from_this()
-        {
-            return std::static_pointer_cast<T>(Object::shared_from_this());
-        }
 
         void drawString(std::string str, const float *rawMatrix, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
 
