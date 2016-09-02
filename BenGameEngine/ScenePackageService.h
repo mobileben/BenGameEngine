@@ -47,6 +47,16 @@ namespace BGE {
         void destroy() final {}
         void update(double deltaTime) final {}
         
+        uint32_t numUsedHandles() const final;
+        uint32_t maxHandles() const final;
+        uint32_t numHandleResizes() const final;
+        uint32_t maxHandlesAllocated() const final;
+
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
+        size_t totalMemory() const;
+        
         uint32_t numScenePackages() const;
         
         void createPackage(SpaceHandle spaceHandle, std::string name, std::string filename, ScenePackageLoadCompletionHandler callback);
@@ -76,6 +86,9 @@ namespace BGE {
         void link();
         void link(ScenePackageHandle handle);
         
+        void outputResourceBreakdown(uint32_t numTabs) const final;
+        void outputMemoryBreakdown(uint32_t numTabs) const final;
+
     private:
         static const uint32_t InitialScenePackageReserve = 32;
         

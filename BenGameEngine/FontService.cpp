@@ -120,6 +120,22 @@ uint32_t BGE::FontService::numFonts() const {
     return num;
 }
 
+uint32_t BGE::FontService::numUsedHandles() const {
+    return handleService_.numUsedHandles();
+}
+
+uint32_t BGE::FontService::maxHandles() const {
+    return handleService_.capacity();
+}
+
+uint32_t BGE::FontService::numHandleResizes() const {
+    return handleService_.numResizes();
+}
+
+uint32_t BGE::FontService::maxHandlesAllocated() const {
+    return handleService_.getMaxAllocated();
+}
+
 size_t BGE::FontService::usedHandleMemory() const {
     return handleService_.usedMemory();
 }

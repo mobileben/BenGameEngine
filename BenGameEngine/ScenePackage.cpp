@@ -21,7 +21,7 @@ BGE::ScenePackage::ScenePackage() : NamedObject(), status_(ScenePackageStatus::I
     fontCount_ = std::make_shared<std::atomic_int>(0);
 }
 
-BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
+BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), memoryUsage_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
     position_ = Vector2{0, 0};
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
@@ -36,6 +36,8 @@ void BGE::ScenePackage::initialize(ScenePackageHandle handle, std::string name) 
     texturesLoaded_ = false;
     hasExternal_ = false;
 
+    memoryUsage_ = 0;
+    
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
 }
@@ -48,6 +50,8 @@ void BGE::ScenePackage::destroy() {
     fontsLoaded_ = false;
     texturesLoaded_ = false;
     hasExternal_ = false;
+    
+    memoryUsage_ = 0;
     
     strings_.clear();
     textures_.clear();
@@ -158,72 +162,184 @@ void BGE::ScenePackage::destroy() {
     handle_ = ScenePackageHandle();
 }
 
+size_t BGE::ScenePackage::getMemoryUsage() const {
+    return memoryUsage_;
+}
+
+void BGE::ScenePackage::computeMemoryUsage() {
+    memoryUsage_ = 0;
+    memoryUsage_ += strings_.getMemoryUsage();
+    memoryUsage_ += textures_.getMemoryUsage();
+    memoryUsage_ += text_.getMemoryUsage();
+    memoryUsage_ += animationSequences_.getMemoryUsage();
+    memoryUsage_ += placements_.getMemoryUsage();
+    memoryUsage_ += masks_.getMemoryUsage();
+    memoryUsage_ += textureMasks_.getMemoryUsage();
+    memoryUsage_ += buttons_.getMemoryUsage();
+    memoryUsage_ += buttonStates_.getMemoryUsage();
+    memoryUsage_ += externalPackages_.getMemoryUsage();
+    memoryUsage_ += autoDisplayElements_.getMemoryUsage();
+    memoryUsage_ += rects_.getMemoryUsage();
+    memoryUsage_ += colorTransforms_.getMemoryUsage();
+    memoryUsage_ += colorMatrices_.getMemoryUsage();
+    memoryUsage_ += vector2s_.getMemoryUsage();
+    memoryUsage_ += bounds_.getMemoryUsage();
+    memoryUsage_ += keyframes_.getMemoryUsage();
+    memoryUsage_ += channels_.getMemoryUsage();
+    memoryUsage_ += textureNames_.getMemoryUsage();
+    memoryUsage_ += textureIndices_.getMemoryUsage();
+    memoryUsage_ += textureRefs_.getMemoryUsage();
+    memoryUsage_ += textNames_.getMemoryUsage();
+    memoryUsage_ += textIndices_.getMemoryUsage();
+    memoryUsage_ += textRefs_.getMemoryUsage();
+    memoryUsage_ += boundsRefs_.getMemoryUsage();
+    memoryUsage_ += animSeqNames_.getMemoryUsage();
+    memoryUsage_ += animSeqIndices_.getMemoryUsage();
+    memoryUsage_ += animSeqRefs_.getMemoryUsage();
+    memoryUsage_ += animChannelNames_.getMemoryUsage();
+    memoryUsage_ += animChannelIndices_.getMemoryUsage();
+    memoryUsage_ += animChannelRefs_.getMemoryUsage();
+    memoryUsage_ += animKeyframeNames_.getMemoryUsage();
+    memoryUsage_ += animKeyframeIndices_.getMemoryUsage();
+    memoryUsage_ += animKeyframeRefs_.getMemoryUsage();
+    memoryUsage_ += animChannelKeyframes_.getMemoryUsage();
+    memoryUsage_ += placementNames_.getMemoryUsage();
+    memoryUsage_ += placementIndices_.getMemoryUsage();
+    memoryUsage_ += placementRefs_.getMemoryUsage();
+    memoryUsage_ += maskNames_.getMemoryUsage();
+    memoryUsage_ += maskIndices_.getMemoryUsage();
+    memoryUsage_ += maskRefs_.getMemoryUsage();
+    memoryUsage_ += textureMaskNames_.getMemoryUsage();
+    memoryUsage_ += textureMaskIndices_.getMemoryUsage();
+    memoryUsage_ += textureMaskRefs_.getMemoryUsage();
+    memoryUsage_ += buttonStateRefs_.getMemoryUsage();
+    memoryUsage_ += buttonNames_.getMemoryUsage();
+    memoryUsage_ += buttonIndices_.getMemoryUsage();
+    memoryUsage_ += buttonRefs_.getMemoryUsage();
+    memoryUsage_ += externalPackageNames_.getMemoryUsage();
+    memoryUsage_ += externalPackageIndices_.getMemoryUsage();
+    memoryUsage_ += externalPackageRefs_.getMemoryUsage();
+    memoryUsage_ += autoDisplayElementRefs_.getMemoryUsage();
+}
+
 void BGE::ScenePackage::outputResourceBreakdown(uint32_t numTabs) const {
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
-    
-    printf("ScenePackage (%s):\n", getName().c_str());
+    Game::outputValue(numTabs, "ScenePackage (%s):\n", getName().c_str());
 
     numTabs++;
     
-    auto textureService = Game::getInstance()->getTextureService();
-    auto fontService = Game::getInstance()->getFontService();
+    Game::outputValue(numTabs, "Num Strings: %d\n", strings_.size());
+    Game::outputValue(numTabs, "Num TextureReferenceIntermediate: %d\n", textures_.size());
+    Game::outputValue(numTabs, "Num TextReferenceIntermediate: %d\n", text_.size());
+    Game::outputValue(numTabs, "Num AnimationSequenceReferenceIntermediate: %d\n", animationSequences_.size());
+    Game::outputValue(numTabs, "Num PlacementIntermediate: %d\n", placements_.size());
+    Game::outputValue(numTabs, "Num MaskIntermediate: %d\n", masks_.size());
+    Game::outputValue(numTabs, "Num TextureMaskIntermediate: %d\n", textureMasks_.size());
+    Game::outputValue(numTabs, "Num ButtonIntermediate: %d\n", buttons_.size());
+    Game::outputValue(numTabs, "Num ButtonStateIntermediate: %d\n", buttonStates_.size());
+    Game::outputValue(numTabs, "Num ExternalPackageIntermediate: %d\n", externalPackages_.size());
+    Game::outputValue(numTabs, "Num AutoDisplayElementIntermediate: %d\n", autoDisplayElements_.size());
+    Game::outputValue(numTabs, "Num Rect: %d\n", rects_.size());
+    Game::outputValue(numTabs, "Num ColorTransform: %d\n", colorTransforms_.size());
+    Game::outputValue(numTabs, "Num ColorMatrix: %d\n", colorMatrices_.size());
+    Game::outputValue(numTabs, "Num Vector2: %d\n", vector2s_.size());
+    Game::outputValue(numTabs, "Num BoundsReferenceIntermediate: %d\n", bounds_.size());
+    Game::outputValue(numTabs, "Num AnimationKeyframeReferenceIntermediate: %d\n", keyframes_.size());
+    Game::outputValue(numTabs, "Num AnimationChannelReferenceIntermediate: %d\n", channels_.size());
     
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
+    Game::outputValue(numTabs, "Num Texture Names: %d\n", textureNames_.size());
+    Game::outputValue(numTabs, "Num Texture Indices: %d\n", textureIndices_.size());
+    Game::outputValue(numTabs, "Num TextureReference: %d\n", textureRefs_.size());
+    Game::outputValue(numTabs, "Num Text Names: %d\n", textNames_.size());
+    Game::outputValue(numTabs, "Num Text Indices: %d\n", textIndices_.size());
+    Game::outputValue(numTabs, "Num TextReference: %d\n", textRefs_.size());
+    Game::outputValue(numTabs, "Num BoundsReference: %d\n", boundsRefs_.size());
+    Game::outputValue(numTabs, "Num AnimationSequence Names: %d\n", animSeqNames_.size());
+    Game::outputValue(numTabs, "Num AnimationSequence Indices: %d\n", animSeqIndices_.size());
+    Game::outputValue(numTabs, "Num AnimationSequenceReference: %d\n", animSeqRefs_.size());
+    Game::outputValue(numTabs, "Num AnimationChannel Names: %d\n", animChannelNames_.size());
+    Game::outputValue(numTabs, "Num AnimationChannel Indices: %d\n", animChannelIndices_.size());
+    Game::outputValue(numTabs, "Num AnimationChannelReference: %d\n", animChannelRefs_.size());
+    Game::outputValue(numTabs, "Num AnimationKeyframe Names: %d\n", animKeyframeNames_.size());
+    Game::outputValue(numTabs, "Num AnimationKeyframe Indices: %d\n", animKeyframeIndices_.size());
+    Game::outputValue(numTabs, "Num AnimationKeyframeReference: %d\n", animKeyframeRefs_.size());
+    Game::outputValue(numTabs, "Num AnimationKeyframeReference *: %d\n", animChannelKeyframes_.size());
+    Game::outputValue(numTabs, "Num Placement Names: %d\n", placementNames_.size());
+    Game::outputValue(numTabs, "Num Placement Indices: %d\n", placementIndices_.size());
+    Game::outputValue(numTabs, "Num PlacementReference: %d\n", placementRefs_.size());
+    Game::outputValue(numTabs, "Num Mask Names: %d\n", maskNames_.size());
+    Game::outputValue(numTabs, "Num Mask Indices: %d\n", maskIndices_.size());
+    Game::outputValue(numTabs, "Num MaskReference: %d\n", maskRefs_.size());
+    Game::outputValue(numTabs, "Num TextureMask Names: %d\n", textureMaskNames_.size());
+    Game::outputValue(numTabs, "Num TextureMask Indices: %d\n", textureMaskIndices_.size());
+    Game::outputValue(numTabs, "Num TextureMaskReference: %d\n", textureMaskRefs_.size());
+    Game::outputValue(numTabs, "Num ButtonStateReference: %d\n", buttonStateRefs_.size());
+    Game::outputValue(numTabs, "Num Button Names: %d\n", buttonNames_.size());
+    Game::outputValue(numTabs, "Num Button Indices: %d\n", buttonIndices_.size());
+    Game::outputValue(numTabs, "Num ButtonReference: %d\n", buttonRefs_.size());
+    Game::outputValue(numTabs, "Num ExternalPackage Names: %d\n", externalPackageNames_.size());
+    Game::outputValue(numTabs, "Num ExternalPackage Indices: %d\n", externalPackageIndices_.size());
+    Game::outputValue(numTabs, "Num ExternalPackageReference: %d\n", externalPackageRefs_.size());
+    Game::outputValue(numTabs, "Num AutoDisplayElementReference: %d\n", autoDisplayElementRefs_.size());
+}
 
-    printf("Num TextureAtlas: %ld\n", loadedTextureAtlases_.size());
+void BGE::ScenePackage::outputMemoryBreakdown(uint32_t numTabs) const {
+    Game::outputValue(numTabs, "ScenePackage (%s):\n", getName().c_str());
     
-    for (auto const &handle : loadedTextureAtlases_) {
-        auto atlas = textureService->getTextureAtlas(handle);
-        
-        if (atlas) {
-            for (auto i=0;i<numTabs + 1;i++) {
-                printf("\t");
-            }
-            
-            printf("%s\n", atlas->getName().c_str());
-        }
-    }
+    numTabs++;
     
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
+    Game::outputValue(numTabs, "Strings: %zd bytes\n", strings_.getMemoryUsage());
+    Game::outputValue(numTabs, "TextureReferenceIntermediate: %zd bytes\n", textures_.getMemoryUsage());
+    Game::outputValue(numTabs, "TextReferenceIntermediate: %zd bytes\n", text_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationSequenceReferenceIntermediate: %zd bytes\n", animationSequences_.getMemoryUsage());
+    Game::outputValue(numTabs, "PlacementIntermediate: %zd bytes\n", placements_.getMemoryUsage());
+    Game::outputValue(numTabs, "MaskIntermediate: %zd bytes\n", masks_.getMemoryUsage());
+    Game::outputValue(numTabs, "TextureMaskIntermediate: %zd bytes\n", textureMasks_.getMemoryUsage());
+    Game::outputValue(numTabs, "ButtonIntermediate: %zd bytes\n", buttons_.getMemoryUsage());
+    Game::outputValue(numTabs, "ButtonStateIntermediate: %zd bytes\n", buttonStates_.getMemoryUsage());
+    Game::outputValue(numTabs, "ExternalPackageIntermediate: %zd bytes\n", externalPackages_.getMemoryUsage());
+    Game::outputValue(numTabs, "AutoDisplayElementIntermediate: %zd bytes\n", autoDisplayElements_.getMemoryUsage());
+    Game::outputValue(numTabs, "Rect: %zd bytes\n", rects_.getMemoryUsage());
+    Game::outputValue(numTabs, "ColorTransform: %zd bytes\n", colorTransforms_.getMemoryUsage());
+    Game::outputValue(numTabs, "ColorMatrix: %zd bytes\n", colorMatrices_.getMemoryUsage());
+    Game::outputValue(numTabs, "Vector2: %zd bytes\n", vector2s_.getMemoryUsage());
+    Game::outputValue(numTabs, "BoundsReferenceIntermediate: %zd bytes\n", bounds_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationKeyframeReferenceIntermediate: %zd bytes\n", keyframes_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationChannelReferenceIntermediate: %zd bytes\n", channels_.getMemoryUsage());
     
-    printf("Num Texture: %ld\n", loadedTextures_.size());
-    
-    for (auto const &handle : loadedTextures_) {
-        auto texture = textureService->getTexture(handle);
-        
-        if (texture) {
-            for (auto i=0;i<numTabs + 1;i++) {
-                printf("\t");
-            }
-            
-            printf("%s\n", texture->getName().c_str());
-        }
-    }
-    
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
-    
-    printf("Num Font: %ld\n", loadedFonts_.size());
-    
-    for (auto const &handle : loadedFonts_) {
-        auto font = fontService->getFont(handle);
-        
-        if (font) {
-            for (auto i=0;i<numTabs + 1;i++) {
-                printf("\t");
-            }
-            
-            printf("%s\n", font->getNameAsKey().c_str());
-            
-        }
-    }
+    Game::outputValue(numTabs, "Texture Names: %zd bytes\n", textureNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "Texture Indices: %zd bytes\n", textureIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "TextureReference: %zd bytes\n", textureRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "Text Names: %zd bytes\n", textNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "Text Indices: %zd bytes\n", textIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "TextReference: %zd bytes\n", textRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "BoundsReference: %zd bytes\n", boundsRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationSequence Names: %zd bytes\n", animSeqNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationSequence Indices: %zd bytes\n", animSeqIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationSequenceReference: %zd bytes\n", animSeqRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationChannel Names: %zd bytes\n", animChannelNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationChannel Indices: %zd bytes\n", animChannelIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationChannelReference: %zd bytes\n", animChannelRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationKeyframe Names: %zd bytes\n", animKeyframeNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationKeyframe Indices: %zd bytes\n", animKeyframeIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationKeyframeReference: %zd bytes\n", animKeyframeRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "AnimationKeyframeReference *: %zd bytes\n", animChannelKeyframes_.getMemoryUsage());
+    Game::outputValue(numTabs, "Placement Names: %zd bytes\n", placementNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "Placement Indices: %zd bytes\n", placementIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "PlacementReference: %zd bytes\n", placementRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "Mask Names: %zd bytes\n", maskNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "Mask Indices: %zd bytes\n", maskIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "MaskReference: %zd bytes\n", maskRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "TextureMask Names: %zd bytes\n", textureMaskNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "TextureMask Indices: %zd bytes\n", textureMaskIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "TextureMaskReference: %zd bytes\n", textureMaskRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "ButtonStateReference: %zd bytes\n", buttonStateRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "Button Names: %zd bytes\n", buttonNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "Button Indices: %zd bytes\n", buttonIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "ButtonReference: %zd bytes\n", buttonRefs_.size());
+    Game::outputValue(numTabs, "ExternalPackage Names: %zd bytes\n", externalPackageNames_.getMemoryUsage());
+    Game::outputValue(numTabs, "ExternalPackage Indices: %zd bytes\n", externalPackageIndices_.getMemoryUsage());
+    Game::outputValue(numTabs, "ExternalPackageReference: %zd bytes\n", externalPackageRefs_.getMemoryUsage());
+    Game::outputValue(numTabs, "AutoDisplayElementReference: %zd bytes\n", autoDisplayElementRefs_.getMemoryUsage());
 }
 
 BGE::AutoDisplayElementReference *BGE::ScenePackage::getAutoDisplayList() const {
@@ -591,6 +707,8 @@ void BGE::ScenePackage::link() {
             elem->bounds = nullptr;
         }
     }
+    
+    computeMemoryUsage();
 }
 
 void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback) {
@@ -1262,6 +1380,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
         bounds_ = boundsRefIntBuilder.createFixedArray();
         keyframes_ = keyframeIntBuilder.createFixedArray();
         channels_ = channelRefIntBuilder.createFixedArray();
+        
+        computeMemoryUsage();
         
         // TODO: This will be done later perhaps?
         loadTextures([this, callback]() {

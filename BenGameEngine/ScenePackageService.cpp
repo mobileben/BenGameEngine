@@ -16,6 +16,48 @@ BGE::ScenePackageService::ScenePackageService() : handleService_(InitialScenePac
     loadThread_ = std::thread(&ScenePackageService::loadThreadFunction, this);
 }
 
+uint32_t BGE::ScenePackageService::numUsedHandles() const {
+    return handleService_.numUsedHandles();
+}
+
+uint32_t BGE::ScenePackageService::maxHandles() const {
+    return handleService_.capacity();
+}
+
+uint32_t BGE::ScenePackageService::numHandleResizes() const {
+    return handleService_.numResizes();
+}
+
+uint32_t BGE::ScenePackageService::maxHandlesAllocated() const {
+    return handleService_.getMaxAllocated();
+}
+
+size_t BGE::ScenePackageService::usedHandleMemory() const {
+    return handleService_.usedMemory();
+}
+
+size_t BGE::ScenePackageService::unusedHandleMemory() const {
+    return handleService_.unusedMemory();
+}
+
+size_t BGE::ScenePackageService::totalHandleMemory() const {
+    return handleService_.totalMemory();
+}
+
+size_t BGE::ScenePackageService::totalMemory() const {
+    size_t total = 0;
+    
+    for (auto const &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
+        
+        if (package) {
+            total += package->getMemoryUsage();
+        }
+    }
+    
+    return total;
+}
+
 uint32_t BGE::ScenePackageService::numScenePackages() const {
     uint32_t num = 0;
     
@@ -67,7 +109,7 @@ void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, Scen
     if (found != std::string::npos) {
         auto ext = loadable.filename.substr(found + 1);
         
-        std::transform(ext.begin(), ext.end(), ext.begin(), std::tolower);
+        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
         
         if (ext == "json") {
             createPackageFromJSON(loadable, callback);
@@ -381,4 +423,27 @@ void BGE::ScenePackageService::loadThreadFunction() {
     }
 }
 
+void BGE::ScenePackageService::outputResourceBreakdown(uint32_t numTabs) const {
+    for (auto const &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
+        
+        if (package) {
+            package->outputResourceBreakdown(numTabs);
+        } else {
+            assert(false);
+        }
+    }
+}
+
+void BGE::ScenePackageService::outputMemoryBreakdown(uint32_t numTabs) const {
+    for (auto const &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
+        
+        if (package) {
+            package->outputMemoryBreakdown(numTabs);
+        } else {
+            assert(false);
+        }
+    }
+}
 

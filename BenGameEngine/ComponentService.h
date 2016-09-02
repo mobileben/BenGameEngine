@@ -50,7 +50,38 @@ namespace BGE {
             return num;
         }
 
+        template <typename T> uint32_t maxComponents() const {
+            uint32_t num = 0;
+    
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            num = handleService->capacity();
+    
+            return num;
+        }
+
+        template <typename T> uint32_t maxHandlesAllocated() const {
+            uint32_t num = 0;
+    
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            num = handleService->getMaxAllocated();
+    
+            return num;
+        }
+
+        template <typename T> uint32_t numResizes() const {
+            uint32_t num = 0;
+    
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            num = handleService->getNumResizes();
+    
+            return num;
+        }
+
         uint32_t totalNumComponents() const;
+        uint32_t totalNumUsedHandles() const;
+        uint32_t totalMaxHandlesAllocated() const;
+        uint32_t totalMaxHandles() const;
+
         uint32_t numMaterials() const;
         
         size_t usedHandleMemory() const final;
@@ -58,6 +89,7 @@ namespace BGE {
         size_t totalHandleMemory() const final;
 
         void outputResourceBreakdown(uint32_t numTabs) const final;
+        void outputMemoryBreakdown(uint32_t numTabs) const final;
 
         inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
         inline SpaceHandle getSpaceHandle(void) const { return spaceHandle_; }
@@ -143,15 +175,24 @@ namespace BGE {
             componentHandleServices_.push_back(new HandleService<T, HANDLE>(reserve, maxLimit));
         }
 
+        void outputBreakdown(uint32_t numTabs, const char *format, ...) const;
+
         template <typename T> void outputComponentResourceBreakdown(uint32_t numTabs) const {
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
             auto pointers = handleService->activePointers();
             
-            for (auto i=0;i<numTabs;i++) {
-                printf("\t");
-            }
+            assert(pointers.size() == handleService->numUsedHandles());
             
-            printf("%s: %ld\n", typeid(T).name(), pointers.size());
+            outputBreakdown(numTabs, "%s: %zd/%d/%d (%d resizes)\n", typeid(T).name(), pointers.size(), handleService->getMaxAllocated(), handleService->capacity(), handleService->getNumResizes());
+        }
+
+        template <typename T> void outputComponentMemoryBreakdown(uint32_t numTabs) const {
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            auto pointers = handleService->activePointers();
+    
+            assert(pointers.size() == handleService->numUsedHandles());
+    
+            outputBreakdown(numTabs, "%s (sizeof=%zd): %zd/%zd bytes\n", typeid(T).name(), sizeof(T), handleService->usedMemory(), handleService->totalMemory());
         }
 
         template <typename T> void releaseComponentHandle(ComponentHandle handle) {

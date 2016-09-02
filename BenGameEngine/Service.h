@@ -29,6 +29,22 @@ namespace BGE {
         virtual void destroy() =0;
         virtual void update(double deltaTime) =0;
         
+        virtual uint32_t numUsedHandles() const {
+            return 0;
+        }
+        
+        virtual uint32_t maxHandles() const {
+            return 0;
+        }
+        
+        virtual uint32_t numHandleResizes() const {
+            return 0;
+        }
+        
+        virtual uint32_t maxHandlesAllocated() const {
+            return 0;
+        }
+        
         virtual size_t usedHandleMemory() const {
             return 0;
         }

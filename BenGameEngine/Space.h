@@ -35,6 +35,7 @@ namespace BGE {
         void destroy();
         
         void outputResourceBreakdown(uint32_t numTabs) const;
+        void outputMemoryBreakdown(uint32_t numTabs) const;
         
         inline SpaceHandle getHandle() const { return spaceHandle_; }
         

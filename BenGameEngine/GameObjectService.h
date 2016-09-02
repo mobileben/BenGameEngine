@@ -39,6 +39,11 @@ namespace BGE {
         
         uint32_t numGameObjects () const;
         
+        uint32_t numUsedHandles() const final;
+        uint32_t maxHandles() const final;
+        uint32_t numHandleResizes() const final;
+        uint32_t maxHandlesAllocated() const final;
+
         size_t usedHandleMemory() const final;
         size_t unusedHandleMemory() const final;
         size_t totalHandleMemory() const final;

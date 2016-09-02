@@ -56,6 +56,51 @@ void BGE::RenderServiceOpenGLES2::pause() {}
 void BGE::RenderServiceOpenGLES2::resume() {}
 void BGE::RenderServiceOpenGLES2::destroy() {}
 
+size_t BGE::RenderServiceOpenGLES2::totalMemory() const {
+    auto view = this->getRenderWindow()->getView();
+    size_t memory = 0;
+    auto area = view.drawableWidth * view.drawableHeight;
+    
+    switch (view.drawableColorFormat) {
+        case GLKViewDrawableColorFormatRGBA8888:
+        case GLKViewDrawableColorFormatSRGBA8888:
+            memory += area * 4;
+            break;
+            
+        case GLKViewDrawableColorFormatRGB565:
+            memory += area * 2;
+            break;
+            
+        default:
+            break;
+    }
+    
+    switch (view.drawableStencilFormat) {
+        case GLKViewDrawableStencilFormat8:
+            memory += area;
+            break;
+            
+        default:
+            break;
+    }
+    
+    switch (view.drawableDepthFormat) {
+        case GLKViewDrawableDepthFormat24:
+            memory += area * 3;
+            break;
+            
+        case GLKViewDrawableDepthFormat16:
+            memory += area * 2;
+            break;
+            
+        default:
+            break;
+    }
+    
+    return memory;
+    
+}
+
 void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D)
 {
     RenderService::setCoordinateSystem2D(coordSystem2D);

@@ -344,6 +344,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
                     // Spaces are not visible by default
                     space->setVisible(true);
                     BGE::Game::getInstance()->outputResourceBreakdown();
+                    BGE::Game::getInstance()->outputMemoryBreakdown();
                     strongSelf.stage = 2;
                 });
             }

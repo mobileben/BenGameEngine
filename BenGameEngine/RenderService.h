@@ -60,6 +60,8 @@ namespace BGE {
         virtual void resizeRenderWindow();
         virtual void createShaders();
         
+        virtual size_t totalMemory() const { return 0; }
+        
         bool isReady() const { return ready_; }
         void setIsReady() { ready_ = true; }
         
@@ -70,11 +72,11 @@ namespace BGE {
         
         void setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D);
         
-        std::shared_ptr<RenderContext> getRenderContext() { return renderContext_; }
+        std::shared_ptr<RenderContext> getRenderContext() const { return renderContext_; }
         
-        std::shared_ptr<RenderWindow> getRenderWindow() { return renderWindow_; }
+        std::shared_ptr<RenderWindow> getRenderWindow() const { return renderWindow_; }
         
-        std::shared_ptr<ShaderService> getShaderService() { return shaderService_; }
+        std::shared_ptr<ShaderService> getShaderService() const { return shaderService_; }
         
         virtual std::shared_ptr<ShaderProgram> pushShaderProgram(std::string program) =0;
         virtual std::shared_ptr<ShaderProgram> popShaderProgram() =0;

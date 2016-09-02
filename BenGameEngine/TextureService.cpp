@@ -182,6 +182,38 @@ uint32_t BGE::TextureService::numTextureAtlases() const {
     return (uint32_t) atlases.size();
 }
 
+uint32_t BGE::TextureService::numUsedTextureHandles() const {
+    return textureHandleService_.numUsedHandles();
+}
+
+uint32_t BGE::TextureService::maxTextureHandles() const {
+    return textureHandleService_.capacity();
+}
+
+uint32_t BGE::TextureService::numTextureHandleResizes() const {
+    return textureHandleService_.numResizes();
+}
+
+uint32_t BGE::TextureService::maxTextureHandlesAllocated() const {
+    return textureHandleService_.getMaxAllocated();
+}
+
+uint32_t BGE::TextureService::numUsedTextureAtlasHandles() const {
+    return textureAtlasHandleService_.numUsedHandles();
+}
+
+uint32_t BGE::TextureService::maxTextureAtlasHandles() const {
+    return textureAtlasHandleService_.capacity();
+}
+
+uint32_t BGE::TextureService::numTextureAtlasHandleResizes() const {
+    return textureAtlasHandleService_.numResizes();
+}
+
+uint32_t BGE::TextureService::maxTextureAtlasHandlesAllocated() const {
+    return textureAtlasHandleService_.getMaxAllocated();
+}
+
 size_t BGE::TextureService::usedHandleMemory() const {
     return textureHandleService_.usedMemory() + textureAtlasHandleService_.usedMemory();
 }
@@ -255,6 +287,68 @@ size_t BGE::TextureService::totalTextureMemory() const {
     }
     
     return usage;
+}
+
+void BGE::TextureService::outputMemoryBreakdown(uint32_t numTabs) const {
+    std::vector<TextureHandle> textures;
+    auto packageService = Game::getInstance()->getScenePackageService();
+    auto spaceService = Game::getInstance()->getSpaceService();
+    
+    for (auto const &packageIt : packageTextures_) {
+        auto package = packageService->getScenePackage(packageIt.first);
+        
+        if (package) {
+            for (auto &texIt : packageIt.second) {
+                auto tex = getTexture(texIt.second);
+                
+                if (tex) {
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
+                }
+            }
+        }
+    }
+    
+    for (auto const &spaceIt : spaceTextures_) {
+        auto space = spaceService->getSpace(spaceIt.first);
+        
+        if (space) {
+            for (auto &texIt : spaceIt.second) {
+                auto tex = getTexture(texIt.second);
+                
+                if (tex) {
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
+                }
+            }
+        }
+    }
+    
+    for (auto const &atlasIt : atlasTextures_) {
+        auto atlas = getTextureAtlas(atlasIt.first);
+        
+        if (atlas) {
+            for (auto &texIt : atlasIt.second) {
+                auto tex = getTexture(texIt.second);
+                
+                if (tex) {
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        textures.push_back(texIt.second);
+                    }
+                }
+            }
+        }
+    }
+    
+    for (auto handle : textures) {
+        auto tex = getTexture(handle);
+
+        if (tex && !tex->isSubTexture()) {
+            Game::outputValue(numTabs, "%s: %zd bytes\n", tex->getName().c_str(), tex->getMemoryUsage());
+        }
+    }
 }
 
 BGE::TextureHandle BGE::TextureService::getTextureHandle(ScenePackageHandle scenePackageHandle, std::string name) const {

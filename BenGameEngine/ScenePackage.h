@@ -44,7 +44,10 @@ namespace BGE {
         void initialize(ScenePackageHandle handle, std::string name);
         void destroy();
         
+        size_t getMemoryUsage() const;
+        
         void outputResourceBreakdown(uint32_t numTabs) const;
+        void outputMemoryBreakdown(uint32_t numTabs) const;
 
         void link();
         
@@ -96,6 +99,8 @@ namespace BGE {
         int32_t             defaultPositionIndex_;
         int32_t             defaultScaleIndex_;
         
+        size_t                                              memoryUsage_;
+
         FixedArray<char>                                    strings_;
         FixedArray<TextureReferenceIntermediate>            textures_;
         FixedArray<TextReferenceIntermediate>               text_;
@@ -183,6 +188,7 @@ namespace BGE {
         void loadFonts(std::function<void()> callback);
         
         GfxReferenceType referenceTypeForString(std::string type);
+        void computeMemoryUsage();
     };
     
     class GameObject;

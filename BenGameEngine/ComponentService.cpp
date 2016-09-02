@@ -24,6 +24,7 @@
 #include "TextureMaskComponent.h"
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
+#include "Game.h"
 
 bool BGE::ComponentService::componentsRegistered_ = false;
 std::vector<void *> BGE::ComponentService::componentHandleServices_;
@@ -158,6 +159,58 @@ uint32_t BGE::ComponentService::totalNumComponents() const {
     total += numComponents<FlatRectRenderComponent>();
     total += numComponents<MaskComponent>();
     total += numComponents<TextureMaskComponent>();
+    
+    return total;
+}
+
+uint32_t BGE::ComponentService::totalNumUsedHandles() const {
+    return totalNumComponents();
+}
+
+uint32_t BGE::ComponentService::totalMaxHandles() const {
+    uint32_t total = 0;
+    
+    total += maxComponents<TransformComponent>();
+    total += maxComponents<BoundingBoxComponent>();
+    total += maxComponents<AnimationChannelComponent>();
+    total += maxComponents<AnimatorComponent>();
+    total += maxComponents<AnimationSequenceComponent>();
+    total += maxComponents<ChannelFrameAnimatorComponent>();
+    total += maxComponents<ColorMatrixComponent>();
+    total += maxComponents<ColorTransformComponent>();
+    total += maxComponents<FrameAnimatorComponent>();
+    total += maxComponents<SpriteRenderComponent>();
+    total += maxComponents<TextComponent>();
+    total += maxComponents<ButtonComponent>();
+    total += maxComponents<InputTouchComponent>();
+    total += maxComponents<LineRenderComponent>();
+    total += maxComponents<FlatRectRenderComponent>();
+    total += maxComponents<MaskComponent>();
+    total += maxComponents<TextureMaskComponent>();
+    
+    return total;
+}
+
+uint32_t BGE::ComponentService::totalMaxHandlesAllocated() const {
+    uint32_t total = 0;
+    
+    total += maxHandlesAllocated<TransformComponent>();
+    total += maxHandlesAllocated<BoundingBoxComponent>();
+    total += maxHandlesAllocated<AnimationChannelComponent>();
+    total += maxHandlesAllocated<AnimatorComponent>();
+    total += maxHandlesAllocated<AnimationSequenceComponent>();
+    total += maxHandlesAllocated<ChannelFrameAnimatorComponent>();
+    total += maxHandlesAllocated<ColorMatrixComponent>();
+    total += maxHandlesAllocated<ColorTransformComponent>();
+    total += maxHandlesAllocated<FrameAnimatorComponent>();
+    total += maxHandlesAllocated<SpriteRenderComponent>();
+    total += maxHandlesAllocated<TextComponent>();
+    total += maxHandlesAllocated<ButtonComponent>();
+    total += maxHandlesAllocated<InputTouchComponent>();
+    total += maxHandlesAllocated<LineRenderComponent>();
+    total += maxHandlesAllocated<FlatRectRenderComponent>();
+    total += maxHandlesAllocated<MaskComponent>();
+    total += maxHandlesAllocated<TextureMaskComponent>();
     
     return total;
 }
@@ -457,4 +510,54 @@ void BGE::ComponentService::outputResourceBreakdown(uint32_t numTabs) const {
     }
 }
 
+void BGE::ComponentService::outputMemoryBreakdown(uint32_t numTabs) const {
+    for (auto i=0;i<componentHandleServices_.size();i++) {
+        if (i == TransformComponent::typeId_) {
+            outputComponentMemoryBreakdown<TransformComponent>(numTabs);
+        } else if (i == BoundingBoxComponent::typeId_) {
+            outputComponentMemoryBreakdown<BoundingBoxComponent>(numTabs);
+        } else if (i == AnimationChannelComponent::typeId_) {
+            outputComponentMemoryBreakdown<AnimationChannelComponent>(numTabs);
+        } else if (i == AnimationSequenceComponent::typeId_) {
+            outputComponentMemoryBreakdown<AnimationSequenceComponent>(numTabs);
+        } else if (i == AnimatorComponent::typeId_) {
+            outputComponentMemoryBreakdown<AnimatorComponent>(numTabs);
+        } else if (i == ChannelFrameAnimatorComponent::typeId_) {
+            outputComponentMemoryBreakdown<ChannelFrameAnimatorComponent>(numTabs);
+        } else if (i == ColorMatrixComponent::typeId_) {
+            outputComponentMemoryBreakdown<ColorMatrixComponent>(numTabs);
+        } else if (i == ColorTransformComponent::typeId_) {
+            outputComponentMemoryBreakdown<ColorTransformComponent>(numTabs);
+        } else if (i == FrameAnimatorComponent::typeId_) {
+            outputComponentMemoryBreakdown<FrameAnimatorComponent>(numTabs);
+        } else if (i == SpriteRenderComponent::typeId_) {
+            outputComponentMemoryBreakdown<SpriteRenderComponent>(numTabs);
+        } else if (i == TextComponent::typeId_) {
+            outputComponentMemoryBreakdown<TextComponent>(numTabs);
+        } else if (i == ButtonComponent::typeId_) {
+            outputComponentMemoryBreakdown<ButtonComponent>(numTabs);
+        } else if (i == InputTouchComponent::typeId_) {
+            outputComponentMemoryBreakdown<InputTouchComponent>(numTabs);
+        } else if (i == LineRenderComponent::typeId_) {
+            outputComponentMemoryBreakdown<LineRenderComponent>(numTabs);
+        } else if (i == FlatRectRenderComponent::typeId_) {
+            outputComponentMemoryBreakdown<FlatRectRenderComponent>(numTabs);
+        } else if (i == MaskComponent::typeId_) {
+            outputComponentMemoryBreakdown<MaskComponent>(numTabs);
+        } else if (i == TextureMaskComponent::typeId_) {
+            outputComponentMemoryBreakdown<TextureMaskComponent>(numTabs);
+        } else {
+            assert(false);
+        }
+    }
+}
+
+void BGE::ComponentService::outputBreakdown(uint32_t numTabs, const char *format, ...) const {
+    va_list args;
+    va_start(args, format);
+    
+    Game::outputValue(numTabs, format, args);
+    
+    va_end(args);
+}
 

@@ -88,13 +88,10 @@ void BGE::Space::destroy() {
 }
 
 void BGE::Space::outputResourceBreakdown(uint32_t numTabs) const {
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
-    
-    printf("Space (%s):\n", getName().c_str());
+    Game::outputValue(numTabs, "Space (%s):\n", getName().c_str());
     
     // Now breakdown resources
+    numTabs++;
     
     // Game objects
     uint32_t num = 0;
@@ -107,29 +104,13 @@ void BGE::Space::outputResourceBreakdown(uint32_t numTabs) const {
         }
     }
     
-    numTabs++;
+    Game::outputValue(numTabs, "Num GameObject: %u\n", num);
     
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
-    
-    printf("Num GameObject: %d\n", num);
-    
-    num = 0;
-    
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
-    
-    printf("Num Component: %d\n", componentService_->totalNumComponents());
+    Game::outputValue(numTabs, "Num Component: %u\n", componentService_->totalNumComponents());
     
     componentService_->outputResourceBreakdown(numTabs + 1);
-
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
     
-    printf("Num ScenePackage: %ld\n", scenePackages_.size());
+    Game::outputValue(numTabs, "Num ScenePackage: %zd\n", scenePackages_.size());
 
     auto scenePackageService = Game::getInstance()->getScenePackageService();
     
@@ -141,69 +122,49 @@ void BGE::Space::outputResourceBreakdown(uint32_t numTabs) const {
         }
     }
     
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
-    
-    printf("Num Material: %d\n", componentService_->numMaterials());
+    Game::outputValue(numTabs, "Num Material: %d\n", componentService_->numMaterials());
     
     auto textureService = Game::getInstance()->getTextureService();
     auto fontService = Game::getInstance()->getFontService();
     
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
-    
-    printf("Num TextureAtlas: %ld\n", textureAtlases_.size());
+    Game::outputValue(numTabs, "Num TextureAtlas: %zd\n", textureAtlases_.size());
     
     for (auto const &handle : textureAtlases_) {
         auto atlas = textureService->getTextureAtlas(handle);
         
         if (atlas) {
-            for (auto i=0;i<numTabs + 1;i++) {
-                printf("\t");
-            }
-            
-            printf("%s\n", atlas->getName().c_str());
+            Game::outputValue(numTabs, "%s\n", atlas->getName().c_str());
         }
     }
 
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
-    
-    printf("Num Texture: %ld\n", textures_.size());
+    Game::outputValue(numTabs, "Num Texture: %zd\n", textures_.size());
 
     for (auto const &handle : textures_) {
         auto texture = textureService->getTexture(handle);
         
         if (texture) {
-            for (auto i=0;i<numTabs + 1;i++) {
-                printf("\t");
-            }
-            
-            printf("%s\n", texture->getName().c_str());
+            Game::outputValue(numTabs, "%s\n", texture->getName().c_str());
         }
     }
     
-    for (auto i=0;i<numTabs;i++) {
-        printf("\t");
-    }
-    
-    printf("Num Font: %ld\n", fonts_.size());
+    Game::outputValue(numTabs, "Num Font: %zd\n", fonts_.size());
 
     for (auto const &handle : fonts_) {
         auto font = fontService->getFont(handle);
         
         if (font) {
-            for (auto i=0;i<numTabs + 1;i++) {
-                printf("\t");
-            }
-            
-            printf("%s\n", font->getNameAsKey().c_str());
-
+            Game::outputValue(numTabs, "%s\n", font->getNameAsKey().c_str());
         }
     }
+}
+
+void BGE::Space::outputMemoryBreakdown(uint32_t numTabs) const {
+    Game::outputValue(numTabs, "Space (%s):\n", getName().c_str());
+    
+    // Now breakdown resources
+    numTabs++;
+    
+    componentService_->outputMemoryBreakdown(numTabs);
 }
 
 BGE::GameObject *BGE::Space::createGameObject(std::string name ) {

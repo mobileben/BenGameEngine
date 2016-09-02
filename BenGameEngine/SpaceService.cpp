@@ -12,6 +12,34 @@
 BGE::SpaceService::SpaceService() : handleService_(InitialSpaceReserve, HandleServiceNoMaxLimit){
 }
 
+uint32_t BGE::SpaceService::numUsedHandles() const {
+    return handleService_.numUsedHandles();
+}
+
+uint32_t BGE::SpaceService::maxHandles() const {
+    return handleService_.capacity();
+}
+
+uint32_t BGE::SpaceService::numHandleResizes() const {
+    return handleService_.numResizes();
+}
+
+uint32_t BGE::SpaceService::maxHandlesAllocated() const {
+    return handleService_.getMaxAllocated();
+}
+
+size_t BGE::SpaceService::usedHandleMemory() const {
+    return handleService_.usedMemory();
+}
+
+size_t BGE::SpaceService::unusedHandleMemory() const {
+    return handleService_.unusedMemory();
+}
+
+size_t BGE::SpaceService::totalHandleMemory() const {
+    return handleService_.totalMemory();
+}
+
 uint32_t BGE::SpaceService::numSpaces() const {
     uint32_t num = 0;
     
@@ -34,6 +62,18 @@ void BGE::SpaceService::outputResourceBreakdown(uint32_t numTabs) const {
         
         if (space) {
             space->outputResourceBreakdown(numTabs);
+        } else {
+            assert(false);
+        }
+    }
+}
+
+void BGE::SpaceService::outputMemoryBreakdown(uint32_t numTabs) const {
+    for (auto const &handle : spaces_) {
+        auto space = getSpace(handle);
+        
+        if (space) {
+            space->outputMemoryBreakdown(numTabs);
         } else {
             assert(false);
         }

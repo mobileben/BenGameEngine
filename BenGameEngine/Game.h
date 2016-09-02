@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <memory>
+#include <iostream>
 #include "Service.h"
 #include "AnimationService.h"
 #include "GameObjectService.h"
@@ -63,6 +64,33 @@ namespace BGE {
         void outputMemoryUsage() const;
 
         void outputResourceBreakdown(uint32_t numTabs=0) const final;
+        void outputMemoryBreakdown(uint32_t numTabs=0) const final;
+
+        static void outputValue(uint32_t numTabs, std::string format, va_list args);
+        template <typename... Args> static void outputValue(uint32_t numTabs, std::string format, Args... args) {
+            std::string results = format;
+            
+            for (auto i=0;i<numTabs;i++) {
+                printf("\t");
+            }
+            
+            std::vector<AnyToString> vec = {args...};
+            
+            for (auto &e : vec) {
+                auto sVal = e.toString();
+                auto specifiers = e.getFormatSpecififers();
+                for (auto s : specifiers) {
+                    auto f = results.find(s);
+                    
+                    if (f != std::string::npos) {
+                        results.replace(f, s.length(), sVal);
+                        break;
+                    }
+                }
+            }
+            
+            printf("%s", results.c_str());
+        }
 
     protected:
         std::shared_ptr<RenderService>          renderService_;
@@ -77,6 +105,34 @@ namespace BGE {
         std::shared_ptr<EventService>           eventService_;
         
     private:
+        struct AnyToString {
+            enum class type {
+                SizeT, Int, UInt, Double, String
+            };
+            
+            AnyToString(size_t e) { mData.SIZET = e; mType = type::SizeT; formatSpecifiers = { "%zd", "%d" }; }
+            AnyToString(int32_t e) { mData.INT = e; mType = type::Int; formatSpecifiers = { "%d", "%u" }; }
+            AnyToString(uint32_t e) { mData.UINT = e; mType = type::UInt; formatSpecifiers = { "%u", "%d" }; }
+            AnyToString(float e) { mData.DOUBLE = e; mType = type::Double; formatSpecifiers = { "%f" }; }
+            AnyToString(double e) { mData.DOUBLE = e; mType = type::Double; formatSpecifiers = { "%f" }; }
+            AnyToString(char *e) { mData.STRING = e; mType = type::String; formatSpecifiers = { "%s" }; }
+            AnyToString(const char *e) { mData.STRING = e; mType = type::String; formatSpecifiers = { "%s" }; }
+
+            std::string toString() const;
+            std::vector<std::string> getFormatSpecififers() const { return formatSpecifiers; }
+            
+            private:
+                type mType;
+                std::vector<std::string> formatSpecifiers;
+                union {
+                    int32_t     INT;
+                    uint32_t    UINT;
+                    size_t      SIZET;
+                    double      DOUBLE;
+                    const char  *STRING;
+                } mData;
+        };
+        
         // Used to access resources metrics
         std::shared_ptr<ComponentService>       componentService_;
         std::shared_ptr<GameObjectService>      gameObjectService_;

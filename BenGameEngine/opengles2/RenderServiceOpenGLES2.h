@@ -41,6 +41,8 @@ namespace BGE {
 
         static int8_t MaxActiveMasks;
         
+        size_t totalMemory() const final;
+
         void setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D);
         
         void bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window);

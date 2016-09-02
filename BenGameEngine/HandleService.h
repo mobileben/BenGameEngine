@@ -23,7 +23,7 @@ namespace BGE {
     template <typename DATA, typename HANDLE>
     class HandleService : public Service {
     public:
-        HandleService(uint32_t reserve, uint32_t maxLimit) : maxLimit_(maxLimit) {
+        HandleService(uint32_t reserve, uint32_t maxLimit) : numResizes_(0), maxAllocated_(0), maxLimit_(maxLimit) {
 #if UNIT_TESTING
             if (reserve == 0) {
                 throw std::exception();
@@ -67,6 +67,10 @@ namespace BGE {
                 
                 data_.push_back(DATA());
                 magic_.push_back(handle.getMagic());
+                
+                if (data_.size() > maxAllocated_) {
+                    maxAllocated_ = (uint32_t) data_.size();
+                }
                 
                 if (data_.capacity() != initialCapacity_) {
                     numResizes_++;
@@ -162,6 +166,14 @@ namespace BGE {
             return capacity() * sizeof(DATA);
         }
         
+        uint32_t getNumResizes() const {
+            return numResizes_;
+        }
+        
+        uint32_t getMaxAllocated() const {
+            return maxAllocated_;
+        }
+        
 #if UNIT_TESTING
         // Provide means to get the data from a specific index
         DATA *dataAtIndex(uint32_t index) {
@@ -188,6 +200,7 @@ namespace BGE {
         
         uint32_t    initialCapacity_;
         uint32_t    numResizes_;
+        uint32_t    maxAllocated_;
         uint32_t    maxLimit_;
         DataVector  data_;
         MagicVector magic_;

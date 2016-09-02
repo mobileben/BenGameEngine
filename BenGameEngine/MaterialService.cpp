@@ -126,6 +126,22 @@ BGE::Material *BGE::MaterialService::getMaterial(ObjectId matId) const {
     return nullptr;
 }
 
+uint32_t BGE::MaterialService::numUsedHandles() const {
+    return handleService_.numUsedHandles();
+}
+
+uint32_t BGE::MaterialService::maxHandles() const {
+    return handleService_.capacity();
+}
+
+uint32_t BGE::MaterialService::numHandleResizes() const {
+    return handleService_.numResizes();
+}
+
+uint32_t BGE::MaterialService::maxHandlesAllocated() const {
+    return handleService_.getMaxAllocated();
+}
+
 uint32_t BGE::MaterialService::numMaterials() const {
     return handleService_.numUsedHandles();
 }

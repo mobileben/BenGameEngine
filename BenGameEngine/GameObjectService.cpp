@@ -21,6 +21,22 @@ uint32_t BGE::GameObjectService::numGameObjects () const {
     return (uint32_t) pointers.size();
 }
 
+uint32_t BGE::GameObjectService::numUsedHandles() const {
+    return handleService_.numUsedHandles();
+}
+
+uint32_t BGE::GameObjectService::maxHandles() const {
+    return handleService_.capacity();
+}
+
+uint32_t BGE::GameObjectService::numHandleResizes() const {
+    return handleService_.numResizes();
+}
+
+uint32_t BGE::GameObjectService::maxHandlesAllocated() const {
+    return handleService_.getMaxAllocated();
+}
+
 size_t BGE::GameObjectService::usedHandleMemory() const {
     return handleService_.usedMemory();
 }

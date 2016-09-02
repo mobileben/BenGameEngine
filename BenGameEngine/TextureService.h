@@ -42,11 +42,23 @@ namespace BGE {
         uint32_t numSubTextures() const;
         uint32_t numTextureAtlases() const;
         
+        uint32_t numUsedTextureHandles() const;
+        uint32_t maxTextureHandles() const;
+        uint32_t numTextureHandleResizes() const;
+        uint32_t maxTextureHandlesAllocated() const;
+        
+        uint32_t numUsedTextureAtlasHandles() const;
+        uint32_t maxTextureAtlasHandles() const;
+        uint32_t numTextureAtlasHandleResizes() const;
+        uint32_t maxTextureAtlasHandlesAllocated() const;
+
         size_t usedHandleMemory() const final;
         size_t unusedHandleMemory() const final;
         size_t totalHandleMemory() const final;
 
         size_t totalTextureMemory() const;
+        
+        void outputMemoryBreakdown(uint32_t numTabs) const final;
         
         TextureHandle getTextureHandle(ScenePackageHandle scenePackageHandle, std::string name) const;
         TextureHandle getTextureHandle(SpaceHandle spaceHandle, std::string name) const;
