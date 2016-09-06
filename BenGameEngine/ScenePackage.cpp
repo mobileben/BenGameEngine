@@ -1024,23 +1024,27 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                         
                                         float divisor = 1;
                                         float divisor1 = 255.0;
-                                        
+
                                         colorMatrixBacking.matrix.m[0] = [rawMatrix[0] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[4] = [rawMatrix[1] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[8] = [rawMatrix[2] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[12] = [rawMatrix[3] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[1] = [rawMatrix[5] floatValue] / divisor;
+                                        colorMatrixBacking.matrix.m[1] = [rawMatrix[1] floatValue] / divisor;
+                                        colorMatrixBacking.matrix.m[2] = [rawMatrix[2] floatValue] / divisor;
+                                        colorMatrixBacking.matrix.m[3] = [rawMatrix[3] floatValue] / divisor;
+                                        
+                                        colorMatrixBacking.matrix.m[4] = [rawMatrix[5] floatValue] / divisor;
                                         colorMatrixBacking.matrix.m[5] = [rawMatrix[6] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[9] = [rawMatrix[7] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[13] = [rawMatrix[8] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[2] = [rawMatrix[10] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[6] = [rawMatrix[11] floatValue] / divisor;
+                                        colorMatrixBacking.matrix.m[6] = [rawMatrix[7] floatValue] / divisor;
+                                        colorMatrixBacking.matrix.m[7] = [rawMatrix[8] floatValue] / divisor;
+                                        
+                                        colorMatrixBacking.matrix.m[8] = [rawMatrix[10] floatValue] / divisor;
+                                        colorMatrixBacking.matrix.m[9] = [rawMatrix[11] floatValue] / divisor;
                                         colorMatrixBacking.matrix.m[10] = [rawMatrix[12] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[14] = [rawMatrix[13] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[3] = [rawMatrix[15] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[7] = [rawMatrix[16] floatValue] / divisor;
-                                        colorMatrixBacking.matrix.m[11] = [rawMatrix[17] floatValue] / divisor;
+                                        colorMatrixBacking.matrix.m[11] = [rawMatrix[13] floatValue] / divisor;
+                                        
+                                        colorMatrixBacking.matrix.m[12] = [rawMatrix[15] floatValue] / divisor;
+                                        colorMatrixBacking.matrix.m[13] = [rawMatrix[16] floatValue] / divisor;
+                                        colorMatrixBacking.matrix.m[14] = [rawMatrix[17] floatValue] / divisor;
                                         colorMatrixBacking.matrix.m[15] = [rawMatrix[18] floatValue] / divisor;
+                                        
                                         colorMatrixBacking.offset.v[0] = [rawMatrix[4] floatValue] / divisor1;
                                         colorMatrixBacking.offset.v[1] = [rawMatrix[9] floatValue] / divisor1;
                                         colorMatrixBacking.offset.v[2] = [rawMatrix[14] floatValue] / divisor1;
