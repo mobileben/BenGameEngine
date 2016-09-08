@@ -46,7 +46,7 @@ namespace BGE {
         void outputResourceBreakdown(uint32_t numTabs) const final;
         void outputMemoryBreakdown(uint32_t numTabs) const final;
 
-        SpaceHandle createSpace(std::string name);
+        Space *createSpace(std::string name);
         
         void removeSpace(SpaceHandle spaceHandle);
         void removeSpace(std::string name);

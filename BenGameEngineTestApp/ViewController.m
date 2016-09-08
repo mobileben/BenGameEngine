@@ -55,9 +55,9 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
     
     self.renderWindow = std::make_shared<BGE::RenderWindow>();
     self.renderWindow->setView((BGEView *) self.view);
-    
+
     BGE::Game::getInstance()->getRenderService()->bindRenderWindow(self.renderContext, self.renderWindow);
-    
+
     self.queue = dispatch_queue_create("com.test", NULL);;
     self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
     
@@ -85,9 +85,16 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
         
         BGE::Game::getInstance()->outputResourceBreakdown();
 
-        self.spaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
+        auto space = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
+        
+        if (space) {
+            self.spaceHandle = space->getHandle();
+        } else {
+            self.spaceHandle = BGE::SpaceHandle();
+        }
 
-        [self packageTest3];
+        [self defaultPackageTest];
+//        [self packageTest3];
     }
     
     [self.glView display];
@@ -267,7 +274,13 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
             // Space handle already exists, so remove it
             BGE::Game::getInstance()->getSpaceService()->removeSpace(strongSelf.spaceHandle);
 
-            self.spaceHandle = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
+            auto space = BGE::Game::getInstance()->getSpaceService()->createSpace("default");
+            
+            if (space) {
+                self.spaceHandle = space->getHandle();
+            } else {
+                self.spaceHandle = BGE::SpaceHandle();
+            }
 
             strongSelf.stage = 1;
             

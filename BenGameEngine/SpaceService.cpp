@@ -80,7 +80,7 @@ void BGE::SpaceService::outputMemoryBreakdown(uint32_t numTabs) const {
     }
 }
 
-BGE::SpaceHandle BGE::SpaceService::createSpace(std::string name) {
+BGE::Space *BGE::SpaceService::createSpace(std::string name) {
     SpaceHandle handle;
     Space *space = handleService_.allocate(handle);
     
@@ -89,7 +89,7 @@ BGE::SpaceHandle BGE::SpaceService::createSpace(std::string name) {
         spaces_.push_back(handle);
     }
     
-    return handle;
+    return space;
 
 }
 
