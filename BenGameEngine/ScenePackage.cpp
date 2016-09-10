@@ -40,6 +40,9 @@ void BGE::ScenePackage::initialize(ScenePackageHandle handle, std::string name) 
     
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
+    
+    baseDirectory_.type = FileUtilities::PathType::builtin;
+    baseDirectory_.subpath.clear();
 }
 
 void BGE::ScenePackage::destroy() {
@@ -340,6 +343,14 @@ void BGE::ScenePackage::outputMemoryBreakdown(uint32_t numTabs) const {
     Game::outputValue(numTabs, "ExternalPackage Indices: %zd bytes\n", externalPackageIndices_.getMemoryUsage());
     Game::outputValue(numTabs, "ExternalPackageReference: %zd bytes\n", externalPackageRefs_.getMemoryUsage());
     Game::outputValue(numTabs, "AutoDisplayElementReference: %zd bytes\n", autoDisplayElementRefs_.getMemoryUsage());
+}
+
+BGE::BaseDirectory BGE::ScenePackage::getBaseDirectory() const {
+    return baseDirectory_;
+}
+
+void BGE::ScenePackage::setBaseDirectory(const BaseDirectory &baseDirectory) {
+    baseDirectory_ = baseDirectory;
 }
 
 BGE::AutoDisplayElementReference *BGE::ScenePackage::getAutoDisplayList() const {
@@ -804,13 +815,13 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                 }
                 
                 // Now get the file information
-                NSString* filename = [[NSBundle mainBundle] pathForResource:texDict[@"filename"] ofType:nil];
+                FilePath filePath(baseDirectory_);
                 
-                if (filename) {
-                    TextureQueueItem item{name, [filename UTF8String], TextureFormat::RGBA8888};
-                    
-                    textureQueue_.push_back(item);
-                }
+                filePath.basename = [texDict[@"filename"] UTF8String];
+                
+                TextureQueueItem item{name, filePath, TextureFormat::RGBA8888};
+                
+                textureQueue_.push_back(item);
             }
         }
         
@@ -1411,7 +1422,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
             auto it = subTextures_.find(tex.name);
             
             if (it != subTextures_.end()) {
-                Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.name, tex.filename, it->second, tex.format, [this, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
+                Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.name, tex.filePath.filename(), it->second, tex.format, [this, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
                     if (atlas) {
@@ -1426,7 +1437,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
                     }
                 });
             } else {
-                Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), tex.name, tex.filename, tex.format, [this, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
+                Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), tex.name, tex.filePath.filename(), tex.format, [this, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
                     int val = textureCount_->fetch_add(1) + 1;
                     
                     if (texture) {

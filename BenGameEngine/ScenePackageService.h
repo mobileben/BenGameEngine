@@ -21,6 +21,7 @@
 #include "Space.h"
 #include "ScenePackage.h"
 #include "Queue.h"
+#include "FileUtilities.h"
 #include <thread>
 
 namespace BGE {
@@ -29,7 +30,7 @@ namespace BGE {
     struct ScenePackageLoadItem {
         SpaceHandle spaceHandle;
         std::string name;
-        std::string filename;
+        FilePath    filePath;
         ScenePackageLoadCompletionHandler completionHandler;
     };
     
@@ -59,7 +60,7 @@ namespace BGE {
         
         uint32_t numScenePackages() const;
         
-        void createPackage(SpaceHandle spaceHandle, std::string name, std::string filename, ScenePackageLoadCompletionHandler callback);
+        void createPackage(SpaceHandle spaceHandle, std::string name, const FilePath &filePath, ScenePackageLoadCompletionHandler callback);
         
         ScenePackageHandle getScenePackageHandle(std::string name) const;
         

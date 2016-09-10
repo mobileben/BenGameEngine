@@ -103,6 +103,7 @@
 		B5F1F2F11D2CCD2B0034E1B7 /* Lobby-iPh6.json in Resources */ = {isa = PBXBuildFile; fileRef = B5F1F2ED1D2CCD2B0034E1B7 /* Lobby-iPh6.json */; };
 		B5F1F2F21D2CCD2B0034E1B7 /* lobbybkg0@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F1F2EE1D2CCD2B0034E1B7 /* lobbybkg0@2x.png */; };
 		B5F1F2F31D2CCD2B0034E1B7 /* machinecarouseldivider@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B5F1F2EF1D2CCD2B0034E1B7 /* machinecarouseldivider@2x.png */; };
+		B5F4564E1D82597E00B4E340 /* FileUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F4564C1D82597E00B4E340 /* FileUtilities.cpp */; };
 		B5F523131CD9C77E00DE2F82 /* GraphicFormats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F523111CD9C77E00DE2F82 /* GraphicFormats.cpp */; };
 		B5F6B16A1CC8AF7A00E1FD45 /* Space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */; };
 		B5F6B16D1CC8B06E00E1FD45 /* SpaceService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B16B1CC8B06E00E1FD45 /* SpaceService.cpp */; };
@@ -316,6 +317,8 @@
 		B5F1F2ED1D2CCD2B0034E1B7 /* Lobby-iPh6.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "Lobby-iPh6.json"; path = "testPackage/lobby/Lobby-iPh6.json"; sourceTree = "<group>"; };
 		B5F1F2EE1D2CCD2B0034E1B7 /* lobbybkg0@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "lobbybkg0@2x.png"; path = "testPackage/lobby/lobbybkg0@2x.png"; sourceTree = "<group>"; };
 		B5F1F2EF1D2CCD2B0034E1B7 /* machinecarouseldivider@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "machinecarouseldivider@2x.png"; path = "testPackage/lobby/machinecarouseldivider@2x.png"; sourceTree = "<group>"; };
+		B5F4564C1D82597E00B4E340 /* FileUtilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileUtilities.cpp; path = utilities/FileUtilities.cpp; sourceTree = "<group>"; };
+		B5F4564D1D82597E00B4E340 /* FileUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileUtilities.h; path = utilities/FileUtilities.h; sourceTree = "<group>"; };
 		B5F523111CD9C77E00DE2F82 /* GraphicFormats.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = GraphicFormats.cpp; path = dataformats/GraphicFormats.cpp; sourceTree = "<group>"; };
 		B5F523121CD9C77E00DE2F82 /* GraphicFormats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GraphicFormats.h; path = dataformats/GraphicFormats.h; sourceTree = "<group>"; };
 		B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Space.cpp; sourceTree = "<group>"; };
@@ -446,7 +449,6 @@
 		B525E35D1C8950DA00C691C0 /* BenGameEngine */ = {
 			isa = PBXGroup;
 			children = (
-				B54821FA1CD9AD9A0073AFCC /* animation */,
 				B50A1FA21D0E8B2A004B450E /* AnimationService.cpp */,
 				B50A1FA31D0E8B2A004B450E /* AnimationService.h */,
 				B52BFB0A1D00AA750040A839 /* ArrayBuilder.h */,
@@ -534,6 +536,7 @@
 				B525E3B11C89587000C691C0 /* TextureService.cpp */,
 				B525E3B21C89587000C691C0 /* TextureService.h */,
 				B52BFB0D1D0138790040A839 /* UniqueArrayBuilder.h */,
+				B5F4564B1D82593700B4E340 /* utilities */,
 			);
 			path = BenGameEngine;
 			sourceTree = "<group>";
@@ -622,13 +625,6 @@
 			name = "game objects";
 			sourceTree = "<group>";
 		};
-		B54821FA1CD9AD9A0073AFCC /* animation */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = animation;
-			sourceTree = "<group>";
-		};
 		B5503D481D51A68D00FC77B6 /* commonhud */ = {
 			isa = PBXGroup;
 			children = (
@@ -701,6 +697,15 @@
 				B5F1F2EF1D2CCD2B0034E1B7 /* machinecarouseldivider@2x.png */,
 			);
 			name = lobby;
+			sourceTree = "<group>";
+		};
+		B5F4564B1D82593700B4E340 /* utilities */ = {
+			isa = PBXGroup;
+			children = (
+				B5F4564C1D82597E00B4E340 /* FileUtilities.cpp */,
+				B5F4564D1D82597E00B4E340 /* FileUtilities.h */,
+			);
+			name = utilities;
 			sourceTree = "<group>";
 		};
 		B5F5230A1CD9B4C500DE2F82 /* dataformats */ = {
@@ -961,6 +966,7 @@
 				B508CDA51CB4DD5B00127B97 /* Component.cpp in Sources */,
 				B512AD541D2F6DF200DCE362 /* ButtonComponent.cpp in Sources */,
 				B525E3B51C89587000C691C0 /* Error.cpp in Sources */,
+				B5F4564E1D82597E00B4E340 /* FileUtilities.cpp in Sources */,
 				B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */,
 				B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */,
 				B55194A41D28C2B100BDAA5D /* ComponentBitmask.cpp in Sources */,

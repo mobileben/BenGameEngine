@@ -102,72 +102,65 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
 
 - (void)defaultPackageTest
 {
-    NSString *path;
+    BGE::FilePath filePath;
     
-    path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
+    filePath.type = BGE::FileUtilities::PathType::builtin;
+    filePath.basename = "Common-iPh6.json";
     
-    if (path) {
-        BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-            BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-            
-            if (package) {
-                package->link();
-            }
-            
-            BGE::Game::getInstance()->outputResourceBreakdown();
-        });
-    }
+    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", filePath, [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+        BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+        
+        if (package) {
+            package->link();
+        }
+        
+        BGE::Game::getInstance()->outputResourceBreakdown();
+    });
     
-    path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
+    filePath.basename = "CommonLobby-iPh6.json";
     
-    if (path) {
-        BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-            BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-            
-            if (package) {
-                package->link();
-            }
-            
-            BGE::Game::getInstance()->outputResourceBreakdown();
-        });
-    }
+    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", filePath, [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+        BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+        
+        if (package) {
+            package->link();
+        }
+        
+        BGE::Game::getInstance()->outputResourceBreakdown();
+    });
     
-    path = [[NSBundle mainBundle] pathForResource:@"CommonHUD-iPh6" ofType:@"json"];
+    filePath.basename = "CommonHUD-iPh6.json";
     
-    if (path) {
-        BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-            BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-            
-            if (package) {
-                package->link();
-            }
-            
-            BGE::Game::getInstance()->outputResourceBreakdown();
-        });
-    }
+    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", filePath, [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+        BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+        
+        if (package) {
+            package->link();
+        }
+        
+        BGE::Game::getInstance()->outputResourceBreakdown();
+    });
     
-    path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
+    filePath.basename = "Lobby-iPh6.json";
     
-    if (path) {
-        BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", [path UTF8String], [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-            BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-            
-            if (package) {
-                package->link();
-            }
-            
-            auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
-            
-            // Now create auto display objects
-            BGE::SceneObjectCreatedDelegate delegate;
-            
-            space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
-            
-            // Spaces are not visible by default
-            space->setVisible(true);
-            BGE::Game::getInstance()->outputResourceBreakdown();
-        });
-    }
+    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", filePath, [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+        BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+        
+        if (package) {
+            package->link();
+        }
+        
+        auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
+        
+        // Now create auto display objects
+        BGE::SceneObjectCreatedDelegate delegate;
+        
+        space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
+        
+        // Spaces are not visible by default
+        space->setVisible(true);
+        BGE::Game::getInstance()->outputResourceBreakdown();
+    });
 }
 
 - (void)packageTest1
@@ -182,20 +175,19 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
         if (strongSelf.stage == 0) {
             strongSelf.stage = 1;
             
-            NSString *path;
+            BGE::FilePath filePath;
             
-            path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
+            filePath.type = BGE::FileUtilities::PathType::builtin;
+            filePath.basename = "Common-iPh6.json";
             
-            if (path) {
-                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                    __strong typeof(self) strongSelf = weakSelf;
-                    
-                    packageHandles.push_back(packageHandle);
-
-                    BGE::Game::getInstance()->outputResourceBreakdown();
-                    strongSelf.stage = 2;
-                });
-            }
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                __strong typeof(self) strongSelf = weakSelf;
+                
+                packageHandles.push_back(packageHandle);
+                
+                BGE::Game::getInstance()->outputResourceBreakdown();
+                strongSelf.stage = 2;
+            });
         } else if (strongSelf.stage == 2) {
             BGE::Game::getInstance()->getScenePackageService()->removePackage(strongSelf.spaceHandle, packageHandles[0]);
             
@@ -222,30 +214,27 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
         if (strongSelf.stage == 0 ) {
             strongSelf.stage = 1;
             
-            NSString *path;
+            BGE::FilePath filePath;
             
-            path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
+            filePath.type = BGE::FileUtilities::PathType::builtin;
+            filePath.basename = "Common-iPh6.json";
             
-            if (path) {
-                BGE::Game::getInstance()->getScenePackageService()->createPackage(strongSelf.spaceHandle, "Common", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                    packageHandles.push_back(packageHandle);
-                    
-                    BGE::Game::getInstance()->outputResourceBreakdown();
-                });
-            }
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(strongSelf.spaceHandle, "Common", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                packageHandles.push_back(packageHandle);
+                
+                BGE::Game::getInstance()->outputResourceBreakdown();
+            });
             
-            path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
+            filePath.basename = "CommonLobby-iPh6.json";
             
-            if (path) {
-                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                    __strong typeof(self) strongSelf = weakSelf;
-                    packageHandles.push_back(packageHandle);
-                    
-                    BGE::Game::getInstance()->outputResourceBreakdown();
-                    
-                    strongSelf.stage = 2;
-                });
-            }
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                __strong typeof(self) strongSelf = weakSelf;
+                packageHandles.push_back(packageHandle);
+                
+                BGE::Game::getInstance()->outputResourceBreakdown();
+                
+                strongSelf.stage = 2;
+            });
         } else if (strongSelf.stage == 2) {
             BGE::Game::getInstance()->getScenePackageService()->removePackage(strongSelf.spaceHandle, packageHandles[0]);
             BGE::Game::getInstance()->outputResourceBreakdown();
@@ -284,83 +273,75 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
 
             strongSelf.stage = 1;
             
-            NSString *path;
+            BGE::FilePath filePath;
             
-            path = [[NSBundle mainBundle] pathForResource:@"Common-iPh6" ofType:@"json"];
+            filePath.type = BGE::FileUtilities::PathType::builtin;
+            filePath.basename = "Common-iPh6.json";
             
-            if (path) {
-                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                    BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-
-                    packageHandles.push_back(packageHandle);
-                    
-                    if (package) {
-                        package->link();
-                    }
-                    
-                    BGE::Game::getInstance()->outputResourceBreakdown();
-                });
-            }
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                
+                packageHandles.push_back(packageHandle);
+                
+                if (package) {
+                    package->link();
+                }
+                
+                BGE::Game::getInstance()->outputResourceBreakdown();
+            });
             
-            path = [[NSBundle mainBundle] pathForResource:@"CommonLobby-iPh6" ofType:@"json"];
+            filePath.basename = "CommonLobby-iPh6.json";
             
-            if (path) {
-                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                    BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-
-                    packageHandles.push_back(packageHandle);
-
-                    if (package) {
-                        package->link();
-                    }
-                    
-                    BGE::Game::getInstance()->outputResourceBreakdown();
-                });
-            }
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                
+                packageHandles.push_back(packageHandle);
+                
+                if (package) {
+                    package->link();
+                }
+                
+                BGE::Game::getInstance()->outputResourceBreakdown();
+            });
             
-            path = [[NSBundle mainBundle] pathForResource:@"CommonHUD-iPh6" ofType:@"json"];
+            filePath.basename = "CommonHUD-iPh6.json";
             
-            if (path) {
-                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                    BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-                    
-                    packageHandles.push_back(packageHandle);
-
-                    if (package) {
-                        package->link();
-                    }
-                    
-                    BGE::Game::getInstance()->outputResourceBreakdown();
-                });
-            }
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                
+                packageHandles.push_back(packageHandle);
+                
+                if (package) {
+                    package->link();
+                }
+                
+                BGE::Game::getInstance()->outputResourceBreakdown();
+            });
             
-            path = [[NSBundle mainBundle] pathForResource:@"Lobby-iPh6" ofType:@"json"];
-            
-            if (path) {
-                BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", [path UTF8String], [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                    __strong typeof(self) strongSelf = weakSelf;
-                    BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-                    
-                    packageHandles.push_back(packageHandle);
-
-                    if (package) {
-                        package->link();
-                    }
-                    
-                    auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(strongSelf.spaceHandle);
-                    
-                    // Now create auto display objects
-                    BGE::SceneObjectCreatedDelegate delegate;
-                    
-                    space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
-                    
-                    // Spaces are not visible by default
-                    space->setVisible(true);
-                    BGE::Game::getInstance()->outputResourceBreakdown();
-                    BGE::Game::getInstance()->outputMemoryBreakdown();
-                    strongSelf.stage = 2;
-                });
-            }
+            filePath.basename = "Lobby-iPh6.json";
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                __strong typeof(self) strongSelf = weakSelf;
+                BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
+                
+                packageHandles.push_back(packageHandle);
+                
+                if (package) {
+                    package->link();
+                }
+                
+                auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(strongSelf.spaceHandle);
+                
+                // Now create auto display objects
+                BGE::SceneObjectCreatedDelegate delegate;
+                
+                space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
+                
+                // Spaces are not visible by default
+                space->setVisible(true);
+                BGE::Game::getInstance()->outputResourceBreakdown();
+                BGE::Game::getInstance()->outputMemoryBreakdown();
+                strongSelf.stage = 2;
+            });
         } else if (strongSelf.stage == 2) {
             strongSelf.stage = 3;
         } else if (strongSelf.stage == 3) {

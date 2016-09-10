@@ -19,6 +19,7 @@
 #include "GraphicFormats.h"
 #include "FixedArray.h"
 #include "MathTypes.h"
+#include "FileUtilities.h"
 
 namespace BGE {
     enum class ScenePackageStatus {
@@ -30,7 +31,8 @@ namespace BGE {
     enum class ScenePackageError : int32_t {
         UnsupportedFormat = 0,
         DoesNotExist,
-        Loading
+        Loading,
+        NoAvailableHandles
     };
 
     class ScenePackage : public NamedObject {
@@ -58,6 +60,9 @@ namespace BGE {
         inline bool isValid() const { return status_ == ScenePackageStatus::Valid; }
         inline ScenePackageHandle getHandle() const { return handle_; }
         
+        BaseDirectory getBaseDirectory() const;
+        void setBaseDirectory(const BaseDirectory &baseDirectory);
+        
         AutoDisplayElementReference *getAutoDisplayList() const;
         int32_t getAutoDisplayListSize() const;
         
@@ -81,23 +86,26 @@ namespace BGE {
         
         struct TextureQueueItem {
             std::string     name;
-            std::string     filename;
+            FilePath        filePath;
             TextureFormat   format;
         };
         
-        ScenePackageStatus  status_;
-        ScenePackageHandle  handle_;
-        std::string         source_;
-        float               frameRate_;
-        float               width_;
-        float               height_;
-        Vector2             position_;
-        bool                fontsLoaded_;
-        bool                texturesLoaded_;
-        bool                hasExternal_;
+        ScenePackageStatus                                  status_;
+        ScenePackageHandle                                  handle_;
         
-        int32_t             defaultPositionIndex_;
-        int32_t             defaultScaleIndex_;
+        BaseDirectory                                       baseDirectory_;
+        
+        std::string                                         source_;
+        float                                               frameRate_;
+        float                                               width_;
+        float                                               height_;
+        Vector2                                             position_;
+        bool                                                fontsLoaded_;
+        bool                                                texturesLoaded_;
+        bool                                                hasExternal_;
+        
+        int32_t                                             defaultPositionIndex_;
+        int32_t                                             defaultScaleIndex_;
         
         size_t                                              memoryUsage_;
 

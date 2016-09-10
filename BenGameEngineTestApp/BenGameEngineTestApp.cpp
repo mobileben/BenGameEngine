@@ -8,7 +8,7 @@
 
 #include "BenGameEngineTestApp.hpp"
 #include "RenderServiceOpenGLES2.h"
-
+#include "FileUtilities.h"
 
 BenGameEngineTestApp::BenGameEngineTestApp()
 {
@@ -17,4 +17,8 @@ BenGameEngineTestApp::BenGameEngineTestApp()
 
 void BenGameEngineTestApp::initialize() {
     BGE::Game::getInstance()->initialize();
+    NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsPath = [searchPaths objectAtIndex:0];
+    
+    BGE::FileUtilities::initialize([[NSBundle mainBundle].bundlePath UTF8String], [documentsPath UTF8String]);
 }

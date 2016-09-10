@@ -72,8 +72,8 @@ uint32_t BGE::ScenePackageService::numScenePackages() const {
     return num;
 }
 
-void BGE::ScenePackageService::createPackage(SpaceHandle spaceHandle, std::string name, std::string filename, ScenePackageLoadCompletionHandler callback) {
-    ScenePackageLoadItem loadable{spaceHandle, name, filename, callback};
+void BGE::ScenePackageService::createPackage(SpaceHandle spaceHandle, std::string name, const FilePath &filePath, ScenePackageLoadCompletionHandler callback) {
+    ScenePackageLoadItem loadable{spaceHandle, name, filePath, callback};
     
     queuedLoadItems_.push(loadable);
 }
@@ -104,24 +104,14 @@ void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, Scen
         }
     }
     
-    auto found = loadable.filename.find_last_of('.');
+    auto ext = loadable.filePath.extension();
+
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     
-    if (found != std::string::npos) {
-        auto ext = loadable.filename.substr(found + 1);
-        
-        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-        
-        if (ext == "json") {
-            createPackageFromJSON(loadable, callback);
-        } else if (ext == "spkg") {
-            createPackageFromSPKG(loadable, callback);
-        } else {
-            assert(false);
-            
-            if (callback) {
-                callback(ScenePackageHandle(), std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::UnsupportedFormat)));
-            }
-        }
+    if (ext == "json") {
+        createPackageFromJSON(loadable, callback);
+    } else if (ext == "spkg") {
+        createPackageFromSPKG(loadable, callback);
     } else {
         assert(false);
         
@@ -135,51 +125,60 @@ void BGE::ScenePackageService::createPackageFromJSON(ScenePackageLoadItem loadab
     // Does not exist, to load
     // For now we are doing this via iOS methods for faster dev
     NSFileManager *defaultMgr = [NSFileManager defaultManager];
+    NSString *filePath = [[NSString alloc] initWithCString:loadable.filePath.filename().c_str() encoding:NSUTF8StringEncoding];
     ScenePackageHandle handle;
-    ScenePackage *package = handleService_.allocate(handle);
     
-    if (package) {
-        package->initialize(handle, loadable.name);
-        package->setStatus(ScenePackageStatus::Loading);
+    if ([defaultMgr fileExistsAtPath:filePath]) {
+        ScenePackage *package = handleService_.allocate(handle);
         
-        // Now create an entry for this
-        ScenePackageReference ref{ handle, { loadable.spaceHandle }};
-        scenePackages_.push_back(ref);
-        
-        NSData *data = [defaultMgr contentsAtPath:[[NSString alloc] initWithCString:loadable.filename.c_str() encoding:NSUTF8StringEncoding]];
-        NSError *err = nil;
-        NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
-        
-        // The loading system relies on having the package initalized with handle
-        package->create(jsonDict, [this, loadable, callback, handle](ScenePackage * package) {
-            auto tHandle = handle;
-            std::shared_ptr<Error> error = nullptr;
+        if (package) {
+            package->initialize(handle, loadable.name);
+            package->setBaseDirectory(BaseDirectory{loadable.filePath.type, loadable.filePath.subpath});
+            package->setStatus(ScenePackageStatus::Loading);
             
-            if (package) {
-                package->setStatus(ScenePackageStatus::Valid);
-
-                auto space = Game::getInstance()->getSpaceService()->getSpace(loadable.spaceHandle);
+            // Now create an entry for this
+            ScenePackageReference ref{ handle, { loadable.spaceHandle }};
+            scenePackages_.push_back(ref);
+            
+            NSData *data = [defaultMgr contentsAtPath:filePath];
+            NSError *err = nil;
+            NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
+            
+            // The loading system relies on having the package initalized with handle
+            package->create(jsonDict, [this, loadable, callback, handle](ScenePackage * package) {
+                auto tHandle = handle;
+                std::shared_ptr<Error> error = nullptr;
                 
-                if (space) {
-                    space->scenePackageAdded(tHandle);
+                if (package) {
+                    package->setStatus(ScenePackageStatus::Valid);
+                    
+                    auto space = Game::getInstance()->getSpaceService()->getSpace(loadable.spaceHandle);
+                    
+                    if (space) {
+                        space->scenePackageAdded(tHandle);
+                    }
+                } else {
+                    error = std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::Loading));
+                    
+                    // There is no package, so we need to release this
+                    removePackage(loadable.spaceHandle, tHandle);
+                    
+                    // Reset handle
+                    tHandle.nullify();
                 }
-            } else {
-                error = std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::Loading));
-
-                // There is no package, so we need to release this
-                removePackage(loadable.spaceHandle, tHandle);
                 
-                // Reset handle
-                tHandle.nullify();
-            }
-            
+                if (callback) {
+                    callback(tHandle, error);
+                }
+            });
+        } else {
             if (callback) {
-                callback(tHandle, error);
+                callback(handle, std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::NoAvailableHandles)));
             }
-        });
+        }
     } else {
         if (callback) {
-            callback(handle, nullptr);
+            callback(handle, std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::DoesNotExist)));
         }
     }
 }
