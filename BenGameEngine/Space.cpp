@@ -203,6 +203,19 @@ const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
     return gameObjectService_->getGameObjects();
 }
 
+// TODO: Add in support for dependency validation as well as linking in order of dependencies
+void BGE::Space::linkAll() {
+    auto scenePackageService = Game::getInstance()->getScenePackageService();
+    
+    for (auto &packageHandle : scenePackages_) {
+        auto package = scenePackageService->getScenePackage(packageHandle);
+        
+        if (package) {
+            package->link();
+        }
+    }
+}
+
 BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     AnimationSequenceReference *animSeqRef;

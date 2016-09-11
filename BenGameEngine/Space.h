@@ -90,6 +90,8 @@ namespace BGE {
         inline bool isUpdatable() const { return updatable_; }
         inline void setUpdatable(bool updatable) { updatable_ = updatable; }
         
+        void linkAll();
+        
         GameObject *createAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
         GameObject *createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
         GameObject *createFrameAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
