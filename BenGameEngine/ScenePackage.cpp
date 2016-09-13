@@ -522,6 +522,8 @@ void BGE::ScenePackage::link() {
             animChannelRef->keyframes[ki] = animKeyframeRefs_.addressOf(animChannelIntRef->keyframes[ki]);
         }
         
+        animChannelRef->scenePackage = getHandle();
+        
         keyframeIndex += animChannelRef->numKeyframes;
     }
     
@@ -549,6 +551,9 @@ void BGE::ScenePackage::link() {
         
         animSeqRef->channels = animChannelRefs_.addressOf(animSeqRefInt->channels);
         animSeqRef->bounds = boundsRefs_.addressOf(animSeqRefInt->bounds);
+        
+        animSeqRef->scenePackage = getHandle();
+        
         referenceTypes_[resolvedName] = GfxReferenceTypeAnimationSequence;
     }
     
@@ -650,6 +655,8 @@ void BGE::ScenePackage::link() {
         button->name = resolvedName;
         button->states = buttonStateRefs_.addressOf(buttonInt->states);
         button->numStates = buttonInt->numStates;
+        button->scenePackage = getHandle();
+        
         referenceTypes_[resolvedName] = GfxReferenceTypeButton;
     }
     

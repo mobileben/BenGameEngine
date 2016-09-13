@@ -93,8 +93,8 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
             self.spaceHandle = BGE::SpaceHandle();
         }
 
-        [self defaultPackageTest];
-//        [self packageTest3];
+//        [self defaultPackageTest];
+        [self packageTest3];
     }
     
     [self.glView display];
@@ -155,7 +155,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
         // Now create auto display objects
         BGE::SceneObjectCreatedDelegate delegate;
         
-        space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
+        space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, &delegate);
         
         // Spaces are not visible by default
         space->setVisible(true);
@@ -334,7 +334,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
                 // Now create auto display objects
                 BGE::SceneObjectCreatedDelegate delegate;
                 
-                space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, delegate);
+                space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, &delegate);
                 
                 // Spaces are not visible by default
                 space->setVisible(true);

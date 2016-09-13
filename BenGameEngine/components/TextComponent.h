@@ -49,7 +49,7 @@ namespace BGE {
             return text_;
         }
         
-        void setText(std::string& text);
+        void setText(std::string const &text);
         
         FontHandle getFontHandle() const {
             return fontHandle_;

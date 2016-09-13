@@ -31,3 +31,14 @@ void BGE::Component::destroy() {
 BGE::Space *BGE::Component::getSpace() const {
     return Game::getInstance()->getSpaceService()->getSpace(spaceHandle_);
 }
+
+BGE::GameObject *BGE::Component::getGameObject() const {
+    auto space = getSpace();
+    
+    if (space) {
+        return space->getGameObject(gameObjectHandle_);
+    }
+    
+    return nullptr;
+}
+

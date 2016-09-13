@@ -9,6 +9,7 @@
 #include "TransformComponent.h"
 #include "ComponentBitmask.h"
 #include "Space.h"
+#include "GameObject.h"
 #include <cassert>
 
 uint32_t BGE::TransformComponent::bitmask_ = Component::InvalidBitmask;
@@ -141,7 +142,7 @@ std::vector<BGE::TransformComponent *> BGE::TransformComponent::getChildren() {
     return children;
 }
 
-void BGE::TransformComponent::addChildHandle(TransformComponentHandle handle) {
+void BGE::TransformComponent::addChild(TransformComponentHandle handle) {
     auto space = getSpace();
     auto child = space->getComponent<TransformComponent>(handle.getHandle());
     assert(child);
@@ -163,6 +164,40 @@ void BGE::TransformComponent::addChild(TransformComponent *child) {
         child->parentHandle_ = getHandle<TransformComponent>();
         
         // TODO: Update hierarchy
+    }
+}
+
+void BGE::TransformComponent::addChild(GameObjectHandle handle) {
+    auto space = getSpace();
+    
+    if (space) {
+        // Get GameObject from space so we don't get space twice (this->getGameObject would do it)
+        auto gameObj = space->getGameObject(getGameObjectHandle());
+        
+        if (gameObj) {
+            auto otherGameObj = space->getGameObject(handle);
+            
+            if (otherGameObj) {
+                auto otherXform = otherGameObj->getComponent<TransformComponent>();
+                
+                if (otherXform) {
+                    assert(!otherXform->getParent());
+                    
+                    childrenHandles_.push_back(otherXform->getHandle<TransformComponent>());
+                    otherXform->parentHandle_ = getHandle<TransformComponent>();
+                }
+            }
+        }
+    }
+}
+
+void BGE::TransformComponent::addChild(GameObject *child) {
+    assert(child);
+    
+    if (child) {
+        auto xform = child->getComponent<TransformComponent>();
+        
+        addChild(xform);
     }
 }
 

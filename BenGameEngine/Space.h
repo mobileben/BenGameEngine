@@ -33,6 +33,7 @@ namespace BGE {
         
         void initialize(SpaceHandle handle, std::string name);
         void destroy();
+        void reset();
         
         void outputResourceBreakdown(uint32_t numTabs) const;
         void outputMemoryBreakdown(uint32_t numTabs) const;
@@ -61,6 +62,10 @@ namespace BGE {
             }
             
             return component;
+        }
+        
+        template <typename T> inline T *getComponent(Handle<T> handle) const {
+            return componentService_->getComponent<T>(handle);
         }
         
         template <typename T> inline T *getComponent(ComponentHandle handle) const {
@@ -92,17 +97,17 @@ namespace BGE {
         
         void linkAll();
         
-        GameObject *createAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        GameObject *createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        GameObject *createFrameAnimSequence(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        GameObject *createButton(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        GameObject *createExternalReference(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        GameObject *createMask(std::string name, ScenePackageHandle handle = ScenePackageHandle(), SceneObjectCreatedDelegate delegate = SceneObjectCreatedDelegate());
-        GameObject *createSprite(std::string name, ScenePackageHandle handle = ScenePackageHandle());
-        GameObject *createText(std::string name, ScenePackageHandle handle = ScenePackageHandle());
-        GameObject *createPlacement(std::string name, ScenePackageHandle handle = ScenePackageHandle());
+        GameObject *createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
+        GameObject *createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate);
+        GameObject *createFrameAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
+        GameObject *createButton(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
+        GameObject *createExternalReference(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
+        GameObject *createMask(std::string name, ScenePackageHandle handle);
+        GameObject *createSprite(std::string name, ScenePackageHandle handle);
+        GameObject *createText(std::string name, ScenePackageHandle handle);
+        GameObject *createPlacement(std::string name, ScenePackageHandle handle);
         
-        void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate);
+        void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate);
 
         void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
 
@@ -116,6 +121,8 @@ namespace BGE {
     private:
         friend SpaceService;
         
+        using CreatedGameObjectVector = std::vector<std::pair<uint32_t, GameObjectHandle>>;
+        
         std::shared_ptr<GameObjectService>  gameObjectService_;
         std::shared_ptr<ComponentService>   componentService_;
         
@@ -127,7 +134,30 @@ namespace BGE {
         bool        visible_;
         uint32_t    order_;
         bool        updatable_;
-        // TODO:
+        
+        static uint32_t handlerBitmaskForSceneObjectCreatedDelegate(SceneObjectCreatedDelegate *delegate);
+        
+        GameObjectHandle handleForGameObject(GameObject *object) const;
+        
+        GameObject *createAnimSequence(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
+        GameObject *createButton(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
+        GameObject *createExternalReference(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
+        GameObject *createMask(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
+        GameObject *createSprite(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
+        GameObject *createText(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
+        GameObject *createPlacement(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
+        
+        void addCreatedGameObjectsForAnimSequence(GameObject *animSequence, uint32_t pushBitmask, CreatedGameObjectVector *objects) const;
+        void addCreatedGameObjectsForButton(GameObject *button, uint32_t pushBitmask, CreatedGameObjectVector *objects) const;
+
+        template <typename T>
+        void addCreatedGameObjectsForRenderComponent(GameObject *object, CreatedGameObjectVector *objects) const {
+            if (object) {
+                objects->push_back(std::make_pair(T::typeId_, handleForGameObject(object)));
+            }
+        }
+        
+        void dispatchCreatedHandlers(CreatedGameObjectVector *objects, SceneObjectCreatedDelegate *delegate);
     };
 }
 

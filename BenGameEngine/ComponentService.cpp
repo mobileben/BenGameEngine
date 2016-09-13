@@ -24,6 +24,7 @@
 #include "TextureMaskComponent.h"
 #include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
+#include "PlacementComponent.h"
 #include "Game.h"
 
 bool BGE::ComponentService::componentsRegistered_ = false;
@@ -42,6 +43,7 @@ void BGE::ComponentService::registerComponents() {
         registerComponent<FrameAnimatorComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<SpriteRenderComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<TextComponent>(120, HandleServiceNoMaxLimit);
+        registerComponent<PlacementComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<ButtonComponent>(1024, HandleServiceNoMaxLimit);
         registerComponent<InputTouchComponent>(1024, HandleServiceNoMaxLimit);
         registerComponent<LineRenderComponent>(1024, HandleServiceNoMaxLimit);
@@ -107,6 +109,8 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
                 releaseComponentHandle<SpriteRenderComponent>(handle);
             } else if (typeId == TextComponent::typeId_) {
                 releaseComponentHandle<TextComponent>(handle);
+            } else if (typeId == PlacementComponent::typeId_) {
+                releaseComponentHandle<PlacementComponent>(handle);
             } else if (typeId == ButtonComponent::typeId_) {
                 releaseComponentHandle<ButtonComponent>(handle);
             } else if (typeId == InputTouchComponent::typeId_) {
@@ -153,6 +157,7 @@ uint32_t BGE::ComponentService::totalNumComponents() const {
     total += numComponents<FrameAnimatorComponent>();
     total += numComponents<SpriteRenderComponent>();
     total += numComponents<TextComponent>();
+    total += numComponents<PlacementComponent>();
     total += numComponents<ButtonComponent>();
     total += numComponents<InputTouchComponent>();
     total += numComponents<LineRenderComponent>();
@@ -181,6 +186,7 @@ uint32_t BGE::ComponentService::totalMaxHandles() const {
     total += maxComponents<FrameAnimatorComponent>();
     total += maxComponents<SpriteRenderComponent>();
     total += maxComponents<TextComponent>();
+    total += maxComponents<PlacementComponent>();
     total += maxComponents<ButtonComponent>();
     total += maxComponents<InputTouchComponent>();
     total += maxComponents<LineRenderComponent>();
@@ -205,6 +211,7 @@ uint32_t BGE::ComponentService::totalMaxHandlesAllocated() const {
     total += maxHandlesAllocated<FrameAnimatorComponent>();
     total += maxHandlesAllocated<SpriteRenderComponent>();
     total += maxHandlesAllocated<TextComponent>();
+    total += maxHandlesAllocated<PlacementComponent>();
     total += maxHandlesAllocated<ButtonComponent>();
     total += maxHandlesAllocated<InputTouchComponent>();
     total += maxHandlesAllocated<LineRenderComponent>();
@@ -316,6 +323,9 @@ size_t BGE::ComponentService::usedHandleMemory() const {
         } else if (i == TextComponent::typeId_) {
             auto handleService = static_cast<HandleService<TextComponent, TextComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->usedMemory();
+        } else if (i == PlacementComponent::typeId_) {
+            auto handleService = static_cast<HandleService<PlacementComponent, PlacementComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
         } else if (i == ButtonComponent::typeId_) {
             auto handleService = static_cast<HandleService<ButtonComponent, ButtonComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->usedMemory();
@@ -378,6 +388,9 @@ size_t BGE::ComponentService::unusedHandleMemory() const {
             mem += handleService->unusedMemory();
         } else if (i == TextComponent::typeId_) {
             auto handleService = static_cast<HandleService<TextComponent, TextComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == PlacementComponent::typeId_) {
+            auto handleService = static_cast<HandleService<PlacementComponent, PlacementComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->unusedMemory();
         } else if (i == ButtonComponent::typeId_) {
             auto handleService = static_cast<HandleService<ButtonComponent, ButtonComponentHandle> *>(componentHandleServices_[i]);
@@ -442,6 +455,9 @@ size_t BGE::ComponentService::totalHandleMemory() const {
         } else if (i == TextComponent::typeId_) {
             auto handleService = static_cast<HandleService<TextComponent, TextComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->totalMemory();
+        } else if (i == PlacementComponent::typeId_) {
+            auto handleService = static_cast<HandleService<PlacementComponent, PlacementComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
         } else if (i == ButtonComponent::typeId_) {
             auto handleService = static_cast<HandleService<ButtonComponent, ButtonComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->totalMemory();
@@ -492,6 +508,8 @@ void BGE::ComponentService::outputResourceBreakdown(uint32_t numTabs) const {
             outputComponentResourceBreakdown<SpriteRenderComponent>(numTabs);
         } else if (i == TextComponent::typeId_) {
             outputComponentResourceBreakdown<TextComponent>(numTabs);
+        } else if (i == PlacementComponent::typeId_) {
+            outputComponentResourceBreakdown<PlacementComponent>(numTabs);
         } else if (i == ButtonComponent::typeId_) {
             outputComponentResourceBreakdown<ButtonComponent>(numTabs);
         } else if (i == InputTouchComponent::typeId_) {
@@ -534,6 +552,8 @@ void BGE::ComponentService::outputMemoryBreakdown(uint32_t numTabs) const {
             outputComponentMemoryBreakdown<SpriteRenderComponent>(numTabs);
         } else if (i == TextComponent::typeId_) {
             outputComponentMemoryBreakdown<TextComponent>(numTabs);
+        } else if (i == PlacementComponent::typeId_) {
+            outputComponentMemoryBreakdown<PlacementComponent>(numTabs);
         } else if (i == ButtonComponent::typeId_) {
             outputComponentMemoryBreakdown<ButtonComponent>(numTabs);
         } else if (i == InputTouchComponent::typeId_) {

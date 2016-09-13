@@ -19,6 +19,7 @@
 namespace BGE {
     class RenderService;
     class RenderServiceOpenGLES2;
+    class GameObject;
     
     class TransformComponent : public Component
     {
@@ -83,8 +84,11 @@ namespace BGE {
         
         uint32_t getNumChildren() const { return (uint32_t) childrenHandles_.size(); }
         
-        void addChildHandle(TransformComponentHandle handle);
+        void addChild(TransformComponentHandle handle);
         void addChild(TransformComponent *child);
+        void addChild(GameObjectHandle handle);
+        void addChild(GameObject *child);
+
         void removeAllChildren();
         void removeFromParent();
         

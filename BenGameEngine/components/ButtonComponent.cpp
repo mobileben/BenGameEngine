@@ -107,9 +107,9 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                 auto state = &buttonRef.states[i];
                 if (!strcmp(ButtonStateDisabledString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        disabledButton = space->createAnimSequence(state->reference);
+                        disabledButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
                     } else if (state->referenceType == GfxReferenceTypeSprite) {
-                        disabledButton = space->createSprite(state->reference);
+                        disabledButton = space->createSprite(state->reference, buttonRef.scenePackage);
                     } else {
                         assert(false);
                     }
@@ -119,7 +119,7 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(disabledButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateDisabledAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        disabledAnimButton = space->createAnimSequence(state->reference);
+                        disabledAnimButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
                     } else {
                         assert(false);
                     }
@@ -129,9 +129,9 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(disabledAnimButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateNormalString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        normalButton = space->createAnimSequence(state->reference);
+                        normalButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
                     } else if (state->referenceType == GfxReferenceTypeSprite) {
-                        normalButton = space->createSprite(state->reference);
+                        normalButton = space->createSprite(state->reference, buttonRef.scenePackage);
                     } else {
                         assert(false);
                     }
@@ -141,7 +141,7 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(normalButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateNormalAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        normalAnimButton = space->createAnimSequence(state->reference);
+                        normalAnimButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
                     } else {
                         assert(false);
                     }
@@ -151,9 +151,9 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(normalAnimButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateHighlightedString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        highlightedButton = space->createAnimSequence(state->reference);
+                        highlightedButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
                     } else if (state->referenceType == GfxReferenceTypeSprite) {
-                        highlightedButton = space->createSprite(state->reference);
+                        highlightedButton = space->createSprite(state->reference, buttonRef.scenePackage);
                     } else {
                         assert(false);
                     }
@@ -163,7 +163,7 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(highlightedButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateHighlightedAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        highlightedAnimButton = space->createAnimSequence(state->reference);
+                        highlightedAnimButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
                     } else {
                         assert(false);
                     }

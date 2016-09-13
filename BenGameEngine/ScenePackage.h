@@ -201,15 +201,24 @@ namespace BGE {
     
     class GameObject;
     
+#if TARGET_OS_IPHONE
+
+    typedef void (*ObjCGameObjectCreatedHandler)(id, SEL, GameObject *);
+
+#endif /* TARGET_OS_IPHONE */
+    
+    using GameObjectCreatedHandler = std::function<void(GameObject *)>;
+    
     struct SceneObjectCreatedDelegate {
-        std::function<void(GameObject *)> animationSequenceCreatedHandler;
-        std::function<void(GameObject *)> buttonCreatedHandler;
-        std::function<void(GameObject *)> maskCreatedHandler;
-        std::function<void(GameObject *)> placementCreatedHandler;
-        std::function<void(GameObject *)> spriteCreatedHandler;
-        std::function<void(GameObject *)> textCreatedHandler;
-        std::function<void(GameObject *)> textureMaskCreatedHandler;
-        std::function<void(GameObject *)> completionHandler;
+        // ANY MODIFICATION OF THIS WILL REQUIRE CHANGES TO Space.cpp
+        GameObjectCreatedHandler animationSequenceCreatedHandler;
+        GameObjectCreatedHandler buttonCreatedHandler;
+        GameObjectCreatedHandler maskCreatedHandler;
+        GameObjectCreatedHandler placementCreatedHandler;
+        GameObjectCreatedHandler spriteCreatedHandler;
+        GameObjectCreatedHandler textCreatedHandler;
+        GameObjectCreatedHandler textureMaskCreatedHandler;
+        // ANY MODIFICATION OF THIS WILL REQUIRE CHANGES TO Space.cpp
     };
 }
 

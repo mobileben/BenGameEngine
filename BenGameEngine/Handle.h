@@ -31,6 +31,7 @@ namespace BGE {
     class InputTouchComponent;
     class LineRenderComponent;
     class MaskComponent;
+    class PlacementComponent;
     class SpriteRenderComponent;
     class TextComponent;
     class TextureMaskComponent;
@@ -127,6 +128,7 @@ namespace BGE {
     using InputTouchComponentHandle = Handle<InputTouchComponent>;
     using LineRenderComponentHandle = Handle<LineRenderComponent>;
     using MaskComponentHandle = Handle<MaskComponent>;
+    using PlacementComponentHandle = Handle<PlacementComponent>;
     using SpriteRenderComponentHandle = Handle<SpriteRenderComponent>;
     using TextComponentHandle = Handle<TextComponent>;
     using TextureMaskComponentHandle = Handle<TextureMaskComponent>;

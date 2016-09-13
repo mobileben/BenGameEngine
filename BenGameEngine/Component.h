@@ -46,6 +46,7 @@ namespace BGE {
         
         inline bool hasGameObject() const { return !gameObjectHandle_.isNull(); }
         inline GameObjectHandle getGameObjectHandle() const { return gameObjectHandle_; }
+        GameObject *getGameObject() const;
         
         Space *getSpace() const;
         inline SpaceHandle getSpaceHandle() const { return spaceHandle_; }

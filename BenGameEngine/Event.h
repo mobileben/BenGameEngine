@@ -27,7 +27,15 @@ namespace BGE {
         TouchDragExit,
         TouchUpInside,
         TouchUpOutside,
-        TouchCancel
+        TouchCancel,
+        AnimationSequenceCreated,
+        ButtonCreated,
+        FlatRectCreated,
+        LineCreated,
+        MaskCreated,
+        SpriteCreated,
+        TextCreated,
+        TextureMaskCreated
     };
 }
 
@@ -56,7 +64,7 @@ namespace BGE {
         EventHandler(ObjectId objId) : NamedObject(objId) {
         }
         
-        void initialze(EventHandlerHandle handle, ObjectId objId, std::string name, Event event, EventHandlerFunction function) { this->handle = handle; this->setInstanceId(objId); this->setName(name); this->event = event; this->handler = function; }
+        void initialize(EventHandlerHandle handle, std::string name, Event event, EventHandlerFunction function) { this->handle = handle; this->setName(name); this->event = event; this->handler = function; }
         void destroy() {
             handle = EventHandlerHandle();
             spaceHandle = SpaceHandle();

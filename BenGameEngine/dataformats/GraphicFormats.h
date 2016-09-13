@@ -144,6 +144,7 @@ namespace BGE {
             TextReference *text;
             AnimationSequenceReference *sequence;
         };
+        ScenePackageHandle scenePackage;
     };
     
     struct AnimationSequenceReferenceIntermediate {
@@ -164,6 +165,7 @@ namespace BGE {
         uint32_t numBounds;
         AnimationChannelReference *channels;
         BoundsReference *bounds;
+        ScenePackageHandle scenePackage;
     };
     
     struct ButtonStateIntermediate {
@@ -188,6 +190,7 @@ namespace BGE {
         const char              *name;
         ButtonStateReference    *states;
         uint32_t                numStates;
+        ScenePackageHandle scenePackage;
     };
     
     struct PlacementIntermediate {

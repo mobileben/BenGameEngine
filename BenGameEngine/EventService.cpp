@@ -16,9 +16,7 @@ BGE::EventHandlerHandle BGE::EventService::createEventHandlerHandle(std::string 
     auto eventHandler = handleService_.allocate(handle);
  
     if (eventHandler) {
-        ObjectId eventHandlerId = getIdAndIncrement();
-
-        eventHandler->initialze(handle, eventHandlerId, name, event, function);
+        eventHandler->initialize(handle, name, event, function);
     }
     
     return handle;

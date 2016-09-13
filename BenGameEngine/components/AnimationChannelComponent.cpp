@@ -15,6 +15,7 @@
 #include "ButtonComponent.h"
 #include "TextComponent.h"
 #include "MaskComponent.h"
+#include "PlacementComponent.h"
 
 uint32_t BGE::AnimationChannelComponent::bitmask_ = Component::InvalidBitmask;
 uint32_t BGE::AnimationChannelComponent::typeId_ = Component::InvalidTypeId;
@@ -37,6 +38,8 @@ void BGE::AnimationChannelComponent::updateReference() {
     auto gameObj = space->getGameObject(getGameObjectHandle());
     
     if (this->channel) {
+        auto package = Game::getInstance()->getScenePackageService()->getScenePackage(this->channel->scenePackage);
+        
         // Now setup the proper render component
         
         // TODO: Do we do this later?
@@ -44,7 +47,7 @@ void BGE::AnimationChannelComponent::updateReference() {
         switch (this->channel->referenceType) {
             case GfxReferenceTypeSprite: {
                 auto sprite = space->createComponent<SpriteRenderComponent>();
-                auto texRef = Game::getInstance()->getScenePackageService()->getTextureReference(this->channel->reference);
+                auto texRef = package->getTextureReference(this->channel->reference);
                 auto bbox = space->createComponent<BoundingBoxComponent>();
                 
                 // TODO: Remove any older render components
@@ -60,7 +63,7 @@ void BGE::AnimationChannelComponent::updateReference() {
                 auto input = space->createComponent<InputTouchComponent>();
                 auto bbox = space->createComponent<BoundingBoxComponent>();
                 
-                auto buttonRef = Game::getInstance()->getScenePackageService()->getButtonReference(this->channel->reference);
+                auto buttonRef = package->getButtonReference(this->channel->reference);
                 gameObj->addComponent(button);
                 gameObj->addComponent(input);
                 gameObj->addComponent(bbox);
@@ -76,7 +79,7 @@ void BGE::AnimationChannelComponent::updateReference() {
                 
             case GfxReferenceTypeMask: {
                 auto mask = space->createComponent<MaskComponent>();
-                auto maskRef = Game::getInstance()->getScenePackageService()->getMaskReference(this->channel->reference);
+                auto maskRef = package->getMaskReference(this->channel->reference);
                 
                 gameObj->addComponent(mask);
                 mask->setMaskReference(maskRef);
@@ -91,7 +94,7 @@ void BGE::AnimationChannelComponent::updateReference() {
                 break;
                 
             case GfxReferenceTypeText: {
-                TextReference *textRef = Game::getInstance()->getScenePackageService()->getTextReference(this->channel->reference);
+                TextReference *textRef = package->getTextReference(this->channel->reference);
                 
                 if (textRef && !textRef->fontHandle.isNull()) {
                     auto text = space->createComponent<TextComponent>();
@@ -106,8 +109,17 @@ void BGE::AnimationChannelComponent::updateReference() {
             }
                 break;
                 
-            case GfxReferenceTypePlacement:
-                // No-op
+            case GfxReferenceTypePlacement: {
+                PlacementReference *placementRef = package->getPlacementReference(this->channel->reference);
+                
+                if (placementRef) {
+                    auto placement = space->createComponent<PlacementComponent>();
+                    
+                    gameObj->addComponent(placement);
+                    
+                    placement->setPlacementReference(placementRef);
+                }
+            }
                 break;
                 
             default:

@@ -86,6 +86,7 @@
 		B571F1901C9D0A34007F5A90 /* FontGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */; };
 		B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1941C9E1B94007F5A90 /* FontVertex.glsl */; };
 		B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */; };
+		B59BE7891D8622430055800E /* PlacementComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B59BE7871D8622430055800E /* PlacementComponent.cpp */; };
 		B5ACE88F1CBB08D5004B6871 /* TransformComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */; };
 		B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */; };
 		B5ACE8951CBF7B00004B6871 /* LineRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8931CBF7AFF004B6871 /* LineRenderComponent.cpp */; };
@@ -291,6 +292,8 @@
 		B571F18F1C9D0A34007F5A90 /* FontGlyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontGlyph.h; sourceTree = "<group>"; };
 		B571F1941C9E1B94007F5A90 /* FontVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontVertex.glsl; path = shaders/FontVertex.glsl; sourceTree = "<group>"; };
 		B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontFragment.glsl; path = shaders/FontFragment.glsl; sourceTree = "<group>"; };
+		B59BE7871D8622430055800E /* PlacementComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = PlacementComponent.cpp; path = components/PlacementComponent.cpp; sourceTree = "<group>"; };
+		B59BE7881D8622430055800E /* PlacementComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlacementComponent.h; path = components/PlacementComponent.h; sourceTree = "<group>"; };
 		B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TransformComponentTests.m; path = BGEGameObjectAndComponentTests/TransformComponentTests.m; sourceTree = SOURCE_ROOT; };
 		B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = ComponentService.cpp; sourceTree = "<group>"; };
 		B5ACE8911CBB56CE004B6871 /* ComponentService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComponentService.h; sourceTree = "<group>"; };
@@ -409,6 +412,8 @@
 				B5ACE8941CBF7AFF004B6871 /* LineRenderComponent.h */,
 				B512AD551D2F7D0400DCE362 /* MaskComponent.cpp */,
 				B512AD561D2F7D0400DCE362 /* MaskComponent.h */,
+				B59BE7871D8622430055800E /* PlacementComponent.cpp */,
+				B59BE7881D8622430055800E /* PlacementComponent.h */,
 				B52B760F1CBA2C7F00758249 /* RenderComponent.cpp */,
 				B52B76101CBA2C7F00758249 /* RenderComponent.h */,
 				B5EE9D6A1CC4A4C8005D99CC /* SpriteRenderComponent.cpp */,
@@ -938,6 +943,7 @@
 				B571F1901C9D0A34007F5A90 /* FontGlyph.cpp in Sources */,
 				B512AD5D1D3F1C2900DCE362 /* Input.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */,
+				B59BE7891D8622430055800E /* PlacementComponent.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
 				B5F8716E1D406EE5000EA018 /* InputTouchComponent.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* Shader.cpp in Sources */,

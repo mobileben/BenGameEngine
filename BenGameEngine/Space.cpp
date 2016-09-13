@@ -13,9 +13,11 @@
 #include "BoundingBoxComponent.h"
 #include "ButtonComponent.h"
 #include "MaskComponent.h"
+#include "TextureMaskComponent.h"
 #include "SpriteRenderComponent.h"
 #include "TransformComponent.h"
 #include "TextComponent.h"
+#include "PlacementComponent.h"
 
 BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true) {
 }
@@ -42,8 +44,14 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name) {
 }
 
 void BGE::Space::destroy() {
-    visible_ = false;
+    reset();
+    
     order_ = 0;
+    spaceHandle_ = SpaceHandle();
+}
+
+void BGE::Space::reset() {
+    visible_ = false;
     updatable_ = false;
     
     // Destroy all scenePackages
@@ -85,6 +93,42 @@ void BGE::Space::destroy() {
     }
     
     textures_.clear();
+}
+
+uint32_t BGE::Space::handlerBitmaskForSceneObjectCreatedDelegate(SceneObjectCreatedDelegate *delegate) {
+    uint32_t bitmask = 0;
+    
+    if (delegate) {
+        if (delegate->animationSequenceCreatedHandler != nullptr) {
+            bitmask |= AnimationSequenceComponent::bitmask_;
+        }
+        
+        if (delegate->buttonCreatedHandler != nullptr) {
+            bitmask |= ButtonComponent::bitmask_;
+        }
+        
+        if (delegate->maskCreatedHandler != nullptr) {
+            bitmask |= MaskComponent::bitmask_;
+        }
+        
+        if (delegate->placementCreatedHandler != nullptr) {
+            bitmask |= PlacementComponent::bitmask_;
+        }
+        
+        if (delegate->spriteCreatedHandler != nullptr) {
+            bitmask |= SpriteRenderComponent::bitmask_;
+        }
+        
+        if (delegate->textCreatedHandler != nullptr) {
+            bitmask |= TextComponent::bitmask_;
+        }
+        
+        if (delegate->textureMaskCreatedHandler != nullptr) {
+            bitmask |= TextureMaskComponent::bitmask_;
+        }
+    }
+    
+    return bitmask;
 }
 
 void BGE::Space::outputResourceBreakdown(uint32_t numTabs) const {
@@ -216,7 +260,17 @@ void BGE::Space::linkAll() {
     }
 }
 
-BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+    CreatedGameObjectVector objects;
+    auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
+    auto obj = createAnimSequence(name, handle, bitmask, &objects);
+    
+    dispatchCreatedHandlers(&objects, delegate);
+    
+    return obj;
+}
+
+BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     AnimationSequenceReference *animSeqRef;
     
@@ -237,18 +291,19 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHa
         obj->addComponent(boundingBox);
         obj->addComponent(animSeq);
         obj->addComponent(animator);
-
+        
         animSeq->setAnimationSequenceReference(animSeqRef);
         animator->setFrame(0, true);
+        
+        addCreatedGameObjectsForAnimSequence(obj, pushBitmask, objects);
         //obj->setActive(true);
         
         return obj;
     }
     
-    return nullptr;
-}
+    return nullptr;}
 
-BGE::GameObject *BGE::Space::createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate) {
     if (channelRef) {
         auto obj = createGameObject(name);
         auto xform = createComponent<TransformComponent>();
@@ -269,7 +324,7 @@ BGE::GameObject *BGE::Space::createAnimChannel(std::string name, const Animation
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     AnimationSequenceReference *animSeqRef;
     
@@ -299,7 +354,17 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, ScenePack
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+    CreatedGameObjectVector objects;
+    auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
+    auto obj = createButton(name, handle, bitmask, &objects);
+    
+    dispatchCreatedHandlers(&objects, delegate);
+
+    return obj;
+}
+
+BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     ButtonReference *buttonRef;
     
@@ -322,6 +387,8 @@ BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle h
         obj->addComponent(bbox);
         
         button->setButtonReference(buttonRef);
+        
+        addCreatedGameObjectsForButton(obj, pushBitmask, objects);
 
         //obj->setActive(true);
         
@@ -331,7 +398,17 @@ BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle h
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+    CreatedGameObjectVector objects;
+    uint32_t pushBitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
+    auto obj = createExternalReference(name, handle, pushBitmask, &objects);
+    
+    dispatchCreatedHandlers(&objects, delegate);
+    
+    return obj;
+}
+
+BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePackageHandle handle, uint32_t pushBitmap, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     ExternalPackageReference *extRef;
     
@@ -343,39 +420,39 @@ BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePack
     
     if (extRef) {
         auto extPackage = Game::getInstance()->getScenePackageService()->getScenePackage(extRef->externalPackage);
-
+        
         if (extPackage) {
             std::string refName = extRef->name;
             auto type = extPackage->getReferenceType(refName);
-
+            
             printf("XXXXX %s/%d", refName.c_str(), type);
             
             switch (type) {
                 case GfxReferenceTypeAnimationSequence:
-                    return createAnimSequence(refName);
+                    return createAnimSequence(refName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeButton:
-                    return createButton(refName);
+                    return createButton(refName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeExternalReference:
-                    return createExternalReference(refName);
+                    return createExternalReference(refName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeMask:
-                    return createMask(refName);
+                    return createMask(refName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypePlacement:
-                    return createPlacement(refName);
+                    return createPlacement(refName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeSprite:
-                    return createSprite(refName);
+                    return createSprite(refName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeText:
-                    return createText(refName);
+                    return createText(refName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeTextureMask:
                 default:
                     assert(false);
-                break;
+                    break;
             }
         }
     }
@@ -383,7 +460,11 @@ BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePack
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate delegate) {
+BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle handle) {
+    return createMask(name, handle, 0, nullptr);
+}
+
+BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     MaskReference *maskRef;
     
@@ -400,8 +481,12 @@ BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle han
         
         obj->addComponent(xform);
         obj->addComponent(mask);
-
+        
         mask->setMaskReference(maskRef);
+        
+        if (objects && pushBitmask & MaskComponent::bitmask_) {
+            addCreatedGameObjectsForRenderComponent<MaskComponent>(obj, objects);
+        }
         
         //obj->setActive(true);
         
@@ -409,9 +494,14 @@ BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle han
     }
     
     return nullptr;
+
 }
 
 BGE::GameObject *BGE::Space::createSprite(std::string name, ScenePackageHandle handle) {
+    return createSprite(name, handle, 0, nullptr);
+}
+
+BGE::GameObject *BGE::Space::createSprite(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     TextureReference *texRef;
     
@@ -435,6 +525,10 @@ BGE::GameObject *BGE::Space::createSprite(std::string name, ScenePackageHandle h
         
         //obj->setActive(true);
         
+        if (objects && pushBitmask & SpriteRenderComponent::bitmask_) {
+            addCreatedGameObjectsForRenderComponent<SpriteRenderComponent>(obj, objects);
+        }
+        
         return obj;
     }
     
@@ -442,6 +536,10 @@ BGE::GameObject *BGE::Space::createSprite(std::string name, ScenePackageHandle h
 }
 
 BGE::GameObject *BGE::Space::createText(std::string name, ScenePackageHandle handle) {
+    return createText(name, handle, 0, nullptr);
+}
+
+BGE::GameObject *BGE::Space::createText(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     TextReference *textRef;
     
@@ -463,6 +561,10 @@ BGE::GameObject *BGE::Space::createText(std::string name, ScenePackageHandle han
         
         text->setTextReference(textRef);
         
+        if (objects && pushBitmask & TextComponent::bitmask_) {
+            addCreatedGameObjectsForRenderComponent<TextComponent>(obj, objects);
+        }
+        
         //obj->setActive(true);
         
         return obj;
@@ -472,6 +574,10 @@ BGE::GameObject *BGE::Space::createText(std::string name, ScenePackageHandle han
 }
 
 BGE::GameObject *BGE::Space::createPlacement(std::string name, ScenePackageHandle handle) {
+    return createPlacement(name, handle, 0, nullptr);
+}
+
+BGE::GameObject *BGE::Space::createPlacement(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     PlacementReference *placementRef;
     
@@ -487,6 +593,10 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, ScenePackageHandl
         
         obj->addComponent(xform);
         
+        if (objects && pushBitmask & PlacementComponent::bitmask_) {
+            addCreatedGameObjectsForRenderComponent<PlacementComponent>(obj, objects);
+        }
+        
         //obj->setActive(true);
         
         return obj;
@@ -495,19 +605,16 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, ScenePackageHandl
     return nullptr;
 }
 
-void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate delegate) {
+void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
     auto root = getGameObject(rootHandle);
+    auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
     
     if (package) {
         auto autoDisplayList = package->getAutoDisplayList();
         auto num = package->getAutoDisplayListSize();
-        std::map<uint32_t, std::vector<GameObjectHandle>> createdObjectHandles;
+        CreatedGameObjectVector createdObjects;
         std::vector<GameObjectHandle> rootObjHandles;
-        
-        for (auto i=0;i<GfxReferenceTypeLast;i++) {
-            createdObjectHandles[i] = std::vector<GameObjectHandle>();
-        }
         
         for (auto i=0;i<num;i++) {
             auto elem = &autoDisplayList[i];
@@ -515,31 +622,31 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
             
             switch (elem->referenceType) {
                 case GfxReferenceTypeAnimationSequence:
-                    obj = createAnimSequence(elem->reference);
+                    obj = createAnimSequence(elem->reference, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeButton:
-                    obj = createButton(elem->reference);
+                    obj = createButton(elem->reference, packageHandle, bitmask, &createdObjects);
                     break;
                 
                 case GfxReferenceTypeExternalReference:
-                    obj = createExternalReference(elem->reference);
+                    obj = createExternalReference(elem->reference, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeMask:
-                    obj = createMask(elem->reference);
+                    obj = createMask(elem->reference, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypePlacement:
-                    obj = createPlacement(elem->reference);
+                    obj = createPlacement(elem->reference, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeSprite:
-                    obj = createSprite(elem->reference);
+                    obj = createSprite(elem->reference, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeText:
-                    obj = createText(elem->reference);
+                    obj = createText(elem->reference, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeTextureMask:
@@ -577,60 +684,7 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
                 }
             }
 
-            createdObjectHandles[elem->referenceType].push_back(obj->getHandle());
             rootObjHandles.push_back(obj->getHandle());
-        }
-        
-        for (auto i=0;i<GfxReferenceTypeLast;i++) {
-            auto itemHandles = createdObjectHandles[i];
-            
-            if (itemHandles.size() > 0) {
-                std::function<void(GameObject *)> callback = nullptr;
-                
-                switch (i) {
-                    case GfxReferenceTypeAnimationSequence:
-                        callback = delegate.animationSequenceCreatedHandler;
-                        break;
-                        
-                    case GfxReferenceTypeButton:
-                        callback = delegate.buttonCreatedHandler;
-                        break;
-                        
-                    case GfxReferenceTypeExternalReference:
-                        break;
-                        
-                    case GfxReferenceTypeMask:
-                        callback = delegate.maskCreatedHandler;
-                        break;
-                        
-                    case GfxReferenceTypePlacement:
-                        callback = delegate.placementCreatedHandler;
-                        break;
-                        
-                    case GfxReferenceTypeSprite:
-                        callback = delegate.spriteCreatedHandler;
-                        break;
-                        
-                    case GfxReferenceTypeText:
-                        callback = delegate.textCreatedHandler;
-                        break;
-                        
-                    case GfxReferenceTypeTextureMask:
-                        callback = delegate.textureMaskCreatedHandler;
-                        break;
-                        
-                    default:
-                        assert(false);
-                        break;
-                }
-                
-                if (callback) {
-                    for (auto const &itemHandle : itemHandles) {
-                        auto item = getGameObject(itemHandle);
-                        callback(item);
-                    }
-                }
-            }
         }
         
         TransformComponent *rootXform = nullptr;
@@ -650,13 +704,8 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
             obj->setActive(true);
         }
 
-        if (delegate.completionHandler) {
-            delegate.completionHandler(root);
-        }
-    } else {
-        if (delegate.completionHandler) {
-            delegate.completionHandler(root);
-        }
+        // Now notifiy all create handlers
+        dispatchCreatedHandlers(&createdObjects, delegate);
     }
 }
 
@@ -707,6 +756,274 @@ void BGE::Space::scenePackageRemoved(ScenePackageHandle handle) {
         if (*it == handle) {
             scenePackages_.erase(it);
             return;
+        }
+    }
+}
+
+BGE::GameObjectHandle BGE::Space::handleForGameObject(GameObject *object) const {
+    if (object) {
+        return object->getHandle();
+    } else {
+        return GameObjectHandle();
+    }
+}
+
+void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, uint32_t pushBitmask, CreatedGameObjectVector *objects) const {
+    if (animSequence && objects) {
+        if (pushBitmask & AnimationSequenceComponent::bitmask_) {
+            // Animation sequence always pushed first
+            objects->push_back(std::make_pair(AnimationSequenceComponent::typeId_, animSequence->getHandle()));
+        }
+        
+        auto animSeqComponent = animSequence->getComponent<AnimationSequenceComponent>();
+        auto pushSprites = pushBitmask & SpriteRenderComponent::bitmask_;
+        auto pushButtons = pushBitmask & ButtonComponent::bitmask_;
+        auto pushAnims = pushBitmask & AnimationSequenceComponent::bitmask_;
+        auto pushText = pushBitmask & TextComponent::bitmask_;
+        auto pushMasks = pushBitmask & MaskComponent::bitmask_;
+        auto pushPlacements = pushBitmask & PlacementComponent::bitmask_;
+        auto pushTextureMasks = pushBitmask & TextureMaskComponent::bitmask_;
+        
+        if (animSeqComponent) {
+            for (auto &channel : animSeqComponent->channels) {
+                auto channelObj = getGameObject(channel);
+                
+                if (channelObj) {
+                    auto channelComponent = channelObj->getComponent<AnimationChannelComponent>();
+                    
+                    if (channelComponent) {
+                        switch (channelComponent->channel->referenceType) {
+                            case GfxReferenceTypeSprite: {
+                                auto sprite = channelObj->getComponent<SpriteRenderComponent>();
+                                
+                                if (sprite) {
+                                    if (pushSprites) {
+                                        objects->push_back(std::make_pair(SpriteRenderComponent::typeId_, channelObj->getHandle()));
+                                    }
+                                } else {
+                                    assert(false);
+                                }
+                            }
+                                break;
+                                
+                            case GfxReferenceTypeButton:{
+                                auto button = channelObj->getComponent<ButtonComponent>();
+                                
+                                if (button) {
+                                    if (pushButtons) {
+                                        objects->push_back(std::make_pair(ButtonComponent::typeId_, channelObj->getHandle()));
+                                    }
+                                } else {
+                                    assert(false);
+                                }
+                            }
+                                break;
+                                
+                            case GfxReferenceTypeAnimationSequence: {
+                                auto animSeq = channelObj->getComponent<AnimationSequenceComponent>();
+                                
+                                if (animSeq) {
+                                    if (pushAnims) {
+                                        objects->push_back(std::make_pair(AnimationSequenceComponent::typeId_, channelObj->getHandle()));
+                                    }
+                                } else {
+                                    assert(false);
+                                }
+                            }
+                                break;
+                                
+                            case GfxReferenceTypeMask: {
+                                auto mask = channelObj->getComponent<MaskComponent>();
+                                
+                                if (mask) {
+                                    if (pushMasks) {
+                                        objects->push_back(std::make_pair(MaskComponent::typeId_, channelObj->getHandle()));
+                                    }
+                                } else {
+                                    assert(false);
+                                }
+                            }
+                                break;
+                                
+                            case GfxReferenceTypeText: {
+                                auto text = channelObj->getComponent<TextComponent>();
+                                
+                                if (text) {
+                                    if (pushText) {
+                                        objects->push_back(std::make_pair(TextComponent::typeId_, channelObj->getHandle()));
+                                    }
+                                } else {
+                                    assert(false);
+                                }
+                            }
+                                break;
+                                
+                            case GfxReferenceTypePlacement: {
+                                auto placement = channelObj->getComponent<PlacementComponent>();
+                                
+                                if (placement) {
+                                    if (pushPlacements) {
+                                        objects->push_back(std::make_pair(PlacementComponent::typeId_, channelObj->getHandle()));
+                                    }
+                                } else {
+                                    assert(false);
+                                }
+                            }
+                                break;
+                                
+                            default:
+                                break;
+                        }
+                    } else {
+                        assert(false);
+                    }
+                }
+            }
+        } else {
+            assert(false);
+        }
+    }
+}
+
+void BGE::Space::addCreatedGameObjectsForButton(GameObject *button, uint32_t pushBitmask, CreatedGameObjectVector *objects) const {
+    if (button && objects) {
+        if (pushBitmask & ButtonComponent::bitmask_) {
+            // Button is always pushed first
+            objects->push_back(std::make_pair(ButtonComponent::typeId_, button->getHandle()));
+        }
+        
+        auto pushSprites = pushBitmask & SpriteRenderComponent::bitmask_;
+        auto pushAnims = pushBitmask & AnimationSequenceComponent::bitmask_;
+        
+        auto buttonComponent = button->getComponent<ButtonComponent>();
+        
+        auto state = getGameObject(buttonComponent->disabledButtonHandle);
+        
+        if (state) {
+            if (state->hasComponent<SpriteRenderComponent>()) {
+                if (pushSprites) {
+                    objects->push_back(std::make_pair(SpriteRenderComponent::typeId_, state->getHandle()));
+                }
+            } else {
+                // Must be AnimationSequenceComponent
+                if (pushAnims) {
+                    addCreatedGameObjectsForAnimSequence(state, pushBitmask, objects);
+                }
+            }
+        }
+        
+        state = getGameObject(buttonComponent->disabledAnimButtonHandle);
+        
+        if (state) {
+            if (state->hasComponent<SpriteRenderComponent>()) {
+                if (pushSprites) {
+                    objects->push_back(std::make_pair(SpriteRenderComponent::typeId_, state->getHandle()));
+                }
+            } else {
+                // Must be AnimationSequenceComponent
+                if (pushAnims) {
+                    addCreatedGameObjectsForAnimSequence(state, pushBitmask, objects);
+                }
+            }
+        }
+        
+        state = getGameObject(buttonComponent->normalButtonHandle);
+        
+        if (state) {
+            if (state->hasComponent<SpriteRenderComponent>()) {
+                if (pushSprites) {
+                    objects->push_back(std::make_pair(SpriteRenderComponent::typeId_, state->getHandle()));
+                }
+            } else {
+                // Must be AnimationSequenceComponent
+                if (pushAnims) {
+                    addCreatedGameObjectsForAnimSequence(state, pushBitmask, objects);
+                }
+            }
+        }
+
+        state = getGameObject(buttonComponent->normalAnimButtonHandle);
+        
+        if (state) {
+            if (state->hasComponent<SpriteRenderComponent>()) {
+                if (pushSprites) {
+                    objects->push_back(std::make_pair(SpriteRenderComponent::typeId_, state->getHandle()));
+                }
+            } else {
+                // Must be AnimationSequenceComponent
+                if (pushAnims) {
+                    addCreatedGameObjectsForAnimSequence(state, pushBitmask, objects);
+                }
+            }
+        }
+
+        state = getGameObject(buttonComponent->highlightedButtonHandle);
+        
+        if (state) {
+            if (state->hasComponent<SpriteRenderComponent>()) {
+                if (pushSprites) {
+                    objects->push_back(std::make_pair(SpriteRenderComponent::typeId_, state->getHandle()));
+                }
+            } else {
+                // Must be AnimationSequenceComponent
+                if (pushAnims) {
+                    addCreatedGameObjectsForAnimSequence(state, pushBitmask, objects);
+                }
+            }
+        }
+
+        state = getGameObject(buttonComponent->highlightedAnimButtonHandle);
+        
+        if (state) {
+            if (state->hasComponent<SpriteRenderComponent>()) {
+                if (pushSprites) {
+                    objects->push_back(std::make_pair(SpriteRenderComponent::typeId_, state->getHandle()));
+                }
+            } else {
+                // Must be AnimationSequenceComponent
+                if (pushAnims) {
+                    addCreatedGameObjectsForAnimSequence(state, pushBitmask, objects);
+                }
+            }
+        }
+
+        state = getGameObject(buttonComponent->currentButtonHandle);
+        
+        if (state) {
+            if (state->hasComponent<SpriteRenderComponent>()) {
+                if (pushSprites) {
+                    objects->push_back(std::make_pair(SpriteRenderComponent::typeId_, state->getHandle()));
+                }
+            } else {
+                // Must be AnimationSequenceComponent
+                if (pushAnims) {
+                    addCreatedGameObjectsForAnimSequence(state, pushBitmask, objects);
+                }
+            }
+        }
+    }
+}
+
+void BGE::Space::dispatchCreatedHandlers(CreatedGameObjectVector *objects, SceneObjectCreatedDelegate *delegate) {
+    if (delegate) {
+        if (objects) {
+            for (auto &created : *objects) {
+                if (created.first == AnimationSequenceComponent::typeId_) {
+                    delegate->animationSequenceCreatedHandler(getGameObject(created.second));
+                } else if (created.first == ButtonComponent::typeId_) {
+                    delegate->buttonCreatedHandler(getGameObject(created.second));
+                } else if (created.first == SpriteRenderComponent::typeId_) {
+                    delegate->spriteCreatedHandler(getGameObject(created.second));
+                } else if (created.first == TextComponent::typeId_) {
+                    delegate->textCreatedHandler(getGameObject(created.second));
+                } else if (created.first == PlacementComponent::typeId_) {
+                    delegate->placementCreatedHandler(getGameObject(created.second));
+                } else if (created.first == MaskComponent::typeId_) {
+                    delegate->maskCreatedHandler(getGameObject(created.second));
+                } else if (created.first == TextureMaskComponent::typeId_) {
+                    delegate->textureMaskCreatedHandler(getGameObject(created.second));
+                }
+            }
         }
     }
 }

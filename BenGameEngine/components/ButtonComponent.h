@@ -27,6 +27,7 @@ namespace BGE {
     
     class BoundingBoxComponent;
     class Input;
+    class Space;
     
     class ButtonComponent : public Component
     {
@@ -62,6 +63,8 @@ namespace BGE {
         Event handleInput(TouchType type, bool inBounds);
         
     private:
+        friend Space;
+        
         using EventHandlerService = HandleService<EventHandler, EventHandlerHandle>;
 
         uint32_t    state;

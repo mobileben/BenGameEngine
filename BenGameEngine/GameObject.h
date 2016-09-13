@@ -66,6 +66,20 @@ namespace BGE {
             return nullptr;
         }
         
+        template <typename T> Handle<T> getComponentHandle() {
+            if (hasComponent<T>()) {
+                auto typeId = T::typeId_;
+                
+                for (auto const &handle : components_) {
+                    if (handle.typeId == typeId) {
+                        return Handle<T>(handle.handle);
+                    }
+                }
+            }
+            
+            return Handle<T>();
+        }
+        
         template <typename T> void removeComponent() {
             if (hasComponent<T>()) {
                 auto typeId = T::typeId_;

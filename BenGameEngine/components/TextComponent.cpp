@@ -37,7 +37,7 @@ void BGE::TextComponent::setTextReference(const TextReference& textRef) {
     bbox->height = font->getHeight();
 }
 
-void BGE::TextComponent::setText(std::string& text) {
+void BGE::TextComponent::setText(std::string const &text) {
     text_ = text;
 
     updateBoundingBox();
