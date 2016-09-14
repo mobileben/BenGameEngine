@@ -103,13 +103,21 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
         assert(xform);
 
         if (xform) {
+            char catstr[128];
+            
             for (auto i=0;i<buttonRef.numStates;i++) {
                 auto state = &buttonRef.states[i];
                 if (!strcmp(ButtonStateDisabledString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        disabledButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
+                        strcpy(catstr, state->reference);
+                        strcat(catstr, state->state);
+                        
+                        disabledButton = space->createAnimSequence(state->reference, catstr, buttonRef.scenePackage, nullptr);
                     } else if (state->referenceType == GfxReferenceTypeSprite) {
-                        disabledButton = space->createSprite(state->reference, buttonRef.scenePackage);
+                        strcpy(catstr, state->reference);
+                        strcat(catstr, state->state);
+                        
+                        disabledButton = space->createSprite(state->reference, catstr, buttonRef.scenePackage);
                     } else {
                         assert(false);
                     }
@@ -119,7 +127,10 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(disabledButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateDisabledAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        disabledAnimButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
+                        strcpy(catstr, state->reference);
+                        strcat(catstr, state->state);
+                        
+                        disabledAnimButton = space->createAnimSequence(state->reference, catstr, buttonRef.scenePackage, nullptr);
                     } else {
                         assert(false);
                     }
@@ -129,9 +140,15 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(disabledAnimButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateNormalString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        normalButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
+                        strcpy(catstr, state->reference);
+                        strcat(catstr, state->state);
+                        
+                        normalButton = space->createAnimSequence(state->reference, catstr, buttonRef.scenePackage, nullptr);
                     } else if (state->referenceType == GfxReferenceTypeSprite) {
-                        normalButton = space->createSprite(state->reference, buttonRef.scenePackage);
+                        strcpy(catstr, state->reference);
+                        strcat(catstr, state->state);
+                        
+                        normalButton = space->createSprite(state->reference, catstr, buttonRef.scenePackage);
                     } else {
                         assert(false);
                     }
@@ -141,7 +158,10 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(normalButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateNormalAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        normalAnimButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
+                        strcpy(catstr, state->reference);
+                        strcat(catstr, state->state);
+                        
+                        normalAnimButton = space->createAnimSequence(state->reference, catstr, buttonRef.scenePackage, nullptr);
                     } else {
                         assert(false);
                     }
@@ -151,9 +171,15 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(normalAnimButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateHighlightedString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        highlightedButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
+                        strcpy(catstr, state->reference);
+                        strcat(catstr, state->state);
+                        
+                        highlightedButton = space->createAnimSequence(state->reference, catstr, buttonRef.scenePackage, nullptr);
                     } else if (state->referenceType == GfxReferenceTypeSprite) {
-                        highlightedButton = space->createSprite(state->reference, buttonRef.scenePackage);
+                        strcpy(catstr, state->reference);
+                        strcat(catstr, state->state);
+                        
+                        highlightedButton = space->createSprite(state->reference, catstr, buttonRef.scenePackage);
                     } else {
                         assert(false);
                     }
@@ -163,7 +189,10 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     xform->addChild(highlightedButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateHighlightedAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
-                        highlightedAnimButton = space->createAnimSequence(state->reference, buttonRef.scenePackage, nullptr);
+                        strcpy(catstr, state->reference);
+                        strcat(catstr, state->state);
+                        
+                        highlightedAnimButton = space->createAnimSequence(state->reference, catstr, buttonRef.scenePackage, nullptr);
                     } else {
                         assert(false);
                     }

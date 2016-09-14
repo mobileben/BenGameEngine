@@ -53,6 +53,8 @@ namespace BGE {
 
         void link();
         
+        void addSpaceHandleReference(SpaceHandle spaceHandle);
+        
         bool hasExternalPackages() const {
             return hasExternal_;
         }

@@ -46,6 +46,51 @@ void BGE::FileUtilities::initialize(std::string builtinPath, std::string downloa
     initialized_ = true;
 }
 
+BGE::BaseDirectory::BaseDirectory(std::string path) {
+    auto refPath = FileUtilities::getBuiltinPath();
+    auto index = path.find(refPath);
+    
+    if (index != std::string::npos) {
+        type = FileUtilities::PathType::builtin;
+        
+        auto len = index + refPath.length();
+        
+        if (path.substr(len, 1) == FileUtilities::getSeparator()) {
+            len++;
+        }
+        
+        subpath = path.substr(len, path.length() - len);
+        
+        index = subpath.find_last_of(FileUtilities::getSeparator());
+        
+        subpath = subpath.substr(0, index);
+    } else {
+        // This must be downloadPath
+        refPath = FileUtilities::getDownloadPath();
+        index = path.find(refPath);
+        
+        assert(index != std::string::npos);
+        
+        if (index != std::string::npos) {
+            type = FileUtilities::PathType::download;
+            
+            auto len = index + refPath.length();
+            
+            if (path.substr(len, 1) == FileUtilities::getSeparator()) {
+                len++;
+            }
+            
+            subpath = path.substr(len, path.length() - len);
+            
+            index = subpath.find_last_of(FileUtilities::getSeparator());
+            
+            subpath = subpath.substr(0, index);
+        } else {
+            type = FileUtilities::PathType::builtin;
+        }
+    }
+}
+
 std::string BGE::BaseDirectory::filename() const {
     auto separator = FileUtilities::getSeparator();
     

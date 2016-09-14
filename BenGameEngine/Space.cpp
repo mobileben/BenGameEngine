@@ -260,17 +260,17 @@ void BGE::Space::linkAll() {
     }
 }
 
-BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
     CreatedGameObjectVector objects;
     auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
-    auto obj = createAnimSequence(name, handle, bitmask, &objects);
+    auto obj = createAnimSequence(name, instanceName, handle, bitmask, &objects);
     
     dispatchCreatedHandlers(&objects, delegate);
     
     return obj;
 }
 
-BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
+BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     AnimationSequenceReference *animSeqRef;
     
@@ -281,7 +281,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHa
     }
     
     if (animSeqRef) {
-        auto obj = createGameObject(name);
+        auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto boundingBox = createComponent<BoundingBoxComponent>();
         auto animSeq = createComponent<AnimationSequenceComponent>();
@@ -303,9 +303,9 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, ScenePackageHa
     
     return nullptr;}
 
-BGE::GameObject *BGE::Space::createAnimChannel(std::string name, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate) {
+BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string instanceName, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate) {
     if (channelRef) {
-        auto obj = createGameObject(name);
+        auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto channel = createComponent<AnimationChannelComponent>();
         auto animator = createComponent<ChannelFrameAnimatorComponent>();
@@ -324,7 +324,7 @@ BGE::GameObject *BGE::Space::createAnimChannel(std::string name, const Animation
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     AnimationSequenceReference *animSeqRef;
     
@@ -335,7 +335,7 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, ScenePack
     }
     
     if (animSeqRef) {
-        auto obj = createGameObject(name);
+        auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto animSeq = createComponent<AnimationSequenceComponent>();
         auto animator = createComponent<FrameAnimatorComponent>();
@@ -354,17 +354,17 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, ScenePack
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+BGE::GameObject *BGE::Space::createButton(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
     CreatedGameObjectVector objects;
     auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
-    auto obj = createButton(name, handle, bitmask, &objects);
+    auto obj = createButton(name, instanceName, handle, bitmask, &objects);
     
     dispatchCreatedHandlers(&objects, delegate);
 
     return obj;
 }
 
-BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
+BGE::GameObject *BGE::Space::createButton(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     ButtonReference *buttonRef;
     
@@ -375,7 +375,7 @@ BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle h
     }
     
     if (buttonRef) {
-        auto obj = createGameObject(name);
+        auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto button = createComponent<ButtonComponent>();
         auto bbox = createComponent<BoundingBoxComponent>();
@@ -398,17 +398,17 @@ BGE::GameObject *BGE::Space::createButton(std::string name, ScenePackageHandle h
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
     CreatedGameObjectVector objects;
     uint32_t pushBitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
-    auto obj = createExternalReference(name, handle, pushBitmask, &objects);
+    auto obj = createExternalReference(name, instanceName, handle, pushBitmask, &objects);
     
     dispatchCreatedHandlers(&objects, delegate);
     
     return obj;
 }
 
-BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePackageHandle handle, uint32_t pushBitmap, CreatedGameObjectVector *objects) {
+BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmap, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     ExternalPackageReference *extRef;
     
@@ -429,25 +429,25 @@ BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePack
             
             switch (type) {
                 case GfxReferenceTypeAnimationSequence:
-                    return createAnimSequence(refName, extPackage->getHandle(), pushBitmap, objects);
+                    return createAnimSequence(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeButton:
-                    return createButton(refName, extPackage->getHandle(), pushBitmap, objects);
+                    return createButton(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeExternalReference:
-                    return createExternalReference(refName, extPackage->getHandle(), pushBitmap, objects);
+                    return createExternalReference(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeMask:
-                    return createMask(refName, extPackage->getHandle(), pushBitmap, objects);
+                    return createMask(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypePlacement:
-                    return createPlacement(refName, extPackage->getHandle(), pushBitmap, objects);
+                    return createPlacement(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeSprite:
-                    return createSprite(refName, extPackage->getHandle(), pushBitmap, objects);
+                    return createSprite(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeText:
-                    return createText(refName, extPackage->getHandle(), pushBitmap, objects);
+                    return createText(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
                     
                 case GfxReferenceTypeTextureMask:
                 default:
@@ -460,11 +460,11 @@ BGE::GameObject *BGE::Space::createExternalReference(std::string name, ScenePack
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle handle) {
-    return createMask(name, handle, 0, nullptr);
+BGE::GameObject *BGE::Space::createMask(std::string name, std::string instanceName, ScenePackageHandle handle) {
+    return createMask(name, instanceName, handle, 0, nullptr);
 }
 
-BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
+BGE::GameObject *BGE::Space::createMask(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     MaskReference *maskRef;
     
@@ -475,7 +475,7 @@ BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle han
     }
     
     if (maskRef) {
-        auto obj = createGameObject(name);
+        auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto mask = createComponent<MaskComponent>();
         
@@ -497,11 +497,11 @@ BGE::GameObject *BGE::Space::createMask(std::string name, ScenePackageHandle han
 
 }
 
-BGE::GameObject *BGE::Space::createSprite(std::string name, ScenePackageHandle handle) {
-    return createSprite(name, handle, 0, nullptr);
+BGE::GameObject *BGE::Space::createSprite(std::string name, std::string instanceName, ScenePackageHandle handle) {
+    return createSprite(name, instanceName, handle, 0, nullptr);
 }
 
-BGE::GameObject *BGE::Space::createSprite(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
+BGE::GameObject *BGE::Space::createSprite(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     TextureReference *texRef;
     
@@ -512,7 +512,7 @@ BGE::GameObject *BGE::Space::createSprite(std::string name, ScenePackageHandle h
     }
     
     if (texRef) {
-        auto obj = createGameObject(name);
+        auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto sprite = createComponent<SpriteRenderComponent>();
         auto bbox = createComponent<BoundingBoxComponent>();
@@ -535,11 +535,11 @@ BGE::GameObject *BGE::Space::createSprite(std::string name, ScenePackageHandle h
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createText(std::string name, ScenePackageHandle handle) {
-    return createText(name, handle, 0, nullptr);
+BGE::GameObject *BGE::Space::createText(std::string name, std::string instanceName, ScenePackageHandle handle) {
+    return createText(name, instanceName, handle, 0, nullptr);
 }
 
-BGE::GameObject *BGE::Space::createText(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
+BGE::GameObject *BGE::Space::createText(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     TextReference *textRef;
     
@@ -550,7 +550,7 @@ BGE::GameObject *BGE::Space::createText(std::string name, ScenePackageHandle han
     }
     
     if (textRef) {
-        auto obj = createGameObject(name);
+        auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto text = createComponent<TextComponent>();
         auto bbox = createComponent<BoundingBoxComponent>();
@@ -573,11 +573,11 @@ BGE::GameObject *BGE::Space::createText(std::string name, ScenePackageHandle han
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createPlacement(std::string name, ScenePackageHandle handle) {
-    return createPlacement(name, handle, 0, nullptr);
+BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string instanceName, ScenePackageHandle handle) {
+    return createPlacement(name, instanceName, handle, 0, nullptr);
 }
 
-BGE::GameObject *BGE::Space::createPlacement(std::string name, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
+BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     PlacementReference *placementRef;
     
@@ -588,7 +588,7 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, ScenePackageHandl
     }
     
     if (placementRef) {
-        auto obj = createGameObject(name);
+        auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         
         obj->addComponent(xform);
@@ -622,31 +622,31 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
             
             switch (elem->referenceType) {
                 case GfxReferenceTypeAnimationSequence:
-                    obj = createAnimSequence(elem->reference, packageHandle, bitmask, &createdObjects);
+                    obj = createAnimSequence(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeButton:
-                    obj = createButton(elem->reference, packageHandle, bitmask, &createdObjects);
+                    obj = createButton(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
                 
                 case GfxReferenceTypeExternalReference:
-                    obj = createExternalReference(elem->reference, packageHandle, bitmask, &createdObjects);
+                    obj = createExternalReference(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeMask:
-                    obj = createMask(elem->reference, packageHandle, bitmask, &createdObjects);
+                    obj = createMask(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypePlacement:
-                    obj = createPlacement(elem->reference, packageHandle, bitmask, &createdObjects);
+                    obj = createPlacement(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeSprite:
-                    obj = createSprite(elem->reference, packageHandle, bitmask, &createdObjects);
+                    obj = createSprite(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeText:
-                    obj = createText(elem->reference, packageHandle, bitmask, &createdObjects);
+                    obj = createText(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 case GfxReferenceTypeTextureMask:

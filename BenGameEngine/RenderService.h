@@ -78,6 +78,9 @@ namespace BGE {
         
         std::shared_ptr<ShaderService> getShaderService() const { return shaderService_; }
         
+        Color getBackgroundColor() const { return backgroundColor_; }
+        void setBackgroundColor(Color color) { backgroundColor_ = color; }
+        
         virtual std::shared_ptr<ShaderProgram> pushShaderProgram(std::string program) =0;
         virtual std::shared_ptr<ShaderProgram> popShaderProgram() =0;
         
@@ -94,6 +97,8 @@ namespace BGE {
         bool ready_;
         bool invertedYAxis_;    // Y-up is inverted, Y-down is normal
         Render2DCoordinateSystem coordSystem2D_;
+        
+        Color backgroundColor_;
     };
 }
 

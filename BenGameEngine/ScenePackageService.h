@@ -61,12 +61,15 @@ namespace BGE {
         uint32_t numScenePackages() const;
         
         void createPackage(SpaceHandle spaceHandle, std::string name, const FilePath &filePath, ScenePackageLoadCompletionHandler callback);
-        
+        void createPackageFromJSONDict(SpaceHandle spaceHandle, std::string name, NSDictionary *jsonDict, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback);
+
+        void addSpaceHandleReference(SpaceHandle spaceHandle, ScenePackageHandle packageHandle);
+
         ScenePackageHandle getScenePackageHandle(std::string name) const;
         
         ScenePackage *getScenePackage(std::string name) const;
         ScenePackage *getScenePackage(ScenePackageHandle handle) const;
-
+        
         void removePackage(SpaceHandle spaceHandle, std::string name);
         void removePackage(SpaceHandle spaceHandle, ScenePackageHandle handle);
         

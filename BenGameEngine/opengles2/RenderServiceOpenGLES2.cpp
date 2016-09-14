@@ -771,7 +771,10 @@ void BGE::RenderServiceOpenGLES2::updateTransforms() {
 void BGE::RenderServiceOpenGLES2::render()
 {
     std::shared_ptr<RenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<RenderContextOpenGLES2>(getRenderContext());
-    glClearColor(1.0, 1.0, 0.0, 1.0);
+    auto bkgColor = getBackgroundColor();
+    
+    glClearColor(bkgColor.r, bkgColor.g, bkgColor.b, bkgColor.a);
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
     this->activeMasks_ = 0;

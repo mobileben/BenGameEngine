@@ -93,7 +93,7 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
 
     for (auto i=0;i<numChannels;i++) {
         auto channelRef = &channels[i];
-        auto obj = space->createAnimChannel(channelRef->name, channelRef, nullptr);
+        auto obj = space->createAnimChannel(channelRef->reference, channelRef->name, channelRef, nullptr);
         auto xform = obj->getComponent<TransformComponent>();
 
         seqXform->addChild(xform);
@@ -106,7 +106,7 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
         // If this is a sequence keyframe, we need to create more game objects!
         if (channelRef->referenceType == GfxReferenceTypeKeyframe) {
             NSLog(@"Adding sequence %s/%s to channel", channelRef->name, channelRef->reference);
-            auto newObj = space->createFrameAnimSequence(channelRef->reference, animSeqRef.scenePackage, nullptr);
+            auto newObj = space->createFrameAnimSequence(channelRef->reference, channelRef->name, animSeqRef.scenePackage, nullptr);
             
             if (newObj) {
                 auto newXform = newObj->getComponent<TransformComponent>();

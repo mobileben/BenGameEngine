@@ -1420,6 +1420,10 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
     }
 }
 
+void BGE::ScenePackage::addSpaceHandleReference(SpaceHandle spaceHandle) {
+    Game::getInstance()->getScenePackageService()->addSpaceHandleReference(spaceHandle, getHandle());
+}
+
 void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
     if (textureQueue_.size() > 0) {
         textureCount_->store(0);

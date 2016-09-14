@@ -121,38 +121,29 @@ void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, Scen
     }
 }
 
-void BGE::ScenePackageService::createPackageFromJSON(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
-    // Does not exist, to load
-    // For now we are doing this via iOS methods for faster dev
-    NSFileManager *defaultMgr = [NSFileManager defaultManager];
-    NSString *filePath = [[NSString alloc] initWithCString:loadable.filePath.filename().c_str() encoding:NSUTF8StringEncoding];
-    ScenePackageHandle handle;
-    
-    if ([defaultMgr fileExistsAtPath:filePath]) {
+void BGE::ScenePackageService::createPackageFromJSONDict(SpaceHandle spaceHandle, std::string name, NSDictionary *jsonDict, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback) {
+    if (jsonDict) {
+        ScenePackageHandle handle;
         ScenePackage *package = handleService_.allocate(handle);
         
         if (package) {
-            package->initialize(handle, loadable.name);
-            package->setBaseDirectory(BaseDirectory{loadable.filePath.type, loadable.filePath.subpath});
+            package->initialize(handle, name);
+            package->setBaseDirectory(baseDirectory);
             package->setStatus(ScenePackageStatus::Loading);
             
             // Now create an entry for this
-            ScenePackageReference ref{ handle, { loadable.spaceHandle }};
+            ScenePackageReference ref{ handle, { spaceHandle }};
             scenePackages_.push_back(ref);
             
-            NSData *data = [defaultMgr contentsAtPath:filePath];
-            NSError *err = nil;
-            NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
-            
             // The loading system relies on having the package initalized with handle
-            package->create(jsonDict, [this, loadable, callback, handle](ScenePackage * package) {
+            package->create(jsonDict, [this, spaceHandle, callback, handle](ScenePackage * package) {
                 auto tHandle = handle;
                 std::shared_ptr<Error> error = nullptr;
                 
                 if (package) {
                     package->setStatus(ScenePackageStatus::Valid);
                     
-                    auto space = Game::getInstance()->getSpaceService()->getSpace(loadable.spaceHandle);
+                    auto space = Game::getInstance()->getSpaceService()->getSpace(spaceHandle);
                     
                     if (space) {
                         space->scenePackageAdded(tHandle);
@@ -161,7 +152,7 @@ void BGE::ScenePackageService::createPackageFromJSON(ScenePackageLoadItem loadab
                     error = std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::Loading));
                     
                     // There is no package, so we need to release this
-                    removePackage(loadable.spaceHandle, tHandle);
+                    removePackage(spaceHandle, tHandle);
                     
                     // Reset handle
                     tHandle.nullify();
@@ -178,7 +169,26 @@ void BGE::ScenePackageService::createPackageFromJSON(ScenePackageLoadItem loadab
         }
     } else {
         if (callback) {
-            callback(handle, std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::DoesNotExist)));
+            callback(ScenePackageHandle(), std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::DoesNotExist)));
+        }
+    }
+}
+
+void BGE::ScenePackageService::createPackageFromJSON(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
+    // Does not exist, to load
+    // For now we are doing this via iOS methods for faster dev
+    NSFileManager *defaultMgr = [NSFileManager defaultManager];
+    NSString *filePath = [[NSString alloc] initWithCString:loadable.filePath.filename().c_str() encoding:NSUTF8StringEncoding];
+    
+    if ([defaultMgr fileExistsAtPath:filePath]) {
+        NSData *data = [defaultMgr contentsAtPath:filePath];
+        NSError *err = nil;
+        NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
+        
+        createPackageFromJSONDict(loadable.spaceHandle, loadable.name, jsonDict, BaseDirectory{loadable.filePath.type, loadable.filePath.subpath}, callback);
+    } else {
+        if (callback) {
+            callback(ScenePackageHandle(), std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::DoesNotExist)));
         }
     }
 }
@@ -196,6 +206,31 @@ BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::str
     }
     
     return ScenePackageHandle();
+}
+
+
+void BGE::ScenePackageService::addSpaceHandleReference(SpaceHandle spaceHandle, ScenePackageHandle packageHandle) {
+    for (auto &pkgRef : scenePackages_) {
+        if (pkgRef.handle == packageHandle) {
+            bool found = false;
+
+            for (auto &ref : pkgRef.references) {
+                if (ref == spaceHandle) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                pkgRef.references.push_back(spaceHandle);
+                
+                auto space = Game::getInstance()->getSpaceService()->getSpace(spaceHandle);
+                
+                space->scenePackageAdded(packageHandle);
+            }
+            break;
+        }
+    }
 }
 
 BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(std::string name) const {
