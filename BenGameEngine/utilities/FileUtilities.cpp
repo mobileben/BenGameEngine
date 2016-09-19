@@ -69,8 +69,6 @@ BGE::BaseDirectory::BaseDirectory(std::string path) {
         refPath = FileUtilities::getDownloadPath();
         index = path.find(refPath);
         
-        assert(index != std::string::npos);
-        
         if (index != std::string::npos) {
             type = FileUtilities::PathType::download;
             

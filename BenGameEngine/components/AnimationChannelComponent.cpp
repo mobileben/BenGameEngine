@@ -18,7 +18,7 @@
 #include "PlacementComponent.h"
 
 uint32_t BGE::AnimationChannelComponent::bitmask_ = Component::InvalidBitmask;
-uint32_t BGE::AnimationChannelComponent::typeId_ = Component::InvalidTypeId;
+BGE::ComponentTypeId BGE::AnimationChannelComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::AnimationChannelComponent::type_index_ = typeid(BGE::AnimationChannelComponent);
 
 void BGE::AnimationChannelComponent::setGameObjectHandle(GameObjectHandle handle) {

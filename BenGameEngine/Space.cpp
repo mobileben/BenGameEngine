@@ -819,6 +819,28 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                             }
                                 break;
                                 
+                            case GfxReferenceTypeKeyframe: {
+                                // Keyframe has sequence on child
+                                auto xform = channelObj->getComponent<TransformComponent>();
+                                auto childXform = xform->childAtIndex(0);
+                                
+                                if (childXform) {
+                                    auto child = childXform->getGameObject();
+                                    if (child) {
+                                        auto animSeq = child->getComponent<AnimationSequenceComponent>();
+                                        
+                                        if (animSeq) {
+                                            if (pushAnims) {
+                                                objects->push_back(std::make_pair(AnimationSequenceComponent::typeId_, channelObj->getHandle()));
+                                            }
+                                        } else {
+                                            assert(false);
+                                        }
+                                    }
+                                }
+                            }
+                                break;
+                                
                             case GfxReferenceTypeAnimationSequence: {
                                 auto animSeq = channelObj->getComponent<AnimationSequenceComponent>();
                                 

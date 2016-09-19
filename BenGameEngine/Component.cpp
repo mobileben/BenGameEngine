@@ -13,7 +13,7 @@
 uint32_t BGE::Component::InvalidBitmask = (uint32_t)-1;
 uint32_t BGE::Component::InvalidTypeId = (uint32_t)-1;
 uint32_t BGE::Component::bitmask_ = InvalidBitmask;
-uint32_t BGE::Component::typeId_ = InvalidTypeId;
+BGE::ComponentTypeId BGE::Component::typeId_ = InvalidTypeId;
 std::type_index BGE::Component::type_index_ = typeid(BGE::Component);
 
 void BGE::Component::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {

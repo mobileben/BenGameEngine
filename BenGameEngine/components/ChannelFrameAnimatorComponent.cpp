@@ -9,5 +9,5 @@
 #include "ChannelFrameAnimatorComponent.h"
 
 uint32_t BGE::ChannelFrameAnimatorComponent::bitmask_ = Component::InvalidBitmask;
-uint32_t BGE::ChannelFrameAnimatorComponent::typeId_ = Component::InvalidTypeId;
+BGE::ComponentTypeId BGE::ChannelFrameAnimatorComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ChannelFrameAnimatorComponent::type_index_ = typeid(BGE::ChannelFrameAnimatorComponent);

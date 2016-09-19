@@ -13,7 +13,7 @@
 #include "AnimationChannelComponent.h"
 
 uint32_t BGE::AnimationSequenceComponent::bitmask_ = Component::InvalidBitmask;
-uint32_t BGE::AnimationSequenceComponent::typeId_ = Component::InvalidTypeId;
+BGE::ComponentTypeId BGE::AnimationSequenceComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::AnimationSequenceComponent::type_index_ = typeid(BGE::AnimationSequenceComponent);
 
 BGE::AnimationSequenceComponent::AnimationSequenceComponent() : Component(), frameRate(0), totalFrames(0), numChannels(0), numBounds(0) {

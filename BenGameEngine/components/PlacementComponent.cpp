@@ -11,7 +11,7 @@
 #include "TransformComponent.h"
 
 uint32_t BGE::PlacementComponent::bitmask_ = Component::InvalidBitmask;
-uint32_t BGE::PlacementComponent::typeId_ = Component::InvalidTypeId;
+BGE::ComponentTypeId BGE::PlacementComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::PlacementComponent::type_index_ = typeid(BGE::PlacementComponent);
 
 BGE::PlacementComponent::PlacementComponent() : Component() {

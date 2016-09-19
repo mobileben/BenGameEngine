@@ -20,7 +20,7 @@ namespace BGE {
     class AnimationChannelComponent : public Component {
     public:
         static std::type_index  type_index_;
-        static uint32_t         typeId_;
+        static ComponentTypeId  typeId_;
         static uint32_t         bitmask_;
         
         const AnimationChannelReference *channel;

@@ -19,7 +19,7 @@ static const char *ButtonStateHighlightedString = "highlighted";
 static const char *ButtonStateHighlightedAnimString = "highlighted-anim";
 
 uint32_t BGE::ButtonComponent::bitmask_ = Component::InvalidBitmask;
-uint32_t BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
+BGE::ComponentTypeId BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent);
 
 BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted(true), toggleable(false), toggleOn(false) {

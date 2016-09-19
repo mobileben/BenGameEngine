@@ -50,7 +50,12 @@ namespace BGE {
     class GameObject;
 
     using EventHandlerFunction = std::function<void(SpaceHandle, GameObjectHandle, Event)>;
+#if TARGET_OS_IPHONE
     
+    typedef void (*ObjCGameObjectEventHandlerFunction)(id, SEL, SpaceHandle, GameObjectHandle, Event);
+    
+#endif /* TARGET_OS_IPHONE */
+
     struct EventHandler : public NamedObject {
         EventHandlerHandle          handle;
         SpaceHandle                 spaceHandle;

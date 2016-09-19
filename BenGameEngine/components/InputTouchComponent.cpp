@@ -9,5 +9,5 @@
 #include "InputTouchComponent.h"
 
 uint32_t BGE::InputTouchComponent::bitmask_ = Component::InvalidBitmask;
-uint32_t BGE::InputTouchComponent::typeId_ = Component::InvalidTypeId;
+BGE::ComponentTypeId BGE::InputTouchComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::InputTouchComponent::type_index_ = typeid(BGE::InputTouchComponent);

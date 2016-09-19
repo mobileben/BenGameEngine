@@ -120,7 +120,7 @@ namespace BGE {
     private:
         friend SpaceService;
         
-        using CreatedGameObjectVector = std::vector<std::pair<uint32_t, GameObjectHandle>>;
+        using CreatedGameObjectVector = std::vector<std::pair<ComponentTypeId, GameObjectHandle>>;
         
         std::shared_ptr<GameObjectService>  gameObjectService_;
         std::shared_ptr<ComponentService>   componentService_;

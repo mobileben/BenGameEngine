@@ -11,7 +11,7 @@
 #include "Game.h"
 
 uint32_t BGE::SpriteRenderComponent::bitmask_ = Component::InvalidBitmask;
-uint32_t BGE::SpriteRenderComponent::typeId_ = Component::InvalidTypeId;
+BGE::ComponentTypeId BGE::SpriteRenderComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::SpriteRenderComponent::type_index_ = typeid(BGE::SpriteRenderComponent);
 
 BGE::SpriteRenderComponent::SpriteRenderComponent() : RenderComponent() {

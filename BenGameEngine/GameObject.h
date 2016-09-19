@@ -100,12 +100,26 @@ namespace BGE {
         
         void removeAllComponents();
         
+        template <typename T>
+        GameObject *find(std::string name) {
+            return find(T::typeId_, name);
+        }
+        
+        GameObject *find(ComponentTypeId componentTypeId, std::string name);
+        
         inline uint32_t getComponentBitmask() const { return componentBitmask_; }
         
         template <typename T>
         inline bool hasComponent() const {
             return getComponentBitmask() & Component::getBitmask<T>();
         }
+
+        bool isAnimationSubSequence() const;
+        void upgradeToAnimationSequence();
+        
+        // Convenience methods
+        bool isVisible(void);
+        void setVisibility(bool visible);
         
         inline bool operator==(const GameObject &other) const {
             return getInstanceId() == other.getInstanceId();

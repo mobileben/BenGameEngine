@@ -13,7 +13,7 @@
 #include <cassert>
 
 uint32_t BGE::TransformComponent::bitmask_ = Component::InvalidBitmask;
-uint32_t BGE::TransformComponent::typeId_ = Component::InvalidTypeId;
+BGE::ComponentTypeId BGE::TransformComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComponent);
 
 BGE::TransformComponent::TransformComponent() : Component(), visible_(true),

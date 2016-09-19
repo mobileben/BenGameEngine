@@ -10,7 +10,7 @@
 #include "Game.h"
 
 uint32_t BGE::TextureMaskComponent::bitmask_ = Component::InvalidBitmask;
-uint32_t BGE::TextureMaskComponent::typeId_ = Component::InvalidTypeId;
+BGE::ComponentTypeId BGE::TextureMaskComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::TextureMaskComponent::type_index_ = typeid(BGE::TextureMaskComponent);
 
 BGE::TextureMaskComponent::TextureMaskComponent() : RenderComponent() {

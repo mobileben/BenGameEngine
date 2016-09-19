@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <cstdint>
 #include <cassert>
+#include <algorithm>
 
 namespace BGE {
     using HandleBackingType = uint32_t;

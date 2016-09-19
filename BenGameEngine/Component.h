@@ -20,6 +20,8 @@ namespace BGE {
     class ComponentService;
     class Space;
     
+    using ComponentTypeId = uint32_t;
+    
     class Component : public Object
     {
     public:
@@ -31,7 +33,7 @@ namespace BGE {
          ComponentService::registerComponents()
          */
         static std::type_index  type_index_;    // Sub-classes must implement
-        static uint32_t         typeId_;         // Sub-classes must implement
+        static ComponentTypeId  typeId_;         // Sub-classes must implement
         static uint32_t         bitmask_;       // Sub-classes must implement
         
         Component() : Object(), handle_(0) {}
@@ -41,8 +43,8 @@ namespace BGE {
         virtual void destroy();
         
         inline std::type_index getTypeIndex() const { return type_index_; }
-        inline uint32_t getTypeId() const { return typeId_; }
-        inline uint32_t getBitmaska() const { return bitmask_; }
+        inline ComponentTypeId getTypeId() const { return typeId_; }
+        inline uint32_t getBitmask() const { return bitmask_; }
         
         inline bool hasGameObject() const { return !gameObjectHandle_.isNull(); }
         inline GameObjectHandle getGameObjectHandle() const { return gameObjectHandle_; }
@@ -61,7 +63,7 @@ namespace BGE {
             return T::bitmask_;
         }
         
-        template <typename T> inline static uint32_t getTypeId() {
+        template <typename T> inline static ComponentTypeId getTypeId() {
 #if DEBUG
             if (!validateComponent<T>()) {
                 assert(false);

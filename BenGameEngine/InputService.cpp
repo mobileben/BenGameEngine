@@ -118,33 +118,35 @@ void BGE::InputService::process() {
                 space->getComponents<ButtonComponent>(touchComponents);
                 
                 for (auto const &touch : touchComponents) {
-                    auto gameObjHandle = touch->getGameObjectHandle();
-                    
-                    // Compute collision if exists
-                    auto bbox = touch->getBoundingBox();
-                    auto xform = touch->getTransform();
-
-                    Matrix4 matrix;
-                    bool inBounds = false;
-                    
-                    xform->getMatrix(matrix);
-                    bbox->computeAABB(matrix);
-
-                    if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
-                        if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {
-                            inBounds = true;
+                    if (touch->isEnabled()) {
+                        auto gameObjHandle = touch->getGameObjectHandle();
+                        
+                        // Compute collision if exists
+                        auto bbox = touch->getBoundingBox();
+                        auto xform = touch->getTransform();
+                        
+                        Matrix4 matrix;
+                        bool inBounds = false;
+                        
+                        xform->getMatrix(matrix);
+                        bbox->computeAABB(matrix);
+                        
+                        if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
+                            if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {
+                                inBounds = true;
+                            }
                         }
+                        
+                        InputButtonHandler buttonHandler;
+                        
+                        buttonHandler.gameObjHandle = gameObjHandle;
+                        buttonHandler.spaceHandle = handle;
+                        buttonHandler.buttonComponentHandle = touch->getHandle<ButtonComponent>();
+                        buttonHandler.touchType = input->type;
+                        buttonHandler.inBounds = inBounds;
+                        
+                        inputButtonHandlers_.push_back(buttonHandler);
                     }
-                    
-                    InputButtonHandler buttonHandler;
-                    
-                    buttonHandler.gameObjHandle = gameObjHandle;
-                    buttonHandler.spaceHandle = handle;
-                    buttonHandler.buttonComponentHandle = touch->getHandle<ButtonComponent>();
-                    buttonHandler.touchType = input->type;
-                    buttonHandler.inBounds = inBounds;
-                    
-                    inputButtonHandlers_.push_back(buttonHandler);
                 }
                 
                 // Do input touch components

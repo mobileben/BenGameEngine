@@ -25,7 +25,7 @@ namespace BGE {
     {
     public:
         static std::type_index  type_index_;
-        static uint32_t         typeId_;
+        static ComponentTypeId  typeId_;
         static uint32_t         bitmask_;
         
         TransformComponent();
