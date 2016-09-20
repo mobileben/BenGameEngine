@@ -47,6 +47,9 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
 void BGE::TransformComponent::destroy() {
     visible_ = false;
     
+    removeFromParent();
+    removeAllChildren();
+    
     parentHandle_ = TransformComponentHandle();
     childrenHandles_.clear();
 
@@ -231,7 +234,7 @@ void BGE::TransformComponent::removeFromParent() {
     }
 }
 
-void BGE::TransformComponent::insertChildHandle(TransformComponentHandle handle, uint32_t index) {
+void BGE::TransformComponent::insertChild(TransformComponentHandle handle, uint32_t index) {
     auto space = getSpace();
     auto child = space->getComponent<TransformComponent>(handle.getHandle());
     
@@ -264,7 +267,107 @@ void BGE::TransformComponent::insertChild(TransformComponent *child, uint32_t in
     }
 }
 
-void BGE::TransformComponent::moveToParentHandle(TransformComponentHandle handle) {
+void BGE::TransformComponent::insertChild(GameObjectHandle handle, uint32_t index) {
+    auto space = getSpace();
+    auto child = space->getGameObject(handle);
+    
+    assert(child);
+    
+    if (child) {
+        auto childXform = child->getComponent<TransformComponent>();
+        assert(!childXform->getParent());    // Child cannot already have a parent
+        
+        if (childXform) {
+            if (index < childrenHandles_.size()) {
+                childrenHandles_.insert(childrenHandles_.begin() + index, childXform->getHandle<TransformComponent>());
+            } else {
+                childrenHandles_.push_back(childXform->getHandle<TransformComponent>());
+            }
+            
+            childXform->parentHandle_ = getHandle<TransformComponent>();
+        }
+    }
+}
+
+void BGE::TransformComponent::insertChild(GameObject *child, uint32_t index) {
+    assert(child);
+    
+    if (child) {
+        auto childXform = child->getComponent<TransformComponent>();
+        assert(!childXform->getParent());    // Child cannot already have a parent
+
+        if (childXform) {
+            if (index < childrenHandles_.size()) {
+                childrenHandles_.insert(childrenHandles_.begin() + index, childXform->getHandle<TransformComponent>());
+            } else {
+                childrenHandles_.push_back(childXform->getHandle<TransformComponent>());
+            }
+            
+            childXform->parentHandle_ = getHandle<TransformComponent>();
+        }
+    }
+}
+
+void BGE::TransformComponent::replaceChild(TransformComponentHandle handle, uint32_t index) {
+    auto space = getSpace();
+    auto child = space->getComponent<TransformComponent>(handle.getHandle());
+    auto hasParent = child->getParent() != nullptr;
+    
+    assert(child);
+    assert(!hasParent);    // Child cannot already have a parent
+    assert(index < childrenHandles_.size());
+    
+    if (child && index < childrenHandles_.size()) {
+        auto existing = space->getComponent<TransformComponent>(childrenHandles_[index]);
+        
+        if (hasParent) {
+            child->removeFromParent();
+        }
+        
+        existing->removeFromParent();
+        
+        child->parentHandle_ = getHandle<TransformComponent>();
+        childrenHandles_[index] = child->getHandle<TransformComponent>();
+    }
+}
+
+void BGE::TransformComponent::replaceChild(TransformComponent *child, uint32_t index) {
+    auto space = getSpace();
+    auto hasParent = child->getParent() != nullptr;
+    
+    assert(child);
+    assert(!hasParent);    // Child cannot already have a parent
+    assert(index < childrenHandles_.size());
+    
+    if (child && index < childrenHandles_.size()) {
+        auto existing = space->getComponent<TransformComponent>(childrenHandles_[index]);
+        
+        if (hasParent) {
+            child->removeFromParent();
+        }
+        
+        existing->removeFromParent();
+        
+        child->parentHandle_ = getHandle<TransformComponent>();
+        childrenHandles_[index] = child->getHandle<TransformComponent>();
+    }
+}
+
+void BGE::TransformComponent::replaceChild(GameObjectHandle handle, uint32_t index) {
+    auto space = getSpace();
+    auto gameObj = space->getGameObject(handle);
+    auto child = gameObj->getComponent<TransformComponent>();
+    
+    replaceChild(child, index);
+}
+
+void BGE::TransformComponent::replaceChild(GameObject *child, uint32_t index) {
+    auto xform = child->getComponent<TransformComponent>();
+    
+    replaceChild(xform, index);
+}
+
+void BGE::TransformComponent::moveToParent(TransformComponentHandle handle) {
     auto space = getSpace();
     auto parent = space->getComponent<TransformComponent>(handle.getHandle());
     
@@ -287,6 +390,41 @@ void BGE::TransformComponent::moveToParent(TransformComponent *parent) {
     }
 }
 
+void BGE::TransformComponent::moveToParent(GameObjectHandle handle) {
+    auto space = getSpace();
+    auto parent = space->getGameObject(handle);
+    
+    assert(parent);
+    
+    if (parent) {
+        auto parentXform = parent->getComponent<TransformComponent>();
+        
+        assert(parentXform);
+        
+        if (parentXform) {
+            removeFromParent();
+            
+            parentXform->addChild(this);
+        }
+    }
+}
+
+void BGE::TransformComponent::moveToParent(GameObject *parent) {
+    assert(parent);
+    
+    if (parent) {
+        auto parentXform = parent->getComponent<TransformComponent>();
+        
+        assert(parentXform);
+        
+        if (parentXform) {
+            removeFromParent();
+        
+            parentXform->addChild(this);
+        }
+    }
+}
+
 BGE::TransformComponent *BGE::TransformComponent::childAtIndex(uint32_t index) {
     if (index < childrenHandles_.size()) {
         auto handle = childrenHandles_.at(index);
@@ -305,7 +443,7 @@ BGE::TransformComponentHandle BGE::TransformComponent::childHandleAtIndex(uint32
     }
 }
 
-bool BGE::TransformComponent::hasChildHandle(TransformComponentHandle handle, bool descend) {
+bool BGE::TransformComponent::hasChild(TransformComponentHandle handle, bool descend) {
     auto space = getSpace();
     auto child = space->getComponent<TransformComponent>(handle.getHandle());
     
@@ -365,7 +503,7 @@ bool BGE::TransformComponent::hasChild(TransformComponent *child, bool descend) 
     }
 }
 
-bool BGE::TransformComponent::inParentHandleHierarchy(TransformComponentHandle handle) {
+bool BGE::TransformComponent::inParentHierarchy(TransformComponentHandle handle) {
     auto space = getSpace();
     auto parent = space->getComponent<TransformComponent>(handle.getHandle());
 

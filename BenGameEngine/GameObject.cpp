@@ -103,6 +103,70 @@ void BGE::GameObject::setVisibility(bool visible) {
     }
 }
 
+void BGE::GameObject::addChild(GameObjectHandle handle) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->addChild(handle);
+    }
+}
+
+void BGE::GameObject::addChild(GameObject *child) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->addChild(child);
+    }
+}
+
+void BGE::GameObject::insertChild(GameObjectHandle handle, uint32_t index) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->insertChild(handle, index);
+    }
+}
+
+void BGE::GameObject::insertChild(GameObject *child, uint32_t index) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->insertChild(child, index);
+    }
+}
+
+void BGE::GameObject::replaceChild(GameObjectHandle handle, uint32_t index) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->replaceChild(handle, index);
+    }
+}
+
+void BGE::GameObject::replaceChild(GameObject *child, uint32_t index) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->replaceChild(child, index);
+    }
+}
+
+void BGE::GameObject::removeAllChildren() {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->removeAllChildren();
+    }
+}
+
+void BGE::GameObject::removeFromParent() {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->removeFromParent();
+    }
+}
+
 bool BGE::GameObject::isAnimationSubSequence() const {
     return hasComponent<AnimationSequenceComponent>() && hasComponent<FrameAnimatorComponent>();
 }

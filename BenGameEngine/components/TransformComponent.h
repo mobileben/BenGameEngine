@@ -49,6 +49,7 @@ namespace BGE {
         
         Vector2 getPosition() const { return position_; }
         void setPosition(Vector2 &position) { position_ = position; transformDirty_ = true; }
+        void setPosition(Vector2 &&position) { position_ = position; transformDirty_ = true; }
         
         float getScaleX() const { return scale_.x; }
         float getScaleY() const { return scale_.y; }
@@ -92,17 +93,27 @@ namespace BGE {
         void removeAllChildren();
         void removeFromParent();
         
-        void insertChildHandle(TransformComponentHandle handle, uint32_t index);
+        void insertChild(TransformComponentHandle handle, uint32_t index);
         void insertChild(TransformComponent *child, uint32_t index);
-        void moveToParentHandle(TransformComponentHandle handle);
+        void insertChild(GameObjectHandle handle, uint32_t index);
+        void insertChild(GameObject *child, uint32_t index);
+        
+        void replaceChild(TransformComponentHandle handle, uint32_t index);
+        void replaceChild(TransformComponent *child, uint32_t index);
+        void replaceChild(GameObjectHandle handle, uint32_t index);
+        void replaceChild(GameObject *child, uint32_t index);
+        
+        void moveToParent(TransformComponentHandle handle);
         void moveToParent(TransformComponent *parentHandle);
+        void moveToParent(GameObjectHandle handle);
+        void moveToParent(GameObject *parentHandle);
         
         TransformComponent *childAtIndex(uint32_t index);
         TransformComponentHandle childHandleAtIndex(uint32_t index);
         
-        bool hasChildHandle(TransformComponentHandle handle, bool descend=false);
+        bool hasChild(TransformComponentHandle handle, bool descend=false);
         bool hasChild(TransformComponent *child, bool descend=false);
-        bool inParentHandleHierarchy(TransformComponentHandle handle);
+        bool inParentHierarchy(TransformComponentHandle handle);
         bool inParentHierarchy(TransformComponent *parent);
         
     protected:

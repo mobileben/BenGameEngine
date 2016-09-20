@@ -107,6 +107,18 @@ namespace BGE {
         
         GameObject *find(ComponentTypeId componentTypeId, std::string name);
         
+        void addChild(GameObjectHandle handle);
+        void addChild(GameObject *child);
+        
+        void insertChild(GameObjectHandle handle, uint32_t index);
+        void insertChild(GameObject *child, uint32_t index);
+
+        void replaceChild(GameObjectHandle handle, uint32_t index);
+        void replaceChild(GameObject *child, uint32_t index);
+
+        void removeAllChildren();
+        void removeFromParent();
+
         inline uint32_t getComponentBitmask() const { return componentBitmask_; }
         
         template <typename T>
