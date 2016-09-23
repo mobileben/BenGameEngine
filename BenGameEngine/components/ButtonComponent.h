@@ -56,6 +56,8 @@ namespace BGE {
         void setEnabled(bool enabled);
         bool isHighlighted() const;
         void setHighlighted(bool highlighted);
+        bool showHighlighted() const;
+        void setShowHighlighted(bool show);
         bool isSelected() const;
         void setSelected(bool selected);
         void setToggleOn(bool on);
@@ -70,7 +72,7 @@ namespace BGE {
         uint32_t    state;
         bool        animate;
         bool        enabled;
-        bool        showHighlighted;
+        bool        showHighlighted_;
         
         // For when we want to treat this like a toggle
         bool        toggleable;

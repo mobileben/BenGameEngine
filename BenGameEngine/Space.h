@@ -97,6 +97,7 @@ namespace BGE {
         
         void linkAll();
         
+        // Component management
         GameObject *createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
         GameObject *createAnimChannel(std::string name, std::string instanceName, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate);
         GameObject *createFrameAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
@@ -109,7 +110,22 @@ namespace BGE {
         
         void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate);
 
+        // Font management
         void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+
+        // Texture management
+        void createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
+        void createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
+        void createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
+        void createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
+
+        TextureHandle getTextureHandle(std::string name) const;
+        TextureAtlasHandle getTextureAtlasHandle(std::string name) const;
+        Texture *getTexture(std::string name) const;
+        TextureAtlas *getTextureAtlas(std::string name) const;
+
+        void removeTexture(TextureHandle handle);
+        void removeTextureAtlas(TextureAtlasHandle handle);
 
         void scenePackageAdded(ScenePackageHandle handle);
         void scenePackageRemoved(ScenePackageHandle handle);

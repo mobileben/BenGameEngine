@@ -27,7 +27,6 @@ namespace BGE {
     {
     public:
         ComponentService();
-        ComponentService(SpaceHandle spaceHandle);
         ~ComponentService() {}
         
         static void registerComponents();

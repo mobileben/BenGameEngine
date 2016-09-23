@@ -66,17 +66,6 @@ BGE::ComponentService::ComponentService() : Service() {
     }
 }
 
-BGE::ComponentService::ComponentService(SpaceHandle spaceHandle) : Service(), spaceHandle_(spaceHandle) {
-    if (!ComponentService::componentsRegistered_) {
-        ComponentService::registerComponents();
-    }
-    
-    // Create our componentHandle vectors
-    for (auto it=componentHandleServices_.begin();it!=componentHandleServices_.end();++it) {
-        componentHandles_.push_back(std::vector<ComponentHandle>());
-    }
-}
-
 BGE::GameObject *BGE::ComponentService::getComponentGameObject(Component *component, GameObjectHandle gameObjHandle) const {
     return component->getSpace()->getGameObject(gameObjHandle);
 }

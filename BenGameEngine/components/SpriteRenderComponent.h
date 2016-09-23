@@ -32,6 +32,9 @@ namespace BGE {
         void setTextureReference(TextureReference *texRef);
         void setTextureReference(const TextureReference &texRef);
         
+        void setTextureHandle(TextureHandle texHandle);
+        void setTexture(Texture *tex);
+        
     protected:
         void materialsUpdated();
         

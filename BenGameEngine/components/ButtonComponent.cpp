@@ -22,7 +22,7 @@ uint32_t BGE::ButtonComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent);
 
-BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted(true), toggleable(false), toggleOn(false) {
+BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted_(true), toggleable(false), toggleOn(false) {
 }
 
 void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
@@ -31,7 +31,7 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
     state = ButtonStateNormal;
     animate = false;
     enabled = true;
-    showHighlighted = true;
+    showHighlighted_ = true;
     
     toggleable = false;
     toggleOn = false;
@@ -49,7 +49,7 @@ void BGE::ButtonComponent::destroy() {
     state = ButtonStateNormal;
     animate = false;
     enabled = false;
-    showHighlighted = false;
+    showHighlighted_ = false;
     
     toggleable = false;
     toggleOn = false;
@@ -327,6 +327,14 @@ void BGE::ButtonComponent::setHighlighted(bool highlighted) {
     }
 }
 
+bool BGE::ButtonComponent::showHighlighted() const {
+    return showHighlighted_;
+}
+
+void BGE::ButtonComponent::setShowHighlighted(bool show) {
+    showHighlighted_ = show;
+}
+
 bool BGE::ButtonComponent::isSelected() const {
     if (toggleable) {
         return toggleOn;
@@ -377,7 +385,7 @@ void BGE::ButtonComponent::useHighlightedButton() {
     auto space = getSpace();
     auto currentButton = space->getGameObject(currentButtonHandle);
     
-    if (showHighlighted) {
+    if (showHighlighted_) {
         bool playAnim = false;
         
         currentButton->setActive(false);

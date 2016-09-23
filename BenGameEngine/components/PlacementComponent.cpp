@@ -24,15 +24,21 @@ void BGE::PlacementComponent::setPlacementReference(PlacementReference *placemen
 }
 
 void BGE::PlacementComponent::setPlacementReference(const PlacementReference &placementRef) {
+    width_ = placementRef.width;
+    height_ = placementRef.height;
 }
 
 void BGE::PlacementComponent::setWidth(float width) {
+    width_ = width;
 }
 
 void BGE::PlacementComponent::setHeight(float height) {
+    height_ = height;
 }
 
 void BGE::PlacementComponent::setWidthHeight(Vector2 &wh) {
+    width_ = wh.w;
+    height_ = wh.h;
 }
 
 void BGE::PlacementComponent::addChild(GameObjectHandle handle) {

@@ -590,8 +590,13 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string insta
     if (placementRef) {
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
+        auto placement = createComponent<PlacementComponent>();
         
         obj->addComponent(xform);
+        
+        placement->setPlacementReference(placementRef);
+        
+        obj->addComponent(placement);
         
         if (objects && pushBitmask & PlacementComponent::bitmask_) {
             addCreatedGameObjectsForRenderComponent<PlacementComponent>(obj, objects);
@@ -1048,5 +1053,45 @@ void BGE::Space::dispatchCreatedHandlers(CreatedGameObjectVector *objects, Scene
             }
         }
     }
+}
+
+void BGE::Space::createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+    Game::getInstance()->getTextureService()->createTextureFromFile(spaceHandle_, name, filename, format, callback);
+}
+
+void BGE::Space::createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+    Game::getInstance()->getTextureService()->createTextureFromBuffer(spaceHandle_, name, buffer, format, width, height, callback);
+}
+
+void BGE::Space::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+    Game::getInstance()->getTextureService()->createTextureAtlasFromFile(spaceHandle_, name, filename, subTextureDefs, format, callback);
+}
+
+void BGE::Space::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+    Game::getInstance()->getTextureService()->createTextureAtlasFromBuffer(spaceHandle_, name, buffer, format, width, height, subTextureDefs, callback);
+}
+
+BGE::TextureHandle BGE::Space::getTextureHandle(std::string name) const {
+    return Game::getInstance()->getTextureService()->getTextureHandle(spaceHandle_, name);
+}
+
+BGE::TextureAtlasHandle BGE::Space::getTextureAtlasHandle(std::string name) const {
+    return Game::getInstance()->getTextureService()->getTextureAtlasHandle(spaceHandle_, name);
+}
+
+BGE::Texture *BGE::Space::getTexture(std::string name) const {
+    return Game::getInstance()->getTextureService()->getTexture(spaceHandle_, name);
+}
+
+BGE::TextureAtlas *BGE::Space::getTextureAtlas(std::string name) const {
+    return Game::getInstance()->getTextureService()->getTextureAtlas(spaceHandle_, name);
+}
+
+void BGE::Space::removeTexture(TextureHandle handle) {
+    Game::getInstance()->getTextureService()->removeTexture(spaceHandle_, handle);
+}
+
+void BGE::Space::removeTextureAtlas(TextureAtlasHandle handle) {
+    Game::getInstance()->getTextureService()->removeTextureAtlas(spaceHandle_, handle);
 }
 

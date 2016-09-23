@@ -28,7 +28,10 @@ namespace BGE {
         ~PlacementComponent() {}
         
         void setPlacementReference(PlacementReference *placementRef);
-        void setPlacementReference(const PlacementReference &maskRef);
+        void setPlacementReference(const PlacementReference &placementRef);
+        
+        inline float getWidth() const { return width_; }
+        inline float getHeight() const { return height_; }
         
         void setWidth(float width);
         void setHeight(float height);
@@ -36,6 +39,10 @@ namespace BGE {
         
         void addChild(GameObjectHandle handle);
         void addChild(GameObject *object);
+        
+    private:
+        float                   width_;
+        float                   height_;
     };
 }
 

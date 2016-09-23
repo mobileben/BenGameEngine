@@ -29,6 +29,19 @@ void BGE::SpriteRenderComponent::setTextureReference(const TextureReference &tex
     this->setMaterials({material});
 }
 
+void BGE::SpriteRenderComponent::setTextureHandle(TextureHandle texHandle) {
+    auto material = Game::getInstance()->getMaterialService()->createMaterial(texHandle);
+    
+    this->setMaterials({material});
+}
+
+void BGE::SpriteRenderComponent::setTexture(Texture *tex) {
+    auto material = Game::getInstance()->getMaterialService()->createMaterial(tex->getHandle());
+    
+    this->setMaterials({material});
+
+}
+
 void BGE::SpriteRenderComponent::materialsUpdated() {
     
     // Build vertices
