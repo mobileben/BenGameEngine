@@ -16,6 +16,7 @@
 #include "FlatRectRenderComponent.h"
 #include "FrameAnimatorComponent.h"
 #include "LineRenderComponent.h"
+#include "LogicComponent.h"
 #include "SpriteRenderComponent.h"
 #include "TextComponent.h"
 #include "TransformComponent.h"
@@ -42,6 +43,7 @@ void BGE::ComponentService::registerComponents() {
         registerComponent<ColorTransformComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<FrameAnimatorComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<SpriteRenderComponent>(120, HandleServiceNoMaxLimit);
+        registerComponent<LogicComponent>(1024, HandleServiceNoMaxLimit);
         registerComponent<TextComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<PlacementComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<ButtonComponent>(1024, HandleServiceNoMaxLimit);
@@ -96,6 +98,8 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
                 releaseComponentHandle<FrameAnimatorComponent>(handle);
             } else if (typeId == SpriteRenderComponent::typeId_) {
                 releaseComponentHandle<SpriteRenderComponent>(handle);
+            } else if (typeId == LogicComponent::typeId_) {
+                releaseComponentHandle<LogicComponent>(handle);
             } else if (typeId == TextComponent::typeId_) {
                 releaseComponentHandle<TextComponent>(handle);
             } else if (typeId == PlacementComponent::typeId_) {
@@ -145,6 +149,7 @@ uint32_t BGE::ComponentService::totalNumComponents() const {
     total += numComponents<ColorTransformComponent>();
     total += numComponents<FrameAnimatorComponent>();
     total += numComponents<SpriteRenderComponent>();
+    total += numComponents<LogicComponent>();
     total += numComponents<TextComponent>();
     total += numComponents<PlacementComponent>();
     total += numComponents<ButtonComponent>();
@@ -174,6 +179,7 @@ uint32_t BGE::ComponentService::totalMaxHandles() const {
     total += maxComponents<ColorTransformComponent>();
     total += maxComponents<FrameAnimatorComponent>();
     total += maxComponents<SpriteRenderComponent>();
+    total += maxComponents<LogicComponent>();
     total += maxComponents<TextComponent>();
     total += maxComponents<PlacementComponent>();
     total += maxComponents<ButtonComponent>();
@@ -199,6 +205,7 @@ uint32_t BGE::ComponentService::totalMaxHandlesAllocated() const {
     total += maxHandlesAllocated<ColorTransformComponent>();
     total += maxHandlesAllocated<FrameAnimatorComponent>();
     total += maxHandlesAllocated<SpriteRenderComponent>();
+    total += maxHandlesAllocated<LogicComponent>();
     total += maxHandlesAllocated<TextComponent>();
     total += maxHandlesAllocated<PlacementComponent>();
     total += maxHandlesAllocated<ButtonComponent>();
@@ -309,6 +316,9 @@ size_t BGE::ComponentService::usedHandleMemory() const {
         } else if (i == SpriteRenderComponent::typeId_) {
             auto handleService = static_cast<HandleService<SpriteRenderComponent, SpriteRenderComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->usedMemory();
+        } else if (i == LogicComponent::typeId_) {
+            auto handleService = static_cast<HandleService<LogicComponent, LogicComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
         } else if (i == TextComponent::typeId_) {
             auto handleService = static_cast<HandleService<TextComponent, TextComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->usedMemory();
@@ -374,6 +384,9 @@ size_t BGE::ComponentService::unusedHandleMemory() const {
             mem += handleService->unusedMemory();
         } else if (i == SpriteRenderComponent::typeId_) {
             auto handleService = static_cast<HandleService<SpriteRenderComponent, SpriteRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == LogicComponent::typeId_) {
+            auto handleService = static_cast<HandleService<LogicComponent, LogicComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->unusedMemory();
         } else if (i == TextComponent::typeId_) {
             auto handleService = static_cast<HandleService<TextComponent, TextComponentHandle> *>(componentHandleServices_[i]);
@@ -441,6 +454,9 @@ size_t BGE::ComponentService::totalHandleMemory() const {
         } else if (i == SpriteRenderComponent::typeId_) {
             auto handleService = static_cast<HandleService<SpriteRenderComponent, SpriteRenderComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->totalMemory();
+        } else if (i == LogicComponent::typeId_) {
+            auto handleService = static_cast<HandleService<LogicComponent, LogicComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
         } else if (i == TextComponent::typeId_) {
             auto handleService = static_cast<HandleService<TextComponent, TextComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->totalMemory();
@@ -495,6 +511,8 @@ void BGE::ComponentService::outputResourceBreakdown(uint32_t numTabs) const {
             outputComponentResourceBreakdown<FrameAnimatorComponent>(numTabs);
         } else if (i == SpriteRenderComponent::typeId_) {
             outputComponentResourceBreakdown<SpriteRenderComponent>(numTabs);
+        } else if (i == LogicComponent::typeId_) {
+            outputComponentResourceBreakdown<LogicComponent>(numTabs);
         } else if (i == TextComponent::typeId_) {
             outputComponentResourceBreakdown<TextComponent>(numTabs);
         } else if (i == PlacementComponent::typeId_) {
@@ -539,6 +557,8 @@ void BGE::ComponentService::outputMemoryBreakdown(uint32_t numTabs) const {
             outputComponentMemoryBreakdown<FrameAnimatorComponent>(numTabs);
         } else if (i == SpriteRenderComponent::typeId_) {
             outputComponentMemoryBreakdown<SpriteRenderComponent>(numTabs);
+        } else if (i == LogicComponent::typeId_) {
+            outputComponentMemoryBreakdown<LogicComponent>(numTabs);
         } else if (i == TextComponent::typeId_) {
             outputComponentMemoryBreakdown<TextComponent>(numTabs);
         } else if (i == PlacementComponent::typeId_) {

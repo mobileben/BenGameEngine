@@ -48,6 +48,8 @@ namespace BGE {
             components_.push_back(handle);
             
             component->setGameObjectHandle(getHandle());
+            
+            addComponentEpilogue(T::typeId_);
         }
         
         template <typename T> T *getComponent() {
@@ -88,6 +90,8 @@ namespace BGE {
                     if (it->typeId == typeId) {
                         auto space = getSpace();
                         
+                        removeComponentPrologue(T::typeId_);
+                        
                         space->removeComponent(*it);
                         componentBitmask_ &= ~T::bitmask_;
                         
@@ -126,6 +130,9 @@ namespace BGE {
             return getComponentBitmask() & Component::getBitmask<T>();
         }
 
+        void addComponentEpilogue(ComponentTypeId componentTypeId);
+        void removeComponentPrologue(ComponentTypeId componentTypeId);
+        
         bool isAnimationSubSequence() const;
         void upgradeToAnimationSequence();
         

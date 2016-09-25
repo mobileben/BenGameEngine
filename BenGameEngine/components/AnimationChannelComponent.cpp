@@ -10,7 +10,6 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "SpriteRenderComponent.h"
-#include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
 #include "ButtonComponent.h"
 #include "TextComponent.h"
@@ -60,12 +59,10 @@ void BGE::AnimationChannelComponent::updateReference() {
                 
             case GfxReferenceTypeButton:{
                 auto button = space->createComponent<ButtonComponent>();
-                auto input = space->createComponent<InputTouchComponent>();
                 auto bbox = space->createComponent<BoundingBoxComponent>();
                 
                 auto buttonRef = package->getButtonReference(this->channel->reference);
                 gameObj->addComponent(button);
-                gameObj->addComponent(input);
                 gameObj->addComponent(bbox);
                 
                 button->setButtonReference(buttonRef);

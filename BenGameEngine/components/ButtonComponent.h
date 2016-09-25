@@ -67,8 +67,6 @@ namespace BGE {
     private:
         friend Space;
         
-        using EventHandlerService = HandleService<EventHandler, EventHandlerHandle>;
-
         uint32_t    state;
         bool        animate;
         bool        enabled;

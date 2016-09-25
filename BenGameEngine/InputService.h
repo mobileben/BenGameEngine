@@ -53,16 +53,6 @@ namespace BGE {
     class GameObject;
     class ButtonComponent;
     
-    using InputTouchEventHandler = std::function<void(GameObjectHandle, InputTouchEvent)>;
-    
-    struct InputButtonHandler {
-        GameObjectHandle                    gameObjHandle;
-        SpaceHandle                         spaceHandle;
-        ButtonComponentHandle               buttonComponentHandle;
-        TouchType                           touchType;
-        bool                                inBounds;
-    };
-    
     class InputService : public Service {
     public:
         InputService();
@@ -88,6 +78,19 @@ namespace BGE {
         void unregisterEventHandler(EventHandlerHandle handle);
         
     private:
+        struct InputButtonHandler {
+            SpaceHandle                         spaceHandle;
+            GameObjectHandle                    gameObjHandle;
+            ButtonComponentHandle               buttonComponentHandle;
+            TouchType                           touchType;
+            bool                                inBounds;
+        };
+
+        struct InputTouchEvent {
+            SpaceHandle                         spaceHandle;
+            GameObjectHandle                    gameObjHandle;
+        };
+        
         static const uint32_t InitialInputReserve = 64;
         
         using InputHandleService = HandleService<Input, InputHandle>;

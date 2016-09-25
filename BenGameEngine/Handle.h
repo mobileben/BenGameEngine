@@ -18,6 +18,7 @@ namespace BGE {
     using HandleBackingType = uint32_t;
     
     class GameObject;
+    class EventHandler;
     
     class AnimationChannelComponent;
     class AnimationSequenceComponent;
@@ -31,6 +32,7 @@ namespace BGE {
     class FrameAnimatorComponent;
     class InputTouchComponent;
     class LineRenderComponent;
+    class LogicComponent;
     class MaskComponent;
     class PlacementComponent;
     class SpriteRenderComponent;
@@ -90,8 +92,7 @@ namespace BGE {
     inline bool operator== (const Handle<TAG>& lhs, const Handle<TAG>& rhs) { return lhs.getHandle() == rhs.getHandle(); }
     
     // Define handles here, so they can be used anywhere
-    struct EventHandlerTag {};
-    using EventHandlerHandle = Handle<EventHandlerTag>;
+    using EventHandlerHandle = Handle<EventHandler>;
 
     struct FontTag {};
     using FontHandle = Handle<FontTag>;
@@ -128,6 +129,7 @@ namespace BGE {
     using FrameAnimatorComponentHandle = Handle<FrameAnimatorComponent>;
     using InputTouchComponentHandle = Handle<InputTouchComponent>;
     using LineRenderComponentHandle = Handle<LineRenderComponent>;
+    using LogicComponentHandle = Handle<LogicComponent>;
     using MaskComponentHandle = Handle<MaskComponent>;
     using PlacementComponentHandle = Handle<PlacementComponent>;
     using SpriteRenderComponentHandle = Handle<SpriteRenderComponent>;

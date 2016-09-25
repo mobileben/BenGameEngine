@@ -100,11 +100,22 @@ BGE::EventHandlerHandle BGE::InputService::registerEventHandler(std::string name
 
 void BGE::InputService::unregisterEventHandler(EventHandlerHandle handle) {
     Game::getInstance()->getEventService()->removeEventHandler(handle);
+    
+    // Remove event handle from vector
+    for (auto &mapIt : inputEventHandlers_) {
+        auto it = std::find(mapIt.second.begin(), mapIt.second.end(), handle);
+        
+        if (it != mapIt.second.end()) {
+            mapIt.second.erase(it);
+        }
+    }
 }
 
 void BGE::InputService::process() {
     // Sort inputs
     std::sort(inputs_.begin(), inputs_.end());
+    
+    std::vector<InputTouchEvent> inputTouchQueue;
     
     inputButtonHandlers_.clear();
     
@@ -114,10 +125,10 @@ void BGE::InputService::process() {
             
             if (space->isVisible()) {
                 // Do buttons first
-                std::vector<ButtonComponent *> touchComponents;
-                space->getComponents<ButtonComponent>(touchComponents);
+                std::vector<ButtonComponent *> buttonTouchComponents;
+                space->getComponents<ButtonComponent>(buttonTouchComponents);
                 
-                for (auto const &touch : touchComponents) {
+                for (auto const &touch : buttonTouchComponents) {
                     if (touch->isEnabled()) {
                         auto gameObjHandle = touch->getGameObjectHandle();
                         
@@ -139,8 +150,8 @@ void BGE::InputService::process() {
                         
                         InputButtonHandler buttonHandler;
                         
-                        buttonHandler.gameObjHandle = gameObjHandle;
                         buttonHandler.spaceHandle = handle;
+                        buttonHandler.gameObjHandle = gameObjHandle;
                         buttonHandler.buttonComponentHandle = touch->getHandle<ButtonComponent>();
                         buttonHandler.touchType = input->type;
                         buttonHandler.inBounds = inBounds;
@@ -149,7 +160,35 @@ void BGE::InputService::process() {
                     }
                 }
                 
-                // Do input touch components
+                // Do input touch components. Only applicable for TouchType::Down
+                if (input->type == TouchType::Down) {
+                    std::vector<InputTouchComponent *> inputTouchComponents;
+                    space->getComponents<InputTouchComponent>(inputTouchComponents);
+                    
+                    for (auto const &touch : inputTouchComponents) {
+                        auto gameObj = touch->getGameObject();
+                        
+                        if (gameObj->isActive()) {
+                            auto xform = gameObj->getComponent<TransformComponent>();
+                            auto bbox = gameObj->getComponent<BoundingBoxComponent>();
+                            
+                            if (xform && bbox) {
+                                Matrix4 matrix;
+                                
+                                xform->getMatrix(matrix);
+                                bbox->computeAABB(matrix);
+                                
+                                if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
+                                    if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {
+                                        InputTouchEvent inputTouchEvent{handle, gameObj->getHandle()};
+                                        
+                                        inputTouchQueue.push_back(inputTouchEvent);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         
@@ -182,12 +221,50 @@ void BGE::InputService::process() {
                         std::string name = handler->getName();
                         
                         if (name.length()) {
+                            // TODO: Optimize later on without using name
                             if (gameObjName == name) {
                                 handler->handler(space->getHandle(), buttonHandler.gameObjHandle, event);
                             }
                         } else {
                             // Un-named handlers always fire
                             handler->handler(space->getHandle(), buttonHandler.gameObjHandle, event);
+                        }
+                    }
+                }
+            }
+        } else {
+            // buttonHandlers must be associated with active game objects
+            assert(false);
+        }
+    }
+    
+    for (auto const &inputTouchEvent : inputTouchQueue) {
+        auto event = Event::TouchDownInside;
+        auto space = Game::getInstance()->getSpaceService()->getSpace(inputTouchEvent.spaceHandle);
+        auto gameObj = space->getGameObject(inputTouchEvent.gameObjHandle);
+        
+        if (gameObj) {
+            // Now if we match an event handler, dispatch that too
+            auto it = inputEventHandlers_.find(event);
+            
+            if (it != inputEventHandlers_.end()) {
+                auto const &handles = it->second;
+                auto gameObjName = gameObj->getName();
+                
+                for (auto const &handle : handles) {
+                    auto handler = eventService->getEventHandler(handle);
+                    
+                    if (handler) {
+                        std::string name = handler->getName();
+                        
+                        if (name.length()) {
+                            // TODO: Optimize later on without using name
+                            if (gameObjName == name) {
+                                handler->handler(inputTouchEvent.spaceHandle, inputTouchEvent.gameObjHandle, event);
+                            }
+                        } else {
+                            // Un-named handlers always fire
+                            handler->handler(inputTouchEvent.spaceHandle, inputTouchEvent.gameObjHandle, event);
                         }
                     }
                 }

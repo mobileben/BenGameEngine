@@ -25,17 +25,16 @@ namespace BGE {
         TouchDragOutside,
         TouchDragEnter,
         TouchDragExit,
+        TouchDownInside,
+        TouchRepeatInside,
         TouchUpInside,
         TouchUpOutside,
         TouchCancel,
-        AnimationSequenceCreated,
-        ButtonCreated,
-        FlatRectCreated,
-        LineCreated,
-        MaskCreated,
-        SpriteCreated,
-        TextCreated,
-        TextureMaskCreated
+        
+        ValueChanged,
+        
+        AnimationReachedEnd,
+        AnimationReachedBeginning
     };
 }
 

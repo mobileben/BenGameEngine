@@ -15,6 +15,7 @@
 #include "AnimatorComponent.h"
 #include "FrameAnimatorComponent.h"
 #include "TransformComponent.h"
+#include "LogicComponent.h"
 
 BGE::GameObject::GameObject() : NamedObject(), active_(false), componentBitmask_(0) {
 }
@@ -164,6 +165,18 @@ void BGE::GameObject::removeFromParent() {
     
     if (xform) {
         xform->removeFromParent();
+    }
+}
+
+void BGE::GameObject::addComponentEpilogue(ComponentTypeId componentTypeId) {
+    if (componentTypeId == LogicComponent::typeId_) {
+        Game::getInstance()->getLogicService()->addGameObject(this);
+    }
+}
+
+void BGE::GameObject::removeComponentPrologue(ComponentTypeId componentTypeId) {
+    if (componentTypeId == LogicComponent::typeId_) {
+        Game::getInstance()->getLogicService()->removeGameObject(this);
     }
 }
 

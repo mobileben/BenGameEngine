@@ -42,6 +42,80 @@ void BGE::AnimationService::update(double deltaTime) {
             }
         }
     }
+    
+    processEvents();
+}
+
+BGE::EventHandlerHandle BGE::AnimationService::registerEventHandler(std::string name, Event event, EventHandlerFunction function) {
+    auto handle = Game::getInstance()->getEventService()->createEventHandlerHandle(name, event, function);
+    std::vector<EventHandlerHandle> &v = eventHandlers_[event];
+    
+    v.push_back(handle);
+    
+    return handle;
+}
+
+void BGE::AnimationService::unregisterEventHandler(EventHandlerHandle handle) {
+    Game::getInstance()->getEventService()->removeEventHandler(handle);
+    
+    // Remove event handle from vector
+    for (auto &mapIt : eventHandlers_) {
+        auto it = std::find(mapIt.second.begin(), mapIt.second.end(), handle);
+        
+        if (it != mapIt.second.end()) {
+            mapIt.second.erase(it);
+        }
+    }
+}
+
+void BGE::AnimationService::queueEvent(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, Event event) {
+    // TODO: Mutex this
+    AnimationEvent animEvent{ spaceHandle, gameObjHandle, event };
+    
+    events_.push_back(animEvent);
+}
+
+void BGE::AnimationService::processEvents() {
+    auto eventService = Game::getInstance()->getEventService();
+    
+    for (auto const &event : events_) {
+        auto space = Game::getInstance()->getSpaceService()->getSpace(event.spaceHandle);
+        auto gameObj = space->getGameObject(event.gameObjHandle);
+        
+        if (gameObj) {
+            // Now if we match an event handler, dispatch that too
+            auto it = eventHandlers_.find(event.event);
+            
+            if (it != eventHandlers_.end()) {
+                auto const &handles = it->second;
+                auto gameObjName = gameObj->getName();
+                
+                for (auto const &handle : handles) {
+                    auto handler = eventService->getEventHandler(handle);
+                    
+                    if (handler) {
+                        std::string name = handler->getName();
+                        
+                        if (name.length()) {
+                            // TODO: Optimize later on without using name
+                            if (gameObjName == name) {
+                                handler->handler(event.spaceHandle, event.gameObjHandle, event.event);
+                            }
+                        } else {
+                            // Un-named handlers always fire
+                            handler->handler(event.spaceHandle, event.gameObjHandle, event.event);
+                        }
+                    }
+                }
+            }
+        } else {
+            // buttonHandlers must be associated with active game objects
+            assert(false);
+        }
+    }
+    
+    // TODO: Mutex out
+    events_.clear();
 }
 
 void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceComponent *seq, AnimatorComponent *animator, float deltaTime) {
@@ -126,7 +200,11 @@ void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceCompo
             }
             
             if (triggerEvent) {
-                
+                if (animator->forward) {
+                    queueEvent(space->getHandle(), animator->getGameObject()->getHandle(), Event::AnimationReachedEnd);
+                } else {
+                    queueEvent(space->getHandle(), animator->getGameObject()->getHandle(), Event::AnimationReachedBeginning);
+                }
             }
         }
    }
@@ -285,6 +363,7 @@ void BGE::AnimationService::animateChannel(GameObject *gameObj, int32_t frame) {
 }
 
 void BGE::AnimationService::animateSequenceByFrame(Space *space, AnimationSequenceComponent *seq, FrameAnimatorComponent *animator, int32_t frame) {
+    // TODO: UPDATE THIS
     if (true || frame != animator->currentFrame) {
         animator->currentFrame = frame;
         

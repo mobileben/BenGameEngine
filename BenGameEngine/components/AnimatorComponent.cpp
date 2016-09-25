@@ -176,7 +176,14 @@ void BGE::AnimatorComponent::play(int32_t iterations, bool forward, float speed)
     this->forward = forward;
     this->speed = speed;
     
-    this->setFrame(0);
+    if (forward) {
+        this->setFrame(0);
+    } else {
+        auto gameObj = getGameObject();
+        auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+
+        this->setFrame(seq->totalFrames - 1);
+    }
 }
 
 void BGE::AnimatorComponent::pause() {

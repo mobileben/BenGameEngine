@@ -157,7 +157,7 @@ void BGE::Game::outputValue(uint32_t numTabs, std::string format, va_list args) 
     printf("%s", results.c_str());
 }
 
-BGE::Game::Game()
+BGE::Game::Game() : paused_(false)
 {
     materialService_ = std::make_shared<MaterialService>();
     heartbeatService_ = std::make_shared<HeartbeatService>();
@@ -167,6 +167,7 @@ BGE::Game::Game()
     fontService_ = std::make_shared<FontService>();
     inputService_ = std::make_shared<InputService>();
     eventService_ = std::make_shared<EventService>();
+    logicService_ = std::make_shared<LogicService>();
 }
 
 void BGE::Game::provide(std::shared_ptr<RenderService> renderService) {
@@ -208,8 +209,12 @@ void BGE::Game::destroy() {
 
 void BGE::Game::update(double deltaTime) {
     NSLog(@"delta time %f", deltaTime);
+    // TODO: Convert to update
     inputService_->process();
     animationService_->update(deltaTime);
+    logicService_->update(deltaTime);
+    
+    // Now handle logic
 }
 
 void BGE::Game::outputResourceUsage() const {
@@ -229,6 +234,10 @@ void BGE::Game::outputResourceUsage() const {
     BGE::Game::outputValue(numTabs,"Num Texture (sub): %u\n", textureService_->numSubTextures());
     printf("-------- Resource Usage END --------\n\n");
     
+}
+
+void BGE::Game::setPaused(bool paused) {
+    paused_ = true;
 }
 
 void BGE::Game::outputResourceBreakdown(uint32_t numTabs) const {

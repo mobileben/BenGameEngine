@@ -9,7 +9,6 @@
 #include "Space.h"
 #include "Game.h"
 #include "GameObjectService.h"
-#include "InputTouchComponent.h"
 #include "BoundingBoxComponent.h"
 #include "ButtonComponent.h"
 #include "MaskComponent.h"
@@ -379,11 +378,9 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
         auto xform = createComponent<TransformComponent>();
         auto button = createComponent<ButtonComponent>();
         auto bbox = createComponent<BoundingBoxComponent>();
-        auto input = createComponent<InputTouchComponent>();
         
         obj->addComponent(xform);
         obj->addComponent(button);
-        obj->addComponent(input);
         obj->addComponent(bbox);
         
         button->setButtonReference(buttonRef);

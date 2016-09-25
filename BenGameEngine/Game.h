@@ -20,6 +20,7 @@
 #include "TextureService.h"
 #include "FontService.h"
 #include "HeartbeatService.h"
+#include "LogicService.h"
 #include "ComponentService.h"
 #include "ScenePackageService.h"
 #include "SpaceService.h"
@@ -48,6 +49,7 @@ namespace BGE {
         std::shared_ptr<SpaceService> getSpaceService() { return spaceService_; }
         std::shared_ptr<FontService> getFontService() { return fontService_; }
         std::shared_ptr<InputService> getInputService() { return inputService_; }
+        std::shared_ptr<LogicService> getLogicService() { return logicService_; }
         std::shared_ptr<EventService> getEventService() { return eventService_ ; }
         
         // Service functions
@@ -59,6 +61,9 @@ namespace BGE {
         void resume() override;
         void destroy() override;
         void update(double deltaTime) override;
+        
+        bool isPaused() const { return paused_; }
+        void setPaused(bool paused);
         
         void outputResourceUsage() const;
         void outputMemoryUsage() const;
@@ -102,6 +107,7 @@ namespace BGE {
         std::shared_ptr<AnimationService>       animationService_;
         std::shared_ptr<SpaceService>           spaceService_;
         std::shared_ptr<InputService>           inputService_;
+        std::shared_ptr<LogicService>           logicService_;
         std::shared_ptr<EventService>           eventService_;
         
     private:
@@ -132,6 +138,8 @@ namespace BGE {
                     const char  *STRING;
                 } mData;
         };
+        
+        bool paused_;
         
         // Used to access resources metrics
         std::shared_ptr<ComponentService>       componentService_;
