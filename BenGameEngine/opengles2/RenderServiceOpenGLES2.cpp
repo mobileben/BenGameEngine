@@ -513,15 +513,31 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
                 GLint positionLocation = glShader->locationForAttribute("Position");
                 GLint projectionLocation = glShader->locationForUniform("Projection");
                 GLint colorLocation = glShader->locationForUniform("Color");
-                
+                GLint modelLocation = glShader->locationForUniform("ModelView");
+                auto transformComponent = gameObject->getComponent<TransformComponent>();
+
                 glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                       sizeof(Vertex), &vertices[0]);
                 
                 Color color;
                 
+                glEnable (GL_BLEND);
+                glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                
                 material->getColor(color);
                 glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
+
+                if (transformComponent) {
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->matrix_.m);
+                } else {
+                    // TODO: This is a hack for now
+                    Matrix4 mat;
+                    
+                    Matrix4MakeIdentify(mat);
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                }
+
                 glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
                                GL_UNSIGNED_BYTE, &Indices[0]);
 
