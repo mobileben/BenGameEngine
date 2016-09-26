@@ -46,9 +46,11 @@ namespace BGE {
         size_t unusedHandleMemory() const final;
         size_t totalHandleMemory() const final;
 
-        MaterialHandle createMaterial(Vector4& color);
+        MaterialHandle createMaterial(Color& color);
+        MaterialHandle createMaterial(Color&& color);
         MaterialHandle createMaterial(TextureHandle textureHandle);
-        MaterialHandle createMaterial(Vector4& color, TextureHandle textureHandle);
+        MaterialHandle createMaterial(Color& color, TextureHandle textureHandle);
+        MaterialHandle createMaterial(Color&& color, TextureHandle textureHandle);
         
         void removeMaterial(MaterialHandle handle);
         void removeMaterial(ObjectId matId);

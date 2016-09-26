@@ -19,7 +19,20 @@ void BGE::MaterialService::pause() {}
 void BGE::MaterialService::resume() {}
 void BGE::MaterialService::destroy() {}
 
-BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color) {
+BGE::MaterialHandle BGE::MaterialService::createMaterial(Color& color) {
+    MaterialHandle handle;
+    Material *material = handleService_.allocate(handle);
+    
+    if (material) {
+        material->initialize(handle);
+        material->setColor(color);
+        addMaterial(handle);
+    }
+    
+    return handle;
+}
+
+BGE::MaterialHandle BGE::MaterialService::createMaterial(Color&& color) {
     MaterialHandle handle;
     Material *material = handleService_.allocate(handle);
     
@@ -45,7 +58,21 @@ BGE::MaterialHandle BGE::MaterialService::createMaterial(TextureHandle textureHa
     return handle;
 }
 
-BGE::MaterialHandle BGE::MaterialService::createMaterial(Vector4& color, TextureHandle textureHandle) {
+BGE::MaterialHandle BGE::MaterialService::createMaterial(Color& color, TextureHandle textureHandle) {
+    MaterialHandle handle;
+    Material *material = handleService_.allocate(handle);
+    
+    if (material) {
+        material->initialize(handle);
+        material->setColor(color);
+        material->setTextureHandle(textureHandle);
+        addMaterial(handle);
+    }
+    
+    return handle;
+}
+
+BGE::MaterialHandle BGE::MaterialService::createMaterial(Color&& color, TextureHandle textureHandle) {
     MaterialHandle handle;
     Material *material = handleService_.allocate(handle);
     
