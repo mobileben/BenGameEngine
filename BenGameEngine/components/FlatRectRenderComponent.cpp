@@ -38,6 +38,10 @@ void BGE::FlatRectRenderComponent::setWidthHeight(Vector2 &wh) {
     updateLocalBoundsAndVertices(wh);
 }
 
+void BGE::FlatRectRenderComponent::setWidthHeight(Vector2 &&wh) {
+    updateLocalBoundsAndVertices(wh);
+}
+
 void BGE::FlatRectRenderComponent::materialsUpdated() {
 }
 

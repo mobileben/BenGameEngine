@@ -30,6 +30,7 @@ namespace BGE {
         void setWidth(float width);
         void setHeight(float height);
         void setWidthHeight(Vector2 &wh);
+        void setWidthHeight(Vector2 &&wh);
         
     protected:
         Vertex* const getVertices() { return vertices_; }
