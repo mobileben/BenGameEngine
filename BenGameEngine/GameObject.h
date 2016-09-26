@@ -129,9 +129,6 @@ namespace BGE {
         inline bool hasComponent() const {
             return getComponentBitmask() & Component::getBitmask<T>();
         }
-
-        void addComponentEpilogue(ComponentTypeId componentTypeId);
-        void removeComponentPrologue(ComponentTypeId componentTypeId);
         
         bool isAnimationSubSequence() const;
         void upgradeToAnimationSequence();
@@ -158,6 +155,9 @@ namespace BGE {
         std::vector<ComponentHandle>    components_;
         
         void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
+        
+        void addComponentEpilogue(ComponentTypeId componentTypeId);
+        void removeComponentPrologue(ComponentTypeId componentTypeId);
     };
 }
 
