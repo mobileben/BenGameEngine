@@ -7,9 +7,11 @@
 //
 
 #include "LogicService.h"
+
 #include "Game.h"
 #include "GameObject.h"
 #include "LogicComponent.h"
+#include "Space.h"
 
 BGE::LogicService::LogicService() :  Service() {
 }
@@ -20,14 +22,18 @@ void BGE::LogicService::update(double deltaTime) {
     
     for (auto &item : gameObjectHandles_) {
         auto space = spaceService->getSpace(item.first);
+        
         auto gameObj = space->getGameObject(item.second);
-        auto logic = gameObj->getComponent<LogicComponent>();
         
-        assert(logic);
-        
-        if (logic && logic->update) {
-            if (logic->mode == LogicComponentMode::Always || (paused && logic->mode == LogicComponentMode::Paused) || logic->mode == LogicComponentMode::Unapaused) {
-                logic->update(gameObj, deltaTime);
+        if (gameObj->isActive()) {
+            auto logic = gameObj->getComponent<LogicComponent>();
+            
+            assert(logic);
+            
+            if (logic && logic->update) {
+                if (logic->mode == LogicComponentMode::Always || (paused && logic->mode == LogicComponentMode::Paused) || logic->mode == LogicComponentMode::Unapaused) {
+                    logic->update(gameObj, deltaTime);
+                }
             }
         }
     }
