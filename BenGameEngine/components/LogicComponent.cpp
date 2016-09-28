@@ -6,7 +6,9 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
+#include "Game.h"
 #include "LogicComponent.h"
+#include "LogicService.h"
 
 uint32_t BGE::LogicComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::LogicComponent::typeId_ = Component::InvalidTypeId;
@@ -23,6 +25,12 @@ void BGE::LogicComponent::initialize(HandleBackingType handle, SpaceHandle space
 }
 
 void BGE::LogicComponent::destroy() {
+    auto gameObject = getGameObject();
+    
+    if (gameObject) {
+        Game::getInstance()->getLogicService()->removeGameObject(gameObject);
+    }
+    
     this->update = nullptr;
     
     // Component::destroy last

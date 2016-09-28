@@ -111,6 +111,8 @@ namespace BGE {
         
         GameObject *find(ComponentTypeId componentTypeId, std::string name);
         
+        GameObject *getParent();
+        
         void addChild(GameObjectHandle handle);
         void addChild(GameObject *child);
         

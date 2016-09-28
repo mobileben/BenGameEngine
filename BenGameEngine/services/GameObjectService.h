@@ -68,6 +68,7 @@ namespace BGE {
             return handleService_.dereference(handle);
         }
         
+#ifdef NOT_YET
         void removeGameObject(GameObjectHandle handle);
         
         inline void removeGameObject(GameObject *object) {
@@ -75,6 +76,17 @@ namespace BGE {
                 removeGameObject(object->getHandle());
             }
         }
+#else
+        inline void removeGameObject(GameObjectHandle handle) {
+            auto object = getGameObject(handle);
+            
+            if (object) {
+                removeGameObject(object);
+            }
+        }
+        
+        void removeGameObject(GameObject *object);
+#endif
         
         void removeAllGameObjects();
         
@@ -91,6 +103,7 @@ namespace BGE {
         SpaceHandle         spaceHandle_;
         GameObjectVector    gameObjects_;
         
+        void getAllChildGameObjects(GameObject *root, std::vector<GameObject *> &objects);
         void releaseObject(GameObjectHandle handle);
     };
 }

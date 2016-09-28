@@ -99,8 +99,6 @@ BGE::EventHandlerHandle BGE::InputService::registerEventHandler(std::string name
 }
 
 void BGE::InputService::unregisterEventHandler(EventHandlerHandle handle) {
-    Game::getInstance()->getEventService()->removeEventHandler(handle);
-    
     // Remove event handle from vector
     for (auto &mapIt : inputEventHandlers_) {
         auto it = std::find(mapIt.second.begin(), mapIt.second.end(), handle);
@@ -109,6 +107,8 @@ void BGE::InputService::unregisterEventHandler(EventHandlerHandle handle) {
             mapIt.second.erase(it);
         }
     }
+    
+    Game::getInstance()->getEventService()->removeEventHandler(handle);
 }
 
 void BGE::InputService::process() {

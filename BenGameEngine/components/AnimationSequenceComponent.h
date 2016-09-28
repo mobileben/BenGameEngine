@@ -44,7 +44,9 @@ namespace BGE {
         
         // AnimationChannel
         //  GameObject
+#ifdef NOT_YET
         GameObjectHandle sequenceRootHandle;
+#endif
         
         //  Pointer to meta
         std::vector<GameObjectHandle> channels;

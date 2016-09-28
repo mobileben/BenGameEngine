@@ -55,9 +55,7 @@ BGE::EventHandlerHandle BGE::AnimationService::registerEventHandler(std::string 
     return handle;
 }
 
-void BGE::AnimationService::unregisterEventHandler(EventHandlerHandle handle) {
-    Game::getInstance()->getEventService()->removeEventHandler(handle);
-    
+void BGE::AnimationService::unregisterEventHandler(EventHandlerHandle handle) {    
     // Remove event handle from vector
     for (auto &mapIt : eventHandlers_) {
         auto it = std::find(mapIt.second.begin(), mapIt.second.end(), handle);
@@ -66,6 +64,8 @@ void BGE::AnimationService::unregisterEventHandler(EventHandlerHandle handle) {
             mapIt.second.erase(it);
         }
     }
+
+    Game::getInstance()->getEventService()->removeEventHandler(handle);
 }
 
 void BGE::AnimationService::queueEvent(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, Event event) {

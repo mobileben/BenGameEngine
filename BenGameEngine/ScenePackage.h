@@ -205,7 +205,7 @@ namespace BGE {
     
 #if TARGET_OS_IPHONE
 
-    typedef void (*ObjCGameObjectCreatedHandler)(id, SEL, GameObject *);
+    typedef void (*ObjCGameObjectCreatedHandler)(__weak id, SEL, GameObject *);
 
 #endif /* TARGET_OS_IPHONE */
     
@@ -221,6 +221,16 @@ namespace BGE {
         GameObjectCreatedHandler textCreatedHandler;
         GameObjectCreatedHandler textureMaskCreatedHandler;
         // ANY MODIFICATION OF THIS WILL REQUIRE CHANGES TO Space.cpp
+        
+        void clear() {
+            animationSequenceCreatedHandler  = nullptr;
+            buttonCreatedHandler  = nullptr;
+            maskCreatedHandler  = nullptr;
+            placementCreatedHandler  = nullptr;
+            spriteCreatedHandler  = nullptr;
+            textCreatedHandler  = nullptr;
+            textureMaskCreatedHandler  = nullptr;
+        }
     };
 }
 

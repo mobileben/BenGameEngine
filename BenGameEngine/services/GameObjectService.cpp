@@ -9,6 +9,7 @@
 #include "GameObjectService.h"
 #include "GameObject.h"
 #include "Game.h"
+#include "TransformComponent.h"
 
 BGE::GameObjectService::GameObjectHandleService BGE::GameObjectService::handleService_(InitialGameObjectReserve, HandleServiceNoMaxLimit);
 
@@ -89,6 +90,46 @@ BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(std::string na
     return GameObjectHandle();
 }
 
+void BGE::GameObjectService::getAllChildGameObjects(GameObject *root, std::vector<GameObject *> &objects) {
+    auto xform = root->getComponent<TransformComponent>();
+    
+    if (xform) {
+        auto children = xform->getChildren();
+        
+        for (auto &child : children) {
+            auto object = child->getGameObject();
+            
+            if (object) {
+                objects.push_back(object);
+            }
+            
+            getAllChildGameObjects(object, objects);
+        }
+    }
+}
+
+void BGE::GameObjectService::removeGameObject(GameObject *object) {
+    if (object) {
+        std::vector<GameObject *> objects;
+        
+        getAllChildGameObjects(object, objects);
+        
+        for (auto object : objects) {
+            auto handle = object->getHandle();
+            
+            for (auto it = gameObjects_.begin();it != gameObjects_.end();++it) {
+                if (*it == handle) {
+                    releaseObject(handle);
+                    gameObjects_.erase(it);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+#ifdef NOT_YET
+
 void BGE::GameObjectService::removeGameObject(GameObjectHandle handle) {
     for (auto it = gameObjects_.begin();it != gameObjects_.end();++it) {
         if (*it == handle) {
@@ -98,6 +139,8 @@ void BGE::GameObjectService::removeGameObject(GameObjectHandle handle) {
         }
     }
 }
+
+#endif
 
 void BGE::GameObjectService::removeAllGameObjects() {
     for (auto const &handle : gameObjects_) {

@@ -771,6 +771,10 @@ BGE::GameObjectHandle BGE::Space::handleForGameObject(GameObject *object) const 
 }
 
 void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, uint32_t pushBitmask, CreatedGameObjectVector *objects) const {
+    if (!pushBitmask) {
+        return;
+    }
+    
     if (animSequence && objects) {
         if (pushBitmask & AnimationSequenceComponent::bitmask_) {
             // Animation sequence always pushed first
@@ -835,6 +839,8 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                                             if (pushAnims) {
                                                 objects->push_back(std::make_pair(AnimationSequenceComponent::typeId_, channelObj->getHandle()));
                                             }
+                                            
+                                            addCreatedGameObjectsForAnimSequence(child, pushBitmask, objects);
                                         } else {
                                             assert(false);
                                         }
@@ -850,6 +856,8 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                                     if (pushAnims) {
                                         objects->push_back(std::make_pair(AnimationSequenceComponent::typeId_, channelObj->getHandle()));
                                     }
+                                    
+                                    addCreatedGameObjectsForAnimSequence(channelObj, pushBitmask, objects);
                                 } else {
                                     assert(false);
                                 }
@@ -910,6 +918,10 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
 }
 
 void BGE::Space::addCreatedGameObjectsForButton(GameObject *button, uint32_t pushBitmask, CreatedGameObjectVector *objects) const {
+    if (!pushBitmask) {
+        return;
+    }
+    
     if (button && objects) {
         if (pushBitmask & ButtonComponent::bitmask_) {
             // Button is always pushed first

@@ -104,6 +104,20 @@ void BGE::GameObject::setVisibility(bool visible) {
     }
 }
 
+BGE::GameObject * BGE::GameObject::getParent() {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        auto parentXform = xform->getParent();
+        
+        if (parentXform) {
+            return parentXform->getGameObject();
+        }
+    }
+    
+    return nullptr;
+}
+
 void BGE::GameObject::addChild(GameObjectHandle handle) {
     auto xform = getComponent<TransformComponent>();
     

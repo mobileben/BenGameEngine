@@ -20,7 +20,7 @@ namespace BGE {
     
 #if TARGET_OS_IPHONE
     
-    typedef void (*ObjCLogicComponentFunction)(id, SEL, GameObject *, double);
+    typedef void (*ObjCLogicComponentFunction)(__weak id, SEL, GameObject *, double);
     
 #endif /* TARGET_OS_IPHONE */
 

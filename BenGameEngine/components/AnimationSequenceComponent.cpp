@@ -32,12 +32,14 @@ void BGE::AnimationSequenceComponent::initialize(HandleBackingType handle, Space
     assert(space);
     
     if (space) {
+#ifdef NOT_YET
         auto sequenceRoot = space->createGameObject();
         sequenceRootHandle = sequenceRoot->getHandle();
         
         auto xform = space->createComponent<TransformComponent>();
         sequenceRoot->addComponent(xform);
         sequenceRoot->setActive(true);
+#endif
     }
 }
 
@@ -50,8 +52,11 @@ void BGE::AnimationSequenceComponent::destroy() {
 
     channels.clear();
 
+#ifdef NOT_YET
     space->removeGameObject(sequenceRootHandle);
     sequenceRootHandle = GameObjectHandle();
+#endif
+    
     bounds = nullptr;
 
     frameRate = 0;
@@ -77,16 +82,27 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
     
     NSLog(@"setAnimationSequenceReference");
     
+    auto root = getGameObject();
+#ifdef NOT_YET
     auto sequenceRoot = getSpace()->getGameObject(sequenceRootHandle);
     
     sequenceRoot->setName(animSeqRef.name);
+#endif
     
     // seqRoot xform children need to be purged
+#ifdef NOT_YET
     auto seqXform = sequenceRoot->getComponent<TransformComponent>();
     
     if (seqXform) {
         seqXform->removeAllChildren();
     }
+#else
+    auto seqXform = root->getComponent<TransformComponent>();
+    
+    if (seqXform) {
+        seqXform->removeAllChildren();
+    }
+#endif
     
     AnimationChannelReference *channels = animSeqRef.channels;
     auto space = getSpace();
@@ -124,6 +140,7 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
 void BGE::AnimationSequenceComponent::setGameObjectHandle(GameObjectHandle handle) {
     Component::setGameObjectHandle(handle);
     
+#ifdef NOT_YET
     auto space = getSpace();
     auto gameObject = space->getGameObject(handle);
     auto transformComponent = gameObject->getComponent<TransformComponent>();
@@ -133,5 +150,6 @@ void BGE::AnimationSequenceComponent::setGameObjectHandle(GameObjectHandle handl
         // If there is a transformComponent, then add us to it, if we have
         transformComponent->addChild(sequenceRoot->getComponent<TransformComponent>());
     }
+#endif
 }
 
