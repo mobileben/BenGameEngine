@@ -43,10 +43,6 @@ namespace BGE {
         uint32_t    numBounds;
         
         // AnimationChannel
-        //  GameObject
-#ifdef NOT_YET
-        GameObjectHandle sequenceRootHandle;
-#endif
         
         //  Pointer to meta
         std::vector<GameObjectHandle> channels;
@@ -56,7 +52,6 @@ namespace BGE {
         friend GameObject;
         friend ComponentService;
         
-        void setGameObjectHandle(GameObjectHandle handle) override;
         void initialize(HandleBackingType handle);
     };
 }
