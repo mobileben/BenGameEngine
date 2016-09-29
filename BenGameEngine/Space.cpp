@@ -17,6 +17,7 @@
 #include "TransformComponent.h"
 #include "TextComponent.h"
 #include "PlacementComponent.h"
+#include "FlatRectRenderComponent.h"
 
 BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true) {
 }
@@ -605,6 +606,21 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string insta
     }
     
     return nullptr;
+}
+
+BGE::GameObject *BGE::Space::createFlatRect(std::string instanceName, Vector2 &wh, Color &color) {
+    auto obj = createGameObject(instanceName);
+    auto xform = createComponent<TransformComponent>();
+    auto flat = createComponent<FlatRectRenderComponent>();
+    auto material = Game::getInstance()->getMaterialService()->createMaterial(color);
+    
+    flat->setWidthHeight(wh);
+    flat->setMaterials({material});
+    
+    obj->addComponent(xform);
+    obj->addComponent(flat);
+    
+    return obj;
 }
 
 void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate) {

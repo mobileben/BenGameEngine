@@ -108,6 +108,8 @@ namespace BGE {
         GameObject *createText(std::string name, std::string instanceName, ScenePackageHandle handle);
         GameObject *createPlacement(std::string name, std::string instanceName, ScenePackageHandle handle);
         
+        GameObject *createFlatRect(std::string instanceName, Vector2 &wh, Color &color);
+        
         void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate);
 
         // Font management
