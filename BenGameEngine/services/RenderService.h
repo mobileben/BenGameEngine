@@ -81,6 +81,8 @@ namespace BGE {
         Color getBackgroundColor() const { return backgroundColor_; }
         void setBackgroundColor(Color color) { backgroundColor_ = color; }
         
+        Vector2 getWindowWidthHeight() const;
+        
         virtual std::shared_ptr<ShaderProgram> pushShaderProgram(std::string program) =0;
         virtual std::shared_ptr<ShaderProgram> popShaderProgram() =0;
         

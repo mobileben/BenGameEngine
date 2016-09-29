@@ -45,3 +45,14 @@ void BGE::RenderService::setCoordinateSystem2D(Render2DCoordinateSystem coordSys
     }
 }
 
+BGE::Vector2 BGE::RenderService::getWindowWidthHeight() const {
+    Vector2 wh;
+    auto window = getRenderWindow();
+    
+    wh.w = window->getWidth() * window->getContentScaleFactor();
+    wh.h = window->getHeight() * window->getContentScaleFactor();
+    
+    return wh;
+}
+
+
