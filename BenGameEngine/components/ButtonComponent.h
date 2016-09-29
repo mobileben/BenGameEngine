@@ -60,7 +60,10 @@ namespace BGE {
         void setShowHighlighted(bool show);
         bool isSelected() const;
         void setSelected(bool selected);
+        bool isToggleOn() const;
         void setToggleOn(bool on);
+        bool isToggleable() const;
+        void setToggleable(bool on);
         
         Event handleInput(TouchType type, bool inBounds);
         

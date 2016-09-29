@@ -369,6 +369,10 @@ void BGE::ButtonComponent::setSelected(bool selected) {
     }
 }
 
+bool BGE::ButtonComponent::isToggleOn() const {
+    return toggleOn;
+}
+
 void BGE::ButtonComponent::setToggleOn(bool on) {
     toggleOn = on;
     
@@ -379,6 +383,14 @@ void BGE::ButtonComponent::setToggleOn(bool on) {
             useNormalButton();
         }
     }
+}
+
+bool BGE::ButtonComponent::isToggleable() const {
+    return toggleable;
+}
+
+void BGE::ButtonComponent::setToggleable(bool on) {
+    toggleable = on;
 }
 
 void BGE::ButtonComponent::useHighlightedButton() {
