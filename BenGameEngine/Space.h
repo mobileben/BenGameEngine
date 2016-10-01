@@ -109,6 +109,8 @@ namespace BGE {
         GameObject *createPlacement(std::string name, std::string instanceName, ScenePackageHandle handle);
         
         GameObject *createFlatRect(std::string instanceName, Vector2 &wh, Color &color);
+        GameObject *createSprite(std::string instanceName, TextureHandle texHandle);
+        GameObject *createSprite(std::string instanceName, Texture *texture);
         
         void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate);
 

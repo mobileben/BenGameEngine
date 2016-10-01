@@ -623,6 +623,32 @@ BGE::GameObject *BGE::Space::createFlatRect(std::string instanceName, Vector2 &w
     return obj;
 }
 
+BGE::GameObject *BGE::Space::createSprite(std::string instanceName, TextureHandle texHandle) {
+    auto obj = createGameObject(instanceName);
+    auto xform = createComponent<TransformComponent>();
+    auto sprite = createComponent<SpriteRenderComponent>();
+    
+    sprite->setTextureHandle(texHandle);
+    
+    obj->addComponent(xform);
+    obj->addComponent(sprite);
+    
+    return obj;
+}
+
+BGE::GameObject *BGE::Space::createSprite(std::string instanceName, Texture *texture) {
+    auto obj = createGameObject(instanceName);
+    auto xform = createComponent<TransformComponent>();
+    auto sprite = createComponent<SpriteRenderComponent>();
+
+    sprite->setTexture(texture);
+    
+    obj->addComponent(xform);
+    obj->addComponent(sprite);
+    
+    return obj;
+}
+
 void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
     auto root = getGameObject(rootHandle);
