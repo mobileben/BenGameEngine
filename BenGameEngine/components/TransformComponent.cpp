@@ -83,6 +83,17 @@ void BGE::TransformComponent::updateMatrix() {
     }
 }
 
+BGE::Vector2 BGE::TransformComponent::getGlobalPosition() {
+    Matrix4 mtx;
+    Vector2 results;
+    
+    getMatrix(mtx);
+    
+    Matrix4MultiplyVector2(results, mtx, position_);
+                           
+    return results;
+}
+
 void BGE::TransformComponent::getMatrix(Matrix4 &matrix) {
     if (transformDirty_) {
         updateMatrix();

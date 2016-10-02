@@ -51,6 +51,8 @@ namespace BGE {
         void setPosition(Vector2 &position) { position_ = position; transformDirty_ = true; }
         void setPosition(Vector2 &&position) { position_ = position; transformDirty_ = true; }
         
+        Vector2 getGlobalPosition();
+        
         float getScaleX() const { return scale_.x; }
         float getScaleY() const { return scale_.y; }
         void setScaleX(float x) { scale_.x = x; transformDirty_ = true; }
@@ -67,8 +69,11 @@ namespace BGE {
         Vector2 getSkew() const { return skew_; }
         void setSkew(Vector2 &skew) { skew_ = skew; transformDirty_ = true; }
         
-        float getRotation() const { return rotation_; }
-        void setRotation(float rotation) { rotation_ = rotation; transformDirty_ = true; }
+        float getRotationInDegrees() const { return rotation_ * (180.0/M_PI); }
+        void setRotationInDegrees(float rotation) { rotation_ = rotation * (M_PI/180.0); transformDirty_ = true; }
+
+        float getRotationInRadians() const { return rotation_; }
+        void setRotationInRadians(float rotation) { rotation_ = rotation; transformDirty_ = true; }
         
         // TODO: This should be made so that matrices are exposed. This is to reduce overhead of copies
         void getMatrix(Matrix4 &matrix);
@@ -135,6 +140,7 @@ namespace BGE {
         Vector2         scale_;
         Vector2         skew_;
         
+        // Rotation is in radians
         float           rotation_;
         
         Matrix4         matrix_;
