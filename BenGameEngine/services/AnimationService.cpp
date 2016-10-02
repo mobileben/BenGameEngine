@@ -334,7 +334,7 @@ void BGE::AnimationService::animateChannel(GameObject *gameObj, int32_t frame) {
             // Update our render
             //DOTHESTUFF HERE
             
-            xform->setRotation(keyframe->rotation);
+            xform->setRotationInDegrees(keyframe->rotation);
             
             // If this is a Keyframe reference, update
             if (channel->channel->referenceType == GfxReferenceTypeKeyframe) {

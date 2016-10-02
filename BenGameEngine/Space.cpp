@@ -713,7 +713,7 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
                     xform->setScale(*elem->scale);
                 }
                 
-                xform->setRotation(elem->rotation);
+                xform->setRotationInDegrees(elem->rotation);
                 
                 if (elem->colorMatrix) {
                     

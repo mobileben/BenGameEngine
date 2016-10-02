@@ -666,7 +666,9 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                 auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
                 
                 if (texture) {
+#ifdef NOT_YET
                     NSLog(@"Rendering sprite %s", texture->getName().c_str());
+#endif
                     
                     if (texture && texture->isValid()) {
                         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("ColorMatrixTexture"));

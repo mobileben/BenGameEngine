@@ -111,7 +111,7 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
                                 animator->currKeyframe = ki;
                                 xform->setPosition(*keyframe->position);
                                 xform->setScale(*keyframe->scale);
-                                xform->setRotation(keyframe->rotation);
+                                xform->setRotationInDegrees(keyframe->rotation);
                                 
                                 if (keyframe->colorMatrix) {
                                     if (colorMatrix) {
