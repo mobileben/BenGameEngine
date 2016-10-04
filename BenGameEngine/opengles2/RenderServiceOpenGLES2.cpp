@@ -46,14 +46,50 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0) {
     Matrix4MakeIdentify(projectionMatrix_);
     
     Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this, std::placeholders::_1), 1);
+    
+    // Initialize our mutex
+    pthread_mutexattr_t attr;
+    
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&mutex_, &attr);
 }
 
 void BGE::RenderServiceOpenGLES2::initialize() {}
 void BGE::RenderServiceOpenGLES2::reset() {}
-void BGE::RenderServiceOpenGLES2::enteringBackground() { Service::enteringBackground(); }
-void BGE::RenderServiceOpenGLES2::enteringForeground() { Service::enteringForeground(); }
-void BGE::RenderServiceOpenGLES2::pause() { Service::pause(); }
-void BGE::RenderServiceOpenGLES2::resume() { Service::resume(); }
+
+void BGE::RenderServiceOpenGLES2::enteringBackground() {
+    lock();
+    
+    Service::enteringBackground();
+    
+    unlock();
+}
+
+void BGE::RenderServiceOpenGLES2::enteringForeground() {
+    lock();
+    
+    Service::enteringForeground();
+    
+    unlock();
+}
+
+void BGE::RenderServiceOpenGLES2::pause() {
+    lock();
+    
+    Service::pause();
+    
+    unlock();
+}
+
+void BGE::RenderServiceOpenGLES2::resume() {
+    lock();
+    
+    Service::resume();
+    
+    unlock();
+}
+
 void BGE::RenderServiceOpenGLES2::destroy() {}
 
 size_t BGE::RenderServiceOpenGLES2::totalMemory() const {
@@ -780,7 +816,13 @@ void BGE::RenderServiceOpenGLES2::disableMask(uint8_t maskBits)
 }
 
 void BGE::RenderServiceOpenGLES2::queueRender(double time) {
-    [this->getRenderWindow()->getView() display];
+    lock();
+
+    if (!isBackgrounded()) {
+        [this->getRenderWindow()->getView() display];
+    }
+    
+    unlock();
 }
 
 void BGE::RenderServiceOpenGLES2::updateTransforms() {
@@ -789,6 +831,13 @@ void BGE::RenderServiceOpenGLES2::updateTransforms() {
 
 void BGE::RenderServiceOpenGLES2::render()
 {
+    lock();
+    
+    if (isBackgrounded()) {
+        unlock();
+        return;
+    }
+    
     std::shared_ptr<RenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<RenderContextOpenGLES2>(getRenderContext());
     auto bkgColor = getBackgroundColor();
     
@@ -840,6 +889,8 @@ void BGE::RenderServiceOpenGLES2::render()
         
         [glContext->getContext() presentRenderbuffer:GL_RENDERBUFFER];
     }
+    
+    unlock();
 }
 
 int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool root, bool hasNextSibling) {
@@ -998,5 +1049,13 @@ void BGE::RenderServiceOpenGLES2::transformGameObject(GameObject *gameObj) {
         // Now pop the transform
         popMatrix();
     }
+}
+
+void BGE::RenderServiceOpenGLES2::lock() {
+    pthread_mutex_lock(&mutex_);
+}
+
+void BGE::RenderServiceOpenGLES2::unlock() {
+    pthread_mutex_unlock(&mutex_);
 }
 

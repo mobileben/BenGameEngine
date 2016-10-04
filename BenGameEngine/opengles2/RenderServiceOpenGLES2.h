@@ -70,19 +70,23 @@ namespace BGE {
         
         void render();
         
+        virtual void lock() final;
+        virtual void unlock() final;
+
         // TODO: This will get moved out
         void updateTransforms();
         
         void setGLKTextureInfo(GLKTextureInfo *info) { textureInfo_ = info; }
         
     private:
+        pthread_mutex_t mutex_;
+
         Matrix4 currentMatrix_;
         std::vector<Matrix4> matrixStack_;
         ColorMatrix currentColorMatrix_;
         std::vector<ColorMatrix> colorMatrixStack_;
         ColorTransform currentColorTransform_;
         std::vector<ColorTransform> colorTransformStack_;
-        
         bool texturingEnabled_[MaxTextureUnits];
         uint32_t currentTexture_[MaxTextureUnits];
         
