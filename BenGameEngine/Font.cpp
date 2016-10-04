@@ -489,8 +489,8 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, Color &color
         uint16_t prev = 0;
         
         glBindTexture(tex->getTarget(), tex->getHWTextureId());
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         
         glUniform1i(textureUniform, 0);
         glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
