@@ -260,7 +260,6 @@ void BGE::Game::destroy() {
 }
 
 void BGE::Game::update(double deltaTime) {
-    NSLog(@"delta time %f", deltaTime);
     // TODO: Convert to update
     inputService_->process();
     animationService_->update(deltaTime);
