@@ -15,4 +15,7 @@
 @property (nonatomic, readonly) CADisplayLink *displayLink;
 @property (nonatomic, assign) std::function<void()> tickHandler;
 
+- (void)enteringBackground;
+- (void)enteringForeground;
+
 @end

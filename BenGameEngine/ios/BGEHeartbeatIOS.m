@@ -15,8 +15,7 @@
     self = [super init];
     
     if (self) {
-        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
-        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        [self enteringForeground];
     }
     
     return self;
@@ -26,6 +25,18 @@
 {
     if (self.tickHandler) {
         self.tickHandler();
+    }
+}
+
+- (void)enteringBackground {
+    [_displayLink invalidate];
+    _displayLink = nil;
+}
+
+- (void)enteringForeground {
+    if (!_displayLink) {
+        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
+        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     }
 }
 

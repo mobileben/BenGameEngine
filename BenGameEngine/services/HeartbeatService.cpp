@@ -26,8 +26,18 @@ BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCou
 
 void BGE::HeartbeatService::initialize() {}
 void BGE::HeartbeatService::reset() {}
-void BGE::HeartbeatService::enteringBackground() { Service::enteringBackground(); }
-void BGE::HeartbeatService::enteringForeground() { Service::enteringForeground(); }
+void BGE::HeartbeatService::enteringBackground() {
+    Service::enteringBackground();
+    
+    [iosHeartbeat_ enteringBackground];
+}
+
+void BGE::HeartbeatService::enteringForeground() {
+    Service::enteringForeground();
+    
+    [iosHeartbeat_ enteringForeground];
+}
+
 void BGE::HeartbeatService::pause() { Service::pause(); }
 void BGE::HeartbeatService::resume() { Service::resume(); }
 void BGE::HeartbeatService::destroy() {}
@@ -45,13 +55,9 @@ void BGE::HeartbeatService::tickHandler() {
         
         lastCounter_ = counter_;
         
-        NSLog(@"HERE WITH TICK %f", elapsedTime);
-        
         for (auto const& entry : orderedListeners_) {
             entry.first(elapsedTime);
         }
-//        tick(elapsedTime);
-
     }
 }
 
