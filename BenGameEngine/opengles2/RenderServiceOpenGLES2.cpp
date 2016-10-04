@@ -50,10 +50,10 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0) {
 
 void BGE::RenderServiceOpenGLES2::initialize() {}
 void BGE::RenderServiceOpenGLES2::reset() {}
-void BGE::RenderServiceOpenGLES2::enteringBackground() {}
-void BGE::RenderServiceOpenGLES2::enteringForeground() {}
-void BGE::RenderServiceOpenGLES2::pause() {}
-void BGE::RenderServiceOpenGLES2::resume() {}
+void BGE::RenderServiceOpenGLES2::enteringBackground() { Service::enteringBackground(); }
+void BGE::RenderServiceOpenGLES2::enteringForeground() { Service::enteringForeground(); }
+void BGE::RenderServiceOpenGLES2::pause() { Service::pause(); }
+void BGE::RenderServiceOpenGLES2::resume() { Service::resume(); }
 void BGE::RenderServiceOpenGLES2::destroy() {}
 
 size_t BGE::RenderServiceOpenGLES2::totalMemory() const {
@@ -133,6 +133,7 @@ void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<RenderContext
     if (glContext) {
         window->getView().context = glContext->getContext();
         window->getView().drawableStencilFormat = GLKViewDrawableStencilFormat8;
+//        window->getView().drawableMultisample = GLKViewDrawableMultisample4X;
     }
     
     // Create the ortho matrix
@@ -483,8 +484,8 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(texture->getTarget(), texture->getHWTextureId());
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), &vertices[0]);
@@ -706,8 +707,8 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                         
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(texture->getTarget(), texture->getHWTextureId());
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                         
                         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                               sizeof(VertexTex), &vertices[0]);

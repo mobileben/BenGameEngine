@@ -193,15 +193,67 @@ void BGE::Game::reset() {
 }
 
 void BGE::Game::enteringBackground() {
+    Service::enteringBackground();
+    
+    renderService_->enteringBackground();
+    textureService_->enteringBackground();
+    fontService_->enteringBackground();
+    heartbeatService_->enteringBackground();
+    materialService_->enteringBackground();
+    scenePackageService_->enteringBackground();
+    animationService_->enteringBackground();
+    spaceService_->enteringBackground();
+    inputService_->enteringBackground();
+    logicService_->enteringBackground();
+    eventService_->enteringBackground();
 }
 
 void BGE::Game::enteringForeground() {
+    Service::enteringForeground();
+    
+    renderService_->enteringForeground();
+    textureService_->enteringForeground();
+    fontService_->enteringForeground();
+    heartbeatService_->enteringForeground();
+    materialService_->enteringForeground();
+    scenePackageService_->enteringForeground();
+    animationService_->enteringForeground();
+    spaceService_->enteringForeground();
+    inputService_->enteringForeground();
+    logicService_->enteringForeground();
+    eventService_->enteringForeground();
 }
 
 void BGE::Game::pause() {
+    Service::pause();
+    
+    renderService_->pause();
+    textureService_->pause();
+    fontService_->pause();
+    heartbeatService_->pause();
+    materialService_->pause();
+    scenePackageService_->pause();
+    animationService_->pause();
+    spaceService_->pause();
+    inputService_->pause();
+    logicService_->pause();
+    eventService_->pause();
 }
 
 void BGE::Game::resume() {
+    Service::resume();
+    
+    renderService_->resume();
+    textureService_->resume();
+    fontService_->resume();
+    heartbeatService_->resume();
+    materialService_->resume();
+    scenePackageService_->resume();
+    animationService_->resume();
+    spaceService_->resume();
+    inputService_->resume();
+    logicService_->resume();
+    eventService_->resume();
 }
 
 void BGE::Game::destroy() {

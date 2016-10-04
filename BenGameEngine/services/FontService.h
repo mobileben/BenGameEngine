@@ -34,10 +34,10 @@ namespace BGE {
         
         void initialize() final {}
         void reset() final {}
-        void enteringBackground() final {}
-        void enteringForeground() final {}
-        void pause() final {}
-        void resume() final {}
+        void enteringBackground() final { Service::enteringBackground(); }
+        void enteringForeground() final { Service::enteringForeground(); }
+        void pause() final { Service::pause(); }
+        void resume() final { Service::resume(); }
         void destroy() final {}
         void update(double deltaTime) final {}
 

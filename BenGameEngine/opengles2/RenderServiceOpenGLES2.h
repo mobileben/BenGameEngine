@@ -30,14 +30,14 @@ namespace BGE {
         
         RenderServiceOpenGLES2();
         
-        virtual void initialize();
-        virtual void reset();
-        virtual void enteringBackground();
-        virtual void enteringForeground();
-        virtual void pause();
-        virtual void resume();
-        virtual void destroy();
-        void update(double deltaTime) {}
+        virtual void initialize() final;
+        virtual void reset() final;
+        virtual void enteringBackground() final;
+        virtual void enteringForeground() final;
+        virtual void pause() final;
+        virtual void resume() final;
+        virtual void destroy() final;
+        void update(double deltaTime) final {}
 
         static int8_t MaxActiveMasks;
         

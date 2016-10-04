@@ -23,10 +23,10 @@ namespace BGE {
         
         virtual void initialize() {}
         virtual void reset() {}
-        virtual void enteringBackground() {}
-        virtual void enteringForeground() {}
-        virtual void pause() {}
-        virtual void resume() {}
+        virtual void enteringBackground() { Service::enteringBackground(); }
+        virtual void enteringForeground() { Service::enteringForeground(); }
+        virtual void pause() { Service::pause(); }
+        virtual void resume() { Service::resume(); }
         virtual void destroy() {}
         void update(double deltaTime) {}
 

@@ -13,10 +13,10 @@ BGE::MaterialService::MaterialService() :  handleService_(InitialMaterialReserve
 
 void BGE::MaterialService::initialize() {}
 void BGE::MaterialService::reset() {}
-void BGE::MaterialService::enteringBackground() {}
-void BGE::MaterialService::enteringForeground() {}
-void BGE::MaterialService::pause() {}
-void BGE::MaterialService::resume() {}
+void BGE::MaterialService::enteringBackground() { Service::enteringBackground(); }
+void BGE::MaterialService::enteringForeground() { Service::enteringForeground(); }
+void BGE::MaterialService::pause() { Service::pause(); }
+void BGE::MaterialService::resume() { Service::resume(); }
 void BGE::MaterialService::destroy() {}
 
 BGE::MaterialHandle BGE::MaterialService::createMaterial(Color& color) {

@@ -17,15 +17,16 @@ namespace BGE {
     class Service
     {
     public:
-        Service() : identifier_(1) {}
+        Service() : identifier_(1), backgrounded_(false), paused_(false) {}
+        
         virtual ~Service() {}
         
         virtual void initialize() =0;
         virtual void reset() =0;
-        virtual void enteringBackground() =0;
-        virtual void enteringForeground() =0;
-        virtual void pause() =0;
-        virtual void resume() =0;
+        virtual void enteringBackground() { backgrounded_ = true; };
+        virtual void enteringForeground() { backgrounded_ = false; };
+        virtual void pause() { paused_ = true; };
+        virtual void resume() { paused_ = false; };
         virtual void destroy() =0;
         virtual void update(double deltaTime) =0;
         
@@ -64,11 +65,17 @@ namespace BGE {
         virtual void outputResourceBreakdown(uint32_t numTabs) const {};
         virtual void outputMemoryBreakdown(uint32_t numTabs) const {};
         
+        bool isBackgrounded() const { return backgrounded_; }
+        bool isPaused() const { return paused_; }
+        
     protected:
         ObjectId getIdAndIncrement();
         
     private:
         std::atomic<ObjectId>   identifier_;
+        
+        bool                    backgrounded_;
+        bool                    paused_;
     };
 }
 
