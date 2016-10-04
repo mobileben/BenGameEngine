@@ -36,10 +36,19 @@ void BGE::HeartbeatService::enteringForeground() {
     Service::enteringForeground();
     
     [iosHeartbeat_ enteringForeground];
+    
+    // Get our lastCounter to a good time so we don't get a huge jump in time
+    lastCounter_ = mach_absolute_time();
 }
 
-void BGE::HeartbeatService::pause() { Service::pause(); }
-void BGE::HeartbeatService::resume() { Service::resume(); }
+void BGE::HeartbeatService::pause() {
+    Service::pause();
+}
+
+void BGE::HeartbeatService::resume() {
+    Service::resume();
+}
+
 void BGE::HeartbeatService::destroy() {}
 
 void BGE::HeartbeatService::setRunning(bool running) {
@@ -47,7 +56,7 @@ void BGE::HeartbeatService::setRunning(bool running) {
 }
 
 void BGE::HeartbeatService::tickHandler() {
-    if (running_) {
+    if (!isBackgrounded() && running_) {
         counter_ = mach_absolute_time();
         
         double delta = counter_ - lastCounter_;
