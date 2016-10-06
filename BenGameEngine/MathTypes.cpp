@@ -458,11 +458,11 @@ namespace BGE {
         float s = sinf(radians);
         
         matrix.m[0] = c;
-        matrix.m[1] = s;
+        matrix.m[1] = -s;
         matrix.m[2] = 0;
         matrix.m[3] = 0;
         
-        matrix.m[4] = -s;
+        matrix.m[4] = s;
         matrix.m[5] = c;
         matrix.m[6] = 0;
         matrix.m[7] = 0;
