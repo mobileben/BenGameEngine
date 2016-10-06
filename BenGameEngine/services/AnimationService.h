@@ -20,6 +20,8 @@
 #include "Event.h"
 
 namespace BGE {
+    class Space;
+    
     class AnimationService : public Service
     {
     public:
@@ -37,6 +39,7 @@ namespace BGE {
         
         EventHandlerHandle registerEventHandler(std::string name, Event event, EventHandlerFunction function);
         void unregisterEventHandler(EventHandlerHandle handle);
+        void spaceReset(Space *space);
         
     private:
         struct AnimationEvent {

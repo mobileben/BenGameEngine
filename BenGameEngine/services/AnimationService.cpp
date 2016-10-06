@@ -21,13 +21,15 @@
 #include "LineRenderComponent.h"
 
 void BGE::AnimationService::update(double deltaTime) {
+    lock();
+    
     float dt = (float)deltaTime;
 
     // For all the spaces
     for (auto handle : Game::getInstance()->getSpaceService()->getSpaces()) {
         auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
         
-        if (space) {
+        if (space && space->isVisible()) {
             for (auto const &handle : space->getGameObjects()) {
                 auto obj = space->getGameObject(handle);
                 
@@ -44,6 +46,9 @@ void BGE::AnimationService::update(double deltaTime) {
     }
     
     processEvents();
+    
+    // TODO: Does unlocking happen before processing events?
+    unlock();
 }
 
 BGE::EventHandlerHandle BGE::AnimationService::registerEventHandler(std::string name, Event event, EventHandlerFunction function) {
@@ -66,6 +71,29 @@ void BGE::AnimationService::unregisterEventHandler(EventHandlerHandle handle) {
     }
 
     Game::getInstance()->getEventService()->removeEventHandler(handle);
+}
+
+void BGE::AnimationService::spaceReset(Space *space) {
+    lock();
+    
+    auto eventService = Game::getInstance()->getEventService();
+    auto spaceHandle = space->getHandle();
+    
+    for (auto &mapIt : eventHandlers_) {
+        for (auto hIt=mapIt.second.begin();hIt!=mapIt.second.end();) {
+            auto handle = *hIt;
+            auto handler = eventService->getEventHandler(handle);
+            
+            if (handler->spaceHandle == spaceHandle) {
+                eventService->removeEventHandler(handle);
+                hIt = mapIt.second.erase(hIt);
+            } else {
+                hIt++;
+            }
+        }
+    }
+    
+    unlock();
 }
 
 void BGE::AnimationService::queueEvent(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, Event event) {

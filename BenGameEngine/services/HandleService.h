@@ -96,6 +96,10 @@ namespace BGE {
             
             auto index = handle.getIndex();
             
+            if (magic_[index] == 0) {
+                return;
+            }
+            
 #if UNIT_TESTING
             if (index >= data_.size()) {
                 std::exception();

@@ -88,10 +88,6 @@ namespace BGE {
         
         virtual void render() =0;
         
-        // Synchronization
-        virtual void lock() {}
-        virtual void unlock() {}
-        
     protected:
         std::shared_ptr<RenderContext> renderContext_;
         std::shared_ptr<RenderWindow> renderWindow_;

@@ -17,6 +17,7 @@
 
 namespace BGE {
     class GameObject;
+    class Space;
     
     class LogicService : public Service {
     public:
@@ -34,6 +35,7 @@ namespace BGE {
         
         void addGameObject(GameObject *gameObject);
         void removeGameObject(GameObject *gameObject);
+        void spaceReset(Space *space);
         
     private:
         std::vector<std::pair<SpaceHandle, GameObjectHandle>> gameObjectHandles_;

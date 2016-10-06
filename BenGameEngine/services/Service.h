@@ -10,6 +10,7 @@
 #define BGEService_h
 
 #include <stdio.h>
+#include <pthread.h>
 #include <atomic>
 #include "Object.h"
 
@@ -17,7 +18,7 @@ namespace BGE {
     class Service
     {
     public:
-        Service() : identifier_(1), backgrounded_(false), paused_(false) {}
+        Service();
         
         virtual ~Service() {}
         
@@ -68,10 +69,16 @@ namespace BGE {
         bool isBackgrounded() const { return backgrounded_; }
         bool isPaused() const { return paused_; }
         
+        // Synchronization
+        void lock();
+        void unlock();
+
     protected:
         ObjectId getIdAndIncrement();
         
     private:
+        pthread_mutex_t mutex_;
+        
         std::atomic<ObjectId>   identifier_;
         
         bool                    backgrounded_;

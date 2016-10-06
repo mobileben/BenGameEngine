@@ -55,3 +55,7 @@ void BGE::LogicService::removeGameObject(GameObject *gameObject) {
         gameObjectHandles_.erase(it);
     }
 }
+
+void BGE::LogicService::spaceReset(Space *space) {
+    
+}

@@ -46,13 +46,6 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0) {
     Matrix4MakeIdentify(projectionMatrix_);
     
     Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this, std::placeholders::_1), 1);
-    
-    // Initialize our mutex
-    pthread_mutexattr_t attr;
-    
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init(&mutex_, &attr);
 }
 
 void BGE::RenderServiceOpenGLES2::initialize() {}
@@ -832,7 +825,7 @@ void BGE::RenderServiceOpenGLES2::updateTransforms() {
 void BGE::RenderServiceOpenGLES2::render()
 {
     lock();
-    
+ 
     if (isBackgrounded()) {
         unlock();
         return;
@@ -1049,13 +1042,5 @@ void BGE::RenderServiceOpenGLES2::transformGameObject(GameObject *gameObj) {
         // Now pop the transform
         popMatrix();
     }
-}
-
-void BGE::RenderServiceOpenGLES2::lock() {
-    pthread_mutex_lock(&mutex_);
-}
-
-void BGE::RenderServiceOpenGLES2::unlock() {
-    pthread_mutex_unlock(&mutex_);
 }
 

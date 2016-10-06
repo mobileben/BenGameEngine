@@ -51,9 +51,14 @@ void BGE::Space::destroy() {
 }
 
 void BGE::Space::reset() {
+    BGE::Game::getInstance()->getRenderService()->lock();
+    
     visible_ = false;
     updatable_ = false;
-    
+
+    // Remove any events associated with space
+    BGE::Game::getInstance()->getAnimationService()->spaceReset(this);
+
     // Destroy all scenePackages
     auto packageService = Game::getInstance()->getScenePackageService();
     
@@ -92,7 +97,12 @@ void BGE::Space::reset() {
         textureService->removeTexture(spaceHandle_, texture);
     }
     
+    // Remove any outstanding events
+    
     textures_.clear();
+    
+    
+    BGE::Game::getInstance()->getRenderService()->unlock();
 }
 
 uint32_t BGE::Space::handlerBitmaskForSceneObjectCreatedDelegate(SceneObjectCreatedDelegate *delegate) {

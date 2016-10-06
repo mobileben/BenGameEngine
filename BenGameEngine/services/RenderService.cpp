@@ -9,8 +9,7 @@
 #include "RenderService.h"
 #include "FontService.h"
 
-BGE::RenderService::RenderService() : ready_(false), backgroundColor_({0, 0, 0, 1})
-{
+BGE::RenderService::RenderService() : ready_(false), backgroundColor_({0, 0, 0, 1}) {
 }
 
 void BGE::RenderService::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)
@@ -54,5 +53,4 @@ BGE::Vector2 BGE::RenderService::getWindowWidthHeight() const {
     
     return wh;
 }
-
 
