@@ -311,14 +311,16 @@ void BGE::Texture::createFromBuffer(void *buffer, TextureFormat format, uint32_t
 
 std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated) {
     std::shared_ptr<Error> error;
-    
+
+    // Must tag as sub-texture up front so we don't falsely release texture
+    isSubTexture_ = true;
+
     if (atlas && width != 0 && height != 0) {
         if (atlas) {
             atlasHandle_ = atlas->getHandle();
             valid_ = true;
             format_ = atlas->getFormat();
             alphaState_ = atlas->getAlphaState();
-            isSubTexture_ = true;
             
             x_ = x;
             y_ = y;
@@ -363,9 +365,6 @@ void BGE::Texture::createTextureFromAlphaBuffer(unsigned char *buffer, uint32_t 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, buffer);
-        
-        
-        glBindTexture(GL_TEXTURE_2D, 0);
         
         GLenum glErr = glGetError();
         
