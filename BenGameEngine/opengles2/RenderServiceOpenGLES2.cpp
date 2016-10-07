@@ -818,10 +818,6 @@ void BGE::RenderServiceOpenGLES2::queueRender(double time) {
     unlock();
 }
 
-void BGE::RenderServiceOpenGLES2::updateTransforms() {
-    
-}
-
 void BGE::RenderServiceOpenGLES2::render()
 {
     lock();
@@ -864,7 +860,6 @@ void BGE::RenderServiceOpenGLES2::render()
         glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth() * this->getRenderWindow()->getContentScaleFactor(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight() * this->getRenderWindow()->getContentScaleFactor());
         
         std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
-        
         
         for (auto const &handle : spaceHandles) {
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);

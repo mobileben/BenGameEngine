@@ -70,9 +70,6 @@ namespace BGE {
         
         void render();
         
-        // TODO: This will get moved out
-        void updateTransforms();
-        
         void setGLKTextureInfo(GLKTextureInfo *info) { textureInfo_ = info; }
         
     private:
