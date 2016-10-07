@@ -32,10 +32,13 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name) {
     spaceHandle_ = handle;
     setName(name);
 
+    // By default, spaces are not active or visible or updatable
+    active_ = false;
     visible_ = false;
+    updatable_ = false;
+
     order_ = 0;
-    updatable_ = true;
-    
+
     gameObjectService_ = std::make_shared<GameObjectService>();
     gameObjectService_->setSpaceHandle(spaceHandle_);
     
@@ -52,7 +55,9 @@ void BGE::Space::destroy() {
 
 void BGE::Space::reset() {
     BGE::Game::getInstance()->getRenderService()->lock();
-    
+
+    // Turn everything off just in case this object is still accessible
+    visible_ = false;
     visible_ = false;
     updatable_ = false;
 

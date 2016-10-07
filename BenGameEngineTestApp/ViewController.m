@@ -158,6 +158,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
         space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, &delegate);
         
         // Spaces are not visible by default
+        space->setActive(true);
         space->setVisible(true);
         BGE::Game::getInstance()->outputResourceBreakdown();
     });
@@ -337,6 +338,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
                 space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, &delegate);
                 
                 // Spaces are not visible by default
+                space->setActive(true);
                 space->setVisible(true);
                 BGE::Game::getInstance()->outputResourceBreakdown();
                 BGE::Game::getInstance()->outputMemoryBreakdown();
@@ -347,6 +349,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
         } else if (strongSelf.stage == 3) {
             auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(strongSelf.spaceHandle);
             
+            space->setActive(false);
             space->setVisible(false);
             
             BGE::Game::getInstance()->getSpaceService()->removeSpace(strongSelf.spaceHandle);

@@ -88,12 +88,17 @@ namespace BGE {
             componentService_->removeAllComponents<T>();
         }
 
-        inline bool isVisible() const { return visible_; }
+        inline bool isActive() const { return active_; }
+        inline void setActive(bool active) { active_ = active; }
+        
+        inline bool isVisible() const { return active_ && visible_; }
         inline void setVisible(bool visible) { visible_ = visible; }
-        inline uint32_t getOrder() const { return order_; }
-        inline void setOrder(uint32_t order) { order_ = order; }
+
         inline bool isUpdatable() const { return updatable_; }
         inline void setUpdatable(bool updatable) { updatable_ = updatable; }
+        
+        inline uint32_t getOrder() const { return order_; }
+        inline void setOrder(uint32_t order) { order_ = order; }
         
         void linkAll();
         
@@ -149,10 +154,12 @@ namespace BGE {
         std::vector<FontHandle>             fonts_;
         std::vector<TextureHandle>          textures_;
         std::vector<TextureAtlasHandle>     textureAtlases_;
+
+        bool        active_;    // Active
+        bool        visible_;   // Space can be rendered
+        bool        updatable_; // Objects in space can be updated
         
-        bool        visible_;
         uint32_t    order_;
-        bool        updatable_;
         
         static uint32_t handlerBitmaskForSceneObjectCreatedDelegate(SceneObjectCreatedDelegate *delegate);
         
