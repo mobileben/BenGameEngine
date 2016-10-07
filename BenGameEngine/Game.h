@@ -64,6 +64,8 @@ namespace BGE {
         bool isPaused() const { return paused_; }
         void setPaused(bool paused);
         
+        void updateTransforms();
+        
         void spaceReset(Space *space);
         
         void outputResourceUsage() const;

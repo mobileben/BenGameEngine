@@ -94,10 +94,14 @@ void BGE::InputService::touchEventCancel(NSSet* touches, UIView* view) {
 }
 
 BGE::EventHandlerHandle BGE::InputService::registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function) {
+    lock();
+    
     auto handle = eventService_->createEventHandlerHandle(gameObj, event, function);
     std::vector<EventHandlerHandle> &v = inputEventHandlers_[event];
     
     v.push_back(handle);
+    
+    unlock();
     
     return handle;
 }
@@ -106,6 +110,8 @@ void BGE::InputService::unregisterEventHandler(EventHandlerHandle handle) {
     if (handle.isNull()) {
         return;
     }
+    
+    lock();
     
     // Remove event handle from vector
     for (auto &mapIt : inputEventHandlers_) {
@@ -117,6 +123,8 @@ void BGE::InputService::unregisterEventHandler(EventHandlerHandle handle) {
             break;
         }
     }
+    
+    unlock();
 }
 
 void BGE::InputService::spaceReset(Space *space) {
@@ -146,7 +154,7 @@ void BGE::InputService::spaceReset(Space *space) {
     unlock();
 }
 
-void BGE::InputService::process() {
+void BGE::InputService::update(double deltaTime) {
     lock();
     
     // Sort inputs

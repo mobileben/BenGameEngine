@@ -67,14 +67,12 @@ namespace BGE {
         void pause() final { Service::pause(); }
         void resume() final { Service::resume(); }
         void destroy() final {}
-        void update(double deltaTime) final {}
+        void update(double deltaTime) final;
         
         void touchEventDown(NSSet* touches, UIView* view);
         void touchEventUp(NSSet* touches, UIView* view);
         void touchEventMove(NSSet* touches, UIView* view);
         void touchEventCancel(NSSet* touches, UIView* view);
-
-        void process();
         
         EventHandlerHandle registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function);
         void unregisterEventHandler(EventHandlerHandle handle);

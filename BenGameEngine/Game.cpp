@@ -267,12 +267,16 @@ void BGE::Game::spaceReset(Space *space) {
 }
 
 void BGE::Game::update(double deltaTime) {
-    // TODO: Convert to update
-    inputService_->process();
-    animationService_->update(deltaTime);
-    logicService_->update(deltaTime);
+    // Physics here
     
-    // Now handle logic
+    // Input
+    inputService_->update(deltaTime);
+
+    // Updating
+    logicService_->update(deltaTime);
+    animationService_->update(deltaTime);
+    
+    // Update transforms
 }
 
 void BGE::Game::outputResourceUsage() const {
