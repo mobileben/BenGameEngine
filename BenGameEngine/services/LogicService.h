@@ -38,7 +38,27 @@ namespace BGE {
         void spaceReset(Space *space);
         
     private:
-        std::vector<std::pair<SpaceHandle, GameObjectHandle>> gameObjectHandles_;
+        enum class Operation : uint32_t {
+            None = 0,
+            Add,
+            Remove
+        };
+        
+        struct LogicElement {
+            Operation           op;
+            SpaceHandle         spaceHandle;
+            GameObjectHandle    gameObjHandle;
+        };
+        
+        pthread_mutex_t                                         addRemoveMutex_;
+        pthread_mutex_t                                         executeMutex_;
+        std::vector<std::pair<SpaceHandle, GameObjectHandle>>   gameObjectHandles_;
+        std::vector<LogicElement>                               addRemoveQueue_;
+        
+        void addRemoveLock();
+        void addRemoveUnlock();
+        void executeLock();
+        void executeUnlock();
     };
 }
 
