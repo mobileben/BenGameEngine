@@ -41,8 +41,10 @@ void BGE::AnimationChannelComponent::updateReference() {
         
         // Now setup the proper render component
         
+#ifdef NOT_YET
         // TODO: Do we do this later?
         NSLog(@"Channel reference %s/%d", this->channel->reference, this->channel->referenceType);
+#endif
         switch (this->channel->referenceType) {
             case GfxReferenceTypeSprite: {
                 auto sprite = space->createComponent<SpriteRenderComponent>();
@@ -70,7 +72,9 @@ void BGE::AnimationChannelComponent::updateReference() {
                 break;
                 
             case GfxReferenceTypeAnimationSequence: {
+#ifdef NOT_YET
                 NSLog(@"WHY");
+#endif
             }
                 break;
                 
@@ -86,7 +90,9 @@ void BGE::AnimationChannelComponent::updateReference() {
             case GfxReferenceTypeKeyframe: {
                 // Keyframe needs to be filled out later
                 //auto seq =
+#ifdef NOT_YET
                 NSLog(@"HERE");
+#endif
             }
                 break;
                 
@@ -124,10 +130,12 @@ void BGE::AnimationChannelComponent::updateReference() {
                 break;
         }
     } else {
+#ifdef NOT_YET
         if (this->channel) {
             NSLog(@"You fail %lx %lx %lx", (unsigned long) gameObj, (unsigned long) this->channel, (unsigned long) this->channel->referenceData);
         } else {
             NSLog(@"You fail %lx", (unsigned long)  gameObj);
         }
+#endif
     }
 }
