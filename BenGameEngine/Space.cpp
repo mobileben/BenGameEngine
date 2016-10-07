@@ -56,9 +56,9 @@ void BGE::Space::reset() {
     visible_ = false;
     updatable_ = false;
 
-    // Remove any events associated with space
-    BGE::Game::getInstance()->getAnimationService()->spaceReset(this);
-
+    // We forcibly remove any handlers. The game should play nice and do the clean up themselves.
+    BGE::Game::getInstance()->spaceReset(this);
+    
     // Destroy all scenePackages
     auto packageService = Game::getInstance()->getScenePackageService();
     

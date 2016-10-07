@@ -50,7 +50,6 @@ namespace BGE {
         std::shared_ptr<FontService> getFontService() { return fontService_; }
         std::shared_ptr<InputService> getInputService() { return inputService_; }
         std::shared_ptr<LogicService> getLogicService() { return logicService_; }
-        std::shared_ptr<EventService> getEventService() { return eventService_ ; }
         
         // Service functions
         void initialize() override;
@@ -64,6 +63,8 @@ namespace BGE {
         
         bool isPaused() const { return paused_; }
         void setPaused(bool paused);
+        
+        void spaceReset(Space *space);
         
         void outputResourceUsage() const;
         void outputMemoryUsage() const;
@@ -109,7 +110,7 @@ namespace BGE {
         std::shared_ptr<InputService>           inputService_;
         std::shared_ptr<LogicService>           logicService_;
         std::shared_ptr<EventService>           eventService_;
-        
+
     private:
         struct AnyToString {
             enum class type {

@@ -15,12 +15,15 @@
 #include "HandleService.h"
 
 namespace BGE {
+    class GameObject;
+    class Space;
+    
     class EventService : public Service {
     public:
         EventService();
         ~EventService() {}
         
-        EventHandlerHandle createEventHandlerHandle(std::string name, Event event, EventHandlerFunction function);
+        EventHandlerHandle createEventHandlerHandle(GameObject *gameObj, Event event, EventHandlerFunction function);
         
         EventHandler *getEventHandler(EventHandlerHandle handle) const;
         
@@ -34,6 +37,8 @@ namespace BGE {
         void resume() final { Service::resume(); }
         void destroy() final {}
         void update(double deltaTime) final {}
+        
+        void spaceReset(Space *space);
         
     protected:
         

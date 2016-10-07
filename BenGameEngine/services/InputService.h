@@ -50,12 +50,14 @@ struct std::hash<BGE::InputTouchHandlerKey> {
 };
 
 namespace BGE {
-    class GameObject;
     class ButtonComponent;
+    class EventService;
+    class GameObject;
+    class Space;
     
     class InputService : public Service {
     public:
-        InputService();
+        InputService(std::shared_ptr<EventService>);
         ~InputService() {}
         
         void initialize() final {}
@@ -74,10 +76,13 @@ namespace BGE {
 
         void process();
         
-        EventHandlerHandle registerEventHandler(std::string name, Event event, EventHandlerFunction function);
+        EventHandlerHandle registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function);
         void unregisterEventHandler(EventHandlerHandle handle);
-        
+        void spaceReset(Space *space);
+
     private:
+        InputService() = delete;
+        
         struct InputButtonHandler {
             SpaceHandle                         spaceHandle;
             GameObjectHandle                    gameObjHandle;
@@ -98,6 +103,7 @@ namespace BGE {
         using InputVector = std::vector<Input *>;
         
         InputHandleService                                                                  handleService_;
+        std::shared_ptr<EventService>                                                       eventService_;
         InputVector                                                                         inputs_;
         std::vector<InputButtonHandler>                                                     inputButtonHandlers_;
         std::unordered_map<Event, std::vector<EventHandlerHandle>>                          inputEventHandlers_;

@@ -57,5 +57,17 @@ void BGE::LogicService::removeGameObject(GameObject *gameObject) {
 }
 
 void BGE::LogicService::spaceReset(Space *space) {
+    auto spaceHandle = space->getHandle();
     
+    for (auto it=gameObjectHandles_.begin();it!=gameObjectHandles_.end();) {
+        if (it->first == spaceHandle) {
+#if DEBUG
+            auto gameObj = space->getGameObject(it->second);
+            printf("WARNING: removing logic handler for space %s, gameObj %s\n", space->getName().c_str(), gameObj->getName().c_str());
+#endif
+            it = gameObjectHandles_.erase(it);
+        } else {
+            it++;
+        }
+    }
 }

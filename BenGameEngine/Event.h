@@ -48,30 +48,30 @@ struct std::hash<BGE::Event> {
 namespace BGE {
     class GameObject;
 
-    using EventHandlerFunction = std::function<void(SpaceHandle, GameObjectHandle, Event)>;
+    using EventHandlerFunction = std::function<void(GameObject *, Event)>;
 #if TARGET_OS_IPHONE
     
-    typedef void (*ObjCGameObjectEventHandlerFunction)(__weak id, SEL, SpaceHandle, GameObjectHandle, Event);
+    typedef void (*ObjCGameObjectEventHandlerFunction)(__weak id, SEL, GameObject *, Event);
     
 #endif /* TARGET_OS_IPHONE */
 
-    struct EventHandler : public NamedObject {
+    struct EventHandler : public Object {
         EventHandlerHandle          handle;
         SpaceHandle                 spaceHandle;
         GameObjectHandle            gameObjHandle;
         Event                       event;
         EventHandlerFunction        handler;
         
-        EventHandler() : NamedObject() {
+        EventHandler() : Object() {
         }
         
-        EventHandler(ObjectId objId) : NamedObject(objId) {
+        EventHandler(ObjectId objId) : Object(objId) {
         }
         
-        void initialize(EventHandlerHandle handle, std::string name, Event event, EventHandlerFunction function) { this->handle = handle; this->setName(name); this->event = event; this->handler = function; }
+        void initialize(EventHandlerHandle handle, SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, Event event, EventHandlerFunction function) { this->handle = handle; this->spaceHandle = spaceHandle; this->gameObjHandle = gameObjHandle; this->event = event; this->handler = function; }
         void destroy() {
             handle = EventHandlerHandle();
-            spaceHandle = SpaceHandle();
+            spaceHandle  = SpaceHandle();
             gameObjHandle = GameObjectHandle();
             event = Event::None;
             handler = nullptr;

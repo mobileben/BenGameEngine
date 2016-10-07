@@ -1,4 +1,4 @@
-//
+icser//
 //  InputService.cpp
 //  BenGameEngine
 //
@@ -12,8 +12,9 @@
 #include "ButtonComponent.h"
 #include "TransformComponent.h"
 #include "BoundingBoxComponent.h"
+#include "Space.h"
 
-BGE::InputService::InputService() :  handleService_(InitialInputReserve, HandleServiceNoMaxLimit) {
+BGE::InputService::InputService(std::shared_ptr<EventService> eventService) : handleService_(InitialInputReserve, HandleServiceNoMaxLimit), eventService_(eventService) {
     inputs_.reserve(InitialInputReserve);
 }
 
@@ -29,10 +30,11 @@ BGE::Input *BGE::InputService::createInput() {
 }
 
 void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view) {
+    lock();
+    
     auto scale = [[UIScreen mainScreen] scale];
 
-    for (UITouch *touch in touches)
-    {
+    for (UITouch *touch in touches) {
         Input *input = createInput();
         
         auto p = [touch locationInView:view];
@@ -71,6 +73,8 @@ void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view)
         NSLog(@"XXXXX Touch %f %f", input->x, input->y);
         inputs_.push_back(input);
     }
+    
+    unlock();
 }
 
 void BGE::InputService::touchEventDown(NSSet* touches, UIView* view) {
@@ -89,8 +93,8 @@ void BGE::InputService::touchEventCancel(NSSet* touches, UIView* view) {
     touchEvent(TouchType::Cancel, touches, view);
 }
 
-BGE::EventHandlerHandle BGE::InputService::registerEventHandler(std::string name, Event event, EventHandlerFunction function) {
-    auto handle = Game::getInstance()->getEventService()->createEventHandlerHandle(name, event, function);
+BGE::EventHandlerHandle BGE::InputService::registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function) {
+    auto handle = eventService_->createEventHandlerHandle(gameObj, event, function);
     std::vector<EventHandlerHandle> &v = inputEventHandlers_[event];
     
     v.push_back(handle);
@@ -99,19 +103,52 @@ BGE::EventHandlerHandle BGE::InputService::registerEventHandler(std::string name
 }
 
 void BGE::InputService::unregisterEventHandler(EventHandlerHandle handle) {
+    if (handle.isNull()) {
+        return;
+    }
+    
     // Remove event handle from vector
     for (auto &mapIt : inputEventHandlers_) {
         auto it = std::find(mapIt.second.begin(), mapIt.second.end(), handle);
         
         if (it != mapIt.second.end()) {
             mapIt.second.erase(it);
+            eventService_->removeEventHandler(handle);
+            break;
+        }
+    }
+}
+
+void BGE::InputService::spaceReset(Space *space) {
+    lock();
+    
+    auto eventService = eventService_;
+    auto spaceHandle = space->getHandle();
+    
+    for (auto &mapIt : inputEventHandlers_) {
+        for (auto hIt=mapIt.second.begin();hIt!=mapIt.second.end();) {
+            auto handle = *hIt;
+            auto handler = eventService->getEventHandler(handle);
+            
+            if (handler->spaceHandle == spaceHandle) {
+#if DEBUG
+                auto gameObj = space->getGameObject(handler->gameObjHandle);
+                printf("WARNING: removing input handler for space %s, gameObj %s\n", space->getName().c_str(), gameObj->getName().c_str());
+#endif
+                hIt = mapIt.second.erase(hIt);
+                eventService->removeEventHandler(handle);
+            } else {
+                hIt++;
+            }
         }
     }
     
-    Game::getInstance()->getEventService()->removeEventHandler(handle);
+    unlock();
 }
 
 void BGE::InputService::process() {
+    lock();
+    
     // Sort inputs
     std::sort(inputs_.begin(), inputs_.end());
     
@@ -198,7 +235,7 @@ void BGE::InputService::process() {
     
     inputs_.clear();
     
-    auto eventService = Game::getInstance()->getEventService();
+    auto eventService = eventService_;
     
     for (auto const &buttonHandler : inputButtonHandlers_) {
         auto space = Game::getInstance()->getSpaceService()->getSpace(buttonHandler.spaceHandle);
@@ -212,22 +249,14 @@ void BGE::InputService::process() {
             
             if (it != inputEventHandlers_.end()) {
                 auto const &handles = it->second;
-                auto gameObjName = gameObj->getName();
+                auto gameObjHandle = gameObj->getHandle();
                 
                 for (auto const &handle : handles) {
                     auto handler = eventService->getEventHandler(handle);
                     
                     if (handler) {
-                        std::string name = handler->getName();
-                        
-                        if (name.length()) {
-                            // TODO: Optimize later on without using name
-                            if (gameObjName == name) {
-                                handler->handler(space->getHandle(), buttonHandler.gameObjHandle, event);
-                            }
-                        } else {
-                            // Un-named handlers always fire
-                            handler->handler(space->getHandle(), buttonHandler.gameObjHandle, event);
+                        if (gameObjHandle == handler->gameObjHandle) {
+                            handler->handler(gameObj, event);
                         }
                     }
                 }
@@ -249,22 +278,14 @@ void BGE::InputService::process() {
             
             if (it != inputEventHandlers_.end()) {
                 auto const &handles = it->second;
-                auto gameObjName = gameObj->getName();
+                auto gameObjHandle = gameObj->getHandle();
                 
                 for (auto const &handle : handles) {
                     auto handler = eventService->getEventHandler(handle);
                     
                     if (handler) {
-                        std::string name = handler->getName();
-                        
-                        if (name.length()) {
-                            // TODO: Optimize later on without using name
-                            if (gameObjName == name) {
-                                handler->handler(inputTouchEvent.spaceHandle, inputTouchEvent.gameObjHandle, event);
-                            }
-                        } else {
-                            // Un-named handlers always fire
-                            handler->handler(inputTouchEvent.spaceHandle, inputTouchEvent.gameObjHandle, event);
+                        if (gameObjHandle == handler->gameObjHandle) {
+                            handler->handler(gameObj, event);
                         }
                     }
                 }
@@ -274,5 +295,7 @@ void BGE::InputService::process() {
             assert(false);
         }
     }
+    
+    unlock();
 }
 

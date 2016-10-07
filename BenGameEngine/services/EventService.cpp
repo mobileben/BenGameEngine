@@ -7,16 +7,18 @@
 //
 
 #include "EventService.h"
+#include "GameObject.h"
 
 BGE::EventService::EventService() : handleService_(InitialEventHandlerReserve, HandleServiceNoMaxLimit) {
 }
 
-BGE::EventHandlerHandle BGE::EventService::createEventHandlerHandle(std::string name, Event event, EventHandlerFunction function) {
+BGE::EventHandlerHandle BGE::EventService::createEventHandlerHandle(GameObject *gameObj, Event event, EventHandlerFunction function) {
     EventHandlerHandle handle;
     auto eventHandler = handleService_.allocate(handle);
  
     if (eventHandler) {
-        eventHandler->initialize(handle, name, event, function);
+        auto space = gameObj->getSpace();
+        eventHandler->initialize(handle, space->getHandle(), gameObj->getHandle(), event, function);
     }
     
     return handle;
@@ -34,4 +36,8 @@ void BGE::EventService::removeEventHandler(EventHandlerHandle handle) {
     }
     
     handleService_.release(handle);
+}
+
+void BGE::EventService::spaceReset(Space *space) {
+    
 }

@@ -20,12 +20,13 @@
 #include "Event.h"
 
 namespace BGE {
+    class EventService;
     class Space;
     
     class AnimationService : public Service
     {
     public:
-        AnimationService() {}
+        AnimationService(std::shared_ptr<EventService> eventService) : eventService_(eventService) {}
         ~AnimationService() {}
         
         void initialize() final {}
@@ -37,17 +38,20 @@ namespace BGE {
         void destroy() final {}
         void update(double deltaTime) final;
         
-        EventHandlerHandle registerEventHandler(std::string name, Event event, EventHandlerFunction function);
+        EventHandlerHandle registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function);
         void unregisterEventHandler(EventHandlerHandle handle);
         void spaceReset(Space *space);
         
     private:
+        AnimationService() = delete;
+        
         struct AnimationEvent {
             SpaceHandle                         spaceHandle;
             GameObjectHandle                    gameObjHandle;
             Event                               event;
         };
         
+        std::shared_ptr<EventService>                               eventService_;
         std::unordered_map<Event, std::vector<EventHandlerHandle>>  eventHandlers_;
         std::vector<AnimationEvent>                                 events_;
         

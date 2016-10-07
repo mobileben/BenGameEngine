@@ -162,11 +162,11 @@ BGE::Game::Game() : paused_(false)
     materialService_ = std::make_shared<MaterialService>();
     heartbeatService_ = std::make_shared<HeartbeatService>();
     scenePackageService_ = std::make_shared<ScenePackageService>();
-    animationService_ = std::make_shared<AnimationService>();
+    eventService_ = std::make_shared<EventService>();
+    animationService_ = std::make_shared<AnimationService>(eventService_);
+    inputService_ = std::make_shared<InputService>(eventService_);
     spaceService_ = std::make_shared<SpaceService>();
     fontService_ = std::make_shared<FontService>();
-    inputService_ = std::make_shared<InputService>();
-    eventService_ = std::make_shared<EventService>();
     logicService_ = std::make_shared<LogicService>();
 }
 
@@ -257,6 +257,13 @@ void BGE::Game::resume() {
 }
 
 void BGE::Game::destroy() {
+}
+
+void BGE::Game::spaceReset(Space *space) {
+    logicService_->spaceReset(space);
+    animationService_->spaceReset(space);
+    inputService_->spaceReset(space);
+    eventService_->spaceReset(space);
 }
 
 void BGE::Game::update(double deltaTime) {

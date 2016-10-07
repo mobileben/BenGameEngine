@@ -51,8 +51,8 @@ void BGE::AnimationService::update(double deltaTime) {
     unlock();
 }
 
-BGE::EventHandlerHandle BGE::AnimationService::registerEventHandler(std::string name, Event event, EventHandlerFunction function) {
-    auto handle = Game::getInstance()->getEventService()->createEventHandlerHandle(name, event, function);
+BGE::EventHandlerHandle BGE::AnimationService::registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function) {
+    auto handle = eventService_->createEventHandlerHandle(gameObj, event, function);
     std::vector<EventHandlerHandle> &v = eventHandlers_[event];
     
     v.push_back(handle);
@@ -60,23 +60,27 @@ BGE::EventHandlerHandle BGE::AnimationService::registerEventHandler(std::string 
     return handle;
 }
 
-void BGE::AnimationService::unregisterEventHandler(EventHandlerHandle handle) {    
+void BGE::AnimationService::unregisterEventHandler(EventHandlerHandle handle) {
+    if (handle.isNull()) {
+        return;
+    }
+    
     // Remove event handle from vector
     for (auto &mapIt : eventHandlers_) {
         auto it = std::find(mapIt.second.begin(), mapIt.second.end(), handle);
         
         if (it != mapIt.second.end()) {
             mapIt.second.erase(it);
+            eventService_->removeEventHandler(handle);
+            break;
         }
     }
-
-    Game::getInstance()->getEventService()->removeEventHandler(handle);
 }
 
 void BGE::AnimationService::spaceReset(Space *space) {
     lock();
     
-    auto eventService = Game::getInstance()->getEventService();
+    auto eventService = eventService_;
     auto spaceHandle = space->getHandle();
     
     for (auto &mapIt : eventHandlers_) {
@@ -85,8 +89,12 @@ void BGE::AnimationService::spaceReset(Space *space) {
             auto handler = eventService->getEventHandler(handle);
             
             if (handler->spaceHandle == spaceHandle) {
-                eventService->removeEventHandler(handle);
+#if DEBUG
+                auto gameObj = space->getGameObject(handler->gameObjHandle);
+                printf("WARNING: removing anim handler for space %s, gameObj %s\n", space->getName().c_str(), gameObj->getName().c_str());
+#endif
                 hIt = mapIt.second.erase(hIt);
+                eventService->removeEventHandler(handle);
             } else {
                 hIt++;
             }
@@ -104,7 +112,7 @@ void BGE::AnimationService::queueEvent(SpaceHandle spaceHandle, GameObjectHandle
 }
 
 void BGE::AnimationService::processEvents() {
-    auto eventService = Game::getInstance()->getEventService();
+    auto eventService = eventService_;
     
     for (auto const &event : events_) {
         auto space = Game::getInstance()->getSpaceService()->getSpace(event.spaceHandle);
@@ -116,22 +124,14 @@ void BGE::AnimationService::processEvents() {
             
             if (it != eventHandlers_.end()) {
                 auto const &handles = it->second;
-                auto gameObjName = gameObj->getName();
+                auto gameObjHandle = gameObj->getHandle();
                 
                 for (auto const &handle : handles) {
                     auto handler = eventService->getEventHandler(handle);
                     
                     if (handler) {
-                        std::string name = handler->getName();
-                        
-                        if (name.length()) {
-                            // TODO: Optimize later on without using name
-                            if (gameObjName == name) {
-                                handler->handler(event.spaceHandle, event.gameObjHandle, event.event);
-                            }
-                        } else {
-                            // Un-named handlers always fire
-                            handler->handler(event.spaceHandle, event.gameObjHandle, event.event);
+                        if (gameObjHandle == handler->gameObjHandle) {
+                            handler->handler(gameObj, event.event);
                         }
                     }
                 }
