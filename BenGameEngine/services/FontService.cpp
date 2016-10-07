@@ -229,6 +229,8 @@ void BGE::FontService::buildFontInfoForAsset(std::string asset) {
                     }
                 }
             }
+            
+            FT_Done_FreeType(library);
         }
     }
 }
