@@ -341,8 +341,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, 
             
             // Memory usage is considered 0 since the underlying texture of the atlas tracks memory usage
             memoryUsage_ = 0;
-            
-            NSLog(@"Created Subtexture %s", getName().c_str());
         }
     } else {
         error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorInvalidSubTexture);
