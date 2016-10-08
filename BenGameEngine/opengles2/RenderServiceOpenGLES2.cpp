@@ -559,7 +559,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
 
                 if (transformComponent) {
-                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->matrix_.m);
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->worldMatrix_.m);
                 } else {
                     // TODO: This is a hack for now
                     Matrix4 mat;
@@ -596,7 +596,7 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
                 glEnableVertexAttribArray(positionLocation);
 
                 if (transformComponent) {
-                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->matrix_.m);
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->worldMatrix_.m);
                 } else {
                     // This is a hack for now
                     Matrix4 mat;
@@ -656,7 +656,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
             glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
 
             if (xform) {
-                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) xform->matrix_.m);
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) xform->worldMatrix_.m);
             } else {
                 // TODO: This is a hack for now
                 Matrix4 mat;
@@ -720,7 +720,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                         GLint colorOffsetLocation = glShader->locationForUniform("ColorOffset");
                         
                         if (transformComponent) {
-                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->matrix_.m);
+                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->worldMatrix_.m);
                         } else {
                             // TODO: This is a hack for now
                             Matrix4 mat;
@@ -921,9 +921,9 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         transformComponent->localMatrix_ = xlate * transformComponent->localMatrix_;
         
         if (parent) {
-            transformComponent->matrix_ = parent->matrix_ * transformComponent->localMatrix_;
+            transformComponent->worldMatrix_ = parent->worldMatrix_ * transformComponent->localMatrix_;
         } else {
-            transformComponent->matrix_ = transformComponent->localMatrix_;
+            transformComponent->worldMatrix_ = transformComponent->localMatrix_;
         }
         
         auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();

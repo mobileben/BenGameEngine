@@ -143,7 +143,7 @@ namespace BGE {
         // Rotation is in radians
         float           rotation_;
         
-        Matrix4         matrix_;
+        Matrix4         worldMatrix_;
         Matrix4         localMatrix_;
         
         bool            transformDirty_; // Indicates that components and matrix are out of sync

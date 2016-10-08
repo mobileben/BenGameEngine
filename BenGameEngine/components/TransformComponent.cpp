@@ -18,7 +18,7 @@ std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComp
 
 BGE::TransformComponent::TransformComponent() : Component(), visible_(true),
 bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0), transformDirty_(false), speed_(1), paused_(false) {
-    Matrix4MakeIdentify(matrix_);
+    Matrix4MakeIdentify(worldMatrix_);
 }
 
 void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
@@ -41,7 +41,7 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
     speed_ = 1;
     paused_ = false;
     
-    Matrix4MakeIdentify(matrix_);
+    Matrix4MakeIdentify(worldMatrix_);
 }
 
 void BGE::TransformComponent::destroy() {
@@ -77,9 +77,9 @@ void BGE::TransformComponent::updateMatrix() {
     if (parent) {
         parent->getWorldMatrix(mat1);
         
-        matrix_ = mat1 * localMatrix_;
+        worldMatrix_ = mat1 * localMatrix_;
     } else {
-        matrix_ = localMatrix_;
+        worldMatrix_ = localMatrix_;
     }
 }
 
@@ -101,7 +101,7 @@ void BGE::TransformComponent::getWorldMatrix(Matrix4 &matrix) {
         transformDirty_ = false;
     }
     
-    matrix = matrix_;
+    matrix = worldMatrix_;
 }
 
 const float *BGE::TransformComponent::getWorldMatrixRaw() {
@@ -111,7 +111,7 @@ const float *BGE::TransformComponent::getWorldMatrixRaw() {
         transformDirty_ = false;
     }
     
-    return matrix_.m;
+    return worldMatrix_.m;
 }
 
 
