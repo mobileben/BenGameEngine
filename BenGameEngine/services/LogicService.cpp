@@ -205,7 +205,11 @@ void BGE::LogicService::spaceReset(Space *space) {
         if (it->first == spaceHandle) {
 #if DEBUG
             auto gameObj = space->getGameObject(it->second);
-            printf("WARNING: removing logic handler for space %s, gameObj %s\n", space->getName().c_str(), gameObj->getName().c_str());
+            if (gameObj) {
+                printf("WARNING: removing logic handler for space %s, gameObj %s\n", space->getName().c_str(), gameObj->getName().c_str());
+            } else {
+                printf("WARNING: removing logic handler for space %s, gameObj NULL\n", space->getName().c_str());
+            }
 #endif
             it = gameObjectHandles_.erase(it);
         } else {
@@ -218,7 +222,9 @@ void BGE::LogicService::spaceReset(Space *space) {
         if (it->spaceHandle == spaceHandle) {
 #if DEBUG
             auto gameObj = space->getGameObject(it->gameObjHandle);
-            printf("WARNING: removing deferred logic handler %d for space %s, gameObj %s\n", it->op, space->getName().c_str(), gameObj->getName().c_str());
+            if (gameObj) {
+                printf("WARNING: removing deferred logic handler %d for space %s, gameObj NULL\n", it->op, space->getName().c_str());
+            }
 #endif
             it = addRemoveQueue_.erase(it);
         } else {
