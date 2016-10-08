@@ -76,8 +76,8 @@ namespace BGE {
         void setRotationInRadians(float rotation) { rotation_ = rotation; transformDirty_ = true; }
         
         // TODO: This should be made so that matrices are exposed. This is to reduce overhead of copies
-        void getMatrix(Matrix4 &matrix);
-        const float *getMatrixRaw();
+        void getWorldMatrix(Matrix4 &matrix);
+        const float *getWorldMatrixRaw();
         
         void getLocalMatrix(Matrix4 &matrix);
         const float *getLocalMatrixRaw();

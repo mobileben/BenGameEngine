@@ -75,7 +75,7 @@ void BGE::TransformComponent::updateMatrix() {
     auto parent = getParent();
     
     if (parent) {
-        parent->getMatrix(mat1);
+        parent->getWorldMatrix(mat1);
         
         matrix_ = mat1 * localMatrix_;
     } else {
@@ -87,14 +87,14 @@ BGE::Vector2 BGE::TransformComponent::getGlobalPosition() {
     Matrix4 mtx;
     Vector2 results;
     
-    getMatrix(mtx);
+    getWorldMatrix(mtx);
     
     Matrix4MultiplyVector2(results, mtx, position_);
                            
     return results;
 }
 
-void BGE::TransformComponent::getMatrix(Matrix4 &matrix) {
+void BGE::TransformComponent::getWorldMatrix(Matrix4 &matrix) {
     if (transformDirty_) {
         updateMatrix();
         
@@ -104,7 +104,7 @@ void BGE::TransformComponent::getMatrix(Matrix4 &matrix) {
     matrix = matrix_;
 }
 
-const float *BGE::TransformComponent::getMatrixRaw() {
+const float *BGE::TransformComponent::getWorldMatrixRaw() {
     if (transformDirty_) {
         updateMatrix();
         

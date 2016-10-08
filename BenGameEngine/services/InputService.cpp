@@ -184,7 +184,7 @@ void BGE::InputService::update(double deltaTime) {
                         Matrix4 matrix;
                         bool inBounds = false;
                         
-                        xform->getMatrix(matrix);
+                        xform->getWorldMatrix(matrix);
                         bbox->computeAABB(matrix);
                         
                         if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
@@ -220,7 +220,7 @@ void BGE::InputService::update(double deltaTime) {
                             if (xform && bbox) {
                                 Matrix4 matrix;
                                 
-                                xform->getMatrix(matrix);
+                                xform->getWorldMatrix(matrix);
                                 bbox->computeAABB(matrix);
                                 
                                 if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {

@@ -58,7 +58,7 @@ static BGE::ComponentService componentService;
     
     Matrix4 matrix;
     
-    transform->getMatrix(matrix);
+    transform->getWorldMatrix(matrix);
     
     XCTAssertEqual(Matrix4IsIdentity(matrix), true, @"matrix is not identity");
 }

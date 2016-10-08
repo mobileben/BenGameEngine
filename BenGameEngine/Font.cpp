@@ -406,7 +406,7 @@ void BGE::Font::drawString(std::string str, Vector2 &position, Color &color, Fon
 // TODO: Move to renderer
 void BGE::Font::drawString(std::string str, TransformComponent *transform, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     
-    drawString(str, transform->getMatrixRaw(), color, horizAlignment, vertAlignment, minimum);
+    drawString(str, transform->getWorldMatrixRaw(), color, horizAlignment, vertAlignment, minimum);
 }
 
 // TODO: Move to renderer
