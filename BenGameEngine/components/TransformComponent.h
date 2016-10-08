@@ -43,37 +43,41 @@ namespace BGE {
         float getY() const { return position_.y; }
         float getZ() const { return z_; }
         
-        void setX(float x) { position_.x = x; transformDirty_ = true; }
-        void setY(float y) { position_.y = y; transformDirty_ = true; }
-        void setZ(float z) { z_ = z; transformDirty_ = true; }
+        void setX(float x);
+        void setY(float y);
+        void setZ(float z);
         
         Vector2 getPosition() const { return position_; }
-        void setPosition(Vector2 &position) { position_ = position; transformDirty_ = true; }
-        void setPosition(Vector2 &&position) { position_ = position; transformDirty_ = true; }
+        void setPosition(Vector2 &position);
+        void setPosition(Vector2 &&position);
         
         Vector2 getGlobalPosition();
         
         float getScaleX() const { return scale_.x; }
         float getScaleY() const { return scale_.y; }
-        void setScaleX(float x) { scale_.x = x; transformDirty_ = true; }
-        void setScaleY(float y) { scale_.y = y; transformDirty_ = true; }
+        void setScaleX(float x);
+        void setScaleY(float y);
         
         Vector2 getScale() const { return scale_; }
-        void setScale(Vector2 &scale) { scale_ = scale; transformDirty_ = true; }
+        void setScale(Vector2 &scale);
+        void setScale(Vector2 &&scale);
         
         float getSkewX() const { return skew_.x; }
         float getSkewY() const { return skew_.y; }
-        void setSkewX(float x) { skew_.x = x; transformDirty_ = true; }
-        void setSkewY(float y) { skew_.y = y; transformDirty_ = true; }
+        void setSkewX(float x);
+        void setSkewY(float y);
         
         Vector2 getSkew() const { return skew_; }
-        void setSkew(Vector2 &skew) { skew_ = skew; transformDirty_ = true; }
+        void setSkew(Vector2 &skew);
+        void setSkew(Vector2 &&skew);
+        
+        void forceDirty();
         
         float getRotationInDegrees() const { return rotation_ * (180.0/M_PI); }
-        void setRotationInDegrees(float rotation) { rotation_ = rotation * (M_PI/180.0); transformDirty_ = true; }
+        void setRotationInDegrees(float rotation);
 
         float getRotationInRadians() const { return rotation_; }
-        void setRotationInRadians(float rotation) { rotation_ = rotation; transformDirty_ = true; }
+        void setRotationInRadians(float rotation);
         
         // TODO: This should be made so that matrices are exposed. This is to reduce overhead of copies
         void getWorldMatrix(Matrix4 &matrix);
@@ -121,6 +125,9 @@ namespace BGE {
         bool inParentHierarchy(TransformComponentHandle handle);
         bool inParentHierarchy(TransformComponent *parent);
         
+        void updateMatrix();
+        void updateMatrixAndChildren(bool parentDirty=false);
+
     protected:
         friend ComponentService;
         friend RenderService;
@@ -143,10 +150,11 @@ namespace BGE {
         // Rotation is in radians
         float           rotation_;
         
-        Matrix4         worldMatrix_;
         Matrix4         localMatrix_;
+        Matrix4         worldMatrix_;
         
-        bool            transformDirty_; // Indicates that components and matrix are out of sync
+        bool            localDirty_;
+        bool            worldDirty_;
         
         // Hierarchy
         TransformComponentHandle                parentHandle_;
@@ -158,7 +166,9 @@ namespace BGE {
         bool            paused_;
         
         void setGameObjectHandle(GameObjectHandle handle) override;
-        void updateMatrix();
+        
+        void setParentHandle(TransformComponentHandle parentHandle);
+        void setParent(TransformComponent *parent);
     };
 }
 

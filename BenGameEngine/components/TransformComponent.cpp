@@ -17,7 +17,8 @@ BGE::ComponentTypeId BGE::TransformComponent::typeId_ = Component::InvalidTypeId
 std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComponent);
 
 BGE::TransformComponent::TransformComponent() : Component(), visible_(true),
-bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0), transformDirty_(false), speed_(1), paused_(false) {
+bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0), localDirty_(false), worldDirty_(false), speed_(1), paused_(false) {
+    Matrix4MakeIdentify(localMatrix_);
     Matrix4MakeIdentify(worldMatrix_);
 }
 
@@ -37,10 +38,14 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
     skew_.x = 0;
     skew_.y = 0;
     rotation_ = 0;
-    transformDirty_ = false;
+    
+    localDirty_ = false;
+    worldDirty_ = false;
+    
     speed_ = 1;
     paused_ = false;
     
+    Matrix4MakeIdentify(localMatrix_);
     Matrix4MakeIdentify(worldMatrix_);
 }
 
@@ -61,26 +66,201 @@ void BGE::TransformComponent::setGameObjectHandle(GameObjectHandle handle) {
     Component::setGameObjectHandle(handle);
 }
 
+void BGE::TransformComponent::setParentHandle(TransformComponentHandle parentHandle) {
+    parentHandle_ = parentHandle;
+    worldDirty_ = true;
+}
+
+void BGE::TransformComponent::setParent(TransformComponent *parent) {
+    if (parent) {
+        setParentHandle(parent->getHandle<TransformComponent>());
+    }
+}
+
+void BGE::TransformComponent::setX(float x) {
+    if (position_.x != x) {
+        position_.x = x;
+
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setY(float y) {
+    if (position_.y != y) {
+        position_.y = y;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setZ(float z) {
+    if (z_ != z) {
+        z_ = z;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setPosition(Vector2 &position) {
+    if (position_.x != position.x || position_.y != position.y) {
+        position_ = position;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setPosition(Vector2 &&position) {
+    if (position_.x != position.x || position_.y != position.y) {
+        position_ = position;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setScaleX(float x) {
+    if (scale_.x != x) {
+        scale_.x = x;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setScaleY(float y) {
+    if (scale_.y != y) {
+        scale_.y = y;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setScale(Vector2 &scale) {
+    if (scale_.x != scale.x || scale_.y != scale.y) {
+        scale_ = scale;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setScale(Vector2 &&scale) {
+    if (scale_.x != scale.x || scale_.y != scale.y) {
+        scale_ = scale;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setSkewX(float x) {
+    if (skew_.x != x) {
+        skew_.x = x;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setSkewY(float y) {
+    if (skew_.y != y) {
+        skew_.y = y;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setSkew(Vector2 &skew) {
+    if (skew_.x != skew.x || skew_.y != skew.y) {
+        skew_ = skew;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setSkew(Vector2 &&skew) {
+    if (skew_.x != skew.x || skew_.y != skew.y) {
+        skew_ = skew;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setRotationInDegrees(float rotation) {
+    float radians = rotation * (M_PI/180.0);
+    
+    setRotationInRadians(radians);
+}
+
+void BGE::TransformComponent::setRotationInRadians(float rotation) {
+    if (rotation_ != rotation) {
+        rotation_ = rotation;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::forceDirty() {
+    worldDirty_ = true;
+}
+
 void BGE::TransformComponent::updateMatrix() {
-    Matrix4 mat1;
-    Matrix4 mat2;
-    
-    Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
-    Matrix4MakeRotationZ(mat2, rotation_);
-    
-    localMatrix_ = mat2 * mat1;
-    Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
-    localMatrix_ = mat1 * localMatrix_;
-    
+    // If our local xform is dirty, compute
+    if (localDirty_) {
+        Matrix4 mat1;
+        Matrix4 mat2;
+
+        Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
+        Matrix4MakeRotationZ(mat2, rotation_);
+        
+        localMatrix_ = mat2 * mat1;
+        Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
+        localMatrix_ = mat1 * localMatrix_;
+    }
+
     auto parent = getParent();
     
     if (parent) {
-        parent->getWorldMatrix(mat1);
-        
-        worldMatrix_ = mat1 * localMatrix_;
+        parent->updateMatrix();
+        worldMatrix_ = parent->worldMatrix_ * localMatrix_;
     } else {
         worldMatrix_ = localMatrix_;
     }
+    
+    localDirty_ = worldDirty_ = false;
+}
+
+void BGE::TransformComponent::updateMatrixAndChildren(bool parentDirty) {
+    auto space = getSpace();
+    
+    parentDirty = parentDirty || localDirty_ || worldDirty_;
+    
+    // If our local xform is dirty, compute
+    if (localDirty_) {
+        Matrix4 mat1;
+        Matrix4 mat2;
+        
+        Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
+        Matrix4MakeRotationZ(mat2, rotation_);
+        
+        localMatrix_ = mat2 * mat1;
+        Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
+        localMatrix_ = mat1 * localMatrix_;
+    }
+
+    
+    if (parentDirty) {
+        auto parent = getParent();
+        
+        if (parent) {
+            worldMatrix_ = parent->worldMatrix_ * localMatrix_;
+        } else {
+            worldMatrix_ = localMatrix_;
+        }
+    }
+
+    for (auto childHandle : childrenHandles_) {
+        auto child = space->getComponent(childHandle);
+        
+        child->updateMatrixAndChildren(parentDirty);
+    }
+    
+    localDirty_ = worldDirty_ = false;
 }
 
 BGE::Vector2 BGE::TransformComponent::getGlobalPosition() {
@@ -95,42 +275,26 @@ BGE::Vector2 BGE::TransformComponent::getGlobalPosition() {
 }
 
 void BGE::TransformComponent::getWorldMatrix(Matrix4 &matrix) {
-    if (transformDirty_) {
-        updateMatrix();
-        
-        transformDirty_ = false;
-    }
+    updateMatrix();
     
     matrix = worldMatrix_;
 }
 
 const float *BGE::TransformComponent::getWorldMatrixRaw() {
-    if (transformDirty_) {
-        updateMatrix();
-        
-        transformDirty_ = false;
-    }
-    
+    updateMatrix();
+
     return worldMatrix_.m;
 }
 
 
 void BGE::TransformComponent::getLocalMatrix(Matrix4 &matrix) {
-    if (transformDirty_) {
-        updateMatrix();
-        
-        transformDirty_ = false;
-    }
+    updateMatrix();
     
     matrix = localMatrix_;
 }
 
 const float *BGE::TransformComponent::getLocalMatrixRaw() {
-    if (transformDirty_) {
-        updateMatrix();
-        
-        transformDirty_ = false;
-    }
+    updateMatrix();
     
     return localMatrix_.m;
 }
@@ -164,7 +328,7 @@ void BGE::TransformComponent::addChild(TransformComponentHandle handle) {
 
     if  (child) {
         childrenHandles_.push_back(handle);
-        child->parentHandle_ = getHandle<TransformComponent>();
+        child->setParent(this);
     }
 }
 
@@ -175,9 +339,7 @@ void BGE::TransformComponent::addChild(TransformComponent *child) {
     if (child) {
         auto handle = child->getHandle<TransformComponent>();
         childrenHandles_.push_back(handle);
-        child->parentHandle_ = getHandle<TransformComponent>();
-        
-        // TODO: Update hierarchy
+        child->setParent(this);
     }
 }
 
@@ -198,7 +360,7 @@ void BGE::TransformComponent::addChild(GameObjectHandle handle) {
                     assert(!otherXform->getParent());
                     
                     childrenHandles_.push_back(otherXform->getHandle<TransformComponent>());
-                    otherXform->parentHandle_ = getHandle<TransformComponent>();
+                    otherXform->setParent(this);
                 }
             }
         }
@@ -221,7 +383,7 @@ void BGE::TransformComponent::removeAllChildren() {
     for (auto handle : childrenHandles_) {
         auto child = space->getComponent<TransformComponent>(handle.getHandle());
         // Remove parent from all children
-        child->parentHandle_ = TransformComponentHandle();
+        child->setParentHandle(TransformComponentHandle());
     }
     
     childrenHandles_.clear();
@@ -238,11 +400,9 @@ void BGE::TransformComponent::removeFromParent() {
                 break;
             }
         }
-        
-        parentHandle_ = TransformComponentHandle();
-    } else {
-        parentHandle_ = TransformComponentHandle();
     }
+    
+    setParentHandle(TransformComponentHandle());
 }
 
 void BGE::TransformComponent::insertChild(TransformComponentHandle handle, uint32_t index) {
@@ -259,7 +419,7 @@ void BGE::TransformComponent::insertChild(TransformComponentHandle handle, uint3
             childrenHandles_.push_back(child->getHandle<TransformComponent>());
         }
         
-        child->parentHandle_ = getHandle<TransformComponent>();
+        child->setParent(this);
     }
 }
 
@@ -274,7 +434,7 @@ void BGE::TransformComponent::insertChild(TransformComponent *child, uint32_t in
             childrenHandles_.push_back(child->getHandle<TransformComponent>());
         }
         
-        child->parentHandle_ = getHandle<TransformComponent>();
+        child->setParent(this);
     }
 }
 
@@ -295,7 +455,7 @@ void BGE::TransformComponent::insertChild(GameObjectHandle handle, uint32_t inde
                 childrenHandles_.push_back(childXform->getHandle<TransformComponent>());
             }
             
-            childXform->parentHandle_ = getHandle<TransformComponent>();
+            childXform->setParent(this);
         }
     }
 }
@@ -314,7 +474,7 @@ void BGE::TransformComponent::insertChild(GameObject *child, uint32_t index) {
                 childrenHandles_.push_back(childXform->getHandle<TransformComponent>());
             }
             
-            childXform->parentHandle_ = getHandle<TransformComponent>();
+            childXform->setParent(this);
         }
     }
 }
@@ -337,7 +497,7 @@ void BGE::TransformComponent::replaceChild(TransformComponentHandle handle, uint
         
         existing->removeFromParent();
         
-        child->parentHandle_ = getHandle<TransformComponent>();
+        child->setParent(this);
         childrenHandles_[index] = child->getHandle<TransformComponent>();
     }
 }
@@ -359,7 +519,7 @@ void BGE::TransformComponent::replaceChild(TransformComponent *child, uint32_t i
         
         existing->removeFromParent();
         
-        child->parentHandle_ = getHandle<TransformComponent>();
+        child->setParent(this);
         childrenHandles_[index] = child->getHandle<TransformComponent>();
     }
 }

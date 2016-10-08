@@ -65,6 +65,7 @@ namespace BGE {
         void setPaused(bool paused);
         
         void updateTransforms();
+        void updateRootTransforms();
         
         void spaceReset(Space *space);
         

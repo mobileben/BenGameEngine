@@ -10,6 +10,8 @@
 #include <locale>
 #include <sstream>
 
+#include "TransformComponent.h"
+
 template<typename T>
 struct Sep : public std::numpunct<T>
 {
@@ -267,17 +269,59 @@ void BGE::Game::spaceReset(Space *space) {
 }
 
 void BGE::Game::update(double deltaTime) {
-    // Physics here
-    
+    BGE::Game::getInstance()->getRenderService()->lock();
     // Input
     inputService_->update(deltaTime);
 
     // Updating
     logicService_->update(deltaTime);
     animationService_->update(deltaTime);
+
+    // Physics here
     
     // Update transforms
+    updateTransforms();
+    BGE::Game::getInstance()->getRenderService()->unlock();
 }
+
+void BGE::Game::updateTransforms() {
+    auto spaces = spaceService_->getSpaces();
+    std::vector<TransformComponent *> xforms;
+    
+    for (auto &handle : spaces) {
+        auto space = spaceService_->getSpace(handle);
+        
+        // Non visible spaces can still process transforms
+        if (space && space->isActive()) {
+            space->getTransforms(xforms);
+        }
+    }
+    
+    for (auto xform : xforms) {
+        xform->updateMatrix();
+    }
+}
+
+void BGE::Game::updateRootTransforms() {
+//    printf("3\n");
+    auto spaces = spaceService_->getSpaces();
+    std::vector<TransformComponent *> xforms;
+    
+    for (auto &handle : spaces) {
+        auto space = spaceService_->getSpace(handle);
+        
+        // Non visible spaces can still process transforms
+        if (space && space->isActive()) {
+            space->getRootTransforms(xforms);
+        }
+    }
+    
+    for (auto xform : xforms) {
+        xform->updateMatrixAndChildren();
+    }
+//    printf("4\n");
+}
+
 
 void BGE::Game::outputResourceUsage() const {
     uint32_t numTabs = 0;

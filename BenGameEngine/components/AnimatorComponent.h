@@ -17,6 +17,9 @@
 #include "GraphicFormats.h"
 
 namespace BGE {
+    class AnimationSequenceComponent;
+    class FrameAnimatorComponent;
+
     enum class AnimState {
         Playing,
         Paused,
@@ -53,6 +56,10 @@ namespace BGE {
         void play(int32_t iterations=1, bool forward=true, float speed=1.0);
         void pause();
         void stop();
+        
+    private:
+        void animateChannel(GameObject *gameObj, int32_t frame);
+        void animateSequenceByFrame(Space *space, AnimationSequenceComponent *seq, FrameAnimatorComponent *animator, int32_t frame) ;
     };
 }
 

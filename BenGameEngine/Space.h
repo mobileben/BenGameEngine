@@ -53,6 +53,8 @@ namespace BGE {
         void removeGameObject(GameObject *object);
         
         const std::vector<GameObjectHandle>& getGameObjects() const;
+        void getTransforms(std::vector<TransformComponent *> &xforms) const;
+        void getRootTransforms(std::vector<TransformComponent *> &xforms) const;
         
         template <typename T, typename... Args> T *createComponent(Args&& ...args) {
             auto component = componentService_->createComponent<T>(std::forward<Args>(args)...);

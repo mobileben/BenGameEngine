@@ -93,6 +93,18 @@ namespace BGE {
         inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
         inline SpaceHandle getSpaceHandle(void) const { return spaceHandle_; }
         
+        template <typename T> auto getComponentHandleService() {
+            using HANDLE = Handle<T>;
+            using HANDLESERVICE = HandleService<T, HANDLE>;
+            HANDLESERVICE *handleService = static_cast<HANDLESERVICE *>(componentHandleServices_[T::typeId_]);
+            
+            return handleService;
+        }
+        
+        template <typename T> auto &getComponentHandles() {
+            return componentHandles_[T::typeId_];
+        }
+        
         template <typename T, typename... Args> T *createComponent(Args&& ...args) {
             using HANDLE = Handle<T>;
             using HANDLESERVICE = HandleService<T, HANDLE>;
@@ -133,8 +145,6 @@ namespace BGE {
             auto typeId = T::typeId_;
             auto const &handles = componentHandles_[typeId];
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
-            
-            components.clear();
 
             for (auto const &handle : handles) {
                 auto component = handleService->dereference(Handle<T>(handle.handle));

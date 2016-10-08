@@ -106,7 +106,6 @@ void BGE::Space::reset() {
     
     textures_.clear();
     
-    
     BGE::Game::getInstance()->getRenderService()->unlock();
 }
 
@@ -260,6 +259,25 @@ void BGE::Space::removeGameObject(GameObject *object) {
 
 const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
     return gameObjectService_->getGameObjects();
+}
+
+void BGE::Space::getTransforms(std::vector<TransformComponent *> &xforms) const {
+    componentService_->getComponents<TransformComponent>(xforms);
+}
+
+void BGE::Space::getRootTransforms(std::vector<TransformComponent *> &xforms) const {
+    auto handleService = componentService_->getComponentHandleService<TransformComponent>();
+    auto const &handles = componentService_->getComponentHandles<TransformComponent>();
+    
+    for (auto const &handle : handles) {
+        auto xform = handleService->dereference(TransformComponentHandle(handle.handle));
+        
+        if ( xform->getParent() == nullptr) {
+            xforms.push_back(xform);
+        }
+    }
+
+    componentService_->getComponents<TransformComponent>(xforms);
 }
 
 // TODO: Add in support for dependency validation as well as linking in order of dependencies
@@ -437,8 +455,6 @@ BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::stri
         if (extPackage) {
             std::string refName = extRef->name;
             auto type = extPackage->getReferenceType(refName);
-            
-            printf("XXXXX %s/%d", refName.c_str(), type);
             
             switch (type) {
                 case GfxReferenceTypeAnimationSequence:
@@ -721,7 +737,6 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
                 
                 if (elem->position) {
                     xform->setPosition(*elem->position);
-                    printf("XXXX %s %f %f\n", obj->getName().c_str(), elem->position->x, elem->position->y);
                 }
                 
                 if (elem->scale) {
