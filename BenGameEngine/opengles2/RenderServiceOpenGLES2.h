@@ -73,8 +73,6 @@ namespace BGE {
         void setGLKTextureInfo(GLKTextureInfo *info) { textureInfo_ = info; }
         
     private:
-        Matrix4 currentMatrix_;
-        std::vector<Matrix4> matrixStack_;
         ColorMatrix currentColorMatrix_;
         std::vector<ColorMatrix> colorMatrixStack_;
         ColorTransform currentColorTransform_;
@@ -89,13 +87,8 @@ namespace BGE {
         void queueRender(double deltaTime);
         
         int8_t renderGameObject(GameObject *gameObj, bool root, bool hasNextSibling = false);
-        // TODO: This will get moved out
-        void transformGameObject(GameObject *gameObj);
 
         void resetStacks();
-        
-        void pushMatrix();
-        void popMatrix();
         
         void pushColorMatrix();
         void popColorMatrix();

@@ -837,12 +837,8 @@ void BGE::RenderServiceOpenGLES2::render()
     this->activeMasks_ = 0;
     
     if (isReady()) {
-        assert(matrixStack_.size() == 0);
         assert(colorMatrixStack_.size() == 0);
         assert(colorTransformStack_.size() == 0);
-        
-        Matrix4MakeIdentify(currentMatrix_);
-        matrixStack_.clear();    // TODO: remove?
         
         ColorMatrixMakeIdentify(currentColorMatrix_);
         colorMatrixStack_.clear();  // TODO: remove?
@@ -905,26 +901,8 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         }
         
         // Since we have the transform, push our
-        pushMatrix();
         pushColorMatrix();
         pushColorTransform();
-        
-        Matrix4 xlate;
-        Matrix4 scale;
-        Matrix4 rotate;
-        
-        Matrix4MakeTranslation(xlate, transformComponent->position_.x, transformComponent->position_.y, 0);
-        Matrix4MakeScale(scale, transformComponent->scale_.x, transformComponent->scale_.y, 1);
-        Matrix4MakeRotationZ(rotate, transformComponent->rotation_);
-        
-        transformComponent->localMatrix_ = rotate * scale;
-        transformComponent->localMatrix_ = xlate * transformComponent->localMatrix_;
-        
-        if (parent) {
-            transformComponent->worldMatrix_ = parent->worldMatrix_ * transformComponent->localMatrix_;
-        } else {
-            transformComponent->worldMatrix_ = transformComponent->localMatrix_;
-        }
         
         auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();
         auto colorTransform = gameObj->getComponent<ColorTransformComponent>();
@@ -984,22 +962,10 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         
         popColorTransform();
         popColorMatrix();
-        // Now pop the transform
-        popMatrix();
     }
     
     return maskValue;
 }
-
-void BGE::RenderServiceOpenGLES2::pushMatrix() {
-    matrixStack_.push_back(currentMatrix_);
-}
-
-void BGE::RenderServiceOpenGLES2::popMatrix() {
-    currentMatrix_ = matrixStack_.back();
-    matrixStack_.pop_back();
-}
-
 
 void BGE::RenderServiceOpenGLES2::pushColorMatrix() {
     colorMatrixStack_.push_back(currentColorMatrix_);
@@ -1018,24 +984,3 @@ void BGE::RenderServiceOpenGLES2::popColorTransform() {
     currentColorTransform_ = colorTransformStack_.back();
     colorTransformStack_.pop_back();
 }
-
-void BGE::RenderServiceOpenGLES2::transformGameObject(GameObject *gameObj) {
-    // TODO: Transform
-    auto transformComponent = gameObj->getComponent<TransformComponent>();
-    
-    if (transformComponent) {
-        // Since we have the transform, push our
-        pushMatrix();
-        
-        // Create local transform
-        
-        // Now convert to world space
-        // Determine if we have children, if we do process them.
-        
-        // First sort
-        
-        // Now pop the transform
-        popMatrix();
-    }
-}
-
