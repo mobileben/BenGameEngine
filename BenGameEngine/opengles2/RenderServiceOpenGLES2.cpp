@@ -582,6 +582,7 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
         
         if (maskRect) {
             Vertex *const vertices = maskRect->getVertices();
+            
             auto material = maskRect->getMaterial();
             
             if (material) {
@@ -775,18 +776,20 @@ uint8_t BGE::RenderServiceOpenGLES2::enableMask(GameObject *gameObject) {
         
         if (maskValue) {
             this->activeMasks_ |= maskValue;
+
             glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_ALWAYS, maskValue, maskValue);
             glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
             glStencilMask(this->activeMasks_);
             
             glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+            
             if (gameObject->hasComponent<MaskComponent>()) {
                 drawMaskRect(gameObject);
             } else if (gameObject->hasComponent<TextureMaskComponent>()) {
                 
             }
-            
+      
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
             glStencilFunc(GL_EQUAL, maskValue, maskValue);
             glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -799,6 +802,9 @@ uint8_t BGE::RenderServiceOpenGLES2::enableMask(GameObject *gameObject) {
 void BGE::RenderServiceOpenGLES2::disableMask(uint8_t maskBits)
 {
     if (maskBits) {
+        glStencilMask(maskBits);
+        glClear(GL_STENCIL_BUFFER_BIT);
+        
         activeMasks_ &= ~maskBits;
         glStencilMask(activeMasks_);
     }
@@ -832,6 +838,7 @@ void BGE::RenderServiceOpenGLES2::render()
     
     glClearColor(bkgColor.r, bkgColor.g, bkgColor.b, bkgColor.a);
     
+    glStencilMask(0x7f);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
     this->activeMasks_ = 0;
@@ -861,9 +868,11 @@ void BGE::RenderServiceOpenGLES2::render()
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space && space->isVisible()) {
-                for (auto const &objHandle : space->getGameObjects()) {
-                    auto obj = space->getGameObject(objHandle);
-                    
+                std::vector<GameObject *> objects;
+                
+                space->getRootGameObjects(objects);
+                
+                for (auto const &obj : objects) {
                     if (obj) {
                         renderGameObject(obj, true);
                     }

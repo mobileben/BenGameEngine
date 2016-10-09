@@ -53,6 +53,8 @@ namespace BGE {
         void removeGameObject(GameObject *object);
         
         const std::vector<GameObjectHandle>& getGameObjects() const;
+        void getRootGameObjects(std::vector<GameObject *> &objects);
+        
         void getTransforms(std::vector<TransformComponent *> &xforms) const;
         void getRootTransforms(std::vector<TransformComponent *> &xforms) const;
         

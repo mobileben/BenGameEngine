@@ -261,6 +261,16 @@ const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
     return gameObjectService_->getGameObjects();
 }
 
+void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
+    auto handles = getGameObjects();
+    
+    for (auto const &handle : handles) {
+        auto obj = getGameObject(handle);
+        
+        objects.push_back(obj);
+    }
+}
+
 void BGE::Space::getTransforms(std::vector<TransformComponent *> &xforms) const {
     componentService_->getComponents<TransformComponent>(xforms);
 }

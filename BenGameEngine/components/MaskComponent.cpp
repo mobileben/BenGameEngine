@@ -8,6 +8,7 @@
 
 #include "MaskComponent.h"
 #include "Game.h"
+#include "TransformComponent.h"
 
 uint32_t BGE::MaskComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::MaskComponent::typeId_ = Component::InvalidTypeId;
@@ -51,9 +52,31 @@ void BGE::MaskComponent::setHeight(float height) {
 }
 
 void BGE::MaskComponent::setWidthHeight(Vector2 &wh) {
-    wh.w *= 2;
-    wh.h *= 2;
+    originalSize_ = wh;
+    
     updateLocalBoundsAndVertices(wh);
+}
+
+void BGE::MaskComponent::reposition(Vector2 position) {
+    auto gameObj = getGameObject();
+    auto xform = gameObj->getComponent<TransformComponent>();
+    
+    xform->setPosition(position);
+}
+
+void BGE::MaskComponent::resetPosition() {
+    auto gameObj = getGameObject();
+    auto xform = gameObj->getComponent<TransformComponent>();
+    
+    xform->setPosition(Vector2{0, 0});
+}
+
+void BGE::MaskComponent::resize(Vector2 size) {
+    updateLocalBoundsAndVertices(size);
+}
+
+void BGE::MaskComponent::resetSize() {
+    updateLocalBoundsAndVertices(originalSize_);
 }
 
 void BGE::MaskComponent::materialsUpdated() {

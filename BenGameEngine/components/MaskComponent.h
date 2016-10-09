@@ -35,6 +35,10 @@ namespace BGE {
         void setHeight(float height);
         void setWidthHeight(Vector2 &wh);
 
+        void reposition(Vector2 position);
+        void resetPosition();
+        void resize(Vector2 size);
+        void resetSize();
         
     protected:
         Vertex* const getVertices() { return vertices_; }
@@ -46,6 +50,7 @@ namespace BGE {
 
         static const uint32_t NumVertices = 4;
         
+        Vector2 originalSize_;
         Vertex vertices_[NumVertices];
         
         void updateLocalBoundsAndVertices(Vector2& wh);
