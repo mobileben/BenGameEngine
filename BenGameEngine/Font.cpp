@@ -399,18 +399,31 @@ void BGE::Font::drawString(std::string str, Vector2 &position, Color &color, Fon
     Matrix4 xform;
     Matrix4MakeTranslation(xform, position.x, position.y, 0);
     
-    drawString(str, xform.m, color, horizAlignment, vertAlignment, minimum);
+    drawString(str, xform.m, 0, color, horizAlignment, vertAlignment, minimum);
 }
 
 
 // TODO: Move to renderer
 void BGE::Font::drawString(std::string str, TransformComponent *transform, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     
-    drawString(str, transform->getWorldMatrixRaw(), color, horizAlignment, vertAlignment, minimum);
+    drawString(str, transform->getWorldMatrixRaw(), 0, color, horizAlignment, vertAlignment, minimum);
+}
+
+void BGE::Font::drawString(std::vector<std::string> &strs, std::vector<float> &yPos, TransformComponent *transform, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+    const float *rawMatrix = transform->getWorldMatrixRaw();
+    auto index = 0;
+    
+    for (auto &str : strs) {
+        float yOffset = yPos[index];
+        
+        drawString(str, rawMatrix, yOffset, color, horizAlignment, vertAlignment, minimum);
+        
+        index++;
+    }
 }
 
 // TODO: Move to renderer
-void BGE::Font::drawString(std::string str, const float *rawMatrix, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+void BGE::Font::drawString(std::string str, const float *rawMatrix, float yOffset, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     auto textureAtlas = Game::getInstance()->getTextureService()->getTextureAtlas(textureAtlasHandle_);
     
     if (str.length() > 0 && textureAtlas && textureAtlas->isValid()) {
@@ -418,7 +431,7 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, Color &color
         GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
         // TODO: Adjustment based on alignment to be done here
         float x = 0;
-        float y = 0;
+        float y = yOffset;
         std::shared_ptr<RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<RenderServiceOpenGLES2>(Game::getInstance()->getRenderService());
         
         const char *chars = str.c_str();

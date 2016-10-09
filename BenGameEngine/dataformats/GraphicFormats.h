@@ -27,6 +27,7 @@ namespace BGE {
         float leading;
         Color color;
         FontHorizontalAlignment alignment;
+        bool multiline;
     };
     
     struct TextReference {
@@ -37,6 +38,7 @@ namespace BGE {
         float leading;
         Color color;
         FontHorizontalAlignment alignment;
+        bool multiline;
         // TODO: Change this to Handle later. Note with this it is not a POD
         FontHandle fontHandle;
     };

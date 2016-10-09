@@ -436,6 +436,7 @@ void BGE::ScenePackage::link() {
         textRef->leading = textRefInt->leading;
         textRef->color = textRefInt->color;
         textRef->alignment = textRefInt->alignment;
+        textRef->multiline = textRefInt->multiline;
         
         textRef->fontHandle = fontService->getFontHandle(fontName, textRefInt->size);
         referenceTypes_[resolvedName] = GfxReferenceTypeText;
@@ -854,7 +855,11 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                 textRef->width = [textDict[@"width"] floatValue] * platformScale;
                 textRef->height = [textDict[@"height"] floatValue] * platformScale;
                 textRef->leading = [formatDict[@"leading"] floatValue] * platformScale;
+                textRef->multiline = [textDict[@"multiline"] boolValue];
                 
+                if (textRef->multiline) {
+                    printf("Multi-line text for %s\n", name);
+                }
                 std::string alignment = [formatDict[@"alignment"] UTF8String];
                 
                 if (alignment == "left"){
@@ -865,7 +870,7 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                     textRef->alignment = FontHorizontalAlignment::Center;
                 }
                 
-                uint32_t size = [formatDict[@"fontSize"] unsignedIntValue] * 2;
+                uint32_t size = [formatDict[@"fontSize"] unsignedIntValue] * platformScale;
                 uint32_t color = [formatDict[@"fontColor"] unsignedIntValue];
                 uint32_t blue = color & 0xff;
                 uint32_t green = color >> 8 & 0xff;

@@ -88,6 +88,8 @@ namespace BGE {
         virtual void drawString(std::string str, TransformComponent *transform, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
         virtual void drawString(std::string str, Vector2 &position, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
         
+        void drawString(std::vector<std::string> &strs, std::vector<float> &yPos, TransformComponent *transform, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        
     protected:
         uint32_t    pixelSize_;
         std::string family_;
@@ -105,7 +107,7 @@ namespace BGE {
         std::map<uint16_t, FontGlyph>                       glyphs_;
         std::map<std::pair<uint16_t, uint16_t>, int32_t>    kerning_;
 
-        void drawString(std::string str, const float *rawMatrix, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        void drawString(std::string str, const float *rawMatrix, float yOffset, Color &color, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
 
     private:
         friend class FontService;

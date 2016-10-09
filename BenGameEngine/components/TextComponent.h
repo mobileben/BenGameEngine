@@ -75,6 +75,12 @@ namespace BGE {
         
         float getWidth(bool minimum=true);
         
+        bool isMultiline() const { return multiline_; }
+        void setMultiline(bool multi);
+        
+        const auto &getMultiText() const { return multiText_; }
+        const auto &getMultiTextY() const { return textY_; }
+        
     protected:
         void materialsUpdated();
 
@@ -83,14 +89,23 @@ namespace BGE {
         friend RenderService;
         friend RenderServiceOpenGLES2;
 
-        std::string             text_;
-        Color                   color_;
-        FontHandle              fontHandle_;
-        FontHorizontalAlignment horizAlignment_;
-        FontVerticalAlignment   vertAlignment_;
+        std::string                 text_;
+        std::vector<std::string>    multiText_;
+        std::vector<float>          textY_;
+        float                       boundsWidth_;
+        float                       boundsHeight_;
+        Color                       color_;
+        FontHandle                  fontHandle_;
+        FontHorizontalAlignment     horizAlignment_;
+        FontVerticalAlignment       vertAlignment_;
+        float                       leading_;
+        bool                        multiline_;
+        
         
         void getWidthHeight(float &width, float &height);
         void updateBoundingBox();
+        
+        void buildLines();
     };
 }
 

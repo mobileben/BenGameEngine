@@ -15,12 +15,12 @@
 #include "LineRenderComponent.h"
 #include "FlatRectRenderComponent.h"
 #include "SpriteRenderComponent.h"
-#include "TextComponent.h"
 #include "ColorMatrixComponent.h"
 #include "ColorTransformComponent.h"
 #include "TextureMaskComponent.h"
 #include "MaskComponent.h"
 #include "TransformComponent.h"
+#include "TextComponent.h"
 
 const GLubyte Indices[] = {
     0, 1, 2,
@@ -927,7 +927,14 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
             Font *font = Game::getInstance()->getFontService()->getFont(text->getFontHandle());
             
             if (font) {
-                font->drawString(text->getText(), transformComponent, (Color&) text->getColor());
+                if (text->isMultiline()) {
+                    auto multiText = text->getMultiText();
+                    auto yPos = text->getMultiTextY();
+                    
+                    font->drawString(multiText, yPos, transformComponent, (Color&) text->getColor());
+                } else {
+                    font->drawString(text->getText(), transformComponent, (Color&) text->getColor());
+                }
             }
         } else if (gameObj->hasComponent<MaskComponent>()) {
             maskValue = enableMask(gameObj);

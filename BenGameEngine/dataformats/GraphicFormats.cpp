@@ -37,6 +37,10 @@ bool BGE::operator==(const TextReference& lhs, const TextReference& rhs) {
         return false;
     }
     
+    if (lhs.multiline != rhs.multiline) {
+        return false;
+    }
+    
     if (lhs.fontHandle != rhs.fontHandle) {
         return false;
     }
@@ -73,6 +77,10 @@ bool BGE::operator!=(const TextReference& lhs, const TextReference& rhs) {
         return true;
     }
     
+    if (lhs.multiline != rhs.multiline) {
+        return true;
+    }
+
     if (lhs.fontHandle != rhs.fontHandle) {
         return true;
     }
@@ -101,6 +109,10 @@ bool BGE::operator==(const TextReferenceIntermediate& lhs, const TextReferenceIn
         return false;
     }
     
+    if (lhs.multiline != rhs.multiline) {
+        return false;
+    }
+
     return true;
 }
 
@@ -125,6 +137,10 @@ bool BGE::operator!=(const TextReferenceIntermediate& lhs, const TextReferenceIn
         return true;
     }
     
+    if (lhs.multiline != rhs.multiline) {
+        return true;
+    }
+
     return false;
 }
 
