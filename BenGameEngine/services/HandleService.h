@@ -37,7 +37,7 @@ namespace BGE {
             magic_.reserve(reserve);
             freeSlots_.reserve(reserve);
             
-            initialCapacity_ = (uint32_t) data_.capacity();
+            initialCapacity_ = currCapacity_ = (uint32_t) data_.capacity();
         }
         
         HandleService() = delete;
@@ -72,8 +72,14 @@ namespace BGE {
                     maxAllocated_ = (uint32_t) data_.size();
                 }
                 
-                if (data_.capacity() != initialCapacity_) {
+                if (data_.capacity() != currCapacity_) {
                     numResizes_++;
+
+#if DEBUG
+                    printf("WARNING: %s increased capacity from %ld to %ld. Increase #%ld\n", typeid(DATA).name(), currCapacity_, data_.capacity(), numResizes_);
+#endif
+                    
+                    currCapacity_ = static_cast<uint32_t>(data_.capacity());
                 }
             } else {
                 index = freeSlots_.back();
@@ -203,6 +209,7 @@ namespace BGE {
         typedef std::vector<HandleBackingType> FreeVector;
         
         uint32_t    initialCapacity_;
+        uint32_t    currCapacity_;
         uint32_t    numResizes_;
         uint32_t    maxAllocated_;
         uint32_t    maxLimit_;
