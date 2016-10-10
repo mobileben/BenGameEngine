@@ -77,6 +77,11 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
         auto channelRef = &channels[i];
         auto obj = space->createAnimChannel(channelRef->reference, channelRef->name, channelRef, nullptr);
         auto xform = obj->getComponent<TransformComponent>();
+        auto xformHandle = xform->getHandle<TransformComponent>();
+
+        // Refresh root/seqXform in case handle capacity changed
+        root = getGameObject();
+        seqXform = root->getComponent<TransformComponent>();
 
         seqXform->addChild(xform);
         
@@ -94,6 +99,9 @@ void BGE::AnimationSequenceComponent::setAnimationSequenceReference(const Animat
             
             if (newObj) {
                 auto newXform = newObj->getComponent<TransformComponent>();
+                
+                // Force update xform in case a resize of handle capacity occurred
+                xform = space->getComponent(xformHandle);
                 
                 xform->addChild(newXform);
                 

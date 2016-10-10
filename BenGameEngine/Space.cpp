@@ -325,6 +325,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
     
     if (animSeqRef) {
         auto obj = createGameObject(instanceName);
+        auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
         auto boundingBox = createComponent<BoundingBoxComponent>();
         auto animSeq = createComponent<AnimationSequenceComponent>();
@@ -336,31 +337,38 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
         obj->addComponent(animator);
         
         animSeq->setAnimationSequenceReference(animSeqRef);
+        
+        // Refresh obj/animator in case handle capacity increased
+        obj = getGameObject(objHandle);
+        animator = obj->getComponent<AnimatorComponent>();
+        
         animator->setFrame(0, true);
         
         addCreatedGameObjectsForAnimSequence(obj, pushBitmask, objects);
-        //obj->setActive(true);
         
         return obj;
     }
     
-    return nullptr;}
+    return nullptr;
+}
 
 BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string instanceName, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate) {
     if (channelRef) {
         auto obj = createGameObject(instanceName);
+        auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
         auto channel = createComponent<AnimationChannelComponent>();
         auto animator = createComponent<ChannelFrameAnimatorComponent>();
-        
+
         obj->addComponent(xform);
         obj->addComponent(channel);
         obj->addComponent(animator);
         
         channel->setAnimationChannelReference(channelRef);
         
-        //obj->setActive(true);
-        
+        // Refresh obj/animator in case handle capacity increased
+        obj = getGameObject(objHandle);
+
         return obj;
     }
     
@@ -379,6 +387,7 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
     
     if (animSeqRef) {
         auto obj = createGameObject(instanceName);
+        auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
         auto animSeq = createComponent<AnimationSequenceComponent>();
         auto animator = createComponent<FrameAnimatorComponent>();
@@ -389,7 +398,8 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
         
         animSeq->setAnimationSequenceReference(animSeqRef);
         
-        //obj->setActive(true);
+        // Refresh obj/animator in case handle capacity increased
+        obj = getGameObject(objHandle);
         
         return obj;
     }
@@ -419,6 +429,7 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
     
     if (buttonRef) {
         auto obj = createGameObject(instanceName);
+        auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
         auto button = createComponent<ButtonComponent>();
         auto bbox = createComponent<BoundingBoxComponent>();
@@ -429,10 +440,11 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
         
         button->setButtonReference(buttonRef);
         
+        // Refresh obj/animator in case handle capacity increased
+        obj = getGameObject(objHandle);
+        
         addCreatedGameObjectsForButton(obj, pushBitmask, objects);
 
-        //obj->setActive(true);
-        
         return obj;
     }
     
@@ -527,8 +539,6 @@ BGE::GameObject *BGE::Space::createMask(std::string name, std::string instanceNa
             addCreatedGameObjectsForRenderComponent<MaskComponent>(obj, objects);
         }
         
-        //obj->setActive(true);
-        
         return obj;
     }
     
@@ -561,8 +571,6 @@ BGE::GameObject *BGE::Space::createSprite(std::string name, std::string instance
         obj->addComponent(bbox);
         
         sprite->setTextureReference(texRef);
-        
-        //obj->setActive(true);
         
         if (objects && pushBitmask & SpriteRenderComponent::bitmask_) {
             addCreatedGameObjectsForRenderComponent<SpriteRenderComponent>(obj, objects);
@@ -604,8 +612,6 @@ BGE::GameObject *BGE::Space::createText(std::string name, std::string instanceNa
             addCreatedGameObjectsForRenderComponent<TextComponent>(obj, objects);
         }
         
-        //obj->setActive(true);
-        
         return obj;
     }
     
@@ -640,8 +646,6 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string insta
         if (objects && pushBitmask & PlacementComponent::bitmask_) {
             addCreatedGameObjectsForRenderComponent<PlacementComponent>(obj, objects);
         }
-        
-        //obj->setActive(true);
         
         return obj;
     }
@@ -772,6 +776,9 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
         }
         
         TransformComponent *rootXform = nullptr;
+        
+        // Update root in case allocations moved handles
+        root = getGameObject(rootHandle);
         
         if (root) {
             rootXform = root->getComponent<TransformComponent>();

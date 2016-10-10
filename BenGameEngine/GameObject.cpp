@@ -61,9 +61,11 @@ BGE::Space *BGE::GameObject::getSpace() const {
 }
 
 BGE::GameObject *BGE::GameObject::find(ComponentTypeId componentTypeId, std::string name) {
-    for (auto &componentHandle : components_) {
-        if (componentHandle.typeId == componentTypeId && getName() == name) {
-            return this;
+    if (getName() == name) {
+        for (auto &componentHandle : components_) {
+            if (componentHandle.typeId == componentTypeId) {
+                return this;
+            }
         }
     }
     
