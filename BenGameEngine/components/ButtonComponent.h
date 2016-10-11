@@ -48,7 +48,6 @@ namespace BGE {
         // This may be considered unconventional in that we are allowing us to get another component from this, however it allows us to properly
         // get the most updated BBOX info
         BoundingBoxComponent *getBoundingBox();
-        TransformComponent *getTransform();
         
         bool isAnimating() const;
         void setAnimate(bool animate);

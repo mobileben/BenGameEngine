@@ -241,19 +241,6 @@ BGE::BoundingBoxComponent *BGE::ButtonComponent::getBoundingBox() {
     }
 }
 
-BGE::TransformComponent *BGE::ButtonComponent::getTransform() {
-    auto currentButton = getSpace()->getGameObject(currentButtonHandle);
-    
-    if (currentButton) {
-        return currentButton->getComponent<TransformComponent>();
-    } else {
-        auto gameObjHandle = getGameObjectHandle();
-        auto gameObj = getSpace()->getGameObject(gameObjHandle);
-
-        return gameObj->getComponent<TransformComponent>();
-    }
-}
-
 bool BGE::ButtonComponent::isAnimating() const {
     return animate;
 }
