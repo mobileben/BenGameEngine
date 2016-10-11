@@ -173,35 +173,41 @@ void BGE::InputService::update(double deltaTime) {
                 std::vector<ButtonComponent *> buttonTouchComponents;
                 space->getComponents<ButtonComponent>(buttonTouchComponents);
                 
-                for (auto const &touch : buttonTouchComponents) {
+                for (auto const touch : buttonTouchComponents) {
                     if (touch->isEnabled()) {
                         auto gameObjHandle = touch->getGameObjectHandle();
+                        auto obj = touch->getGameObject();
+                        auto xform = obj->getComponent<TransformComponent>();
                         
-                        // Compute collision if exists
-                        auto bbox = touch->getBoundingBox();
-                        auto xform = touch->getTransform();
-                        
-                        Matrix4 matrix;
-                        bool inBounds = false;
-                        
-                        xform->getWorldMatrix(matrix);
-                        bbox->computeAABB(matrix);
-                        
-                        if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
-                            if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {
-                                inBounds = true;
+                        if (xform->isVisible()) {
+                            
+                            printf("BUTTON %s\n", obj->getName().c_str());
+                            
+                            // Compute collision if exists
+                            auto bbox = touch->getBoundingBox();
+                            
+                            Matrix4 matrix;
+                            bool inBounds = false;
+                            
+                            xform->getWorldMatrix(matrix);
+                            bbox->computeAABB(matrix);
+                            
+                            if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
+                                if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {
+                                    inBounds = true;
+                                }
                             }
+                            
+                            InputButtonHandler buttonHandler;
+                            
+                            buttonHandler.spaceHandle = handle;
+                            buttonHandler.gameObjHandle = gameObjHandle;
+                            buttonHandler.buttonComponentHandle = touch->getHandle<ButtonComponent>();
+                            buttonHandler.touchType = input->type;
+                            buttonHandler.inBounds = inBounds;
+                            
+                            inputButtonHandlers_.push_back(buttonHandler);
                         }
-                        
-                        InputButtonHandler buttonHandler;
-                        
-                        buttonHandler.spaceHandle = handle;
-                        buttonHandler.gameObjHandle = gameObjHandle;
-                        buttonHandler.buttonComponentHandle = touch->getHandle<ButtonComponent>();
-                        buttonHandler.touchType = input->type;
-                        buttonHandler.inBounds = inBounds;
-                        
-                        inputButtonHandlers_.push_back(buttonHandler);
                     }
                 }
                 
