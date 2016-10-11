@@ -181,8 +181,6 @@ void BGE::InputService::update(double deltaTime) {
                         
                         if (xform->isVisible()) {
                             
-                            printf("BUTTON %s\n", obj->getName().c_str());
-                            
                             // Compute collision if exists
                             auto bbox = touch->getBoundingBox();
                             
