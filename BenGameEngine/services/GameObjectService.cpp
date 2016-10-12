@@ -110,9 +110,18 @@ void BGE::GameObjectService::getAllChildGameObjects(GameObject *root, std::vecto
 
 void BGE::GameObjectService::removeGameObject(GameObject *object) {
     if (object) {
+        auto xform = object->getComponent<TransformComponent>();
+        
+        if (xform) {
+            xform->removeFromParent();
+        }
+        
         std::vector<GameObject *> objects;
         
         getAllChildGameObjects(object, objects);
+
+        // Add the game object to the end to ensure it gets removed
+        objects.push_back(object);
         
         for (auto object : objects) {
             auto handle = object->getHandle();
