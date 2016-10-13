@@ -25,7 +25,8 @@ namespace BGE {
     enum class ScenePackageStatus {
         Invalid,
         Loading,
-        Valid
+        Valid,
+        Linked
     };
     
     enum class ScenePackageError : int32_t {
@@ -59,7 +60,7 @@ namespace BGE {
             return hasExternal_;
         }
         
-        inline bool isValid() const { return status_ == ScenePackageStatus::Valid; }
+        inline bool isValid() const { return status_ >= ScenePackageStatus::Valid; }
         inline ScenePackageHandle getHandle() const { return handle_; }
         
         BaseDirectory getBaseDirectory() const;

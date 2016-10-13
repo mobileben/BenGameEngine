@@ -362,6 +362,10 @@ int32_t BGE::ScenePackage::getAutoDisplayListSize() const {
 }
 
 void BGE::ScenePackage::link() {
+    if (status_ != ScenePackageStatus::Valid) {
+        return;
+    }
+    
     // Link Texture
     std::shared_ptr<TextureService> textureService = Game::getInstance()->getTextureService();
     textureNames_ = FixedArray<const char*>(textures_.size());
@@ -727,11 +731,13 @@ void BGE::ScenePackage::link() {
         }
     }
     
+    status_ = ScenePackageStatus::Linked;
+    
     computeMemoryUsage();
 }
 
 void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback) {
-    if (status_ != ScenePackageStatus::Valid) {
+    if (status_ < ScenePackageStatus::Valid) {
         float platformScale = 2.0;
         
         // Textures
