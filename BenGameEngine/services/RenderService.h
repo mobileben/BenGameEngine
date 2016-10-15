@@ -83,6 +83,8 @@ namespace BGE {
         
         Vector2 getWindowWidthHeight() const;
         
+        Vector2 deviceCoordinatesFromRenderCoordinates(Vector2 pos);
+        
         virtual std::shared_ptr<ShaderProgram> pushShaderProgram(std::string program) =0;
         virtual std::shared_ptr<ShaderProgram> popShaderProgram() =0;
         

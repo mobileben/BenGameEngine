@@ -54,3 +54,31 @@ BGE::Vector2 BGE::RenderService::getWindowWidthHeight() const {
     return wh;
 }
 
+BGE::Vector2 BGE::RenderService::deviceCoordinatesFromRenderCoordinates(Vector2 pos) {
+    // This is the MacOS/iOS implementation
+    Vector2 convertedPos;
+    auto window = this->getRenderWindow();
+    auto scale = window->getContentScaleFactor();
+    
+    switch (coordSystem2D_) {
+        case Render2DCoordinateSystem::Traditional:
+            convertedPos.x =  pos.x / scale;
+            convertedPos.y =  pos.y / scale;
+            break;
+        case Render2DCoordinateSystem::TraditionalCentered:
+            convertedPos.x =  pos.x / scale + window->getWidth()/2;
+            convertedPos.y =  pos.y / scale + window->getHeight()/2;
+            break;
+        case Render2DCoordinateSystem::OpenGL:
+            convertedPos.x =  pos.x / scale;
+            convertedPos.y =  window->getHeight() - pos.y / scale;
+            break;
+        case Render2DCoordinateSystem::OpenGLCentered:
+            convertedPos.x = pos.x / scale + window->getWidth() / 2;
+            convertedPos.y = window->getHeight() / 2 - pos.y / scale;
+            break;
+    }
+    
+    return convertedPos;
+}
+
