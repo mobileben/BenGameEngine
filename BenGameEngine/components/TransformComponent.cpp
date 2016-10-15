@@ -269,7 +269,7 @@ BGE::Vector2 BGE::TransformComponent::getGlobalPosition() {
     
     getWorldMatrix(mtx);
     
-    Matrix4MultiplyVector2(results, mtx, position_);
+    Matrix4MultiplyVector2(results, mtx, Vector2{0, 0});
                            
     return results;
 }
