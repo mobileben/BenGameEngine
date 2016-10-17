@@ -34,33 +34,20 @@ void BGE::LogicService::update(double deltaTime) {
     addRemoveLock();
     
     // Update our list based on our array
-    std::vector<std::pair<SpaceHandle, GameObjectHandle>> removeQueue;
-    
     for (auto &element : addRemoveQueue_) {
         auto item = std::make_pair(element.spaceHandle, element.gameObjHandle);
         
         if (element.op == Operation::Add) {
             gameObjectHandles_.push_back(item);
         } else {
-            removeQueue.push_back(item);
-        }
-    }
-    
-    for (auto it=gameObjectHandles_.begin();it!=gameObjectHandles_.end();) {
-        bool found = false;
-        
-        for (auto rIt=removeQueue.begin();rIt!=removeQueue.end();rIt++) {
-            if (*rIt == *it) {
-                removeQueue.erase(rIt);
-                found = true;
-                break;
+            auto removeHandle = element.gameObjHandle;
+            
+            for (auto it=gameObjectHandles_.begin();it!=gameObjectHandles_.end();it++) {
+                if (it->second == removeHandle) {
+                    gameObjectHandles_.erase(it);
+                    break;
+                }
             }
-        }
-        
-        if (found) {
-            it = gameObjectHandles_.erase(it);
-        } else {
-            it++;
         }
     }
     
@@ -136,29 +123,9 @@ void BGE::LogicService::addGameObject(GameObject *gameObject) {
     
     auto spaceHandle = gameObject->getSpace()->getHandle();
     auto gameObjHandle = gameObject->getHandle();
-    bool found = false;
     
-    for (auto it=addRemoveQueue_.begin();it!=addRemoveQueue_.end();it++) {
-        if (it->spaceHandle == spaceHandle && it->gameObjHandle == gameObjHandle) {
-            // We have an existing. If it is an Add, then we have a repeat.
-            if (it->op == Operation::Add) {
-                found = true;
-                break;
-            } else if (it->op == Operation::Remove) {
-                // Remove this
-                addRemoveQueue_.erase(it);
-                found = true;
-                break;
-            } else {
-                assert(false);
-            }
-        }
-    }
-    
-    if (!found) {
-        LogicElement element{Operation::Add, spaceHandle, gameObjHandle};
-        addRemoveQueue_.push_back(element);
-    }
+    LogicElement element{Operation::Add, spaceHandle, gameObjHandle};
+    addRemoveQueue_.push_back(element);
     
     addRemoveUnlock();
 }
@@ -168,29 +135,9 @@ void BGE::LogicService::removeGameObject(GameObject *gameObject) {
     
     auto spaceHandle = gameObject->getSpace()->getHandle();
     auto gameObjHandle = gameObject->getHandle();
-    bool found = false;
-    
-    for (auto it=addRemoveQueue_.begin();it!=addRemoveQueue_.end();it++) {
-        if (it->spaceHandle == spaceHandle && it->gameObjHandle == gameObjHandle) {
-            // We have an existing. If it is an Add, then we have a repeat.
-            if (it->op == Operation::Remove) {
-                found = true;
-                break;
-            } else if (it->op == Operation::Add) {
-                // Remove this
-                addRemoveQueue_.erase(it);
-                found = true;
-                break;
-            } else {
-                assert(false);
-            }
-        }
-    }
-    
-    if (!found) {
-        LogicElement element{Operation::Remove, spaceHandle, gameObjHandle};
-        addRemoveQueue_.push_back(element);
-    }
+
+    LogicElement element{Operation::Remove, spaceHandle, gameObjHandle};
+    addRemoveQueue_.push_back(element);
 
     addRemoveUnlock();
 }
