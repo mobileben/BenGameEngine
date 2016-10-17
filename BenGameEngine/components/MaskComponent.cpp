@@ -31,6 +31,11 @@ void BGE::MaskComponent::setMaskReference(const MaskReference &maskRef) {
     wh.w = maskRef.width;
     wh.h = maskRef.height;
     setWidthHeight(wh);
+
+    // Update the material
+    Color color = { 1, 0, 1, 1 };
+    auto handle = Game::getInstance()->getMaterialService()->createMaterial(color);
+    setMaterials({handle});
 }
 
 void BGE::MaskComponent::setWidth(float width) {
