@@ -3,12 +3,12 @@
 varying lowp vec2 TexCoordOut;
 uniform sampler2D Texture;
 uniform lowp mat4 ColorMatrix;
-uniform lowp vec4 ColorOffset;
+uniform lowp vec4 ColorMatOffset;
 
 void main()
 {
     lowp vec4 textureColor = texture2D(Texture, TexCoordOut);
-    lowp vec4 frag = (textureColor * ColorMatrix) + ColorOffset;
+    lowp vec4 frag = (textureColor * ColorMatrix) + ColorMatOffset;
     lowp vec4 destColor = gl_LastFragData[0];
     
     gl_FragColor =  frag * frag.a + destColor * ( 1.0 - frag.a);

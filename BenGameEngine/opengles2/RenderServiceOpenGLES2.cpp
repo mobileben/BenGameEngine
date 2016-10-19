@@ -199,11 +199,15 @@ void BGE::RenderServiceOpenGLES2::createShaders()
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, "ColorMatrixTextureVertex");
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, "ColorMatrixTextureFragment");
-    program = this->getShaderService()->createShaderProgram("ColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "ColorMatrix", "ColorOffset" });
+    program = this->getShaderService()->createShaderProgram("ColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "ColorMatrix", "ColorMatOffset" });
+    
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "FullColorTextureVertex");
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "FullColorTextureFragment");
+    program = this->getShaderService()->createShaderProgram("FullColorTexture", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "ColorMatrix", "ColorMatOffset", "ColorMultiplier", "ColorOffset" });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, "MaskColorMatrixTextureVertex");
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, "MaskColorMatrixTextureFragment");
-    program = this->getShaderService()->createShaderProgram("MaskColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn", "MaskTexCoordIn" }, { "ModelView", "Projection", "Texture", "MaskTexture", "colorMatrix", "colorOffset" });
+    program = this->getShaderService()->createShaderProgram("MaskColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn", "MaskTexCoordIn" }, { "ModelView", "Projection", "Texture", "MaskTexture", "ColorMatrix", "ColorMatOffset" });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, "FontVertex");
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, "FontFragment");
@@ -702,7 +706,11 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
 #endif
                     
                     if (texture && texture->isValid()) {
+#if 0
                         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("ColorMatrixTexture"));
+#else
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("FullColorTexture"));
+#endif
                         
                         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
                         
@@ -718,7 +726,9 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                         auto transformComponent = gameObject->getComponent<TransformComponent>();
                         GLint modelLocation = glShader->locationForUniform("ModelView");
                         GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
-                        GLint colorOffsetLocation = glShader->locationForUniform("ColorOffset");
+                        GLint colorMatOffsetLocation = glShader->locationForUniform("ColorMatOffset");
+                        auto colorMultiplierLocation = glShader->locationForUniform("ColorMultiplier");
+                        auto colorOffsetLocation = glShader->locationForUniform("ColorOffset");
                         
                         if (transformComponent) {
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->worldMatrix_.m);
@@ -731,7 +741,10 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                         }
                         
                         glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) currentColorMatrix_.matrix.m);
-                        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) currentColorMatrix_.offset.v);
+                        glUniform4fv(colorMatOffsetLocation, 1, (GLfloat *) currentColorMatrix_.offset.v);
+
+                        glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) currentColorTransform_.multiplier.v);
+                        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) currentColorTransform_.offset.v);
                         
                         glDisable(GL_BLEND);
                         
@@ -922,7 +935,8 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         }
         
         if (colorTransform) {
-            
+            auto tColor = currentColorTransform_ * colorTransform->transform;
+            currentColorTransform_ = tColor;
         }
         
         if (gameObj->hasComponent<LineRenderComponent>()) {

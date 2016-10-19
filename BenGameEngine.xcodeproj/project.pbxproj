@@ -93,6 +93,8 @@
 		B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */; };
 		B5ACE8951CBF7B00004B6871 /* LineRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8931CBF7AFF004B6871 /* LineRenderComponent.cpp */; };
 		B5AE8C9A1CEC44E100FAA0DC /* ScenePackage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5AE8C981CEC44E100FAA0DC /* ScenePackage.cpp */; };
+		B5B457271DB6DC2D0099CB42 /* FullColorTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B56470881DB6D7E4003AC11F /* FullColorTextureFragment.glsl */; };
+		B5B457281DB6DC2D0099CB42 /* FullColorTextureVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B56470891DB6D7E4003AC11F /* FullColorTextureVertex.glsl */; };
 		B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */; };
 		B5C388E21D24D91B00137CEC /* ColorTransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */; };
 		B5DCDA231CE2F9F100CBF0A6 /* HandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */; };
@@ -282,6 +284,8 @@
 		B5503D801D51A6B700FC77B6 /* CommonHUD-iPh6.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "CommonHUD-iPh6.json"; path = "testPackage/commonhud/CommonHUD-iPh6.json"; sourceTree = "<group>"; };
 		B55194A21D28C2B100BDAA5D /* ComponentBitmask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ComponentBitmask.cpp; path = components/ComponentBitmask.cpp; sourceTree = "<group>"; };
 		B55194A31D28C2B100BDAA5D /* ComponentBitmask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ComponentBitmask.h; path = components/ComponentBitmask.h; sourceTree = "<group>"; };
+		B56470881DB6D7E4003AC11F /* FullColorTextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FullColorTextureFragment.glsl; path = shaders/FullColorTextureFragment.glsl; sourceTree = "<group>"; };
+		B56470891DB6D7E4003AC11F /* FullColorTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FullColorTextureVertex.glsl; path = shaders/FullColorTextureVertex.glsl; sourceTree = "<group>"; };
 		B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureVertex.glsl; path = shaders/ColorMatrixTextureVertex.glsl; sourceTree = "<group>"; };
 		B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureFragment.glsl; path = shaders/ColorMatrixTextureFragment.glsl; sourceTree = "<group>"; };
 		B571F1761C93B604007F5A90 /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sample.png; path = textures/sample.png; sourceTree = "<group>"; };
@@ -593,6 +597,8 @@
 				B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */,
 				B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */,
 				B571F1941C9E1B94007F5A90 /* FontVertex.glsl */,
+				B56470881DB6D7E4003AC11F /* FullColorTextureFragment.glsl */,
+				B56470891DB6D7E4003AC11F /* FullColorTextureVertex.glsl */,
 				B5E7B9B41CC35B5000978F1A /* LineFragment.glsl */,
 				B5E7B9B51CC35B5000978F1A /* LineVertex.glsl */,
 				B571F17A1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl */,
@@ -901,6 +907,8 @@
 				B525E3DD1C895A1900C691C0 /* SimpleVertex.glsl in Resources */,
 				B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */,
 				B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */,
+				B5B457281DB6DC2D0099CB42 /* FullColorTextureVertex.glsl in Resources */,
+				B5B457271DB6DC2D0099CB42 /* FullColorTextureFragment.glsl in Resources */,
 				B525E3DE1C895A1900C691C0 /* TextureFragment.glsl in Resources */,
 				B525E3DF1C895A1900C691C0 /* TextureVertex.glsl in Resources */,
 				B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */,

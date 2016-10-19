@@ -62,6 +62,7 @@ BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(std::st
         }
     } else {
         state_ = ShaderProgramState::GLError;
+        assert(false);
     }
     
     return state_;
