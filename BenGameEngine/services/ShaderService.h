@@ -23,8 +23,8 @@ namespace BGE {
         
         virtual void initialize() {}
         virtual void reset() {}
-        virtual void enteringBackground() { Service::enteringBackground(); }
-        virtual void enteringForeground() { Service::enteringForeground(); }
+        virtual void platformSuspending() { Service::platformSuspending(); }
+        virtual void platformResuming() { Service::platformResuming(); }
         virtual void pause() { Service::pause(); }
         virtual void resume() { Service::resume(); }
         virtual void destroy() {}

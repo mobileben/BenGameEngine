@@ -141,7 +141,10 @@ void BGE::InputService::spaceReset(Space *space) {
             if (handler->spaceHandle == spaceHandle) {
 #if DEBUG
                 auto gameObj = space->getGameObject(handler->gameObjHandle);
-                printf("WARNING: removing input handler for space %s, gameObj %s\n", space->getName().c_str(), gameObj->getName().c_str());
+                
+                if (gameObj) {
+                    printf("WARNING: removing input handler for space %s, gameObj %s\n", space->getName().c_str(), gameObj->getName().c_str());
+                }
 #endif
                 hIt = mapIt.second.erase(hIt);
                 eventService->removeEventHandler(handle);
@@ -274,8 +277,7 @@ void BGE::InputService::update(double deltaTime) {
                 }
             }
         } else {
-            // buttonHandlers must be associated with active game objects
-            assert(false);
+            // buttonHandlers must be associated with active game objects, but it is possible they are nullptr due to being released during processing
         }
     }
     
@@ -303,8 +305,7 @@ void BGE::InputService::update(double deltaTime) {
                 }
             }
         } else {
-            // buttonHandlers must be associated with active game objects
-            assert(false);
+            // buttonHandlers must be associated with active game objects, but it is possible they are nullptr due to being released during processing
         }
     }
     

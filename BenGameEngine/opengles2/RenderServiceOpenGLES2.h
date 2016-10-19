@@ -32,8 +32,8 @@ namespace BGE {
         
         virtual void initialize() final;
         virtual void reset() final;
-        virtual void enteringBackground() final;
-        virtual void enteringForeground() final;
+        virtual void platformSuspending() final;
+        virtual void platformResuming() final;
         virtual void pause() final;
         virtual void resume() final;
         virtual void destroy() final;

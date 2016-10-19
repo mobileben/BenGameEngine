@@ -26,16 +26,16 @@ BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCou
 
 void BGE::HeartbeatService::initialize() {}
 void BGE::HeartbeatService::reset() {}
-void BGE::HeartbeatService::enteringBackground() {
-    Service::enteringBackground();
+void BGE::HeartbeatService::platformSuspending() {
+    Service::platformSuspending();
     
-    [iosHeartbeat_ enteringBackground];
+    [iosHeartbeat_ platformSuspending];
 }
 
-void BGE::HeartbeatService::enteringForeground() {
-    Service::enteringForeground();
+void BGE::HeartbeatService::platformResuming() {
+    Service::platformResuming();
     
-    [iosHeartbeat_ enteringForeground];
+    [iosHeartbeat_ platformResuming];
     
     // Get our lastCounter to a good time so we don't get a huge jump in time
     lastCounter_ = mach_absolute_time();

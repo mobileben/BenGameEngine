@@ -24,8 +24,8 @@ namespace BGE {
         
         virtual void initialize() =0;
         virtual void reset() =0;
-        virtual void enteringBackground() { backgrounded_ = true; };
-        virtual void enteringForeground() { backgrounded_ = false; };
+        virtual void platformSuspending() { backgrounded_ = true; };
+        virtual void platformResuming() { backgrounded_ = false; };
         virtual void pause() { paused_ = true; };
         virtual void resume() { paused_ = false; };
         virtual void destroy() =0;

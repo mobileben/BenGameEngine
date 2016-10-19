@@ -54,8 +54,8 @@ namespace BGE {
         // Service functions
         void initialize() override;
         void reset() override;
-        void enteringBackground() override;
-        void enteringForeground() override;
+        void platformSuspending() override;
+        void platformResuming() override;
         void pause() override;
         void resume() override;
         void destroy() override;

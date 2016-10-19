@@ -31,8 +31,8 @@ namespace BGE {
         
         void initialize() final {}
         void reset() final {}
-        void enteringBackground() final { Service::enteringBackground(); }
-        void enteringForeground() final { Service::enteringForeground(); }
+        void platformSuspending() final { Service::platformSuspending(); }
+        void platformResuming() final { Service::platformResuming(); }
         void pause() final { Service::pause(); }
         void resume() final { Service::resume(); }
         void destroy() final {}
@@ -117,7 +117,7 @@ namespace BGE {
         Texture *createSubTexture(TextureAtlasHandle atlasHandle, std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated = false);
     
     private:
-        static const uint32_t InitialTextureReserve = 1024;
+        static const uint32_t InitialTextureReserve = 4096;
         static const uint32_t InitialTextureAtlasReserve = 32;
         
         using TextureHandleService = HandleService<Texture, TextureHandle>;

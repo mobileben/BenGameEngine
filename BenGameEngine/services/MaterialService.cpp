@@ -13,8 +13,8 @@ BGE::MaterialService::MaterialService() :  handleService_(InitialMaterialReserve
 
 void BGE::MaterialService::initialize() {}
 void BGE::MaterialService::reset() {}
-void BGE::MaterialService::enteringBackground() { Service::enteringBackground(); }
-void BGE::MaterialService::enteringForeground() { Service::enteringForeground(); }
+void BGE::MaterialService::platformSuspending() { Service::platformSuspending(); }
+void BGE::MaterialService::platformResuming() { Service::platformResuming(); }
 void BGE::MaterialService::pause() { Service::pause(); }
 void BGE::MaterialService::resume() { Service::resume(); }
 void BGE::MaterialService::destroy() {}

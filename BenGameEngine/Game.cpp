@@ -194,36 +194,64 @@ void BGE::Game::initialize() {
 void BGE::Game::reset() {
 }
 
-void BGE::Game::enteringBackground() {
-    Service::enteringBackground();
+void BGE::Game::platformSuspending() {
+    Service::platformSuspending();
     
-    renderService_->enteringBackground();
-    textureService_->enteringBackground();
-    fontService_->enteringBackground();
-    heartbeatService_->enteringBackground();
-    materialService_->enteringBackground();
-    scenePackageService_->enteringBackground();
-    animationService_->enteringBackground();
-    spaceService_->enteringBackground();
-    inputService_->enteringBackground();
-    logicService_->enteringBackground();
-    eventService_->enteringBackground();
+    renderService_->platformSuspending();
+    textureService_->platformSuspending();
+    fontService_->platformSuspending();
+    heartbeatService_->platformSuspending();
+    materialService_->platformSuspending();
+    scenePackageService_->platformSuspending();
+    animationService_->platformSuspending();
+    spaceService_->platformSuspending();
+    inputService_->platformSuspending();
+    logicService_->platformSuspending();
+    eventService_->platformSuspending();
 }
 
-void BGE::Game::enteringForeground() {
-    Service::enteringForeground();
+void BGE::Game::platformResuming() {
+    Service::platformResuming();
     
-    renderService_->enteringForeground();
-    textureService_->enteringForeground();
-    fontService_->enteringForeground();
-    heartbeatService_->enteringForeground();
-    materialService_->enteringForeground();
-    scenePackageService_->enteringForeground();
-    animationService_->enteringForeground();
-    spaceService_->enteringForeground();
-    inputService_->enteringForeground();
-    logicService_->enteringForeground();
-    eventService_->enteringForeground();
+    if (renderService_) {
+        renderService_->platformResuming();
+    }
+    
+    if (textureService_) {
+        textureService_->platformResuming();
+    }
+    
+    if (fontService_) {
+        fontService_->platformResuming();
+    }
+    
+    if (heartbeatService_) {
+        heartbeatService_->platformResuming();
+    }
+    
+    if (materialService_) {
+        scenePackageService_->platformResuming();
+    }
+    
+    if (animationService_) {
+        animationService_->platformResuming();
+    }
+    
+    if (spaceService_) {
+        spaceService_->platformResuming();
+    }
+    
+    if (inputService_) {
+        inputService_->platformResuming();
+    }
+    
+    if (logicService_) {
+        logicService_->platformResuming();
+    }
+    
+    if (eventService_) {
+        eventService_->platformResuming();
+    }
 }
 
 void BGE::Game::pause() {

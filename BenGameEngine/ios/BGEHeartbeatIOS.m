@@ -15,7 +15,7 @@
     self = [super init];
     
     if (self) {
-        [self enteringForeground];
+        [self platformResuming];
     }
     
     return self;
@@ -28,12 +28,12 @@
     }
 }
 
-- (void)enteringBackground {
+- (void)platformSuspending {
     [_displayLink invalidate];
     _displayLink = nil;
 }
 
-- (void)enteringForeground {
+- (void)platformResuming {
     if (!_displayLink) {
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];

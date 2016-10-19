@@ -51,18 +51,18 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0) {
 void BGE::RenderServiceOpenGLES2::initialize() {}
 void BGE::RenderServiceOpenGLES2::reset() {}
 
-void BGE::RenderServiceOpenGLES2::enteringBackground() {
+void BGE::RenderServiceOpenGLES2::platformSuspending() {
     lock();
     
-    Service::enteringBackground();
+    Service::platformSuspending();
     
     unlock();
 }
 
-void BGE::RenderServiceOpenGLES2::enteringForeground() {
+void BGE::RenderServiceOpenGLES2::platformResuming() {
     lock();
     
-    Service::enteringForeground();
+    Service::platformResuming();
     
     unlock();
 }

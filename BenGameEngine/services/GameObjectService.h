@@ -30,8 +30,8 @@ namespace BGE {
         
         void initialize() final {}
         void reset() final {}
-        void enteringBackground() final { Service::enteringBackground(); }
-        void enteringForeground() final { Service::enteringForeground(); }
+        void platformSuspending() final { Service::platformSuspending(); }
+        void platformResuming() final { Service::platformResuming(); }
         void pause() final { Service::pause(); }
         void resume() final { Service::resume(); }
         void destroy() final {}
@@ -97,7 +97,7 @@ namespace BGE {
         
         using GameObjectHandleService = HandleService<GameObject, GameObjectHandle>;
 
-        static const uint32_t InitialGameObjectReserve = 1024;
+        static const uint32_t InitialGameObjectReserve = 4096;
         static GameObjectHandleService handleService_;
         
         SpaceHandle         spaceHandle_;

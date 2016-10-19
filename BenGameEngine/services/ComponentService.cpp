@@ -33,16 +33,16 @@ std::vector<void *> BGE::ComponentService::componentHandleServices_;
 
 void BGE::ComponentService::registerComponents() {
     if (!ComponentService::componentsRegistered_) {
-        registerComponent<TransformComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<BoundingBoxComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<AnimationChannelComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<TransformComponent>(2048, HandleServiceNoMaxLimit);
+        registerComponent<BoundingBoxComponent>(2048, HandleServiceNoMaxLimit);
+        registerComponent<AnimationChannelComponent>(2048, HandleServiceNoMaxLimit);
         registerComponent<AnimationSequenceComponent>(1024, HandleServiceNoMaxLimit);
         registerComponent<AnimatorComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<ChannelFrameAnimatorComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<ChannelFrameAnimatorComponent>(2048, HandleServiceNoMaxLimit);
         registerComponent<ColorMatrixComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<ColorTransformComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<FrameAnimatorComponent>(120, HandleServiceNoMaxLimit);
-        registerComponent<SpriteRenderComponent>(120, HandleServiceNoMaxLimit);
+        registerComponent<SpriteRenderComponent>(2048, HandleServiceNoMaxLimit);
         registerComponent<LogicComponent>(1024, HandleServiceNoMaxLimit);
         registerComponent<TextComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<PlacementComponent>(120, HandleServiceNoMaxLimit);
@@ -76,6 +76,7 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
     auto typeId = handle.typeId;
     auto &handles = componentHandles_[typeId];
     
+    lock();
     for (auto h=handles.begin();h!=handles.end();++h) {
         if (h->handle == handle.handle) {
             if (typeId == TransformComponent::typeId_) {
@@ -121,9 +122,13 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
             }
 
             handles.erase(h);
+            
+            unlock();
             return;
         }
     }
+    
+    unlock();
 }
 
 void BGE::ComponentService::removeAllComponents() {

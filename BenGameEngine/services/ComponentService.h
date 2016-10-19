@@ -33,8 +33,8 @@ namespace BGE {
         
         void initialize() final {}
         void reset() final {}
-        void enteringBackground() final { Service::enteringBackground(); }
-        void enteringForeground() final { Service::enteringForeground(); }
+        void platformSuspending() final { Service::platformSuspending(); }
+        void platformResuming() final { Service::platformResuming(); }
         void pause() final { Service::pause(); }
         void resume() final { Service::resume(); }
         void destroy() final {}
@@ -111,6 +111,8 @@ namespace BGE {
             HANDLESERVICE *handleService = static_cast<HANDLESERVICE *>(componentHandleServices_[T::typeId_]);
             
             if (handleService) {
+                lock();
+                
                 HANDLE componentHandle;
                 T *component = handleService->allocate(componentHandle);
                 auto &handles = componentHandles_[T::typeId_];
@@ -121,6 +123,8 @@ namespace BGE {
                 assert(component);
                 
                 component->initialize(handle.handle, spaceHandle_);
+                
+                unlock();
                 
                 return component;
             }

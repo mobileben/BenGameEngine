@@ -28,8 +28,8 @@ namespace BGE {
         
         void initialize() final;
         void reset() final;
-        void enteringBackground() final;
-        void enteringForeground() final;
+        void platformSuspending() final;
+        void platformResuming() final;
         void pause() final;
         void resume() final;
         void destroy() final;
@@ -61,7 +61,7 @@ namespace BGE {
         Material *getMaterial(ObjectId matId) const;
         
     private:
-        static const uint32_t InitialMaterialReserve = 1024;
+        static const uint32_t InitialMaterialReserve = 2048;
         
         using MaterialHandleService = HandleService<Material, MaterialHandle>;
         
