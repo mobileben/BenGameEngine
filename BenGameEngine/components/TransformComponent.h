@@ -141,6 +141,7 @@ namespace BGE {
         Rect            bounds_;
         
         // Transformation
+        bool            useSkew_;   // Note this is Flash skew, not affine skew. When skew is in use, rotation is not used
         Vector2         position_;
         float           z_;
         

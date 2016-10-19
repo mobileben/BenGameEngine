@@ -15,13 +15,13 @@
 
 const std::string BGE::ScenePackage::ErrorDomain = "ScenePackage";
 
-BGE::ScenePackage::ScenePackage() : NamedObject(), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
+BGE::ScenePackage::ScenePackage() : NamedObject(), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), fontCount_(nullptr) {
     position_ = Vector2{0, 0};
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
 }
 
-BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), memoryUsage_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
+BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), memoryUsage_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), fontCount_(nullptr) {
     position_ = Vector2{0, 0};
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
@@ -482,6 +482,11 @@ void BGE::ScenePackage::link() {
         } else {
             keyframeRef->scale = nullptr;
         }
+        if (keyframeRefInt->skew != NullPtrIndex) {
+            keyframeRef->skew = keyframeRefInt->skew + vector2s_.baseAddress();
+        } else {
+            keyframeRef->skew = nullptr;
+        }
         keyframeRef->rotation = keyframeRefInt->rotation;
         keyframeRef->matrix = nullptr;  // TODO
         if (keyframeRefInt->colorMatrix != NullPtrIndex) {
@@ -712,6 +717,11 @@ void BGE::ScenePackage::link() {
         } else {
             elem->scale = nullptr;
         }
+        if (elemInt->skew != NullPtrIndex) {
+            elem->skew = elemInt->skew + vector2s_.baseAddress();
+        } else {
+            elem->skew = nullptr;
+        }
         elem->rotation = elemInt->rotation;
         elem->matrix = nullptr;  // TODO default matrix and default color matrix and default color transform
         if (elemInt->colorMatrix != NullPtrIndex) {
@@ -773,6 +783,7 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
         
         defaultPositionIndex_ = vector2Builder.add(Vector2{0, 0});
         defaultScaleIndex_ = vector2Builder.add(Vector2{1, 1});
+        defaultSkewIndex_ = vector2Builder.add(Vector2{0, 0});
         
         // TextureReferenceIntermediate total count are all textures and subTextures
         texIntBuilder.resize((int32_t) (textures.count + subtextures.count));
@@ -1004,6 +1015,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                             ColorMatrix *colorMatrix = &colorMatrixBacking;
                             Vector2 scaleBacking;
                             Vector2 *scale = &scaleBacking;
+                            Vector2 skewBacking;
+                            Vector2 *skew = &skewBacking;
                             Vector2 positionBacking;
                             Vector2 *position = &positionBacking;
                             
@@ -1026,10 +1039,10 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                 colorTransformBacking.multiplier.g = [childDict[@"color"][@"greenMultiplier"] floatValue];
                                 colorTransformBacking.multiplier.b = [childDict[@"color"][@"blueMultiplier"] floatValue];
                                 colorTransformBacking.multiplier.a = [childDict[@"color"][@"alphaMultiplier"] floatValue];
-                                colorTransformBacking.offset.r = [childDict[@"color"][@"redOffset"] floatValue];
-                                colorTransformBacking.offset.g = [childDict[@"color"][@"greenOffset"] floatValue];
-                                colorTransformBacking.offset.b = [childDict[@"color"][@"blueOffset"] floatValue];
-                                colorTransformBacking.offset.a = [childDict[@"color"][@"alphaOffset"] floatValue];
+                                colorTransformBacking.offset.r = [childDict[@"color"][@"redOffset"] floatValue] / 255.0;
+                                colorTransformBacking.offset.g = [childDict[@"color"][@"greenOffset"] floatValue] / 255.0;
+                                colorTransformBacking.offset.b = [childDict[@"color"][@"blueOffset"] floatValue] / 255.0;
+                                colorTransformBacking.offset.a = [childDict[@"color"][@"alphaOffset"] floatValue] / 255.0;
                                 colorTransformBacking.color = [childDict[@"color"][@"color"] floatValue];
                             } else {
                                 colorTransform = nullptr;
@@ -1110,6 +1123,14 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                 keyframe.rotation = 0;
                             }
                             
+                            // Skew
+                            if (childDict[@"skew"]) {
+                                skewBacking.x = [childDict[@"skew"][@"x"] floatValue];
+                                skewBacking.y = [childDict[@"skew"][@"y"] floatValue];
+                            } else {
+                                skew = nullptr;
+                            }
+                            
                             // TODO: Now build matrix
                             
                             // Now determine if this Keyframe is a new Keyframe
@@ -1137,12 +1158,14 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                     ColorMatrix *currColorMatrix;
                                     Vector2 *currPosition;
                                     Vector2 *currScale;
+                                    Vector2 *currSkew;
                                     
                                     currBounds = rectBuilder.safeAddressOf(currKeyframe->bounds);
                                     currColorTransform = colorXformBuilder.safeAddressOf(currKeyframe->colorTransform);
                                     currColorMatrix = colorMtxBuilder.safeAddressOf(currKeyframe->colorMatrix);
                                     currPosition = vector2Builder.safeAddressOf(currKeyframe->position);
                                     currScale = vector2Builder.safeAddressOf(currKeyframe->scale);
+                                    currSkew = vector2Builder.safeAddressOf(currKeyframe->skew);
                                     
                                     // Bounds the same?
                                     if ((currBounds != bounds) || ((currBounds && bounds) && (*currBounds != *bounds))) {
@@ -1150,6 +1173,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                     } else if ((currPosition != position) || ((currPosition && position) && (*currPosition != *position))) {
                                         isNew = true;
                                     } else if ((currScale != scale) || ((currScale && scale) && (*currScale != *scale))) {
+                                        isNew = true;
+                                    } else if ((currSkew != skew) || ((currSkew && skew) && (*currSkew != *skew))) {
                                         isNew = true;
                                     } else if ((currColorTransform != colorTransform) || ((currColorTransform && colorTransform) && (*currColorTransform != *colorTransform))) {
                                         isNew = true;
@@ -1173,6 +1198,12 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                     keyframe.scale = vector2Builder.add(*scale);
                                 } else {
                                     keyframe.scale = defaultScaleIndex_;
+                                }
+                                
+                                if (skew) {
+                                    keyframe.skew = vector2Builder.add(*skew);
+                                } else {
+                                    keyframe.skew = defaultSkewIndex_;
                                 }
                                 
                                 if (colorTransform) {
@@ -1383,6 +1414,17 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                 elem->scale = vector2Builder.add(scale);
             } else {
                 elem->scale = defaultScaleIndex_;
+            }
+            
+            if (dict[@"skew"]) {
+                Vector2 skew;
+                
+                skew.x = [dict[@"skew"][@"x"] floatValue];
+                skew.y = [dict[@"skew"][@"y"] floatValue];
+                
+                elem->skew = vector2Builder.add(skew);
+            } else {
+                elem->skew = defaultSkewIndex_;
             }
             
             if (dict[@"hidden"]) {

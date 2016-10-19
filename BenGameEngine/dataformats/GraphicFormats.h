@@ -77,6 +77,7 @@ namespace BGE {
         uint32_t frame;
         int32_t position;
         int32_t scale;
+        int32_t skew;
         float rotation;
         int32_t matrix;
         int32_t colorMatrix;
@@ -92,6 +93,7 @@ namespace BGE {
         uint32_t frame;
         Vector2 *position;
         Vector2 *scale;
+        Vector2 *skew;
         float  rotation;
         Matrix4 *matrix;
         ColorMatrix *colorMatrix;
@@ -244,6 +246,7 @@ namespace BGE {
         uint32_t            flags;
         int32_t             position;
         int32_t             scale;
+        int32_t             skew;
         float               rotation;
         int32_t             matrix;
         int32_t             colorMatrix;
@@ -259,6 +262,7 @@ namespace BGE {
         uint32_t            flags;
         Vector2             *position;
         Vector2             *scale;
+        Vector2             *skew;
         float               rotation;
         bool                hidden;
         Matrix4             *matrix;

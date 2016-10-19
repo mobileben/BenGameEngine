@@ -109,6 +109,7 @@ namespace BGE {
         
         int32_t                                             defaultPositionIndex_;
         int32_t                                             defaultScaleIndex_;
+        int32_t                                             defaultSkewIndex_;
         
         size_t                                              memoryUsage_;
 

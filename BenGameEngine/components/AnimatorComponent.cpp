@@ -186,7 +186,11 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
                 xform->setScaleX(1);
                 xform->setScaleY(1);
             }
-            
+            if (keyframe->skew) {
+                xform->setSkew(*keyframe->skew);
+            } else {
+                xform->setSkew(Vector2{0, 0});
+            }
             auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();
             auto colorTransform = gameObj->getComponent<ColorTransformComponent>();
             auto space = gameObj->getSpace();

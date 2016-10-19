@@ -133,6 +133,7 @@ namespace BGE {
     
     bool operator==(const ColorTransform& lhs, const ColorTransform& rhs);
     bool operator!=(const ColorTransform& lhs, const ColorTransform& rhs);
+    ColorTransform operator*(ColorTransform& lhs, ColorTransform& rhs);
 
     extern void ColorTransformMakeIdentity(ColorTransform &transform);
     
@@ -151,6 +152,7 @@ namespace BGE {
     extern void Matrix4MakeRotationZ(Matrix4& matrix, float radians);
     
     extern void Matrix4MakeScale(Matrix4& matrix, float sx, float sy, float sz);
+    extern void Matrix4MakeFlashSkew(Matrix4& matrix, float sx, float sy);
     
     extern void Matrix4MakeTranslation(Matrix4& matrix, float tx, float ty, float tz);
     

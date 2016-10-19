@@ -17,7 +17,7 @@ BGE::ComponentTypeId BGE::TransformComponent::typeId_ = Component::InvalidTypeId
 std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComponent);
 
 BGE::TransformComponent::TransformComponent() : Component(), visible_(true),
-bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), rotation_(0), localDirty_(false), worldDirty_(false), speed_(1), paused_(false) {
+bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), useSkew_(false), rotation_(0), localDirty_(false), worldDirty_(false), speed_(1), paused_(false) {
     Matrix4MakeIdentify(localMatrix_);
     Matrix4MakeIdentify(worldMatrix_);
 }
@@ -37,7 +37,9 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
     scale_.y = 1;
     skew_.x = 0;
     skew_.y = 0;
+    useSkew_ = false;
     rotation_ = 0;
+    
     
     localDirty_ = false;
     worldDirty_ = false;
@@ -153,6 +155,12 @@ void BGE::TransformComponent::setSkewX(float x) {
     if (skew_.x != x) {
         skew_.x = x;
         
+        if (skew_.x != 0 || skew_.y != 0) {
+            useSkew_ = true;
+        } else {
+            useSkew_ = false;
+        }
+        
         localDirty_ = worldDirty_ = true;
     }
 }
@@ -160,6 +168,12 @@ void BGE::TransformComponent::setSkewX(float x) {
 void BGE::TransformComponent::setSkewY(float y) {
     if (skew_.y != y) {
         skew_.y = y;
+        
+        if (skew_.x != 0 || skew_.y != 0) {
+            useSkew_ = true;
+        } else {
+            useSkew_ = false;
+        }
         
         localDirty_ = worldDirty_ = true;
     }
@@ -169,6 +183,12 @@ void BGE::TransformComponent::setSkew(Vector2 &skew) {
     if (skew_.x != skew.x || skew_.y != skew.y) {
         skew_ = skew;
         
+        if (skew_.x != 0 || skew_.y != 0) {
+            useSkew_ = true;
+        } else {
+            useSkew_ = false;
+        }
+        
         localDirty_ = worldDirty_ = true;
     }
 }
@@ -176,6 +196,12 @@ void BGE::TransformComponent::setSkew(Vector2 &skew) {
 void BGE::TransformComponent::setSkew(Vector2 &&skew) {
     if (skew_.x != skew.x || skew_.y != skew.y) {
         skew_ = skew;
+        
+        if (skew_.x != 0 || skew_.y != 0) {
+            useSkew_ = true;
+        } else {
+            useSkew_ = false;
+        }
         
         localDirty_ = worldDirty_ = true;
     }
@@ -206,7 +232,12 @@ void BGE::TransformComponent::updateMatrix() {
         Matrix4 mat2;
 
         Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
-        Matrix4MakeRotationZ(mat2, rotation_);
+
+        if (useSkew_) {
+            Matrix4MakeFlashSkew(mat2, skew_.x, skew_.y);
+        } else {
+            Matrix4MakeRotationZ(mat2, rotation_);
+        }
         
         localMatrix_ = mat2 * mat1;
         Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
@@ -236,13 +267,17 @@ void BGE::TransformComponent::updateMatrixAndChildren(bool parentDirty) {
         Matrix4 mat2;
         
         Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
-        Matrix4MakeRotationZ(mat2, rotation_);
+        
+        if (useSkew_) {
+            Matrix4MakeFlashSkew(mat2, skew_.x, skew_.y);
+        } else {
+            Matrix4MakeRotationZ(mat2, rotation_);
+        }
         
         localMatrix_ = mat2 * mat1;
         Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
         localMatrix_ = mat1 * localMatrix_;
     }
-
     
     if (parentDirty) {
         auto parent = getParent();

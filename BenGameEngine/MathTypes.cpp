@@ -287,6 +287,22 @@ namespace BGE {
         
         return false;
     }
+    
+    ColorTransform operator*(ColorTransform& lhs, ColorTransform& rhs) {
+        ColorTransform xform;
+        
+        xform.multiplier.r = lhs.multiplier.r * rhs.multiplier.r;
+        xform.multiplier.g = lhs.multiplier.g * rhs.multiplier.g;
+        xform.multiplier.b = lhs.multiplier.b * rhs.multiplier.b;
+        xform.multiplier.a = lhs.multiplier.a * rhs.multiplier.a;
+        
+        xform.offset.r = lhs.offset.r + lhs.multiplier.r * rhs.offset.r;
+        xform.offset.g = lhs.offset.g + lhs.multiplier.g * rhs.offset.g;
+        xform.offset.b = lhs.offset.b + lhs.multiplier.b * rhs.offset.b;
+        xform.offset.a = lhs.offset.a + lhs.multiplier.a * rhs.offset.a;
+        
+        return xform;
+    }
 
     void ColorTransformMakeIdentity(ColorTransform &transform) {
         transform.multiplier.r = 1;
@@ -487,6 +503,35 @@ namespace BGE {
         matrix.m[10] = sz;
     }
     
+    void Matrix4MakeFlashSkew(Matrix4& matrix, float sx, float sy) {
+        Matrix4MakeIdentify(matrix);
+        
+        float c_x = cosf(sx);
+        float s_x = sinf(sx);
+        float c_y = cosf(sy);
+        float s_y = sinf(sy);
+
+        matrix.m[0] = c_y;
+        matrix.m[1] = -s_x;
+        matrix.m[2] = 0;
+        matrix.m[3] = 0;
+        
+        matrix.m[4] = s_y;
+        matrix.m[5] = c_x;
+        matrix.m[6] = 0;
+        matrix.m[7] = 0;
+        
+        matrix.m[8] = 0;
+        matrix.m[9] = 0;
+        matrix.m[10] = 1;
+        matrix.m[11] = 0;
+        
+        matrix.m[12] = 0;
+        matrix.m[13] = 0;
+        matrix.m[14] = 0;
+        matrix.m[15] = 1;
+    }
+
     void Matrix4MakeTranslation(Matrix4& matrix, float tx, float ty, float tz)
     {
         Matrix4MakeIdentify(matrix);
