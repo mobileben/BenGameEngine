@@ -55,6 +55,7 @@ namespace BGE {
         Space *getSpace(std::string name) const;
         
         std::vector<SpaceHandle> getSpaces() const;
+        std::vector<SpaceHandle> getReversedSpaces() const;
         
     private:
         static const uint32_t InitialSpaceReserve = 32;

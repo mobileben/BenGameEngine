@@ -160,3 +160,26 @@ std::vector<BGE::SpaceHandle> BGE::SpaceService::getSpaces() const {
     
     return spaces;
 }
+
+
+std::vector<BGE::SpaceHandle> BGE::SpaceService::getReversedSpaces() const {
+    std::vector<SpaceHandle> spaces;
+    
+    for(auto handle : spaces_) {
+        spaces.push_back(handle);
+    }
+    
+    std::sort(spaces.begin(), spaces.end(),
+              [this](const SpaceHandle &lhs, const SpaceHandle &rhs) {
+                  auto lSpace = this->getSpace(lhs);
+                  auto rSpace = this->getSpace(rhs);
+                  
+                  if (lSpace && rSpace) {
+                      return rSpace->order_ < lSpace->order_;
+                  }
+                  
+                  return false;
+              });
+    
+    return spaces;
+}
