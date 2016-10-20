@@ -880,7 +880,7 @@ void BGE::RenderServiceOpenGLES2::render()
         for (auto const &handle : spaceHandles) {
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
-            if (space && space->isVisible()) {
+            if (space && space->isActive() && space->isVisible()) {
                 std::vector<GameObject *> objects;
                 
                 space->getRootGameObjects(objects);
