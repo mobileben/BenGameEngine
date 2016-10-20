@@ -94,6 +94,15 @@ namespace BGE {
             GameObjectHandle                    gameObjHandle;
         };
         
+        struct InputEventItem {
+            SpaceHandle                         spaceHandle;
+            GameObjectHandle                    gameObjHandle;
+            ButtonComponentHandle               buttonComponentHandle;
+            TouchType                           touchType;
+            Event                               event;
+            bool                                inBounds;
+        };
+        
         static const uint32_t InitialInputReserve = 64;
         
         using InputHandleService = HandleService<Input, InputHandle>;
@@ -108,6 +117,7 @@ namespace BGE {
         
         Input *createInput();
         void touchEvent(TouchType type, NSSet* touches, UIView* view);
+        bool checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue);
     };
 }
 
