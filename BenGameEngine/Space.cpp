@@ -360,6 +360,8 @@ BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string ins
         auto channel = createComponent<AnimationChannelComponent>();
         auto animator = createComponent<ChannelFrameAnimatorComponent>();
 
+        assert(obj);
+        
         obj->addComponent(xform);
         obj->addComponent(channel);
         obj->addComponent(animator);
@@ -658,12 +660,19 @@ BGE::GameObject *BGE::Space::createFlatRect(std::string instanceName, Vector2 &w
     auto xform = createComponent<TransformComponent>();
     auto flat = createComponent<FlatRectRenderComponent>();
     auto material = Game::getInstance()->getMaterialService()->createMaterial(color);
+    auto bbox = createComponent<BoundingBoxComponent>();
+    
+    bbox->x = 0;
+    bbox->y = 0;
+    bbox->width = wh.w;
+    bbox->height = wh.h;
     
     flat->setWidthHeight(wh);
     flat->setMaterials({material});
     
     obj->addComponent(xform);
     obj->addComponent(flat);
+    obj->addComponent(bbox);
     
     return obj;
 }
@@ -672,11 +681,13 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, TextureHandl
     auto obj = createGameObject(instanceName);
     auto xform = createComponent<TransformComponent>();
     auto sprite = createComponent<SpriteRenderComponent>();
-    
-    sprite->setTextureHandle(texHandle);
-    
+    auto bbox = createComponent<BoundingBoxComponent>();
+
     obj->addComponent(xform);
     obj->addComponent(sprite);
+    obj->addComponent(bbox);
+
+    sprite->setTextureHandle(texHandle);
     
     return obj;
 }
