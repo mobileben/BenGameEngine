@@ -99,7 +99,12 @@ void BGE::AnimationService::spaceReset(Space *space) {
             if (handler->spaceHandle == spaceHandle) {
 #if DEBUG
                 auto gameObj = space->getGameObject(handler->gameObjHandle);
-                printf("WARNING: removing anim handler for space %s, gameObj %s\n", space->getName().c_str(), gameObj->getName().c_str());
+                
+                if (gameObj) {
+                    printf("WARNING: removing anim handler for space %s, gameObj %s\n", space->getName().c_str(), gameObj->getName().c_str());
+                } else {
+                    printf("WARNING: removing anim handler for space %s, gameObj nullptr\n", space->getName().c_str());
+                }
 #endif
                 hIt = mapIt.second.erase(hIt);
                 eventService->removeEventHandler(handle);
