@@ -76,7 +76,7 @@ namespace BGE {
                     numResizes_++;
 
 #if DEBUG
-                    printf("WARNING: %s increased capacity from %ld to %ld. Increase #%ld\n", typeid(DATA).name(), currCapacity_, data_.capacity(), numResizes_);
+                    printf("WARNING: %s increased capacity from %u to %lu. Increase #%u\n", typeid(DATA).name(), currCapacity_, data_.capacity(), numResizes_);
 #endif
                     
                     currCapacity_ = static_cast<uint32_t>(data_.capacity());
