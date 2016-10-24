@@ -113,8 +113,6 @@ void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, Scen
     } else if (ext == "spkg") {
         createPackageFromSPKG(loadable, callback);
     } else {
-        assert(false);
-        
         if (callback) {
             callback(ScenePackageHandle(), std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::UnsupportedFormat)));
         }
