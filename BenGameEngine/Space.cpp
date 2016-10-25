@@ -696,11 +696,13 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, Texture *tex
     auto obj = createGameObject(instanceName);
     auto xform = createComponent<TransformComponent>();
     auto sprite = createComponent<SpriteRenderComponent>();
-
-    sprite->setTexture(texture);
+    auto bbox = createComponent<BoundingBoxComponent>();
     
     obj->addComponent(xform);
     obj->addComponent(sprite);
+    obj->addComponent(bbox);
+    
+    sprite->setTexture(texture);
     
     return obj;
 }
