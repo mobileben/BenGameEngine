@@ -74,6 +74,11 @@ BGE::TextureHandle BGE::TextureAtlas::getSubTextureHandle(std::string name) {
     }
 }
 
+BGE::Texture *BGE::TextureAtlas::getSubTexture(std::string name) {
+    auto handle = getSubTextureHandle(name);
+    
+    return BGE::Game::getInstance()->getTextureService()->getTexture(handle);
+}
 
 size_t BGE::TextureAtlas::getMemoryUsage() const {
     auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle_);
@@ -189,4 +194,8 @@ void BGE::TextureAtlas::createFromBuffer(void *buffer, TextureFormat format, uin
             callback(nullptr, error);
         }
     });
+}
+
+const std::map<std::string, BGE::TextureHandle>& BGE::TextureAtlas::getSubTextures() const {
+    return subTextures_;
 }

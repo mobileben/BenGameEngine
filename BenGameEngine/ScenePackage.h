@@ -76,6 +76,7 @@ namespace BGE {
         TextReference *getTextReference(std::string name);
         TextureReference *getTextureReference(std::string name);
         ExternalPackageReference *getExternalReference(std::string name);
+        bool hasSubTexture(std::string name);
         
         // Get the reference type for the item, if it exists
         GfxReferenceType getReferenceType(std::string name);

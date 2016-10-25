@@ -64,7 +64,9 @@ namespace BGE {
         
         std::string atlasTextureKey() const;
         TextureHandle getSubTextureHandle(std::string name);
-        
+        Texture *getSubTexture(std::string name);
+        const std::map<std::string, TextureHandle>& getSubTextures() const;
+
         size_t getMemoryUsage() const;
 
         void createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);

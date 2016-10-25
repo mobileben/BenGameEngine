@@ -526,6 +526,14 @@ void BGE::TextureService::removeTextureAtlas(ScenePackageHandle scenePackageHand
         for (auto const &packageTex : scenePackage->second) {
             if (packageTex.second == handle) {
                 auto atlas = getTextureAtlas(handle);
+                
+                // Now remove all subtextures
+                auto subTextures = atlas->getSubTextures();
+                
+                for (auto &subTex : subTextures) {
+                    removeTexture(scenePackageHandle, subTex.second);
+                }
+                
                 releaseTextureAtlas(atlas);
 
                 scenePackage->second.erase(packageTex.first);
@@ -688,7 +696,7 @@ void BGE::TextureService::createTextureFromBuffer(TextureAtlasHandle atlasHandle
 
 void BGE::TextureService::createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback)
 {
-    [textureLoader_ textureWithContentsOfFile:[[NSString alloc] initWithCString:filename.c_str() encoding:NSUTF8StringEncoding] options:@{ GLKTextureLoaderApplyPremultiplication: @(YES) } queue:nil completionHandler:^(GLKTextureInfo *textureInfo, NSError *error) {
+    [textureLoader_ textureWithContentsOfFile:[[NSString alloc] initWithCString:filename.c_str() encoding:NSUTF8StringEncoding] options:@{ GLKTextureLoaderApplyPremultiplication: @(NO) } queue:nil completionHandler:^(GLKTextureInfo *textureInfo, NSError *error) {
         std::shared_ptr<Error> bgeError;
         
         if (textureInfo) {
@@ -763,6 +771,12 @@ void BGE::TextureService::createTextureAtlasFromFile(ScenePackageHandle scenePac
             if (atlas) {
                 auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
                 scenePackage[name] = atlas->getHandle();
+                
+                // Now for each item in the atlas, add it to normal textures
+                auto &sceneTex = packageTextures_[scenePackageHandle];
+                auto subTextures = atlas->getSubTextures();
+                
+                sceneTex.insert(subTextures.begin(), subTextures.end());
             }
             
             if (callback) {

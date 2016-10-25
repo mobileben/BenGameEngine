@@ -1605,6 +1605,17 @@ BGE::TextureReference *BGE::ScenePackage::getTextureReference(std::string name) 
     return nullptr;
 }
 
+bool BGE::ScenePackage::hasSubTexture(std::string name) {
+    bool has = false;
+    auto it = subTextures_.find(name);
+    
+    if (it != subTextures_.end()) {
+        has = true;
+    }
+    
+    return has;
+}
+
 BGE::TextReference *BGE::ScenePackage::getTextReference(std::string name) {
     const char *cstr = name.c_str();
     
