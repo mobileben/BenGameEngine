@@ -102,6 +102,13 @@ BGE::RawTexture *BGE::RawTexture::createFromPng(std::string filename) {
                 format = RawTexture::Format::A8;
                 assert(false); // We don't know if this will work yet
                 break;
+
+            case PNG_COLOR_TYPE_GRAY:
+                if (bitDepth < 8) {
+                    png_set_expand_gray_1_2_4_to_8(png_ptr);
+                }
+                assert(false); // We don't know if this will work yet
+                break;
                 
             case PNG_COLOR_TYPE_PALETTE:
                 png_set_palette_to_rgb(png_ptr);
@@ -113,6 +120,10 @@ BGE::RawTexture *BGE::RawTexture::createFromPng(std::string filename) {
         
         if (bitDepth == 16) {
             png_set_strip_16(png_ptr);
+        }
+        
+        if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) {
+            png_set_tRNS_to_alpha(png_ptr);
         }
         
         // Update the png info struct.
