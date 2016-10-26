@@ -8,6 +8,7 @@
 
 #include "TextureService.h"
 #include "Game.h"
+#include "RawTexture.h"
 
 BGE::TextureService::TextureService(EAGLContext *context) : Service(), textureHandleService_(InitialTextureReserve, HandleServiceNoMaxLimit), textureAtlasHandleService_(InitialTextureAtlasReserve, HandleServiceNoMaxLimit) {
     textureLoader_ = [[GLKTextureLoader alloc] initWithSharegroup:context.sharegroup];
@@ -696,6 +697,7 @@ void BGE::TextureService::createTextureFromBuffer(TextureAtlasHandle atlasHandle
 
 void BGE::TextureService::createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback)
 {
+#ifdef SUPPORT_GLKTEXTURELOADER
     [textureLoader_ textureWithContentsOfFile:[[NSString alloc] initWithCString:filename.c_str() encoding:NSUTF8StringEncoding] options:@{ GLKTextureLoaderApplyPremultiplication: @(NO) } queue:nil completionHandler:^(GLKTextureInfo *textureInfo, NSError *error) {
         std::shared_ptr<Error> bgeError;
         
@@ -731,6 +733,48 @@ void BGE::TextureService::createTextureFromFile(std::string name, std::string fi
             }
         }
     }];
+#else
+    auto rawTex = RawTexture::createFromPng(filename);
+    std::shared_ptr<Error> bgeError;
+
+    if (rawTex) {
+        TextureHandle textureHandle;
+        Texture *texture;
+        
+        texture = textureHandleService_.allocate(textureHandle);
+        
+        if (texture) {
+            texture->initialize(textureHandle, name, rawTex, [rawTex, textureHandle, callback](Texture * tex) {
+                std::shared_ptr<Error> bgeError;
+
+                if (!tex) {
+                    bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorOS);
+                }
+                
+                if (callback) {
+                    callback(tex, bgeError);
+                }
+                
+                delete rawTex;
+            });
+        } else {
+            bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorOS);
+            
+            // We had a problem, release the handle
+            textureHandleService_.release(textureHandle);
+            
+            if (callback) {
+                callback(texture, bgeError);
+            }
+        }
+    } else {
+        bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorOS);
+        
+        if (callback) {
+            callback(nullptr, bgeError);
+        }
+    }
+#endif
 }
 
 void BGE::TextureService::createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback)

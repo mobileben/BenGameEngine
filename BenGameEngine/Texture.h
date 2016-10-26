@@ -18,6 +18,7 @@
 #include "NamedObject.h"
 #include "MathTypes.h"
 #include "Handle.h"
+#include "RawTexture.h"
 #include <GLKit/GLKit.h>
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
@@ -73,6 +74,7 @@ namespace BGE {
         ~Texture() {}
         
         void initialize(TextureHandle handle, std::string name, TextureFormat format);
+        void initialize(TextureHandle handle, std::string name, RawTexture *rawTexture, std::function<void(Texture *)> callback);
         void initialize(TextureHandle handle, std::string name, TextureFormat format, GLKTextureInfo *texInfo);
         void destroy();
         

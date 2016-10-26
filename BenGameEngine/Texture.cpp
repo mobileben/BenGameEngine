@@ -9,6 +9,7 @@
 #include "Texture.h"
 #include "TextureAtlas.h"
 #include "Game.h"
+#include "RawTexture.h"
 
 const std::string BGE::Texture::ErrorDomain = "Texture";
 
@@ -79,6 +80,69 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFor
         
         memoryUsage_ = computeMemoryUsage(format_, width_, height_);
     }
+}
+
+void BGE::Texture::initialize(TextureHandle handle, std::string name, RawTexture *rawTexture, std::function<void(Texture *)> callback) {
+    TextureFormat format = TextureFormat::Undefined;
+    GLint glFormat = 0;
+    
+    switch (rawTexture->getFormat()) {
+        case RawTexture::Format::RGB8_A8:
+            format = TextureFormat::RGBA8888;
+            glFormat = GL_RGBA;
+            break;
+            
+        case RawTexture::Format::RGB8:
+            format = TextureFormat::RGB888;
+            glFormat = GL_RGB;
+            break;
+            
+        default:
+            assert(false);
+            break;
+    }
+    
+    initialize(handle, name, format);
+
+    // Always delete textures on main thread (for now)
+    auto width = rawTexture->getWidth();
+    auto height = rawTexture->getHeight();
+    auto buffer = rawTexture->getBuffer();
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        GLuint tex;
+        
+        glGenTextures(1, &tex);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, glFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, buffer);
+        GLenum glErr = glGetError();
+        
+        if (glErr == GL_NO_ERROR) {
+            valid_ = true;
+            hwId_ = tex;
+            format_ = format;
+            target_ = GL_TEXTURE_2D;
+            width_ = width;
+            height_ = height;
+            
+            updateUVs();
+            updateXYs();
+            
+            memoryUsage_ = computeMemoryUsage(format_, width_, height_);
+            
+            if (callback) {
+                callback(this);
+            }
+        } else {
+            if (callback) {
+                callback(nullptr);
+            }
+        }
+    });
 }
 
 void BGE::Texture::destroy() {

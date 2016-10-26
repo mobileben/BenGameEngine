@@ -68,6 +68,9 @@
 		B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B760F1CBA2C7F00758249 /* RenderComponent.cpp */; };
 		B52B76141CBADF5E00758249 /* MaterialService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B76121CBADF5E00758249 /* MaterialService.cpp */; };
 		B52BFB081D000C650040A839 /* StringArrayBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52BFB061D000C650040A839 /* StringArrayBuilder.cpp */; };
+		B545A6041DC01D81000ADD6C /* RawTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B545A6021DC01D81000ADD6C /* RawTexture.cpp */; };
+		B545A6071DC0210F000ADD6C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B545A6061DC0210F000ADD6C /* libpng.a */; };
+		B545A6091DC0217F000ADD6C /* libz.1.2.8.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = B545A6081DC0217F000ADD6C /* libz.1.2.8.tbd */; };
 		B547F17A1D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B547F1781D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp */; };
 		B547F17D1D125BD00031AF58 /* FrameAnimatorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B547F17B1D125BD00031AF58 /* FrameAnimatorComponent.cpp */; };
 		B54821F61CD87A8A0073AFCC /* AnimationSequenceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B54821F41CD87A8A0073AFCC /* AnimationSequenceComponent.cpp */; };
@@ -269,6 +272,11 @@
 		B52BFB0A1D00AA750040A839 /* ArrayBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArrayBuilder.h; sourceTree = "<group>"; };
 		B52BFB0D1D0138790040A839 /* UniqueArrayBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UniqueArrayBuilder.h; sourceTree = "<group>"; };
 		B52BFB0F1D0155720040A839 /* FixedArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FixedArray.h; sourceTree = "<group>"; };
+		B545A6021DC01D81000ADD6C /* RawTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RawTexture.cpp; path = dataformats/RawTexture.cpp; sourceTree = "<group>"; };
+		B545A6031DC01D81000ADD6C /* RawTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RawTexture.h; path = dataformats/RawTexture.h; sourceTree = "<group>"; };
+		B545A6051DC020C7000ADD6C /* libpng */ = {isa = PBXFileReference; lastKnownFileType = folder; name = libpng; path = external/libpng; sourceTree = "<group>"; };
+		B545A6061DC0210F000ADD6C /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = BenGameEngine/external/libpng/lib/libpng.a; sourceTree = "<group>"; };
+		B545A6081DC0217F000ADD6C /* libz.1.2.8.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.8.tbd; path = usr/lib/libz.1.2.8.tbd; sourceTree = SDKROOT; };
 		B547F1781D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = ChannelFrameAnimatorComponent.cpp; path = components/ChannelFrameAnimatorComponent.cpp; sourceTree = "<group>"; };
 		B547F1791D125BB70031AF58 /* ChannelFrameAnimatorComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChannelFrameAnimatorComponent.h; path = components/ChannelFrameAnimatorComponent.h; sourceTree = "<group>"; };
 		B547F17B1D125BD00031AF58 /* FrameAnimatorComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = FrameAnimatorComponent.cpp; path = components/FrameAnimatorComponent.cpp; sourceTree = "<group>"; };
@@ -366,9 +374,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B545A6091DC0217F000ADD6C /* libz.1.2.8.tbd in Frameworks */,
 				B571F18D1C992ECE007F5A90 /* libfreetype.a in Frameworks */,
 				B525E3EA1C8960BA00C691C0 /* GLKit.framework in Frameworks */,
 				B525E3841C8957BD00C691C0 /* libBenGameEngine.a in Frameworks */,
+				B545A6071DC0210F000ADD6C /* libpng.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -485,12 +495,12 @@
 		B525E3521C8950DA00C691C0 = {
 			isa = PBXGroup;
 			children = (
-				B571F18C1C992ECE007F5A90 /* libfreetype.a */,
 				B525E35D1C8950DA00C691C0 /* BenGameEngine */,
 				B525E36C1C8957A700C691C0 /* BenGameEngineTestApp */,
 				B525E3D71C8959D200C691C0 /* BenGameEngineBundle */,
 				B508CD991CAF95A000127B97 /* BGEGameObejctAndComponentTests */,
 				B525E35C1C8950DA00C691C0 /* Products */,
+				B545A5FD1DC01CAC000ADD6C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -644,6 +654,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B545A5FD1DC01CAC000ADD6C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B545A6081DC0217F000ADD6C /* libz.1.2.8.tbd */,
+				B545A6061DC0210F000ADD6C /* libpng.a */,
+				B571F18C1C992ECE007F5A90 /* libfreetype.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B5503D481D51A68D00FC77B6 /* commonhud */ = {
 			isa = PBXGroup;
 			children = (
@@ -683,6 +703,7 @@
 			isa = PBXGroup;
 			children = (
 				B571F17D1C97CFB3007F5A90 /* freetype */,
+				B545A6051DC020C7000ADD6C /* libpng */,
 			);
 			name = external;
 			sourceTree = "<group>";
@@ -732,6 +753,8 @@
 			children = (
 				B5F523111CD9C77E00DE2F82 /* GraphicFormats.cpp */,
 				B5F523121CD9C77E00DE2F82 /* GraphicFormats.h */,
+				B545A6021DC01D81000ADD6C /* RawTexture.cpp */,
+				B545A6031DC01D81000ADD6C /* RawTexture.h */,
 			);
 			name = dataformats;
 			sourceTree = "<group>";
@@ -939,6 +962,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B50E4E051D978BB800AE3AEB /* LogicService.cpp in Sources */,
+				B545A6041DC01D81000ADD6C /* RawTexture.cpp in Sources */,
 				B525E3CB1C89587000C691C0 /* TextureService.cpp in Sources */,
 				B547F17A1D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp in Sources */,
 				B512AD601D3F1C5E00DCE362 /* InputService.cpp in Sources */,
@@ -1177,7 +1201,10 @@
 		B525E3651C8950DA00C691C0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/$(TARGET_NAME)/external/freetype/include";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/$(TARGET_NAME)/external/freetype/include",
+					"$(PROJECT_DIR)/$(TARGET_NAME)/external/libpng/include",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1187,7 +1214,10 @@
 		B525E3661C8950DA00C691C0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/$(TARGET_NAME)/external/freetype/include";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/$(TARGET_NAME)/external/freetype/include",
+					"$(PROJECT_DIR)/$(TARGET_NAME)/external/libpng/include",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1200,12 +1230,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ENABLE_BITCODE = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/BenGameEngine/external/freetype/include";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/BenGameEngine/external/freetype/include",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/include",
+				);
 				INFOPLIST_FILE = BenGameEngineTestApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/BenGameEngine/external/freetype/lib",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/lib",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BenGameEngineTestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1219,12 +1253,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ENABLE_BITCODE = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/BenGameEngine/external/freetype/include";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/BenGameEngine/external/freetype/include",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/include",
+				);
 				INFOPLIST_FILE = BenGameEngineTestApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/BenGameEngine/external/freetype/lib",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/lib",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BenGameEngineTestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
