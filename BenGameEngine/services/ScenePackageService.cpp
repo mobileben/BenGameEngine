@@ -437,21 +437,15 @@ BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string nam
 }
 
 void BGE::ScenePackageService::loadThreadFunction() {
-    std::mutex                      mutex;
-    std::condition_variable         cond;
-    std::unique_lock<std::mutex>    lck(mutex);
-    
     while (true) {
         auto loadable = queuedLoadItems_.pop();
         
-        auto f = std::async(std::launch::async, static_cast<void(ScenePackageService::*)(ScenePackageLoadItem, ScenePackageLoadCompletionHandler)>(&ScenePackageService::createPackage), this, loadable, [&cond, loadable](ScenePackageHandle packageHandle, std::shared_ptr<Error> error) {
+        auto f = std::async(std::launch::async, static_cast<void(ScenePackageService::*)(ScenePackageLoadItem, ScenePackageLoadCompletionHandler)>(&ScenePackageService::createPackage), this, loadable, [loadable](ScenePackageHandle packageHandle, std::shared_ptr<Error> error) {
+
             if (loadable.completionHandler) {
                 loadable.completionHandler(packageHandle, error);
             }
-            cond.notify_all();
         });
-        
-        cond.wait(lck);
     }
 }
 
