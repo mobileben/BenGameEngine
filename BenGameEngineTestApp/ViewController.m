@@ -107,7 +107,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
     filePath.type = BGE::FileUtilities::PathType::builtin;
     filePath.basename = "Common-iPh6.json";
     
-    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", filePath, [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", filePath, [](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
         BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
         
         if (package) {
@@ -119,7 +119,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
     
     filePath.basename = "CommonLobby-iPh6.json";
     
-    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", filePath, [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", filePath, [](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
         BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
         
         if (package) {
@@ -131,7 +131,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
     
     filePath.basename = "CommonHUD-iPh6.json";
     
-    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", filePath, [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", filePath, [](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
         BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
         
         if (package) {
@@ -142,25 +142,31 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
     });
     
     filePath.basename = "Lobby-iPh6.json";
-    
-    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", filePath, [self](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+
+    typeof(self) __weak weakSelf = self;
+
+    BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
         BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
         
         if (package) {
             package->link();
         }
         
-        auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(self.spaceHandle);
-        
         // Now create auto display objects
         BGE::SceneObjectCreatedDelegate delegate;
         
-        space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, &delegate);
-        
-        // Spaces are not visible by default
-        space->setActive(true);
-        space->setVisible(true);
-        BGE::Game::getInstance()->outputResourceBreakdown();
+        space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, &delegate, [delegate, weakSelf]() {
+            typeof(weakSelf) __strong strongSelf = weakSelf;
+            
+            delegate.clear();
+            
+            auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(strongSelf.spaceHandle);
+            
+            // Spaces are not visible by default
+            space->setActive(true);
+            space->setVisible(true);
+            BGE::Game::getInstance()->outputResourceBreakdown();
+        });
     });
 }
 
@@ -330,19 +336,26 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
                     package->link();
                 }
                 
-                auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(strongSelf.spaceHandle);
-                
                 // Now create auto display objects
                 BGE::SceneObjectCreatedDelegate delegate;
                 
-                space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, &delegate);
+                typeof(self) __weak weakSelf = self;
                 
-                // Spaces are not visible by default
-                space->setActive(true);
-                space->setVisible(true);
-                BGE::Game::getInstance()->outputResourceBreakdown();
-                BGE::Game::getInstance()->outputMemoryBreakdown();
-                strongSelf.stage = 2;
+                space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, &delegate, [weakSelf]() {
+                    typeof(weakSelf) __strong strongSelf = weakSelf;
+                    
+                    auto space = BGE::Game::getInstance()->getSpaceService()->getSpace(strongSelf.spaceHandle);
+                    // Spaces are not visible by default
+                    space->setActive(true);
+                    space->setVisible(true);
+                    
+                    BGE::Game::getInstance()->outputResourceBreakdown();
+                    BGE::Game::getInstance()->outputMemoryBreakdown();
+                    strongSelf.stage = 2;
+                    
+                    delegate.clear();
+                });
+                
             });
         } else if (strongSelf.stage == 2) {
             strongSelf.stage = 3;
