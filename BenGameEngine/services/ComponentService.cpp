@@ -68,6 +68,28 @@ BGE::ComponentService::ComponentService() : Service() {
     }
 }
 
+void BGE::ComponentService::garbageCollect() {
+    garbageCollectComponent<TransformComponent>();
+    garbageCollectComponent<BoundingBoxComponent>();
+    garbageCollectComponent<AnimationChannelComponent>();
+    garbageCollectComponent<AnimationSequenceComponent>();
+    garbageCollectComponent<AnimatorComponent>();
+    garbageCollectComponent<ChannelFrameAnimatorComponent>();
+    garbageCollectComponent<ColorMatrixComponent>();
+    garbageCollectComponent<ColorTransformComponent>();
+    garbageCollectComponent<FrameAnimatorComponent>();
+    garbageCollectComponent<SpriteRenderComponent>();
+    garbageCollectComponent<LogicComponent>();
+    garbageCollectComponent<TextComponent>();
+    garbageCollectComponent<PlacementComponent>();
+    garbageCollectComponent<ButtonComponent>();
+    garbageCollectComponent<InputTouchComponent>();
+    garbageCollectComponent<LineRenderComponent>();
+    garbageCollectComponent<FlatRectRenderComponent>();
+    garbageCollectComponent<MaskComponent>();
+    garbageCollectComponent<TextureMaskComponent>();
+}
+
 BGE::GameObject *BGE::ComponentService::getComponentGameObject(Component *component, GameObjectHandle gameObjHandle) const {
     return component->getSpace()->getGameObject(gameObjHandle);
 }

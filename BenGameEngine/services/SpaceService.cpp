@@ -85,7 +85,7 @@ BGE::Space *BGE::SpaceService::createSpace(std::string name) {
     Space *space = handleService_.allocate(handle);
     
     if (space) {
-        space->initialize(handle, name);
+        space->initialize(handle, name, shared_from_this());
         spaces_.push_back(handle);
     }
     

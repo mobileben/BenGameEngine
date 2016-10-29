@@ -18,6 +18,8 @@
 #include "Handle.h"
 
 namespace BGE {
+    class AnimationSequenceComponent;
+    class Game;
     class GameObject;
     class GameObjectService;
     class SpaceService;
@@ -31,9 +33,9 @@ namespace BGE {
 
         ~Space() {}
         
-        void initialize(SpaceHandle handle, std::string name);
+        void initialize(SpaceHandle handle, std::string name, std::shared_ptr<SpaceService> service);
         void destroy();
-        void reset();
+        void reset(std::function<void()> callback);
         
         void outputResourceBreakdown(uint32_t numTabs) const;
         void outputMemoryBreakdown(uint32_t numTabs) const;
@@ -59,11 +61,15 @@ namespace BGE {
         void getRootTransforms(std::vector<TransformComponent *> &xforms) const;
         
         template <typename T, typename... Args> T *createComponent(Args&& ...args) {
+            lock();
+            
             auto component = componentService_->createComponent<T>(std::forward<Args>(args)...);
             
             if (component) {
                 component->setSpaceHandle(componentService_->getSpaceHandle());
             }
+            
+            unlock();
             
             return component;
         }
@@ -85,11 +91,19 @@ namespace BGE {
         }
         
         inline void removeComponent(ComponentHandle handle) {
+            lock();
+            
             componentService_->removeComponent(handle);
+            
+            unlock();
         }
         
         template <typename T> inline void removeAllComponents()  {
+            lock();
+            
             componentService_->removeAllComponents<T>();
+            
+            unlock();
         }
 
         inline bool isActive() const { return active_; }
@@ -108,8 +122,6 @@ namespace BGE {
         
         // Component management
         GameObject *createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
-        GameObject *createAnimChannel(std::string name, std::string instanceName, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate);
-        GameObject *createFrameAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
         GameObject *createButton(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
         GameObject *createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
         GameObject *createMask(std::string name, std::string instanceName, ScenePackageHandle handle);
@@ -121,7 +133,7 @@ namespace BGE {
         GameObject *createSprite(std::string instanceName, TextureHandle texHandle);
         GameObject *createSprite(std::string instanceName, Texture *texture);
         
-        void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate);
+        void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback);
 
         // Font management
         void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
@@ -148,9 +160,12 @@ namespace BGE {
         
     private:
         friend SpaceService;
+        friend Game;
+        friend AnimationSequenceComponent;
         
         using CreatedGameObjectVector = std::vector<std::pair<ComponentTypeId, GameObjectHandle>>;
         
+        std::shared_ptr<SpaceService>       spaceService_;
         std::shared_ptr<GameObjectService>  gameObjectService_;
         std::shared_ptr<ComponentService>   componentService_;
         
@@ -165,11 +180,18 @@ namespace BGE {
         
         uint32_t    order_;
         
+        void lock();
+        void unlock();
+        
+        void reset_();
+        
         static uint32_t handlerBitmaskForSceneObjectCreatedDelegate(SceneObjectCreatedDelegate *delegate);
         
         GameObjectHandle handleForGameObject(GameObject *object) const;
         
         GameObject *createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
+        GameObject *createAnimChannel(std::string name, std::string instanceName, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate);
+        GameObject *createFrameAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
         GameObject *createButton(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         GameObject *createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         GameObject *createMask(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
@@ -177,6 +199,8 @@ namespace BGE {
         GameObject *createText(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         GameObject *createPlacement(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         
+        void createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback);
+
         void addCreatedGameObjectsForAnimSequence(GameObject *animSequence, uint32_t pushBitmask, CreatedGameObjectVector *objects) const;
         void addCreatedGameObjectsForButton(GameObject *button, uint32_t pushBitmask, CreatedGameObjectVector *objects) const;
 

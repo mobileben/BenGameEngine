@@ -21,7 +21,10 @@
 #include "LineRenderComponent.h"
 
 void BGE::AnimationService::update(double deltaTime) {
+    auto spaceService = Game::getInstance()->getSpaceService();
+    
     lock();
+    spaceService->lock();
     
     float dt = (float)deltaTime;
 
@@ -45,10 +48,16 @@ void BGE::AnimationService::update(double deltaTime) {
         }
     }
     
-    processEvents();
+    spaceService->unlock();
     
+    processEvents();
+
     // TODO: Does unlocking happen before processing events?
     unlock();
+}
+
+void BGE::AnimationService::garbageCollect() {
+    eventService_->garbageCollect();
 }
 
 BGE::EventHandlerHandle BGE::AnimationService::registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function) {

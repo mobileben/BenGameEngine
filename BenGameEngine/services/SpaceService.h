@@ -18,7 +18,7 @@
 #include <type_traits>
 
 namespace BGE {
-    class SpaceService : public Service {
+    class SpaceService : public Service, public std::enable_shared_from_this<SpaceService> {
     public:
         SpaceService();
         ~SpaceService() {}
@@ -31,6 +31,7 @@ namespace BGE {
         void resume() final { Service::resume(); }
         void destroy() final {}
         void update(double deltaTime) final {}
+        void garbageCollect() final { handleService_.garbageCollect(); }
 
         uint32_t numUsedHandles() const final;
         uint32_t maxHandles() const final;

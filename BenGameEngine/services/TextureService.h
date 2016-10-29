@@ -37,6 +37,7 @@ namespace BGE {
         void resume() final { Service::resume(); }
         void destroy() final {}
         void update(double deltaTime) {}
+        void garbageCollect() final;
         
         uint32_t numTextures() const;   // Texture count includes subtextures
         uint32_t numSubTextures() const;

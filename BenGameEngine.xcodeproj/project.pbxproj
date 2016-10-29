@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B5018A011DC2F346009D3326 /* HandleService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5018A001DC2F346009D3326 /* HandleService.cpp */; };
 		B508CD8E1CA8ABA100127B97 /* Arial Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */; };
 		B508CD901CA901B700127B97 /* Avenir.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8F1CA901B700127B97 /* Avenir.ttc */; };
 		B508CD931CAE285000127B97 /* TransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD911CAE285000127B97 /* TransformComponent.cpp */; };
@@ -157,6 +158,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B5018A001DC2F346009D3326 /* HandleService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HandleService.cpp; path = services/HandleService.cpp; sourceTree = "<group>"; };
 		B50326F21D1F4BA100156217 /* FontInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontInfo.h; sourceTree = "<group>"; };
 		B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Black.ttf"; sourceTree = "<group>"; };
 		B508CD8F1CA901B700127B97 /* Avenir.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Avenir.ttc; sourceTree = "<group>"; };
@@ -467,6 +469,7 @@
 				B571F17F1C97D88E007F5A90 /* FontService.h */,
 				B508CDAC1CB78DA100127B97 /* GameObjectService.cpp */,
 				B508CDAD1CB78DA100127B97 /* GameObjectService.h */,
+				B5018A001DC2F346009D3326 /* HandleService.cpp */,
 				B50F60011CD343E400A5D017 /* HandleService.h */,
 				B525E38D1C89587000C691C0 /* HeartbeatService.cpp */,
 				B525E38E1C89587000C691C0 /* HeartbeatService.h */,
@@ -1000,6 +1003,7 @@
 				B5F6B16A1CC8AF7A00E1FD45 /* Space.cpp in Sources */,
 				B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */,
 				B525E3C81C89587000C691C0 /* Texture.cpp in Sources */,
+				B5018A011DC2F346009D3326 /* HandleService.cpp in Sources */,
 				B571F1831C97D92E007F5A90 /* Font.cpp in Sources */,
 				B5EE9D6C1CC4A4C8005D99CC /* SpriteRenderComponent.cpp in Sources */,
 				B547F17D1D125BD00031AF58 /* FrameAnimatorComponent.cpp in Sources */,

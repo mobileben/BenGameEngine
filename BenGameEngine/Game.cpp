@@ -161,6 +161,8 @@ void BGE::Game::outputValue(uint32_t numTabs, std::string format, va_list args) 
 
 BGE::Game::Game() : paused_(false)
 {
+    handleServicesInitialize();
+    
     materialService_ = std::make_shared<MaterialService>();
     heartbeatService_ = std::make_shared<HeartbeatService>();
     scenePackageService_ = std::make_shared<ScenePackageService>();
@@ -289,7 +291,38 @@ void BGE::Game::resume() {
 void BGE::Game::destroy() {
 }
 
-void BGE::Game::spaceReset(Space *space) {
+void BGE::Game::garbageCollect() {
+    handleServicesLock();
+    
+    renderService_->garbageCollect();
+    textureService_->garbageCollect();
+    fontService_->garbageCollect();
+    heartbeatService_->garbageCollect();
+    materialService_->garbageCollect();
+    scenePackageService_->garbageCollect();
+    animationService_->garbageCollect();
+    spaceService_->garbageCollect();
+    inputService_->garbageCollect();
+    logicService_->garbageCollect();
+    eventService_->garbageCollect();
+    gameObjectService_->garbageCollect();
+    componentService_->garbageCollect();
+    
+    Service::garbageCollect();
+    
+    handleServicesUnlock();
+}
+
+void BGE::Game::queueSpaceReset(Space *space, std::function<void()> callback) {
+    lock();
+    
+    auto item = std::make_pair(space->getHandle(), callback);
+    spaceResetQueue_.push_back(item);
+    
+    unlock();
+}
+
+void BGE::Game::servicesSpaceReset(Space *space) {
     logicService_->spaceReset(space);
     animationService_->spaceReset(space);
     inputService_->spaceReset(space);
@@ -298,6 +331,7 @@ void BGE::Game::spaceReset(Space *space) {
 
 void BGE::Game::update(double deltaTime) {
     BGE::Game::getInstance()->getRenderService()->lock();
+
     // Input
     inputService_->update(deltaTime);
 
@@ -307,12 +341,37 @@ void BGE::Game::update(double deltaTime) {
 
     // Physics here
     
+    // Clean out queued space resets
+    lock();
+    
+    auto spaceService = getSpaceService();
+    spaceService_->lock();
+    
+    for (auto &item : spaceResetQueue_) {
+        auto space = spaceService->getSpace(item.first);
+        
+        if (space) {
+            space->reset_();
+            item.second();
+        }
+    }
+    
+    spaceResetQueue_.clear();
+
+    spaceService_->unlock();
+    unlock();
+    
     // Update transforms
     updateTransforms();
+
+    // Garbage collect
+    garbageCollect();
+
     BGE::Game::getInstance()->getRenderService()->unlock();
 }
 
 void BGE::Game::updateTransforms() {
+    spaceService_->lock();
     auto spaces = spaceService_->getSpaces();
     std::vector<TransformComponent *> xforms;
     
@@ -328,10 +387,11 @@ void BGE::Game::updateTransforms() {
     for (auto xform : xforms) {
         xform->updateMatrix();
     }
+    spaceService_->unlock();
 }
 
 void BGE::Game::updateRootTransforms() {
-//    printf("3\n");
+    spaceService_->lock();
     auto spaces = spaceService_->getSpaces();
     std::vector<TransformComponent *> xforms;
     
@@ -347,7 +407,8 @@ void BGE::Game::updateRootTransforms() {
     for (auto xform : xforms) {
         xform->updateMatrixAndChildren();
     }
-//    printf("4\n");
+    
+    spaceService_->unlock();
 }
 
 

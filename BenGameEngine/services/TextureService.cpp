@@ -14,6 +14,11 @@ BGE::TextureService::TextureService(EAGLContext *context) : Service(), textureHa
     textureLoader_ = [[GLKTextureLoader alloc] initWithSharegroup:context.sharegroup];
 }
 
+void BGE::TextureService::garbageCollect() {
+    textureHandleService_.garbageCollect();
+    textureAtlasHandleService_.garbageCollect();
+}
+
 uint32_t BGE::TextureService::numTextures() const {
     std::vector<TextureHandle> textures;
     auto packageService = Game::getInstance()->getScenePackageService();

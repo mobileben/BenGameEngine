@@ -33,7 +33,6 @@ namespace BGE {
     class Input : public Object {
     public:
         TouchType       type;
-        InputHandle getHandle() const { return handle_; }
         
         NSTimeInterval  timestamp;
         
@@ -47,6 +46,8 @@ namespace BGE {
         
         void initialize(InputHandle handle);
         void destroy();
+        
+        inline InputHandle getHandle() const { return handle_; }
         
         bool operator <(const Input &rhs) const { return timestamp < rhs.timestamp; }
         

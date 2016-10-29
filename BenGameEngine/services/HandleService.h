@@ -20,6 +20,10 @@
 namespace BGE {
     static const uint32_t HandleServiceNoMaxLimit = 0;
     
+    extern void handleServicesInitialize();
+    extern void handleServicesLock();
+    extern void handleServicesUnlock();
+    
     template <typename DATA, typename HANDLE>
     class HandleService : public Service {
     public:
@@ -36,6 +40,7 @@ namespace BGE {
             data_.reserve(reserve);
             magic_.reserve(reserve);
             freeSlots_.reserve(reserve);
+            toBeFreeSlots_.reserve(reserve);
             
             initialCapacity_ = currCapacity_ = (uint32_t) data_.capacity();
         }
@@ -55,10 +60,14 @@ namespace BGE {
         DATA* allocate(HANDLE& handle) {
             HandleBackingType index;
             
+            handleServicesLock();
+            
             if (freeSlots_.empty()) {
                 // We have no free slots, so create a new one if we are not at our limit
                 if (maxLimit_ != HandleServiceNoMaxLimit && data_.size() >= maxLimit_) {
                     handle.nullify();
+                    handleServicesUnlock();
+
                     return nullptr;
                 }
                 
@@ -92,6 +101,9 @@ namespace BGE {
             ObjectId objId = getIdAndIncrement();
 
             data->setInstanceId(objId);
+            
+            handleServicesUnlock();
+            
             return data;
         }
         
@@ -101,8 +113,11 @@ namespace BGE {
             }
             
             auto index = handle.getIndex();
-            
+
+            handleServicesLock();
+
             if (magic_[index] == 0) {
+                handleServicesUnlock();
                 return;
             }
             
@@ -117,7 +132,9 @@ namespace BGE {
             assert(magic_[index] == handle.getMagic());
 #endif
             magic_[index] = 0;
-            freeSlots_.push_back(index);
+            toBeFreeSlots_.push_back(index);
+            
+            handleServicesUnlock();
         }
         
         DATA *dereference(HANDLE handle) const {
@@ -127,16 +144,35 @@ namespace BGE {
             
             auto index = handle.getIndex();
             
-            if (index >= data_.size() || magic_[index] != handle.getMagic()) {
+            handleServicesLock();
+            
+            if (index < data_.size()) {
+                auto magicIndex = magic_[index];
+                
+                if (magicIndex != handle.getMagic() || magicIndex == 0) {
+                    handleServicesUnlock();
+                    return nullptr;
+                }
+            } else {
+                handleServicesUnlock();
                 return nullptr;
             }
             
-            return const_cast<DATA *>(&data_[index]);
+            auto retVal = const_cast<DATA *>(&data_[index]);
+            
+            handleServicesUnlock();
+            return retVal;
         }
 
+        void garbageCollect() {
+            freeSlots_.insert(freeSlots_.end(), toBeFreeSlots_.begin(), toBeFreeSlots_.end());
+            toBeFreeSlots_.clear();
+        }
+        
         std::vector<DATA *> activePointers() const {
             std::vector<DATA *> pointers;
-        
+            handleServicesLock();
+            
             for (auto i=0;i<data_.size();i++) {
                 if (magic_[i] != 0) {
                     DATA *ptr = const_cast<DATA *>(&data_[i]);
@@ -145,11 +181,13 @@ namespace BGE {
                 }
             }
             
+            handleServicesUnlock();
+            
             return pointers;
         }
         
         uint32_t numUsedHandles() const {
-            return (uint32_t) (magic_.size() - freeSlots_.size());
+            return (uint32_t) (magic_.size() - freeSlots_.size() - toBeFreeSlots_.size());
         }
         
         uint32_t capacity() const {
@@ -201,21 +239,31 @@ namespace BGE {
         uint32_t numFreeSlots() const {
             return (uint32_t) freeSlots_.size();
         }
+        
+        uint32_t toBeFreeIndexAtIndex(uint32_t index) {
+            return toBeFreeSlots_[index];
+        }
+        
+        uint32_t numToBeFreeSlots() const {
+            return (uint32_t) toBeFreeSlots_.size();
+        }
 #endif
         
     private:
         typedef std::vector<DATA> DataVector;
         typedef std::vector<HandleBackingType> MagicVector;
         typedef std::vector<HandleBackingType> FreeVector;
+        typedef std::vector<HandleBackingType> ToBeFreeVector;
         
-        uint32_t    initialCapacity_;
-        uint32_t    currCapacity_;
-        uint32_t    numResizes_;
-        uint32_t    maxAllocated_;
-        uint32_t    maxLimit_;
-        DataVector  data_;
-        MagicVector magic_;
-        FreeVector  freeSlots_;
+        uint32_t        initialCapacity_;
+        uint32_t        currCapacity_;
+        uint32_t        numResizes_;
+        uint32_t        maxAllocated_;
+        uint32_t        maxLimit_;
+        DataVector      data_;
+        MagicVector     magic_;
+        FreeVector      freeSlots_;
+        ToBeFreeVector  toBeFreeSlots_;
     };
 }
 

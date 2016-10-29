@@ -62,6 +62,8 @@ void BGE::LogicService::update(double deltaTime) {
     auto spaceService = Game::getInstance()->getSpaceService();
     auto paused = Game::getInstance()->isPaused();
 
+    spaceService->lock();
+    
     // Iterate so we can remove nullptr objects
     for (auto it=gameObjectHandles_.begin();it!=gameObjectHandles_.end();) {
         auto spaceHandle = it->first;
@@ -112,6 +114,8 @@ void BGE::LogicService::update(double deltaTime) {
             }
         }
     }
+    
+    spaceService->unlock();
 }
 
 void BGE::LogicService::addGameObject(GameObject *gameObject) {

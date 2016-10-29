@@ -40,7 +40,8 @@ namespace BGE {
         void resume() final { Service::resume(); }
         void destroy() final {}
         void update(double deltaTime) final {}
-
+        void garbageCollect() final { handleService_.garbageCollect(); }
+        
         uint32_t numFonts() const;
         
         uint32_t numUsedHandles() const final;
@@ -85,9 +86,10 @@ namespace BGE {
         static const uint32_t InitialFontReserve = 32;
 
         using FontHandleService = HandleService<Font, FontHandle>;
-        
-        void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+
         FontHandleService handleService_;
+
+        void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
         void removeFont(FontHandle handle);
 
         void buildFontInfoForAsset(std::string asset);

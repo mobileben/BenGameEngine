@@ -28,6 +28,8 @@
 #include "EventService.h"
 
 namespace BGE {
+    using SpaceResetQueueItem = std::pair<SpaceHandle, std::function<void()>>;
+    
     class Game : public Service
     {
     public:
@@ -67,7 +69,10 @@ namespace BGE {
         void updateTransforms();
         void updateRootTransforms();
         
-        void spaceReset(Space *space);
+        void garbageCollect() override;
+        
+        void queueSpaceReset(Space *space, std::function<void()> callback);
+        void servicesSpaceReset(Space *space);
         
         void outputResourceUsage() const;
         void outputMemoryUsage() const;
@@ -144,6 +149,7 @@ namespace BGE {
         };
         
         bool paused_;
+        std::vector<SpaceResetQueueItem>        spaceResetQueue_;
         
         // Used to access resources metrics
         std::shared_ptr<ComponentService>       componentService_;

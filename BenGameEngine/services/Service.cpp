@@ -26,11 +26,11 @@ BGE::ObjectId BGE::Service::getIdAndIncrement() {
     return id;
 }
 
-void BGE::Service::lock() {
-    pthread_mutex_lock(&mutex_);
+void BGE::Service::lock() const {
+    pthread_mutex_lock((pthread_mutex_t *)&mutex_);
 }
 
-void BGE::Service::unlock() {
-    pthread_mutex_unlock(&mutex_);
+void BGE::Service::unlock() const {
+    pthread_mutex_unlock((pthread_mutex_t *)&mutex_);
 }
 

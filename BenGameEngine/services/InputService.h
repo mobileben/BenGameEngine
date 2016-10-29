@@ -68,6 +68,7 @@ namespace BGE {
         void resume() final { Service::resume(); }
         void destroy() final {}
         void update(double deltaTime) final;
+        void garbageCollect() final;
         
         void touchEventDown(NSSet* touches, UIView* view);
         void touchEventUp(NSSet* touches, UIView* view);

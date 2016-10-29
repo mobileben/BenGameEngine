@@ -31,6 +31,8 @@ namespace BGE {
         virtual void destroy() =0;
         virtual void update(double deltaTime) =0;
         
+        virtual void garbageCollect() {}
+        
         virtual uint32_t numUsedHandles() const {
             return 0;
         }
@@ -70,8 +72,8 @@ namespace BGE {
         bool isPaused() const { return paused_; }
         
         // Synchronization
-        void lock();
-        void unlock();
+        void lock() const;
+        void unlock() const;
 
     protected:
         ObjectId getIdAndIncrement();

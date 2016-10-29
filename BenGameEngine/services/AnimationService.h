@@ -37,6 +37,7 @@ namespace BGE {
         void resume() final { Service::resume(); }
         void destroy() final {}
         void update(double deltaTime) final;
+        void garbageCollect() final;
         
         EventHandlerHandle registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function);
         void unregisterEventHandler(EventHandlerHandle handle);

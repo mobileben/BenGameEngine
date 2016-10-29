@@ -39,6 +39,7 @@ namespace BGE {
         void resume() final { Service::resume(); }
         void destroy() final {}
         void update(double deltaTime) final {}
+        void garbageCollect() final;
 
         template <typename T> uint32_t numComponents() const {
             uint32_t num = 0;
@@ -194,6 +195,13 @@ namespace BGE {
             componentHandleServices_.push_back(new HandleService<T, HANDLE>(reserve, maxLimit));
         }
 
+        template <typename T> static void garbageCollectComponent() {
+            auto typeId = T::typeId_;
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
+
+            handleService->garbageCollect();
+        }
+        
         void outputBreakdown(uint32_t numTabs, const char *format, ...) const;
 
         template <typename T> void outputComponentResourceBreakdown(uint32_t numTabs) const {

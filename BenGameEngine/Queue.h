@@ -68,6 +68,10 @@ public:
         return e;
     }
     
+    Queue() = default;
+    Queue(const Queue &) = delete;
+    Queue &operator=(const Queue &) = delete;
+    
 private:
     std::queue<T>           queue_;
     std::mutex              mutex_;

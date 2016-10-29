@@ -19,6 +19,8 @@
 #include "PlacementComponent.h"
 #include "FlatRectRenderComponent.h"
 
+#include <future>
+
 BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true) {
 }
 
@@ -28,9 +30,10 @@ BGE::Space::Space(ObjectId spaceId) : NamedObject(spaceId), visible_(false), ord
 BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true) {
 }
 
-void BGE::Space::initialize(SpaceHandle handle, std::string name) {
+void BGE::Space::initialize(SpaceHandle handle, std::string name, std::shared_ptr<SpaceService> service) {
     spaceHandle_ = handle;
     setName(name);
+    spaceService_ = service;
 
     // By default, spaces are not active or visible or updatable
     active_ = false;
@@ -47,22 +50,38 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name) {
 }
 
 void BGE::Space::destroy() {
-    reset();
-    
-    order_ = 0;
-    spaceHandle_ = SpaceHandle();
+    reset([this]() {
+        order_ = 0;
+        spaceHandle_ = SpaceHandle();
+    });
 }
 
-void BGE::Space::reset() {
-    BGE::Game::getInstance()->getRenderService()->lock();
+void BGE::Space::lock() {
+    spaceService_->lock();
+}
 
+void BGE::Space::unlock() {
+    spaceService_->unlock();
+}
+
+void BGE::Space::reset(std::function<void()> callback) {
+    spaceService_->lock();
+    
+    BGE::Game::getInstance()->queueSpaceReset(this, callback);
+    
+    spaceService_->unlock();
+}
+
+void BGE::Space::reset_() {
+    // Locking happens externally
+    
     // Turn everything off just in case this object is still accessible
     visible_ = false;
     visible_ = false;
     updatable_ = false;
-
+    
     // We forcibly remove any handlers. The game should play nice and do the clean up themselves.
-    BGE::Game::getInstance()->spaceReset(this);
+    BGE::Game::getInstance()->servicesSpaceReset(this);
     
     // Destroy all scenePackages
     auto packageService = Game::getInstance()->getScenePackageService();
@@ -105,8 +124,6 @@ void BGE::Space::reset() {
     // Remove any outstanding events
     
     textures_.clear();
-    
-    BGE::Game::getInstance()->getRenderService()->unlock();
 }
 
 uint32_t BGE::Space::handlerBitmaskForSceneObjectCreatedDelegate(SceneObjectCreatedDelegate *delegate) {
@@ -226,7 +243,13 @@ void BGE::Space::outputMemoryBreakdown(uint32_t numTabs) const {
 }
 
 BGE::GameObject *BGE::Space::createGameObject(std::string name ) {
-    return gameObjectService_->createGameObject(name);
+    spaceService_->lock();
+    
+    auto obj = gameObjectService_->createGameObject(name);
+    
+    spaceService_->unlock();
+    
+    return obj;
 }
 
 BGE::GameObjectHandle BGE::Space::getGameObjectHandle(ObjectId objId) const {
@@ -250,11 +273,15 @@ BGE::GameObject *BGE::Space::getGameObject(GameObjectHandle handle) const {
 }
 
 void BGE::Space::removeGameObject(GameObjectHandle handle) {
+    spaceService_->lock();
     gameObjectService_->removeGameObject(handle);
+    spaceService_->unlock();
 }
 
 void BGE::Space::removeGameObject(GameObject *object) {
+    spaceService_->lock();
     gameObjectService_->removeGameObject(object);
+    spaceService_->unlock();
 }
 
 const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
@@ -304,16 +331,21 @@ void BGE::Space::linkAll() {
 }
 
 BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+    spaceService_->lock();
+    
     CreatedGameObjectVector objects;
     auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
     auto obj = createAnimSequence(name, instanceName, handle, bitmask, &objects);
     
     dispatchCreatedHandlers(&objects, delegate);
     
+    spaceService_->unlock();
+    
     return obj;
 }
 
 BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
+    
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     AnimationSequenceReference *animSeqRef;
     
@@ -324,6 +356,8 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
     }
     
     if (animSeqRef) {
+        spaceService_->lock();
+
         auto obj = createGameObject(instanceName);
         auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
@@ -346,6 +380,8 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
         
         addCreatedGameObjectsForAnimSequence(obj, pushBitmask, objects);
         
+        spaceService_->unlock();
+        
         return obj;
     }
     
@@ -354,6 +390,8 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
 
 BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string instanceName, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate) {
     if (channelRef) {
+        spaceService_->lock();
+        
         auto obj = createGameObject(instanceName);
         auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
@@ -370,6 +408,8 @@ BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string ins
         
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
+
+        spaceService_->unlock();
 
         return obj;
     }
@@ -388,6 +428,8 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
     }
     
     if (animSeqRef) {
+        spaceService_->lock();
+        
         auto obj = createGameObject(instanceName);
         auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
@@ -403,6 +445,8 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
         
+        spaceService_->unlock();
+
         return obj;
     }
     
@@ -410,11 +454,16 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
 }
 
 BGE::GameObject *BGE::Space::createButton(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+    spaceService_->lock();
+
     CreatedGameObjectVector objects;
+    
     auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
     auto obj = createButton(name, instanceName, handle, bitmask, &objects);
     
     dispatchCreatedHandlers(&objects, delegate);
+
+    spaceService_->unlock();
 
     return obj;
 }
@@ -430,6 +479,8 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
     }
     
     if (buttonRef) {
+        spaceService_->lock();
+        
         auto obj = createGameObject(instanceName);
         auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
@@ -447,6 +498,8 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
         
         addCreatedGameObjectsForButton(obj, pushBitmask, objects);
 
+        spaceService_->unlock();
+
         return obj;
     }
     
@@ -454,12 +507,16 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
 }
 
 BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+    spaceService_->lock();
+
     CreatedGameObjectVector objects;
     uint32_t pushBitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
     auto obj = createExternalReference(name, instanceName, handle, pushBitmask, &objects);
     
     dispatchCreatedHandlers(&objects, delegate);
     
+    spaceService_->unlock();
+
     return obj;
 }
 
@@ -528,6 +585,8 @@ BGE::GameObject *BGE::Space::createMask(std::string name, std::string instanceNa
     }
     
     if (maskRef) {
+        spaceService_->lock();
+        
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto mask = createComponent<MaskComponent>();
@@ -540,6 +599,8 @@ BGE::GameObject *BGE::Space::createMask(std::string name, std::string instanceNa
         if (objects && pushBitmask & MaskComponent::bitmask_) {
             addCreatedGameObjectsForRenderComponent<MaskComponent>(obj, objects);
         }
+
+        spaceService_->unlock();
         
         return obj;
     }
@@ -563,6 +624,8 @@ BGE::GameObject *BGE::Space::createSprite(std::string name, std::string instance
     }
     
     if (texRef) {
+        spaceService_->lock();
+        
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto sprite = createComponent<SpriteRenderComponent>();
@@ -577,6 +640,8 @@ BGE::GameObject *BGE::Space::createSprite(std::string name, std::string instance
         if (objects && pushBitmask & SpriteRenderComponent::bitmask_) {
             addCreatedGameObjectsForRenderComponent<SpriteRenderComponent>(obj, objects);
         }
+        
+        spaceService_->unlock();
         
         return obj;
     }
@@ -599,6 +664,8 @@ BGE::GameObject *BGE::Space::createText(std::string name, std::string instanceNa
     }
     
     if (textRef) {
+        spaceService_->lock();
+        
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto text = createComponent<TextComponent>();
@@ -613,6 +680,8 @@ BGE::GameObject *BGE::Space::createText(std::string name, std::string instanceNa
         if (objects && pushBitmask & TextComponent::bitmask_) {
             addCreatedGameObjectsForRenderComponent<TextComponent>(obj, objects);
         }
+        
+        spaceService_->unlock();
         
         return obj;
     }
@@ -635,6 +704,8 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string insta
     }
     
     if (placementRef) {
+        spaceService_->lock();
+        
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
         auto placement = createComponent<PlacementComponent>();
@@ -649,6 +720,8 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string insta
             addCreatedGameObjectsForRenderComponent<PlacementComponent>(obj, objects);
         }
         
+        spaceService_->unlock();
+        
         return obj;
     }
     
@@ -656,6 +729,8 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string insta
 }
 
 BGE::GameObject *BGE::Space::createFlatRect(std::string instanceName, Vector2 &wh, Color &color) {
+    spaceService_->lock();
+    
     auto obj = createGameObject(instanceName);
     auto xform = createComponent<TransformComponent>();
     auto flat = createComponent<FlatRectRenderComponent>();
@@ -674,10 +749,14 @@ BGE::GameObject *BGE::Space::createFlatRect(std::string instanceName, Vector2 &w
     obj->addComponent(flat);
     obj->addComponent(bbox);
     
+    spaceService_->unlock();
+    
     return obj;
 }
 
 BGE::GameObject *BGE::Space::createSprite(std::string instanceName, TextureHandle texHandle) {
+    spaceService_->lock();
+    
     auto obj = createGameObject(instanceName);
     auto xform = createComponent<TransformComponent>();
     auto sprite = createComponent<SpriteRenderComponent>();
@@ -689,10 +768,14 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, TextureHandl
 
     sprite->setTextureHandle(texHandle);
     
+    spaceService_->unlock();
+    
     return obj;
 }
 
 BGE::GameObject *BGE::Space::createSprite(std::string instanceName, Texture *texture) {
+    spaceService_->lock();
+    
     auto obj = createGameObject(instanceName);
     auto xform = createComponent<TransformComponent>();
     auto sprite = createComponent<SpriteRenderComponent>();
@@ -704,15 +787,23 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, Texture *tex
     
     sprite->setTexture(texture);
     
+    spaceService_->unlock();
+    
     return obj;
 }
 
-void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate) {
+void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
+    auto f = std::async(std::launch::async, static_cast<void(Space::*)(GameObjectHandle, ScenePackageHandle, SceneObjectCreatedDelegate *, std::function<void()>)>(&Space::createAutoDisplayObjects_), this, rootHandle, packageHandle, delegate, callback);
+}
+
+void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
     auto root = getGameObject(rootHandle);
     auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
     
     if (package) {
+        spaceService_->lock();
+        
         auto autoDisplayList = package->getAutoDisplayList();
         auto num = package->getAutoDisplayListSize();
         CreatedGameObjectVector createdObjects;
@@ -810,11 +901,16 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
 
         // Now notifiy all create handlers
         dispatchCreatedHandlers(&createdObjects, delegate);
+        spaceService_->unlock();
+    }
+    
+    if (callback) {
+        callback();
     }
 }
 
 void BGE::Space::createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback) {
-    // TODO: This needs to be thread safe at some point
+    spaceService_->lock();
     
     auto fontService = Game::getInstance()->getFontService();
     auto font = fontService->getFont(name, pxSize);
@@ -827,6 +923,8 @@ void BGE::Space::createFont(std::string name, uint32_t pxSize, std::function<voi
                 callback(handle, nullptr);
             }
             
+            spaceService_->unlock();
+            
             return;
         }
     }
@@ -834,6 +932,9 @@ void BGE::Space::createFont(std::string name, uint32_t pxSize, std::function<voi
     // Not found, so try and allocate it
     Game::getInstance()->getFontService()->createFont(name, pxSize, spaceHandle_, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
         fonts_.push_back(font);
+        
+        spaceService_->unlock();
+
         if (callback) {
             callback(font, error);
         }

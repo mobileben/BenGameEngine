@@ -18,6 +18,11 @@ BGE::InputService::InputService(std::shared_ptr<EventService> eventService) : ha
     inputs_.reserve(InitialInputReserve);
 }
 
+void BGE::InputService::garbageCollect() {
+    handleService_.garbageCollect();
+    eventService_->garbageCollect();
+}
+
 BGE::Input *BGE::InputService::createInput() {
     InputHandle handle;
     Input *input = handleService_.allocate(handle);
@@ -293,6 +298,11 @@ void BGE::InputService::update(double deltaTime) {
         }
     }
 
+    for (auto input : inputs_) {
+        auto handle = input->getHandle();
+        handleService_.release(handle);
+    }
+    
     inputs_.clear();
     
     auto eventService = eventService_;

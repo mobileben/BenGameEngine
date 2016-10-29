@@ -34,6 +34,7 @@ namespace BGE {
         void resume() final;
         void destroy() final;
         void update(double deltaTime) final {}
+        void garbageCollect() final { handleService_.garbageCollect(); }
         
         uint32_t numMaterials() const;
         
