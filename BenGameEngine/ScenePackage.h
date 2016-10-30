@@ -200,6 +200,8 @@ namespace BGE {
         void loadTextures(std::function<void()> callback);
         void loadFonts(std::function<void()> callback);
         
+        void sortChannels(AnimationChannelReferenceIntermediate *channels, int32_t size);
+        
         GfxReferenceType referenceTypeForString(std::string type);
         void computeMemoryUsage();
     };

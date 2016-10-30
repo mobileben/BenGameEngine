@@ -340,6 +340,17 @@ BGE::TransformComponent *BGE::TransformComponent::getParent() const {
     return space->getComponent<TransformComponent>(parentHandle_.getHandle());
 }
 
+std::vector<BGE::TransformComponentHandle> BGE::TransformComponent::getOrderedChildrenHandles() {
+    auto xforms = getOrderedChildren();
+    std::vector<TransformComponentHandle> children;
+
+    for (auto xform : xforms) {
+        children.push_back(xform->getHandle<TransformComponent>());
+    }
+    
+    return children;
+}
+
 std::vector<BGE::TransformComponent *> BGE::TransformComponent::getChildren() {
     auto space = getSpace();
     std::vector<TransformComponent *> children;
@@ -349,6 +360,36 @@ std::vector<BGE::TransformComponent *> BGE::TransformComponent::getChildren() {
         
         if (xform) {
             children.push_back(xform);
+        }
+    }
+    
+    return children;
+}
+
+std::vector<BGE::TransformComponent *> BGE::TransformComponent::getOrderedChildren() {
+    auto space = getSpace();
+    std::vector<TransformComponent *> children;
+    
+    for (auto handle : childrenHandles_) {
+        auto xform = space->getComponent<TransformComponent>(handle.getHandle());
+        
+        if (xform) {
+            children.push_back(xform);
+        }
+    }
+    
+    TransformComponent **xforms = &children[0];
+    
+    int32_t i, j;
+    
+    for (i=1;i<children.size();++i) {
+        j = i;
+        
+        while (j > 0 && xforms[j]->getZ() < xforms[j-1]->getZ()) {
+            auto temp = xforms[j];
+            xforms[j] = xforms[j-1];
+            xforms[j-1] = temp;
+            --j;
         }
     }
     

@@ -130,6 +130,8 @@ namespace BGE {
     struct AnimationChannelReferenceIntermediate {
         int32_t name;
         int32_t reference;
+        int32_t startFrame;
+        int32_t order;
         GfxReferenceType referenceType;
         std::vector<int32_t> keyframes;
     };

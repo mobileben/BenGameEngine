@@ -746,6 +746,21 @@ void BGE::ScenePackage::link() {
     computeMemoryUsage();
 }
 
+void BGE::ScenePackage::sortChannels(AnimationChannelReferenceIntermediate *channels, int32_t size) {
+    int32_t i, j;
+    
+    for (i=1;i<size;++i) {
+        j = i;
+        
+        while (j > 0 && (channels[j].order < channels[j-1].order || (channels[j].order == channels[j-1].order && channels[j].startFrame >= channels[j-1].startFrame))) {
+            auto temp = channels[j];
+            channels[j] = channels[j-1];
+            channels[j-1] = temp;
+            --j;
+        }
+    }
+}
+
 void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback) {
     if (status_ < ScenePackageStatus::Valid) {
         float platformScale = 2.0;
@@ -986,6 +1001,10 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                             AnimationChannelReferenceIntermediate *channel;
                             if (channelIndexIt != channelIndex.end()) {
                                 channel = channelRefIntBuilder.addressOf(channelIndexIt->second);
+                                
+                                if (ci > channel->order) {
+                                    channel->order = static_cast<int32_t>(ci);
+                                }
                             } else {
                                 AnimationChannelReferenceIntermediate newChannel;
                                 const char* reference = [childDict[@"reference"] UTF8String];
@@ -995,6 +1014,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                 
                                 newChannel.name = stringBuilder.add(childName);
                                 newChannel.reference = stringBuilder.add(reference);
+                                newChannel.startFrame = static_cast<int32_t>(fi);
+                                newChannel.order =  static_cast<int32_t>(ci);
                                 
                                 GfxReferenceType value = referenceTypeForString(type);
                                 
@@ -1234,6 +1255,9 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                 
                 animSeq->numBounds = (uint32_t) boundsRefIntBuilder.size() - (uint32_t) animSeq->bounds;
                 animSeq->numChannels = (uint32_t) channelRefIntBuilder.size() - animSeq->channels;
+                
+                // Sort channels for proper draw order
+                sortChannels(channelRefIntBuilder.addressOf(animSeq->channels), animSeq->numChannels);
             }
         }
         

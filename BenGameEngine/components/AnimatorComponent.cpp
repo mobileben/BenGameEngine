@@ -180,6 +180,9 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
                 xform->setX(0);
                 xform->setY(0);
             }
+            
+            xform->setZ(keyframe->order);
+            
             if (keyframe->scale) {
                 xform->setScale(*keyframe->scale);
             } else {
