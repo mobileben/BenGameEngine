@@ -86,7 +86,9 @@ void BGE::Space::reset_() {
     // Destroy all scenePackages
     auto packageService = Game::getInstance()->getScenePackageService();
     
-    for (auto const &package : scenePackages_) {
+    auto package = scenePackages_;
+    
+    for (auto const &package : package) {
         packageService->removePackage(spaceHandle_, package);
     }
     
