@@ -504,19 +504,17 @@ namespace BGE {
     }
     
     void Matrix4MakeFlashSkew(Matrix4& matrix, float sx, float sy) {
-        Matrix4MakeIdentify(matrix);
-        
         float c_x = cosf(sx);
         float s_x = sinf(sx);
         float c_y = cosf(sy);
         float s_y = sinf(sy);
 
         matrix.m[0] = c_y;
-        matrix.m[1] = -s_x;
+        matrix.m[1] = -s_y;
         matrix.m[2] = 0;
         matrix.m[3] = 0;
         
-        matrix.m[4] = s_y;
+        matrix.m[4] = s_x;
         matrix.m[5] = c_x;
         matrix.m[6] = 0;
         matrix.m[7] = 0;
