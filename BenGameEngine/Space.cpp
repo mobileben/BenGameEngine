@@ -65,11 +65,14 @@ void BGE::Space::unlock() {
 }
 
 void BGE::Space::reset(std::function<void()> callback) {
-    spaceService_->lock();
-    
-    BGE::Game::getInstance()->queueSpaceReset(this, callback);
-    
-    spaceService_->unlock();
+    // TODO: For now, on iOS, this needs to be done on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^() {
+        spaceService_->lock();
+        
+        BGE::Game::getInstance()->queueSpaceReset(this, callback);
+        
+        spaceService_->unlock();
+    });
 }
 
 void BGE::Space::reset_() {
