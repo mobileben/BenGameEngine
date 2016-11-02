@@ -65,6 +65,10 @@ namespace BGE {
             color_ = color;
         }
         
+        void setColor(Color&& color) {
+            color_ = color;
+        }
+        
         void setTextReference(TextReference *textRef) {
             if (textRef) {
                 setTextReference(*textRef);
