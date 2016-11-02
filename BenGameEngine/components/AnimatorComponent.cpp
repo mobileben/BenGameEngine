@@ -130,7 +130,7 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
             keyframe = channel->channel->keyframes[channelFrame];
             hide = true;
         }
-    } else if (frame > (keyframe->startFrame + keyframe->totalFrames) ) {
+    } else if (frame > (keyframe->startFrame + keyframe->totalFrames - 1) ) {
         // We need to start stepping forward keyframes
         while (++channelFrame < channel->channel->numKeyframes) {
             keyframe = channel->channel->keyframes[channelFrame];
