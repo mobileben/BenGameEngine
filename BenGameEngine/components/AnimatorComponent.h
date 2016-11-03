@@ -53,6 +53,7 @@ namespace BGE {
         // TODO: Look at possibly having an animation controller to wrap around this.
         void reset();
         void setFrame(int32_t frame, bool force=false);
+        void setToLastFrame();
         void play(int32_t iterations=1, bool forward=true, float speed=1.0);
         void pause();
         void stop();

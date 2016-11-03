@@ -106,6 +106,18 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
     }
 }
 
+void BGE::AnimatorComponent::setToLastFrame() {
+    auto space = getSpace();
+    auto gameObjHandle = getGameObjectHandle();
+    auto gameObj = space->getGameObject(gameObjHandle);
+
+    if (gameObj) {
+        auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+
+        setFrame(seq->totalFrames - 1, true);
+    }
+}
+
 void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) {
     auto xform = gameObj->getComponent<TransformComponent>();
     auto channel = gameObj->getComponent<AnimationChannelComponent>();
