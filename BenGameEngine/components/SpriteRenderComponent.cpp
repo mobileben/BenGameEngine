@@ -42,6 +42,16 @@ void BGE::SpriteRenderComponent::setTexture(Texture *tex) {
 
 }
 
+BGE::TextureHandle BGE::SpriteRenderComponent::getTextureHandle() {
+    auto material = getMaterial();
+    
+    if (material) {
+        return material->getTextureHandle();
+    } else {
+        return BGE::TextureHandle();
+    }
+}
+
 void BGE::SpriteRenderComponent::materialsUpdated() {
     
     // Build vertices
