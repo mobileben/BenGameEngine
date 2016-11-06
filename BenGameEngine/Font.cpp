@@ -494,8 +494,7 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, float yOffse
         float gridX = x;
         float gridY = y;
         
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
+        glDisable(GL_BLEND);
         
         glActiveTexture(GL_TEXTURE0);
         
