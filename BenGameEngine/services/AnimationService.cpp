@@ -242,7 +242,8 @@ void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceCompo
                 animator->setFrame(frame, true);
             }
             
-            if (triggerEvent) {
+            // Only trigger when done
+            if (triggerEvent && animator->state == AnimState::Done) {
                 if (animator->forward) {
                     queueEvent(space->getHandle(), animator->getGameObject()->getHandle(), Event::AnimationReachedEnd);
                 } else {
@@ -270,6 +271,7 @@ int32_t BGE::AnimationService::handleEndOfAnim(AnimatorComponent *animator, int3
             break;
         default:
             animator->iterations--;
+            reset = true;
             break;
     }
     
