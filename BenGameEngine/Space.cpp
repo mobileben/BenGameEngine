@@ -808,8 +808,8 @@ void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePac
     auto animationService = Game::getInstance()->getAnimationService();
     
     if (package) {
-        spaceService_->lock();
         animationService->lock();
+        spaceService_->lock();
         
         auto autoDisplayList = package->getAutoDisplayList();
         auto num = package->getAutoDisplayListSize();
@@ -908,8 +908,8 @@ void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePac
 
         // Now notifiy all create handlers
         dispatchCreatedHandlers(&createdObjects, delegate);
-        animationService->unlock();
         spaceService_->unlock();
+        animationService->unlock();
     }
     
     if (callback) {
