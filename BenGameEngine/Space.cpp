@@ -367,6 +367,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
         auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
         auto boundingBox = createComponent<BoundingBoxComponent>();
+
         auto animSeq = createComponent<AnimationSequenceComponent>();
         auto animator = createComponent<AnimatorComponent>();
         
@@ -375,7 +376,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
         obj->addComponent(animSeq);
         obj->addComponent(animator);
         
-        animSeq->setAnimationSequenceReference(animSeqRef);
+        setAnimationSequenceReference(animSeq->getHandle<AnimationSequenceComponent>(), animSeqRef);
         
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
@@ -438,6 +439,7 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
         auto obj = createGameObject(instanceName);
         auto objHandle = obj->getHandle();
         auto xform = createComponent<TransformComponent>();
+
         auto animSeq = createComponent<AnimationSequenceComponent>();
         auto animator = createComponent<FrameAnimatorComponent>();
         
@@ -445,7 +447,7 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
         obj->addComponent(animSeq);
         obj->addComponent(animator);
         
-        animSeq->setAnimationSequenceReference(animSeqRef);
+        setAnimationSequenceReference(animSeq->getHandle<AnimationSequenceComponent>(), animSeqRef);
         
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
@@ -1313,5 +1315,74 @@ void BGE::Space::removeTexture(TextureHandle handle) {
 
 void BGE::Space::removeTextureAtlas(TextureAtlasHandle handle) {
     Game::getInstance()->getTextureService()->removeTextureAtlas(spaceHandle_, handle);
+}
+
+void BGE::Space::setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, AnimationSequenceReference *animSeqRef) {
+    if (animSeqRef) {
+        setAnimationSequenceReference(animSeqHandle, *animSeqRef);
+    }
+}
+
+void BGE::Space::setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, const AnimationSequenceReference& animSeqRef) {
+    auto animSeq = getComponent(animSeqHandle);
+    
+    animSeq->frameRate = animSeqRef.frameRate;
+    animSeq->totalFrames = animSeqRef.totalFrames;
+    animSeq->numChannels = animSeqRef.numChannels;
+    animSeq->numBounds = animSeqRef.numBounds;
+    
+#ifdef NOT_YET
+    NSLog(@"setAnimationSequenceReference");
+#endif
+    auto root = animSeq->getGameObject();
+    auto seqXform = root->getComponent<TransformComponent>();
+    
+    if (seqXform) {
+        seqXform->removeAllChildren();
+    }
+    
+    AnimationChannelReference *channels = animSeqRef.channels;
+    auto numChannels = animSeq->numChannels;
+    
+    for (auto i=0;i<numChannels;i++) {
+        auto channelRef = &channels[i];
+        auto obj = this->createAnimChannel(channelRef->reference, channelRef->name, channelRef, nullptr);
+        auto xform = obj->getComponent<TransformComponent>();
+        auto xformHandle = xform->getHandle<TransformComponent>();
+        
+        // Refresh root/seqXform in case handle capacity changed
+        animSeq = getComponent(animSeqHandle);
+        root = animSeq->getGameObject();
+        seqXform = root->getComponent<TransformComponent>();
+        
+        seqXform->addChild(xform);
+        
+        // TODO: Destroy components when done!
+        
+        animSeq->channels.push_back(obj->getHandle());
+        obj->setActive(true);
+        
+        // If this is a sequence keyframe, we need to create more game objects!
+        if (channelRef->referenceType == GfxReferenceTypeKeyframe) {
+#ifdef NOT_YET
+            NSLog(@"Adding sequence %s/%s to channel", channelRef->name, channelRef->reference);
+#endif
+            auto newObj = this->createFrameAnimSequence(channelRef->reference, channelRef->name, animSeqRef.scenePackage, nullptr);
+            
+            if (newObj) {
+                auto newXform = newObj->getComponent<TransformComponent>();
+                
+                // Force update xform in case a resize of handle capacity occurred
+                xform = this->getComponent(xformHandle);
+                
+                xform->addChild(newXform);
+                
+                newObj->setActive(true);
+            }
+        }
+    }
+    
+    animSeq = getComponent(animSeqHandle);
+    animSeq->bounds = animSeqRef.bounds;
 }
 

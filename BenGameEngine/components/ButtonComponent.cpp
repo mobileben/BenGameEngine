@@ -124,6 +124,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     
                     disabledButtonHandle = disabledButton->getHandle();
                     
+                    gameObj = space->getGameObject(getGameObjectHandle());
+                    xform = gameObj->getComponent<TransformComponent>();
                     xform->addChild(disabledButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateDisabledAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
@@ -135,8 +137,10 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                         assert(false);
                     }
                     
-                    disabledAnimButtonHandle = disabledButton->getHandle();
+                    disabledAnimButtonHandle = disabledAnimButton->getHandle();
                     
+                    gameObj = space->getGameObject(getGameObjectHandle());
+                    xform = gameObj->getComponent<TransformComponent>();
                     xform->addChild(disabledAnimButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateNormalString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
@@ -155,6 +159,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     
                     normalButtonHandle = normalButton->getHandle();
                     
+                    gameObj = space->getGameObject(getGameObjectHandle());
+                    xform = gameObj->getComponent<TransformComponent>();
                     xform->addChild(normalButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateNormalAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
@@ -168,6 +174,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
 
                     normalAnimButtonHandle = normalAnimButton->getHandle();
 
+                    gameObj = space->getGameObject(getGameObjectHandle());
+                    xform = gameObj->getComponent<TransformComponent>();
                     xform->addChild(normalAnimButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateHighlightedString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
@@ -186,6 +194,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     
                     highlightedButtonHandle = highlightedButton->getHandle();
                     
+                    gameObj = space->getGameObject(getGameObjectHandle());
+                    xform = gameObj->getComponent<TransformComponent>();
                     xform->addChild(highlightedButton->getComponent<TransformComponent>());
                 } else if (!strcmp(ButtonStateHighlightedAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
@@ -199,11 +209,18 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     
                     highlightedAnimButtonHandle = highlightedAnimButton->getHandle();
                     
+                    gameObj = space->getGameObject(getGameObjectHandle());
+                    xform = gameObj->getComponent<TransformComponent>();
                     xform->addChild(highlightedAnimButton->getComponent<TransformComponent>());
                 }
             }
             
             // Initial button from setButtonReference can only be normal or disabled
+            normalButton = space->getGameObject(normalButtonHandle);
+            normalAnimButton = space->getGameObject(normalAnimButtonHandle);
+            disabledButton = space->getGameObject(disabledButtonHandle);
+            disabledAnimButton = space->getGameObject(disabledAnimButtonHandle);
+            
             if (normalButton) {
                 currentButton = normalButton;
                 state = ButtonStateNormal;

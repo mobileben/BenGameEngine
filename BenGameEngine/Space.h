@@ -211,6 +211,9 @@ namespace BGE {
             }
         }
         
+        void setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, AnimationSequenceReference *animSeqRef);
+        void setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, const AnimationSequenceReference& animSeqRef);
+
         void dispatchCreatedHandlers(CreatedGameObjectVector *objects, SceneObjectCreatedDelegate *delegate);
     };
 }

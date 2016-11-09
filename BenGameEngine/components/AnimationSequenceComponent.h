@@ -51,6 +51,7 @@ namespace BGE {
     protected:
         friend GameObject;
         friend ComponentService;
+        friend Space; // We allow Space to access us because we need a 3rd Party to set AnimationSequenceReference since this can cause the pointer to change
         
         void initialize(HandleBackingType handle);
     };

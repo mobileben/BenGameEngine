@@ -80,12 +80,20 @@ void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
 
     if (gameObj) {
         auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+        auto numChannels = seq->channels.size();
         
-        for (auto const &childHandle : seq->channels) {
+        for (auto i=0;i<numChannels;i++) {
+            gameObj = space->getGameObject(gameObjHandle);
+            seq = gameObj->getComponent<AnimationSequenceComponent>();
+            
+            auto childHandle = seq->channels[i];
             auto childObj = space->getGameObject(childHandle);
             
             animateChannel(childObj, frame);
         }
+        
+        gameObj = space->getGameObject(gameObjHandle);
+        seq = gameObj->getComponent<AnimationSequenceComponent>();
         
         // Update the bounds
         for (auto i=0;i<seq->numBounds;i++) {
