@@ -46,8 +46,7 @@ namespace BGE {
             ComponentHandle handle{T::typeId_, component->getRawHandle()};
             componentBitmask_ |= bitmask;
             components_.push_back(handle);
-            
-            component->setGameObjectHandle(getHandle());
+            getSpace()->setGameObjectHandle(component, getHandle());
             
             addComponentEpilogue(T::typeId_);
         }

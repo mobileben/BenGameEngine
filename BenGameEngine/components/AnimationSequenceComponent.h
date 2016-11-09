@@ -33,9 +33,6 @@ namespace BGE {
         void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final;
         void destroy() final;
 
-        void setAnimationSequenceReference(AnimationSequenceReference *animSeqRef);
-        void setAnimationSequenceReference(const AnimationSequenceReference& animSeqRef);
-
         // TODO: Handle to AnimationSequenceReference
         uint32_t    frameRate;
         uint32_t    totalFrames;

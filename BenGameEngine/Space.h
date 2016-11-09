@@ -155,6 +155,19 @@ namespace BGE {
         void scenePackageAdded(ScenePackageHandle handle);
         void scenePackageRemoved(ScenePackageHandle handle);
         
+        template <typename T>
+        void setGameObjectHandle(T *component, GameObjectHandle gameObjHandle) {
+            component->setGameObjectHandle(gameObjHandle);
+            
+            ComponentHandle handle{T::typeId_, component->getRawHandle()};
+
+            setGameObjectHandle(handle, gameObjHandle);
+        }
+        
+        void setGameObjectHandle(ComponentHandle compHandle, GameObjectHandle gameObjHandle);
+        
+        void setAnimationChannelReference(AnimationChannelComponentHandle channelHandle, const AnimationChannelReference *animChanRef);
+
     protected:
         SpaceHandle spaceHandle_;
         

@@ -64,10 +64,6 @@ void BGE::TransformComponent::destroy() {
     Component::destroy();
 }
 
-void BGE::TransformComponent::setGameObjectHandle(GameObjectHandle handle) {
-    Component::setGameObjectHandle(handle);
-}
-
 void BGE::TransformComponent::setParentHandle(TransformComponentHandle parentHandle) {
     parentHandle_ = parentHandle;
     worldDirty_ = true;

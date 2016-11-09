@@ -169,8 +169,6 @@ namespace BGE {
         float           speed_;
         bool            paused_;
         
-        void setGameObjectHandle(GameObjectHandle handle) override;
-        
         void setParentHandle(TransformComponentHandle parentHandle);
         void setParent(TransformComponent *parent);
     };

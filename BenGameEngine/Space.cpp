@@ -410,7 +410,7 @@ BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string ins
         obj->addComponent(channel);
         obj->addComponent(animator);
         
-        channel->setAnimationChannelReference(channelRef);
+        setAnimationChannelReference(channel->getHandle<AnimationChannelComponent>(), channelRef);
         
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
@@ -1385,4 +1385,128 @@ void BGE::Space::setAnimationSequenceReference(AnimationSequenceComponentHandle 
     animSeq = getComponent(animSeqHandle);
     animSeq->bounds = animSeqRef.bounds;
 }
+
+void BGE::Space::setAnimationChannelReference(AnimationChannelComponentHandle channelHandle, const AnimationChannelReference *animChanRef) {
+    auto channel = getComponent(channelHandle);
+    
+    if (channel) {
+        channel->channel = animChanRef;
+
+        auto gameObj = getGameObject(channel->getGameObjectHandle());
+        
+        if (channel->channel) {
+            auto package = Game::getInstance()->getScenePackageService()->getScenePackage(channel->channel->scenePackage);
+            
+            // Now setup the proper render component
+            
+#ifdef NOT_YET
+            // TODO: Do we do this later?
+            NSLog(@"Channel reference %s/%d", channel->channel->reference, channel->channel->referenceType);
+#endif
+            switch (channel->channel->referenceType) {
+                case GfxReferenceTypeSprite: {
+                    auto sprite = createComponent<SpriteRenderComponent>();
+                    auto texRef = package->getTextureReference(channel->channel->reference);
+                    auto bbox = createComponent<BoundingBoxComponent>();
+                    
+                    // TODO: Remove any older render components
+                    gameObj->addComponent(sprite);
+                    gameObj->addComponent(bbox);
+                    
+                    sprite->setTextureReference(texRef);
+                }
+                    break;
+                    
+                case GfxReferenceTypeButton:{
+                    auto button = createComponent<ButtonComponent>();
+                    auto bbox = createComponent<BoundingBoxComponent>();
+                    
+                    auto buttonRef = package->getButtonReference(channel->channel->reference);
+                    gameObj->addComponent(button);
+                    gameObj->addComponent(bbox);
+                    
+                    button->setButtonReference(buttonRef);
+                }
+                    break;
+                    
+                case GfxReferenceTypeAnimationSequence: {
+#ifdef NOT_YET
+                    NSLog(@"WHY");
+#endif
+                }
+                    break;
+                    
+                case GfxReferenceTypeMask: {
+                    auto mask = createComponent<MaskComponent>();
+                    auto maskRef = package->getMaskReference(channel->channel->reference);
+                    
+                    gameObj->addComponent(mask);
+                    mask->setMaskReference(maskRef);
+                }
+                    break;
+                    
+                case GfxReferenceTypeKeyframe: {
+                    // Keyframe needs to be filled out later
+                    //auto seq =
+#ifdef NOT_YET
+                    NSLog(@"HERE");
+#endif
+                }
+                    break;
+                    
+                case GfxReferenceTypeText: {
+                    TextReference *textRef = package->getTextReference(channel->channel->reference);
+                    
+                    if (textRef && !textRef->fontHandle.isNull()) {
+                        auto text = createComponent<TextComponent>();
+                        auto bbox = createComponent<BoundingBoxComponent>();
+                        
+                        gameObj->addComponent(text);
+                        gameObj->addComponent(bbox);
+                        
+                        text->setTextReference(*textRef);
+                    }
+                    // TODO: Remove any older render components
+                }
+                    break;
+                    
+                case GfxReferenceTypePlacement: {
+                    PlacementReference *placementRef = package->getPlacementReference(channel->channel->reference);
+                    
+                    if (placementRef) {
+                        auto placement = createComponent<PlacementComponent>();
+                        
+                        gameObj->addComponent(placement);
+                        
+                        placement->setPlacementReference(placementRef);
+                    }
+                }
+                    break;
+                    
+                default:
+                    assert(false);
+                    break;
+            }
+        } else {
+#ifdef NOT_YET
+            if (channel->channel) {
+                NSLog(@"You fail %lx %lx %lx", (unsigned long) gameObj, (unsigned long) channel->channel, (unsigned long) channel->channel->referenceData);
+            } else {
+                NSLog(@"You fail %lx", (unsigned long)  gameObj);
+            }
+#endif
+        }
+    }
+}
+void BGE::Space::setGameObjectHandle(ComponentHandle compHandle, GameObjectHandle gameObjHandle) {
+    if (compHandle.typeId == AnimationChannelComponent::typeId_) {
+        auto handle = AnimationChannelComponentHandle(compHandle.handle);
+        auto comp = getComponent(handle);
+        
+        if (comp) {
+            setAnimationChannelReference(handle, comp->channel);
+        }
+    }
+}
+
 

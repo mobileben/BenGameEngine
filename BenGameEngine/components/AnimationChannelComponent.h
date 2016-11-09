@@ -40,16 +40,11 @@ namespace BGE {
             // Component::destroy last
             Component::destroy();
         }
-        
-        void setAnimationChannelReference(const AnimationChannelReference *animChanRef);
-        
-        void updateReference();
 
     protected:
         friend ComponentService;
         friend GameObject;
-        
-        void setGameObjectHandle(GameObjectHandle handle) override;
+        friend Space; // Do this since channel may get modified during handle expansion
     };
 }
 
