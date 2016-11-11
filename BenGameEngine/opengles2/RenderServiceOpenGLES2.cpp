@@ -793,7 +793,7 @@ uint8_t BGE::RenderServiceOpenGLES2::enableMask(GameObject *gameObject) {
             glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_ALWAYS, maskValue, maskValue);
             glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
-            glStencilMask(this->activeMasks_);
+            glStencilMask(maskValue);
             
             glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
             
@@ -804,7 +804,7 @@ uint8_t BGE::RenderServiceOpenGLES2::enableMask(GameObject *gameObject) {
             }
       
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-            glStencilFunc(GL_EQUAL, maskValue, maskValue);
+            glStencilFunc(GL_EQUAL, this->activeMasks_, this->activeMasks_);
             glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         }
     }
@@ -819,7 +819,7 @@ void BGE::RenderServiceOpenGLES2::disableMask(uint8_t maskBits)
         glClear(GL_STENCIL_BUFFER_BIT);
         
         activeMasks_ &= ~maskBits;
-        glStencilMask(activeMasks_);
+        glStencilFunc(GL_EQUAL, this->activeMasks_, this->activeMasks_);
     }
     
     if (!activeMasks_) {
