@@ -108,7 +108,13 @@ namespace BGE {
             return find(T::typeId_, name);
         }
         
+        template <typename T>
+        GameObject *findWithPrefix(std::string name) {
+            return findWithPrefix(T::typeId_, name);
+        }
+        
         GameObject *find(ComponentTypeId componentTypeId, std::string name);
+        GameObject *findWithPrefix(ComponentTypeId componentTypeId, std::string name);
         
         GameObject *getParent();
         

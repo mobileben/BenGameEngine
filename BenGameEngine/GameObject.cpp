@@ -88,6 +88,34 @@ BGE::GameObject *BGE::GameObject::find(ComponentTypeId componentTypeId, std::str
     return nullptr;
 }
 
+BGE::GameObject *BGE::GameObject::findWithPrefix(ComponentTypeId componentTypeId, std::string name) {
+    if (getName().find(name) != std::string::npos) {
+        for (auto &componentHandle : components_) {
+            if (componentHandle.typeId == componentTypeId) {
+                return this;
+            }
+        }
+    }
+    
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        for (auto &childXform : xform->getChildren()) {
+            auto child = childXform->getGameObject();
+            
+            if (child) {
+                auto found = child->findWithPrefix(componentTypeId, name);
+                
+                if (found) {
+                    return found;
+                }
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
 bool BGE::GameObject::isVisible(void) {
     auto xform = getComponent<TransformComponent>();
     
