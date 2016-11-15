@@ -337,13 +337,17 @@ BGE::TransformComponent *BGE::TransformComponent::getParent() const {
 }
 
 std::vector<BGE::TransformComponentHandle> BGE::TransformComponent::getOrderedChildrenHandles() {
+    handleServicesLock();
+    
     auto xforms = getOrderedChildren();
     std::vector<TransformComponentHandle> children;
 
     for (auto xform : xforms) {
         children.push_back(xform->getHandle<TransformComponent>());
     }
-    
+
+    handleServicesUnlock();
+
     return children;
 }
 
@@ -363,6 +367,8 @@ std::vector<BGE::TransformComponent *> BGE::TransformComponent::getChildren() {
 }
 
 std::vector<BGE::TransformComponent *> BGE::TransformComponent::getOrderedChildren() {
+    handleServicesLock();
+
     auto space = getSpace();
     std::vector<TransformComponent *> children;
     
@@ -389,6 +395,8 @@ std::vector<BGE::TransformComponent *> BGE::TransformComponent::getOrderedChildr
         }
     }
     
+    handleServicesUnlock();
+
     return children;
 }
 

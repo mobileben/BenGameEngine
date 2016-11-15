@@ -82,3 +82,8 @@ BGE::Vector2 BGE::RenderService::deviceCoordinatesFromRenderCoordinates(Vector2 
     return convertedPos;
 }
 
+void BGE::RenderService::setComponentService(std::shared_ptr<ComponentService> componentService) {
+    componentService_ = componentService;
+}
+
+

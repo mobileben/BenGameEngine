@@ -19,6 +19,8 @@
 #include "MathTypes.h"
 
 namespace BGE {
+    class ComponentService;
+    
     typedef Vector3 Vertex;
     
     typedef struct {
@@ -85,6 +87,8 @@ namespace BGE {
         
         Vector2 deviceCoordinatesFromRenderCoordinates(Vector2 pos);
         
+        void setComponentService(std::shared_ptr<ComponentService> componentService);
+        
         virtual std::shared_ptr<ShaderProgram> pushShaderProgram(std::string program) =0;
         virtual std::shared_ptr<ShaderProgram> popShaderProgram() =0;
         
@@ -96,6 +100,8 @@ namespace BGE {
         std::shared_ptr<ShaderService> shaderService_;
         
         std::vector<std::shared_ptr<ShaderProgram>> shaderProgramStack_;
+        
+        std::shared_ptr<ComponentService>   componentService_;
         
     private:
         bool ready_;

@@ -191,6 +191,7 @@ void BGE::Game::initialize() {
     ComponentService::registerComponents();
     
     getHeartbeatService()->registerListener("Game", std::bind(&Game::update, this, std::placeholders::_1), 0);
+    renderService_->setComponentService(componentService_);
 }
 
 void BGE::Game::reset() {

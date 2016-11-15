@@ -966,9 +966,10 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         uint8_t childrenMasks = 0;;
         
         // Determine if we have children, if we do process them.
-        auto children = transformComponent->getOrderedChildren();
-        for (auto i=0;i<children.size();++i) {
-            auto childXform = children[i];
+        auto childrenHandles = transformComponent->getOrderedChildrenHandles();
+        for (auto i=0;i<childrenHandles.size();++i) {
+            auto childXformHandle = childrenHandles[i];
+            auto childXform = componentService_->getComponent<TransformComponent>(childXformHandle.getHandle());
             
             if (childXform->hasGameObject()) {
                 auto childObjHandle = childXform->getGameObjectHandle();
