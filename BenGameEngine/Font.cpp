@@ -188,7 +188,7 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                 
                 // Go through ASCII. Include extended ASCII. Ignore control characters
                 for (int i=0;i<NumSupportedCharacters;i++) {
-                    error = FT_Load_Char( face, i + InitialSupportedCharacterOffset, FT_LOAD_RENDER );
+                    error = FT_Load_Char( face, i + InitialSupportedCharacterOffset, FT_LOAD_RENDER|FT_LOAD_FORCE_AUTOHINT );
                     
                     if (!error) {
                         FT_Glyph_Metrics *currMetrics = &face->glyph->metrics;
