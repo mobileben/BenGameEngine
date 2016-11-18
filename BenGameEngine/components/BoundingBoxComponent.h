@@ -38,6 +38,10 @@ namespace BGE {
         void destroy() final;
 
         void computeAABB(Matrix4 &transform);
+        void computeAABB(Matrix4 &transform, Vector2 scale);
+        
+    private:
+        void computeAABB(Matrix4 &transform, float w, float h);
     };
 }
 

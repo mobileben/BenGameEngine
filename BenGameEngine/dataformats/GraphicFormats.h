@@ -78,6 +78,7 @@ namespace BGE {
         int32_t position;
         int32_t scale;
         int32_t skew;
+        int32_t collisionRectScale;
         float rotation;
         int32_t matrix;
         int32_t colorMatrix;
@@ -94,6 +95,7 @@ namespace BGE {
         Vector2 *position;
         Vector2 *scale;
         Vector2 *skew;
+        Vector2 *collisionRectScale;
         float  rotation;
         Matrix4 *matrix;
         ColorMatrix *colorMatrix;
@@ -249,6 +251,7 @@ namespace BGE {
         int32_t             position;
         int32_t             scale;
         int32_t             skew;
+        int32_t             collisionRectScale;
         float               rotation;
         int32_t             matrix;
         int32_t             colorMatrix;
@@ -265,6 +268,7 @@ namespace BGE {
         Vector2             *position;
         Vector2             *scale;
         Vector2             *skew;
+        Vector2             *collisionRectScale;
         float               rotation;
         bool                hidden;
         Matrix4             *matrix;

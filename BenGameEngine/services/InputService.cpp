@@ -178,7 +178,7 @@ bool BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                 bool inBounds = false;
                 
                 xform->getWorldMatrix(matrix);
-                bbox->computeAABB(matrix);
+                bbox->computeAABB(matrix, xform->getCollisionRectScale());
                 
                 if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
                     if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {
@@ -212,7 +212,7 @@ bool BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                     Matrix4 matrix;
                     
                     xform->getWorldMatrix(matrix);
-                    bbox->computeAABB(matrix);
+                    bbox->computeAABB(matrix, xform->getCollisionRectScale());
 
                     if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
                         if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {

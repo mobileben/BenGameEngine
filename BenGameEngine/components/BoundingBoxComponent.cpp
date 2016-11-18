@@ -45,11 +45,15 @@ void BGE::BoundingBoxComponent::destroy() {
 }
 
 void BGE::BoundingBoxComponent::computeAABB(Matrix4 &transform) {
+    computeAABB(transform, width, height);
+}
+
+void BGE::BoundingBoxComponent::computeAABB(Matrix4 &transform, float w, float h) {
     Vector2 pt;
     Vector2 newPt;
     
-    pt.x = x - width/2.0;
-    pt.y = y - height/2.0;
+    pt.x = x - w/2.0;
+    pt.y = y - h/2.0;
     
     Matrix4MultiplyVector2(newPt, transform, pt);
     
@@ -58,24 +62,8 @@ void BGE::BoundingBoxComponent::computeAABB(Matrix4 &transform) {
     aabbMaxX = newPt.x;
     aabbMaxY = newPt.y;
     
-    pt.x += width;
-
-    Matrix4MultiplyVector2(newPt, transform, pt);
-
-    if (newPt.x > aabbMaxX) {
-        aabbMaxX = newPt.x;
-    } else if (newPt.x < aabbMinX) {
-        aabbMinX = newPt.x;
-    }
+    pt.x += w;
     
-    if (newPt.y > aabbMaxY) {
-        aabbMaxY = newPt.y;
-    } else if (newPt.y < aabbMinY) {
-        aabbMinY = newPt.y;
-    }
-    
-    pt.y += height;
-
     Matrix4MultiplyVector2(newPt, transform, pt);
     
     if (newPt.x > aabbMaxX) {
@@ -89,8 +77,24 @@ void BGE::BoundingBoxComponent::computeAABB(Matrix4 &transform) {
     } else if (newPt.y < aabbMinY) {
         aabbMinY = newPt.y;
     }
-
-    pt.x -=width;
+    
+    pt.y += h;
+    
+    Matrix4MultiplyVector2(newPt, transform, pt);
+    
+    if (newPt.x > aabbMaxX) {
+        aabbMaxX = newPt.x;
+    } else if (newPt.x < aabbMinX) {
+        aabbMinX = newPt.x;
+    }
+    
+    if (newPt.y > aabbMaxY) {
+        aabbMaxY = newPt.y;
+    } else if (newPt.y < aabbMinY) {
+        aabbMinY = newPt.y;
+    }
+    
+    pt.x -=w;
     Matrix4MultiplyVector2(newPt, transform, pt);
     
     if (newPt.x > aabbMaxX) {
@@ -105,3 +109,8 @@ void BGE::BoundingBoxComponent::computeAABB(Matrix4 &transform) {
         aabbMinY = newPt.y;
     }
 }
+
+void BGE::BoundingBoxComponent::computeAABB(Matrix4 &transform, Vector2 scale) {
+    computeAABB(transform, width * scale.x, height * scale.y);
+}
+

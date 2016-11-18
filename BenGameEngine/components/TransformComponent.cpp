@@ -17,7 +17,7 @@ BGE::ComponentTypeId BGE::TransformComponent::typeId_ = Component::InvalidTypeId
 std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComponent);
 
 BGE::TransformComponent::TransformComponent() : Component(), visible_(true),
-bounds_({ 0, 0, 0, 0}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), useSkew_(false), rotation_(0), localDirty_(false), worldDirty_(false), speed_(1), paused_(false) {
+bounds_({ 0, 0, 0, 0}), useCollisionRectScale_(false), collisionRectScale_({1, 1}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), useSkew_(false), rotation_(0), localDirty_(false), worldDirty_(false), speed_(1), paused_(false) {
     Matrix4MakeIdentify(localMatrix_);
     Matrix4MakeIdentify(worldMatrix_);
 }
@@ -31,6 +31,9 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
     bounds_.y = 0;
     bounds_.w = 0;
     bounds_.h = 0;
+    collisionRectScale_.x = 1;
+    collisionRectScale_.y = 1;
+    useCollisionRectScale_ = false;
     position_.x = 0;
     position_.y = 0;
     scale_.x = 1;
@@ -72,6 +75,26 @@ void BGE::TransformComponent::setParentHandle(TransformComponentHandle parentHan
 void BGE::TransformComponent::setParent(TransformComponent *parent) {
     if (parent) {
         setParentHandle(parent->getHandle<TransformComponent>());
+    }
+}
+
+void BGE::TransformComponent::setCollisionRectScale(Vector2 &scale) {
+    collisionRectScale_ = scale;
+    
+    if (scale.x != 1.0 || scale.y != 1.0) {
+        useCollisionRectScale_ = true;
+    } else {
+        useCollisionRectScale_ = false;
+    }
+}
+
+void BGE::TransformComponent::setCollisionRectScale(Vector2 &&scale) {
+    collisionRectScale_ = scale;
+    
+    if (scale.x != 1.0 || scale.y != 1.0) {
+        useCollisionRectScale_ = true;
+    } else {
+        useCollisionRectScale_ = false;
     }
 }
 

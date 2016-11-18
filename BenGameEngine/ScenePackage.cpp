@@ -15,13 +15,13 @@
 
 const std::string BGE::ScenePackage::ErrorDomain = "ScenePackage";
 
-BGE::ScenePackage::ScenePackage() : NamedObject(), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), fontCount_(nullptr) {
+BGE::ScenePackage::ScenePackage() : NamedObject(), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
     position_ = Vector2{0, 0};
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
 }
 
-BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), memoryUsage_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), fontCount_(nullptr) {
+BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), memoryUsage_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), fontCount_(nullptr) {
     position_ = Vector2{0, 0};
     textureCount_ = std::make_shared<std::atomic_int>(0);
     fontCount_ = std::make_shared<std::atomic_int>(0);
@@ -487,6 +487,11 @@ void BGE::ScenePackage::link() {
         } else {
             keyframeRef->skew = nullptr;
         }
+        if (keyframeRefInt->collisionRectScale != NullPtrIndex) {
+            keyframeRef->collisionRectScale = keyframeRefInt->collisionRectScale + vector2s_.baseAddress();
+        } else {
+            keyframeRef->collisionRectScale = nullptr;
+        }
         keyframeRef->rotation = keyframeRefInt->rotation;
         keyframeRef->matrix = nullptr;  // TODO
         if (keyframeRefInt->colorMatrix != NullPtrIndex) {
@@ -722,6 +727,11 @@ void BGE::ScenePackage::link() {
         } else {
             elem->skew = nullptr;
         }
+        if (elemInt->collisionRectScale != NullPtrIndex) {
+            elem->collisionRectScale = elemInt->collisionRectScale + vector2s_.baseAddress();
+        } else {
+            elem->collisionRectScale = nullptr;
+        }
         elem->rotation = elemInt->rotation;
         elem->matrix = nullptr;  // TODO default matrix and default color matrix and default color transform
         if (elemInt->colorMatrix != NullPtrIndex) {
@@ -799,6 +809,7 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
         defaultPositionIndex_ = vector2Builder.add(Vector2{0, 0});
         defaultScaleIndex_ = vector2Builder.add(Vector2{1, 1});
         defaultSkewIndex_ = vector2Builder.add(Vector2{0, 0});
+        defaultCollisionRectScaleIndex_ = vector2Builder.add(Vector2{1, 1});
         
         // TextureReferenceIntermediate total count are all textures and subTextures
         texIntBuilder.resize((int32_t) (textures.count + subtextures.count));
@@ -1038,6 +1049,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                             Vector2 *scale = &scaleBacking;
                             Vector2 skewBacking;
                             Vector2 *skew = &skewBacking;
+                            Vector2 collisionRectScaleBacking;
+                            Vector2 *collisionRectScale = &collisionRectScaleBacking;
                             Vector2 positionBacking;
                             Vector2 *position = &positionBacking;
                             
@@ -1152,6 +1165,13 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                 skew = nullptr;
                             }
                             
+                            if (childDict[@"collRectScale"]) {
+                                collisionRectScaleBacking.x = [childDict[@"collRectScale"][@"x"] floatValue];
+                                collisionRectScaleBacking.y = [childDict[@"collRectScale"][@"y"] floatValue];
+                            } else {
+                                collisionRectScale = nullptr;
+                            }
+                            
                             // TODO: Now build matrix
                             
                             // Now determine if this Keyframe is a new Keyframe
@@ -1180,6 +1200,7 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                     Vector2 *currPosition;
                                     Vector2 *currScale;
                                     Vector2 *currSkew;
+                                    Vector2 *currCollisionRectScale;
                                     
                                     currBounds = rectBuilder.safeAddressOf(currKeyframe->bounds);
                                     currColorTransform = colorXformBuilder.safeAddressOf(currKeyframe->colorTransform);
@@ -1187,6 +1208,7 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                     currPosition = vector2Builder.safeAddressOf(currKeyframe->position);
                                     currScale = vector2Builder.safeAddressOf(currKeyframe->scale);
                                     currSkew = vector2Builder.safeAddressOf(currKeyframe->skew);
+                                    currCollisionRectScale = vector2Builder.safeAddressOf(currKeyframe->collisionRectScale);
                                     
                                     // Bounds the same?
                                     if ((currBounds != bounds) || ((currBounds && bounds) && (*currBounds != *bounds))) {
@@ -1196,6 +1218,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                     } else if ((currScale != scale) || ((currScale && scale) && (*currScale != *scale))) {
                                         isNew = true;
                                     } else if ((currSkew != skew) || ((currSkew && skew) && (*currSkew != *skew))) {
+                                        isNew = true;
+                                    } else if ((currCollisionRectScale != collisionRectScale) || ((currCollisionRectScale && collisionRectScale) && (*currCollisionRectScale != *collisionRectScale))) {
                                         isNew = true;
                                     } else if ((currColorTransform != colorTransform) || ((currColorTransform && colorTransform) && (*currColorTransform != *colorTransform))) {
                                         isNew = true;
@@ -1225,6 +1249,12 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                                     keyframe.skew = vector2Builder.add(*skew);
                                 } else {
                                     keyframe.skew = defaultSkewIndex_;
+                                }
+                                
+                                if (collisionRectScale) {
+                                    keyframe.collisionRectScale = vector2Builder.add(*collisionRectScale);
+                                } else {
+                                    keyframe.collisionRectScale = defaultCollisionRectScaleIndex_;
                                 }
                                 
                                 if (colorTransform) {
@@ -1451,6 +1481,17 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                 elem->skew = defaultSkewIndex_;
             }
             
+            if (dict[@"collRectScale"]) {
+                Vector2 collisionRectScale;
+                
+                collisionRectScale.x = [dict[@"collRectScale"][@"x"] floatValue];
+                collisionRectScale.y = [dict[@"collRectScale"][@"y"] floatValue];
+                
+                elem->collisionRectScale = vector2Builder.add(collisionRectScale);
+            } else {
+                elem->collisionRectScale = defaultCollisionRectScaleIndex_;
+            }
+
             if (dict[@"hidden"]) {
                 elem->hidden = [dict[@"hidden"] boolValue];
             } else {

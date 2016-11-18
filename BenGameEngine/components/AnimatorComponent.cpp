@@ -214,6 +214,11 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
             } else {
                 xform->setSkew(Vector2{0, 0});
             }
+            if (keyframe->collisionRectScale) {
+                xform->setCollisionRectScale(*keyframe->collisionRectScale);
+            } else {
+                xform->setCollisionRectScale(Vector2{1,1});
+            }
             auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();
             auto colorTransform = gameObj->getComponent<ColorTransformComponent>();
             auto space = gameObj->getSpace();

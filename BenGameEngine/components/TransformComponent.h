@@ -38,6 +38,10 @@ namespace BGE {
         void setVisibility(bool visible) { visible_ = visible; }
         
         void getBounds(Rect &bounds) { bounds = bounds_; }
+        bool useCollisionRectScale() const { return useCollisionRectScale_; }
+        Vector2 getCollisionRectScale() const { return collisionRectScale_; }
+        void setCollisionRectScale(Vector2 &scale);
+        void setCollisionRectScale(Vector2 &&scale);
         
         float getX() const { return position_.x; }
         float getY() const { return position_.y; }
@@ -142,6 +146,8 @@ namespace BGE {
         
         // Bounds
         Rect            bounds_;
+        bool            useCollisionRectScale_;
+        Vector2         collisionRectScale_;
         
         // Transformation
         bool            useSkew_;   // Note this is Flash skew, not affine skew. When skew is in use, rotation is not used
