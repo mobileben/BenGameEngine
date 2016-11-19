@@ -866,10 +866,12 @@ void BGE::RenderServiceOpenGLES2::queueRender(double time) {
 
 void BGE::RenderServiceOpenGLES2::render()
 {
+    handleServicesLock();
     lock();
  
     if (isBackgrounded()) {
         unlock();
+        handleServicesUnlock();
         return;
     }
     
@@ -934,6 +936,7 @@ void BGE::RenderServiceOpenGLES2::render()
     }
     
     unlock();
+    handleServicesUnlock();
 }
 
 int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool root, bool hasNextSibling) {
