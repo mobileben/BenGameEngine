@@ -28,6 +28,12 @@
 #include "EventService.h"
 
 namespace BGE {
+    enum class WireframeMode {
+        Off,
+        WireframeOnly,
+        WireframeAndActual
+    };
+    
     using SpaceResetQueueItem = std::pair<SpaceHandle, std::function<void()>>;
     
     class Game : public Service
@@ -65,6 +71,11 @@ namespace BGE {
         
         bool isPaused() const { return paused_; }
         void setPaused(bool paused);
+        
+        WireframeMode getWireframeMode() const { return wireframeMode_; }
+        void setWireframeMode(WireframeMode mode) { wireframeMode_ = mode; }
+        bool showCollisionRects() const { return showCollisionRects_; }
+        void setShowCollisionRects(bool show) { showCollisionRects_ = show; }
         
         void updateTransforms();
         void updateRootTransforms();
@@ -149,6 +160,9 @@ namespace BGE {
         };
         
         bool paused_;
+        WireframeMode wireframeMode_;
+        bool showCollisionRects_;
+        
         std::vector<SpaceResetQueueItem>        spaceResetQueue_;
         
         // Used to access resources metrics

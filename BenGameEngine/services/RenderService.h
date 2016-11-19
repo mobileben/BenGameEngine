@@ -80,6 +80,9 @@ namespace BGE {
         
         std::shared_ptr<ShaderService> getShaderService() const { return shaderService_; }
         
+        std::vector<Vector3> &getBoundBoxPoints() { return boundingBoxPoints_; }
+        std::vector<Vector3> &getScaledBoundBoxPoints() { return scaledBoundingBoxPoints_; }
+        
         Color getBackgroundColor() const { return backgroundColor_; }
         void setBackgroundColor(Color color) { backgroundColor_ = color; }
         
@@ -102,6 +105,9 @@ namespace BGE {
         std::vector<std::shared_ptr<ShaderProgram>> shaderProgramStack_;
         
         std::shared_ptr<ComponentService>   componentService_;
+        
+        std::vector<Vector3> boundingBoxPoints_;
+        std::vector<Vector3> scaledBoundingBoxPoints_;
         
     private:
         bool ready_;

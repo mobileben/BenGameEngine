@@ -9,6 +9,8 @@
 #ifndef InputTouchComponent_h
 #define InputTouchComponent_h
 
+#import <UIKit/UIKit.h>
+
 #include <stdio.h>
 #include "Component.h"
 
@@ -18,9 +20,13 @@ namespace BGE {
         static std::type_index  type_index_;
         static ComponentTypeId  typeId_;
         static uint32_t         bitmask_;
+
+        UITouch *touch;
         
-        InputTouchComponent() {}
+        InputTouchComponent() : touch(nil) {}
         ~InputTouchComponent() {}
+
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final;
     };
 }
 

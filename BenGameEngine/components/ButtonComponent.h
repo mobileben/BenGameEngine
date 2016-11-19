@@ -9,6 +9,7 @@
 #ifndef ButtonComponent_h
 #define ButtonComponent_h
 
+#import <UIKit/UIKit.h>
 #include <stdio.h>
 #include <memory>
 #include "Component.h"
@@ -64,7 +65,10 @@ namespace BGE {
         bool isToggleable() const;
         void setToggleable(bool on);
         
-        Event handleInput(TouchType type, bool inBounds);
+        Event handleInput(Input *input, bool inBounds);
+        
+        UITouch *getTouch() const { return touch; }
+        void setTouch(UITouch *t) { touch = t; }
         
     private:
         friend Space;
@@ -77,6 +81,8 @@ namespace BGE {
         // For when we want to treat this like a toggle
         bool        toggleable;
         bool        toggleOn;
+        
+        UITouch     *touch; // We need this to properly track events
         
         GameObjectHandle disabledButtonHandle;
         GameObjectHandle disabledAnimButtonHandle;

@@ -15,6 +15,7 @@
 #include "Input.h"
 #include "Event.h"
 #include "HandleService.h"
+#include "MathTypes.h"
 
 namespace BGE {
     enum class InputTouchEvent {
@@ -99,6 +100,7 @@ namespace BGE {
             SpaceHandle                         spaceHandle;
             GameObjectHandle                    gameObjHandle;
             ButtonComponentHandle               buttonComponentHandle;
+            InputTouchComponentHandle           inputTouchComponentHandle;
             TouchType                           touchType;
             Event                               event;
             bool                                inBounds;
@@ -118,7 +120,8 @@ namespace BGE {
         
         Input *createInput();
         void touchEvent(TouchType type, NSSet* touches, UIView* view);
-        bool checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue);
+        void checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue);
+        void getInputPoints(GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints);
     };
 }
 

@@ -159,7 +159,7 @@ void BGE::Game::outputValue(uint32_t numTabs, std::string format, va_list args) 
     printf("%s", results.c_str());
 }
 
-BGE::Game::Game() : paused_(false)
+BGE::Game::Game() : paused_(false), wireframeMode_(WireframeMode::Off), showCollisionRects_(false)
 {
     handleServicesInitialize();
     

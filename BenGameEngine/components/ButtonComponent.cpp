@@ -22,7 +22,7 @@ uint32_t BGE::ButtonComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent);
 
-BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted_(true), toggleable(false), toggleOn(false) {
+BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted_(true), toggleable(false), toggleOn(false), touch(nil) {
 }
 
 void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
@@ -35,6 +35,8 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
     
     toggleable = false;
     toggleOn = false;
+    
+    touch = nil;
     
     disabledButtonHandle = GameObjectHandle();
     disabledAnimButtonHandle = GameObjectHandle();
@@ -53,6 +55,8 @@ void BGE::ButtonComponent::destroy() {
     
     toggleable = false;
     toggleOn = false;
+    
+    touch = nil;
     
     auto space = getSpace();
     
@@ -381,6 +385,8 @@ void BGE::ButtonComponent::setToggleOn(bool on) {
     toggleOn = on;
     
     if (toggleable) {
+        auto gameObj = getGameObject();
+        
         if (toggleOn) {
             useHighlightedButton();
         } else {
@@ -562,7 +568,7 @@ void BGE::ButtonComponent::useNormalButton() {
         currentButtonHandle = normalButtonHandle;
         
         currentButton = space->getGameObject(currentButtonHandle);
-        
+
         if (!currentButton) {
             // Fallback as we don't have this
             if ((button = space->getGameObject(normalAnimButtonHandle)) != nullptr && button->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
@@ -589,20 +595,30 @@ void BGE::ButtonComponent::useNormalButton() {
     }
 }
 
-BGE::Event BGE::ButtonComponent::handleInput(TouchType type, bool inBounds) {
+BGE::Event BGE::ButtonComponent::handleInput(Input *input, bool inBounds) {
     Event event = Event::None;
     
-    switch (type) {
+    switch (input->type) {
         case TouchType::Down:
             event = handleTouchDownEvent(inBounds);
+            
+            if (event == Event::TouchDown) {
+                touch = input->touch;
+            }
             break;
             
         case TouchType::Up:
-            event = handleTouchUpEvent(inBounds);
+            if (touch == input->touch) {
+                event = handleTouchUpEvent(inBounds);
+                touch = nil;
+            }
             break;
             
         case TouchType::Cancel:
-            event = handleTouchCancelEvent();
+            if (touch == input->touch) {
+                event = handleTouchCancelEvent();
+                touch = nil;
+            }
             break;
             
         default:

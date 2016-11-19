@@ -75,7 +75,9 @@ void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view)
         }
         
         
-        NSLog(@"XXXXX Touch %f %f", input->x, input->y);
+#ifdef NOT_YET
+        printf("XXXXX Touch %d %f %f\n", type, input->x, input->y);
+#endif
         inputs_.push_back(input);
     }
     
@@ -162,9 +164,8 @@ void BGE::InputService::spaceReset(Space *space) {
     unlock();
 }
 
-bool BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue) {
+void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue) {
     auto xform = gameObj->getComponent<TransformComponent>();
-    bool found = false;
     
     if (xform && xform->isVisible()) {
         auto button = gameObj->getComponent<ButtonComponent>();
@@ -186,7 +187,7 @@ bool BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                     }
                 }
                 
-                auto event = button->handleInput(input->type, inBounds);
+                auto event = button->handleInput(input, inBounds);
                 
                 if (event == Event::TouchDown || event == Event::TouchUpInside) {
                     InputEventItem eventItem;
@@ -194,12 +195,13 @@ bool BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                     eventItem.spaceHandle = gameObj->getSpace()->getHandle();
                     eventItem.gameObjHandle = gameObj->getHandle();
                     eventItem.buttonComponentHandle = button->getHandle<ButtonComponent>();
+                    eventItem.inputTouchComponentHandle = InputTouchComponentHandle();
                     eventItem.touchType = input->type;
                     eventItem.event = event;
                     eventItem.inBounds = inBounds;
                     
+                    auto space = gameObj->getSpace();
                     queue.push_back(eventItem);
-                    found = true;
                 }
             }
         } else {
@@ -210,70 +212,98 @@ bool BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                 
                 if (bbox) {
                     Matrix4 matrix;
+                    bool inBounds = false;
                     
                     xform->getWorldMatrix(matrix);
                     bbox->computeAABB(matrix, xform->getCollisionRectScale());
 
                     if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
                         if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {
+                            inBounds = true;
+                            
                             if (input->type == TouchType::Down) {
                                 InputEventItem eventItem;
 
                                 eventItem.spaceHandle = gameObj->getSpace()->getHandle();
                                 eventItem.gameObjHandle = gameObj->getHandle();
                                 eventItem.buttonComponentHandle = ButtonComponentHandle();
+                                eventItem.inputTouchComponentHandle = InputTouchComponentHandle();
+                                eventItem.inputTouchComponentHandle = inputTouch->getHandle<InputTouchComponent>();
                                 eventItem.touchType = input->type;
                                 eventItem.event = Event::TouchDownInside;
-                                eventItem.inBounds = false;
-                                
+                                eventItem.inBounds = true;
+                                auto space = gameObj->getSpace();
+
                                 queue.push_back(eventItem);
+                                
+                                inputTouch->touch = input->touch;
+                            }
+                        }
+                    }
+                    
+                    if (inputTouch->touch == input->touch) {
+                        if (input->type == TouchType::Up && inputTouch->touch == input->touch) {
+                            auto event = Event::TouchUpOutside;
+                            
+                            if (inBounds) {
+                                event = Event::TouchUpInside;
                             }
                             
-                            found = true;
+                            InputEventItem eventItem;
+                            
+                            eventItem.spaceHandle = gameObj->getSpace()->getHandle();
+                            eventItem.gameObjHandle = gameObj->getHandle();
+                            eventItem.buttonComponentHandle = ButtonComponentHandle();
+                            eventItem.inputTouchComponentHandle = inputTouch->getHandle<InputTouchComponent>();
+                            eventItem.touchType = input->type;
+                            eventItem.event = event;
+                            eventItem.inBounds = inBounds;
+                            
+                            queue.push_back(eventItem);
+                            
+                            inputTouch->touch = nil;
+                        } else if (input->type == TouchType::Cancel) {
+                            inputTouch->touch = nil;
                         }
                     }
                 }
             }
         }
         
-        if (!found) {
-            // Determine if we have children, if we do process them.
-            for (auto i=0;i<xform->getNumChildren();i++) {
-                auto childXform = xform->childAtIndex(i);
-                if (childXform->hasGameObject()) {
-                    auto childObjHandle = childXform->getGameObjectHandle();
-                    auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
-                    
-                    // TODO: Have some better means of identifying the right child. For now brute force it
-                    if (childObj) {
-                        found = checkInput(input, childObj, queue);
-                        
-                        if (found) {
-                            break;
-                        }
-                    }
+        // Determine if we have children, if we do process them.
+        for (auto i=0;i<xform->getNumChildren();i++) {
+            auto childXform = xform->childAtIndex(i);
+            if (childXform->hasGameObject()) {
+                auto childObjHandle = childXform->getGameObjectHandle();
+                auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
+                
+                // TODO: Have some better means of identifying the right child. For now brute force it
+                if (childObj && childObj->isActive() && childObj->isVisible()) {
+                    checkInput(input, childObj, queue);
                 }
             }
         }
     }
-    
-    return found;
+}
+
+bool compareInputPointers(BGE::Input *lhs, BGE::Input *rhs) {
+    return lhs->timestamp < rhs->timestamp;
 }
 
 void BGE::InputService::update(double deltaTime) {
     lock();
     
     // Sort inputs
-    std::sort(inputs_.begin(), inputs_.end());
+    std::sort(inputs_.begin(), inputs_.end(), compareInputPointers);
     
     std::vector<InputTouchEvent> inputTouchQueue;
     std::vector<InputEventItem> inputEventQueue;
-    std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getReversedSpaces();
+    std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
 
     for (auto input : inputs_) {
+        std::vector<InputEventItem> inputQueue;
+        
         for (auto const &handle : spaceHandles) {
-            bool found = false;
-            
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space && space->isActive() && space->isVisible()) {
@@ -282,18 +312,41 @@ void BGE::InputService::update(double deltaTime) {
                 space->getRootGameObjects(objects);
                 
                 for (auto const &obj : objects) {
-                    if (obj && obj->isActive()) {
-                        found = checkInput(input, obj, inputEventQueue);
-                        
-                        if (found) {
-                            break;
-                        }
+                    if (obj && obj->isActive() && obj->isVisible()) {
+                        checkInput(input, obj, inputQueue);
                     }
                 }
             }
+        }
+        
+        if (inputQueue.size() > 0) {
+            auto spaceService = Game::getInstance()->getSpaceService();
             
-            if (found) {
-                break;
+            inputEventQueue.push_back(inputQueue.back());
+            inputQueue.pop_back();
+            
+            // Now clear out any touch tags that match
+            for (auto &item : inputQueue) {
+                auto space = spaceService->getSpace(item.spaceHandle);
+                
+                if (space) {
+                    auto button = space->getComponent(item.buttonComponentHandle);
+                    
+                    if (button) {
+                        if (button->getTouch() == input->touch) {
+                            button->setTouch(nil);
+                        }
+                    } else {
+                        auto inputTouch = space->getComponent(item.inputTouchComponentHandle);
+                        
+                        if (inputTouch) {
+                            if (inputTouch->touch == input->touch) {
+                                inputTouch->touch = nil;
+                            }
+                        }
+                    }
+                }
+                
             }
         }
     }
@@ -316,8 +369,16 @@ void BGE::InputService::update(double deltaTime) {
             
             if (button) {
                 auto event = item.event;
+#ifdef NOT_YET
+                auto parent = gameObj->getParent();
+                std::string parentName = "none";
                 
-                printf("Processed button %s (%d)\n", gameObj->getName().c_str(), item.touchType);
+                if (parent) {
+                    parentName = parent->getName();
+                }
+                
+                printf("Processed button %s::%s (%d)\n", parentName.c_str(), gameObj->getName().c_str(), item.touchType);
+#endif
                 // Now if we match an event handler, dispatch that too
                 auto it = inputEventHandlers_.find(event);
                 
@@ -362,6 +423,86 @@ void BGE::InputService::update(double deltaTime) {
         }
     }
 
+    if (Game::getInstance()->showCollisionRects()) {
+        auto &bboxPoints = Game::getInstance()->getRenderService()->getBoundBoxPoints();
+        auto &scaledBBoxPoints = Game::getInstance()->getRenderService()->getScaledBoundBoxPoints();
+        
+        bboxPoints.clear();
+        scaledBBoxPoints.clear();
+        
+        for (auto const &handle : spaceHandles) {
+            auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
+            
+            if (space && space->isActive() && space->isVisible()) {
+                std::vector<GameObject *> objects;
+                
+                space->getRootGameObjects(objects);
+                
+                for (auto const &obj : objects) {
+                    getInputPoints(obj, bboxPoints, scaledBBoxPoints);
+                }
+            }
+        }
+    }
+    
     unlock();
 }
 
+void BGE::InputService::getInputPoints(GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints) {
+    if (gameObj && gameObj->isActive() && gameObj->isVisible()) {
+        auto button = gameObj->getComponent<ButtonComponent>();
+        auto xform = gameObj->getComponent<TransformComponent>();
+        BoundingBoxComponent *bbox = nullptr;
+        
+        if (button && button->isEnabled()) {
+            // Buttons need to check their parent because often button's bezels are the ones not visible
+            auto parent = gameObj->getParent();
+            
+            if (!parent || (parent->isActive() && parent->isVisible())) {
+                // Compute collision if exists
+                bbox = button->getBoundingBox();
+            }
+        }
+        else {
+            auto inputTouch = gameObj->getComponent<InputTouchComponent>();
+                
+            if (inputTouch) {
+                bbox = gameObj->getComponent<BoundingBoxComponent>();
+            }
+        }
+        
+        if (bbox) {
+            Matrix4 matrix;
+            xform->getWorldMatrix(matrix);
+            bbox->computeAABB(matrix);
+            // Add points
+            bboxPoints.push_back(Vector3{ bbox->aabbMinX, bbox->aabbMinY, 0});
+            bboxPoints.push_back(Vector3{ bbox->aabbMaxX, bbox->aabbMinY, 0});
+            bboxPoints.push_back(Vector3{ bbox->aabbMaxX, bbox->aabbMaxY, 0});
+            bboxPoints.push_back(Vector3{ bbox->aabbMinX, bbox->aabbMaxY, 0});
+            
+            if (xform->useCollisionRectScale()) {
+                bbox->computeAABB(matrix, xform->getCollisionRectScale());
+                
+                // Add points
+                scaledBBoxPoints.push_back(Vector3{ bbox->aabbMinX, bbox->aabbMinY, 0});
+                scaledBBoxPoints.push_back(Vector3{ bbox->aabbMaxX, bbox->aabbMinY, 0});
+                scaledBBoxPoints.push_back(Vector3{ bbox->aabbMaxX, bbox->aabbMaxY, 0});
+                scaledBBoxPoints.push_back(Vector3{ bbox->aabbMinX, bbox->aabbMaxY, 0});
+            }
+        }
+        
+        for (auto i=0;i<xform->getNumChildren();i++) {
+            auto childXform = xform->childAtIndex(i);
+            if (childXform->hasGameObject()) {
+                auto childObjHandle = childXform->getGameObjectHandle();
+                auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
+                
+                // TODO: Have some better means of identifying the right child. For now brute force it
+                if (childObj) {
+                    getInputPoints(childObj, bboxPoints, scaledBBoxPoints);
+                }
+            }
+        }
+    }
+}

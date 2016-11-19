@@ -298,8 +298,13 @@ void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
     
     for (auto const &handle : handles) {
         auto obj = getGameObject(handle);
+        auto xform = obj->getComponent<TransformComponent>();
         
-        objects.push_back(obj);
+        if (xform) {
+            if (!xform->getParent()) {
+                objects.push_back(obj);
+            }
+        }
     }
 }
 

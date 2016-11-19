@@ -626,6 +626,33 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
     }
 }
 
+void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Color &color) {
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+    
+    GLint positionLocation = glShader->locationForAttribute("Position");
+    GLint projectionLocation = glShader->locationForUniform("Projection");
+    GLint modelLocation = glShader->locationForUniform("ModelView");
+    GLint colorLocation = glShader->locationForUniform("Color");
+    
+    glEnableVertexAttribArray(positionLocation);
+    glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+
+    Matrix4 mat;
+    
+    Matrix4MakeIdentify(mat);
+    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+    
+    glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
+
+    glLineWidth(2);
+
+    for (auto index=0;index<points.size();index += 4) {
+        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                              sizeof(Vertex), &points[index]);
+        glDrawArrays(GL_LINE_LOOP, 0, (GLsizei) 4);
+    }
+}
+
 void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
     if (gameObject) {
         auto line = gameObject->getComponent<LineRenderComponent>();
@@ -891,6 +918,16 @@ void BGE::RenderServiceOpenGLES2::render()
                     }
                 }
             }
+        }
+        
+        if (Game::getInstance()->showCollisionRects()) {
+            // Draw collision rects if needed
+            Color color = Color{ 1, 1, 1, 1 };
+            drawDebugQuads(boundingBoxPoints_, color);
+            
+            // First draw normal bounds
+            color = Color{ 1, 1, 0, 1 };
+            drawDebugQuads(scaledBoundingBoxPoints_, color);
         }
         
         [glContext->getContext() presentRenderbuffer:GL_RENDERBUFFER];

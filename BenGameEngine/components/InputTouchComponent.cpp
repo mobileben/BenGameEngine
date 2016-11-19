@@ -11,3 +11,10 @@
 uint32_t BGE::InputTouchComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::InputTouchComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::InputTouchComponent::type_index_ = typeid(BGE::InputTouchComponent);
+
+void BGE::InputTouchComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    Component::initialize(handle, spaceHandle);
+    
+    touch = nil;
+}
+

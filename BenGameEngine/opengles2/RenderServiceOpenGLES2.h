@@ -65,6 +65,8 @@ namespace BGE {
         
         void drawSprite(GameObject *gameObject);
 
+        void drawDebugQuads(std::vector<Vector3> points, Color &color);
+        
         uint8_t enableMask(GameObject *gameObject);
         void disableMask(uint8_t maskBits);
         
