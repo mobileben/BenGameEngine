@@ -39,6 +39,8 @@ namespace BGE {
     class TextComponent;
     class TextureMaskComponent;
     class TransformComponent;
+    class Audio;
+    class AudioBuffer;
     
     template <typename TAG>
     class Handle {
@@ -120,6 +122,8 @@ namespace BGE {
     using AnimationChannelComponentHandle = Handle<AnimationChannelComponent>;
     using AnimationSequenceComponentHandle = Handle<AnimationSequenceComponent>;
     using AnimatorComponentHandle = Handle<AnimatorComponent>;
+    using AudioHandle = Handle<Audio>;
+    using AudioBufferHandle = Handle<AudioBuffer>;
     using BoundingBoxComponentHandle = Handle<BoundingBoxComponent>;
     using ButtonComponentHandle = Handle<ButtonComponent>;
     using ChannelFrameAnimatorComponentHandle = Handle<ChannelFrameAnimatorComponent>;

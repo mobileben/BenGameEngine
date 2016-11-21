@@ -172,6 +172,7 @@ BGE::Game::Game() : paused_(false), wireframeMode_(WireframeMode::Off), showColl
     spaceService_ = std::make_shared<SpaceService>();
     fontService_ = std::make_shared<FontService>();
     logicService_ = std::make_shared<LogicService>();
+    audioService_ = std::make_shared<AudioService>(eventService_);
 }
 
 void BGE::Game::provide(std::shared_ptr<RenderService> renderService) {

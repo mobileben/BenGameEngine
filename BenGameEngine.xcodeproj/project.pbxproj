@@ -99,6 +99,9 @@
 		B5AE8C9A1CEC44E100FAA0DC /* ScenePackage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5AE8C981CEC44E100FAA0DC /* ScenePackage.cpp */; };
 		B5B457271DB6DC2D0099CB42 /* FullColorTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B56470881DB6D7E4003AC11F /* FullColorTextureFragment.glsl */; };
 		B5B457281DB6DC2D0099CB42 /* FullColorTextureVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B56470891DB6D7E4003AC11F /* FullColorTextureVertex.glsl */; };
+		B5BBFAD21DE15A8A0035AA74 /* AudioService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAD01DE15A8A0035AA74 /* AudioService.cpp */; };
+		B5BBFAD51DE15E9C0035AA74 /* Audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAD31DE15E9C0035AA74 /* Audio.cpp */; };
+		B5BBFAD81DE15EAB0035AA74 /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAD61DE15EAB0035AA74 /* AudioBuffer.cpp */; };
 		B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */; };
 		B5C388E21D24D91B00137CEC /* ColorTransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */; };
 		B5DCDA231CE2F9F100CBF0A6 /* HandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */; };
@@ -321,6 +324,12 @@
 		B5ACE8941CBF7AFF004B6871 /* LineRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LineRenderComponent.h; path = components/LineRenderComponent.h; sourceTree = "<group>"; };
 		B5AE8C981CEC44E100FAA0DC /* ScenePackage.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = ScenePackage.cpp; sourceTree = "<group>"; };
 		B5AE8C991CEC44E100FAA0DC /* ScenePackage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenePackage.h; sourceTree = "<group>"; };
+		B5BBFAD01DE15A8A0035AA74 /* AudioService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = AudioService.cpp; path = services/AudioService.cpp; sourceTree = "<group>"; };
+		B5BBFAD11DE15A8A0035AA74 /* AudioService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioService.h; path = services/AudioService.h; sourceTree = "<group>"; };
+		B5BBFAD31DE15E9C0035AA74 /* Audio.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Audio.cpp; sourceTree = "<group>"; };
+		B5BBFAD41DE15E9C0035AA74 /* Audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Audio.h; sourceTree = "<group>"; };
+		B5BBFAD61DE15EAB0035AA74 /* AudioBuffer.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = AudioBuffer.cpp; sourceTree = "<group>"; };
+		B5BBFAD71DE15EAB0035AA74 /* AudioBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioBuffer.h; sourceTree = "<group>"; };
 		B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorMatrixComponent.cpp; path = components/ColorMatrixComponent.cpp; sourceTree = "<group>"; };
 		B5C388DE1D24D90500137CEC /* ColorMatrixComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorMatrixComponent.h; path = components/ColorMatrixComponent.h; sourceTree = "<group>"; };
 		B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformComponent.cpp; path = components/ColorTransformComponent.cpp; sourceTree = "<group>"; };
@@ -461,6 +470,8 @@
 			children = (
 				B50A1FA21D0E8B2A004B450E /* AnimationService.cpp */,
 				B50A1FA31D0E8B2A004B450E /* AnimationService.h */,
+				B5BBFAD01DE15A8A0035AA74 /* AudioService.cpp */,
+				B5BBFAD11DE15A8A0035AA74 /* AudioService.h */,
 				B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */,
 				B5ACE8911CBB56CE004B6871 /* ComponentService.h */,
 				B5503D451D4EBC3500FC77B6 /* EventService.cpp */,
@@ -521,54 +532,58 @@
 		B525E35D1C8950DA00C691C0 /* BenGameEngine */ = {
 			isa = PBXGroup;
 			children = (
-				B525E3851C89587000C691C0 /* Error.cpp */,
-				B571F1811C97D92E007F5A90 /* Font.cpp */,
-				B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */,
-				B525E3871C89587000C691C0 /* Game.cpp */,
-				B508CDA61CB4DE6D00127B97 /* GameObject.cpp */,
-				B512AD5B1D3F1C2900DCE362 /* Input.cpp */,
-				B52B760B1CBA183900758249 /* Material.cpp */,
-				B525E38F1C89587000C691C0 /* MathTypes.cpp */,
-				B525E3911C89587000C691C0 /* RenderContext.cpp */,
-				B525E3991C89587000C691C0 /* RenderView.cpp */,
-				B525E39B1C89587000C691C0 /* RenderWindow.cpp */,
-				B5AE8C981CEC44E100FAA0DC /* ScenePackage.cpp */,
-				B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */,
-				B52BFB061D000C650040A839 /* StringArrayBuilder.cpp */,
-				B525E3AB1C89587000C691C0 /* Texture.cpp */,
-				B525E3AD1C89587000C691C0 /* TextureAtlas.cpp */,
 				B52BFB0A1D00AA750040A839 /* ArrayBuilder.h */,
+				B5BBFAD31DE15E9C0035AA74 /* Audio.cpp */,
+				B5BBFAD41DE15E9C0035AA74 /* Audio.h */,
+				B5BBFAD61DE15EAB0035AA74 /* AudioBuffer.cpp */,
+				B5BBFAD71DE15EAB0035AA74 /* AudioBuffer.h */,
+				B508CDAF1CB8B2EA00127B97 /* components */,
+				B5F5230A1CD9B4C500DE2F82 /* dataformats */,
+				B525E3851C89587000C691C0 /* Error.cpp */,
 				B525E3861C89587000C691C0 /* Error.h */,
 				B5503D431D4EB5FD00FC77B6 /* Event.h */,
+				B571F17C1C97CF42007F5A90 /* external */,
 				B52BFB0F1D0155720040A839 /* FixedArray.h */,
+				B571F1811C97D92E007F5A90 /* Font.cpp */,
 				B571F1821C97D92E007F5A90 /* Font.h */,
+				B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */,
 				B571F18F1C9D0A34007F5A90 /* FontGlyph.h */,
 				B50326F21D1F4BA100156217 /* FontInfo.h */,
+				B525E3871C89587000C691C0 /* Game.cpp */,
 				B525E3881C89587000C691C0 /* Game.h */,
+				B508CDA61CB4DE6D00127B97 /* GameObject.cpp */,
 				B508CDA71CB4DE6D00127B97 /* GameObject.h */,
 				B50F5FFE1CD3418200A5D017 /* Handle.h */,
+				B512AD5B1D3F1C2900DCE362 /* Input.cpp */,
 				B512AD5C1D3F1C2900DCE362 /* Input.h */,
+				B5F871681D3F2B29000EA018 /* ios */,
+				B52B760B1CBA183900758249 /* Material.cpp */,
 				B52B760C1CBA183900758249 /* Material.h */,
+				B525E38F1C89587000C691C0 /* MathTypes.cpp */,
 				B525E3901C89587000C691C0 /* MathTypes.h */,
 				B5C388E41D28635500137CEC /* NamedObject.h */,
 				B508CDAA1CB4DE8E00127B97 /* Object.h */,
-				B51A56E21D72717E005AA9AB /* Queue.h */,
-				B525E3921C89587000C691C0 /* RenderContext.h */,
-				B525E39A1C89587000C691C0 /* RenderView.h */,
-				B525E39C1C89587000C691C0 /* RenderWindow.h */,
-				B5AE8C991CEC44E100FAA0DC /* ScenePackage.h */,
-				B5F6B1691CC8AF7A00E1FD45 /* Space.h */,
-				B52BFB071D000C650040A839 /* StringArrayBuilder.h */,
-				B525E3AC1C89587000C691C0 /* Texture.h */,
-				B525E3AE1C89587000C691C0 /* TextureAtlas.h */,
-				B52BFB0D1D0138790040A839 /* UniqueArrayBuilder.h */,
-				B508CDAF1CB8B2EA00127B97 /* components */,
-				B5F5230A1CD9B4C500DE2F82 /* dataformats */,
-				B571F17C1C97CF42007F5A90 /* external */,
-				B5F871681D3F2B29000EA018 /* ios */,
 				B571F1741C928BA5007F5A90 /* opengles2 */,
+				B51A56E21D72717E005AA9AB /* Queue.h */,
+				B525E3911C89587000C691C0 /* RenderContext.cpp */,
+				B525E3921C89587000C691C0 /* RenderContext.h */,
+				B525E3991C89587000C691C0 /* RenderView.cpp */,
+				B525E39A1C89587000C691C0 /* RenderView.h */,
+				B525E39B1C89587000C691C0 /* RenderWindow.cpp */,
+				B525E39C1C89587000C691C0 /* RenderWindow.h */,
+				B5AE8C981CEC44E100FAA0DC /* ScenePackage.cpp */,
+				B5AE8C991CEC44E100FAA0DC /* ScenePackage.h */,
 				B50E4E011D978A2D00AE3AEB /* services */,
 				B525E3CD1C89587900C691C0 /* shaders */,
+				B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */,
+				B5F6B1691CC8AF7A00E1FD45 /* Space.h */,
+				B52BFB061D000C650040A839 /* StringArrayBuilder.cpp */,
+				B52BFB071D000C650040A839 /* StringArrayBuilder.h */,
+				B525E3AB1C89587000C691C0 /* Texture.cpp */,
+				B525E3AC1C89587000C691C0 /* Texture.h */,
+				B525E3AD1C89587000C691C0 /* TextureAtlas.cpp */,
+				B525E3AE1C89587000C691C0 /* TextureAtlas.h */,
+				B52BFB0D1D0138790040A839 /* UniqueArrayBuilder.h */,
 				B5F4564B1D82593700B4E340 /* utilities */,
 			);
 			path = BenGameEngine;
@@ -969,6 +984,7 @@
 				B525E3CB1C89587000C691C0 /* TextureService.cpp in Sources */,
 				B547F17A1D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp in Sources */,
 				B512AD601D3F1C5E00DCE362 /* InputService.cpp in Sources */,
+				B5BBFAD21DE15A8A0035AA74 /* AudioService.cpp in Sources */,
 				B525E3BE1C89587000C691C0 /* RenderServiceOpenGLES2.cpp in Sources */,
 				B525E3C61C89587000C691C0 /* ShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,
@@ -1013,6 +1029,7 @@
 				B5F871711D41E8CC000EA018 /* BoundingBoxComponent.cpp in Sources */,
 				B508CD931CAE285000127B97 /* TransformComponent.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* Game.cpp in Sources */,
+				B5BBFAD81DE15EAB0035AA74 /* AudioBuffer.cpp in Sources */,
 				B5E7B9BA1CC46A7500978F1A /* FlatRectRenderComponent.cpp in Sources */,
 				B5C388E21D24D91B00137CEC /* ColorTransformComponent.cpp in Sources */,
 				B5DCDA261CE59F7400CBF0A6 /* ScenePackageService.cpp in Sources */,
@@ -1027,6 +1044,7 @@
 				B525E3C51C89587000C691C0 /* ShaderProgramOpenGLES2.cpp in Sources */,
 				B525E3C11C89587000C691C0 /* Service.cpp in Sources */,
 				B525E3BF1C89587000C691C0 /* RenderView.cpp in Sources */,
+				B5BBFAD51DE15E9C0035AA74 /* Audio.cpp in Sources */,
 				B525E3C71C89587000C691C0 /* ShaderServiceOpenGLES2.cpp in Sources */,
 				B52B76141CBADF5E00758249 /* MaterialService.cpp in Sources */,
 				B50E4E001D97807F00AE3AEB /* LogicComponent.cpp in Sources */,

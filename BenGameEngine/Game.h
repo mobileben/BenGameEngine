@@ -14,6 +14,7 @@
 #include <iostream>
 #include "Service.h"
 #include "AnimationService.h"
+#include "AudioService.h"
 #include "GameObjectService.h"
 #include "MaterialService.h"
 #include "RenderService.h"
@@ -58,6 +59,7 @@ namespace BGE {
         std::shared_ptr<FontService> getFontService() { return fontService_; }
         std::shared_ptr<InputService> getInputService() { return inputService_; }
         std::shared_ptr<LogicService> getLogicService() { return logicService_; }
+        std::shared_ptr<AudioService> getAudioService() { return audioService_; }
         
         // Service functions
         void initialize() override;
@@ -129,6 +131,7 @@ namespace BGE {
         std::shared_ptr<InputService>           inputService_;
         std::shared_ptr<LogicService>           logicService_;
         std::shared_ptr<EventService>           eventService_;
+        std::shared_ptr<AudioService>           audioService_;
 
     private:
         struct AnyToString {
