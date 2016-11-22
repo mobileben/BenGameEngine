@@ -9,7 +9,28 @@
 #include "AudioService.h"
 #include "EventService.h"
 
-BGE::AudioService::AudioService(std::shared_ptr<EventService> eventService) : eventService_(eventService), audioHandleService_(InitialAudioReserve, HandleServiceNoMaxLimit), audioBufferHandleService_(InitialAudioBufferReserve, HandleServiceNoMaxLimit) {
+#if TARGET_OS_IPHONE
+
+#include "AudioToolbox/AudioToolbox.h"
+#include "AudioToolbox/AudioServices.h"
+
+#import <AVFoundation/AVAudioSession.h>
+
+#endif /* TARGET_OS_IPHONE */
+
+BGE::AudioService::AudioService(std::shared_ptr<EventService> eventService) : eventService_(eventService), audioHandleService_(InitialAudioReserve, HandleServiceNoMaxLimit), audioBufferHandleService_(InitialAudioBufferReserve, HandleServiceNoMaxLimit), sfxEnabled_(true), musicEnabled_(true) {
+#if TARGET_OS_IPHONE
+    //	First grab an audio session that let's other audio play concurrent with ours!
+    category_ = AVAudioSessionCategoryAmbient;
+    
+    otherAudioPlayingAtStart_ = [AVAudioSession sharedInstance].isOtherAudioPlaying;
+    
+    [[AVAudioSession sharedInstance] setCategory:category_ withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
+    
+    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+
+    helper_ = [[AudioServiceHelper alloc] init];
+#endif /* TARGET_OS_IPHONE */
 }
 
 void BGE::AudioService::update(double deltaTime) {
@@ -146,4 +167,26 @@ void BGE::AudioService::createAudioBufferFromFile(std::string name, std::string 
         callback(buffer, nullptr);
     }
 }
+
+#if TARGET_OS_IPHONE
+
+void BGE::AudioService::enableExternalAppsAudio(void) {
+    if (![category_ isEqualToString:AVAudioSessionCategoryAmbient]) {
+        category_ = AVAudioSessionCategoryAmbient;
+        [[AVAudioSession sharedInstance] setCategory:category_ withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
+
+    }
+}
+
+void BGE::AudioService::disableExternalAppsAudio(void) {
+    if ([category_ isEqualToString:AVAudioSessionCategoryAmbient]) {
+        category_ = AVAudioSessionCategorySoloAmbient;
+        [[AVAudioSession sharedInstance] setCategory:category_ withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
+        
+        // Change this to allow music to play
+        otherAudioPlayingAtStart_ = false;
+    }
+}
+
+#endif /* TARGET_OS_IPHONE */
 

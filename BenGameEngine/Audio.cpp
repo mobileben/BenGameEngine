@@ -18,8 +18,8 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
     BGE::Audio *audio = BGE::Game::getInstance()->getAudioService()->getAudio(handle);
     
     if (audio) {
-        uint32_t	numBytesReadFromFile = 0;
-        uint32_t	numPackets = audio->getNumPacketsToRead();
+        UInt32      numBytesReadFromFile = 0;
+        UInt32      numPackets = audio->getNumPacketsToRead();
         OSStatus	status;
         uint32_t	loopCount = audio->getLoopingCount();
         bool		loopForever = (loopCount == BGE::AudioPlayForever);
@@ -169,7 +169,7 @@ void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *a
         OSStatus status;
         uint32_t i;
         bool isFormatVBR;
-        uint32_t cookieSize(sizeof(uint32_t));
+        UInt32 cookieSize(sizeof(UInt32));
         bool noProperty;
         char* magicCookie = NULL;
         bool invalid = false;

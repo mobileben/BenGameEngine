@@ -102,6 +102,7 @@
 		B5BBFAD21DE15A8A0035AA74 /* AudioService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAD01DE15A8A0035AA74 /* AudioService.cpp */; };
 		B5BBFAD51DE15E9C0035AA74 /* Audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAD31DE15E9C0035AA74 /* Audio.cpp */; };
 		B5BBFAD81DE15EAB0035AA74 /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAD61DE15EAB0035AA74 /* AudioBuffer.cpp */; };
+		B5BBFAE81DE416040035AA74 /* AudioServiceHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAE71DE416040035AA74 /* AudioServiceHelper.mm */; };
 		B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */; };
 		B5C388E21D24D91B00137CEC /* ColorTransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */; };
 		B5DCDA231CE2F9F100CBF0A6 /* HandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */; };
@@ -330,6 +331,8 @@
 		B5BBFAD41DE15E9C0035AA74 /* Audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Audio.h; sourceTree = "<group>"; };
 		B5BBFAD61DE15EAB0035AA74 /* AudioBuffer.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = AudioBuffer.cpp; sourceTree = "<group>"; };
 		B5BBFAD71DE15EAB0035AA74 /* AudioBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioBuffer.h; sourceTree = "<group>"; };
+		B5BBFAE61DE416040035AA74 /* AudioServiceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioServiceHelper.h; path = services/AudioServiceHelper.h; sourceTree = "<group>"; };
+		B5BBFAE71DE416040035AA74 /* AudioServiceHelper.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = AudioServiceHelper.mm; path = services/AudioServiceHelper.mm; sourceTree = "<group>"; };
 		B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorMatrixComponent.cpp; path = components/ColorMatrixComponent.cpp; sourceTree = "<group>"; };
 		B5C388DE1D24D90500137CEC /* ColorMatrixComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorMatrixComponent.h; path = components/ColorMatrixComponent.h; sourceTree = "<group>"; };
 		B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformComponent.cpp; path = components/ColorTransformComponent.cpp; sourceTree = "<group>"; };
@@ -472,6 +475,8 @@
 				B50A1FA31D0E8B2A004B450E /* AnimationService.h */,
 				B5BBFAD01DE15A8A0035AA74 /* AudioService.cpp */,
 				B5BBFAD11DE15A8A0035AA74 /* AudioService.h */,
+				B5BBFAE61DE416040035AA74 /* AudioServiceHelper.h */,
+				B5BBFAE71DE416040035AA74 /* AudioServiceHelper.mm */,
 				B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */,
 				B5ACE8911CBB56CE004B6871 /* ComponentService.h */,
 				B5503D451D4EBC3500FC77B6 /* EventService.cpp */,
@@ -989,6 +994,7 @@
 				B525E3C61C89587000C691C0 /* ShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,
 				B5F8716B1D3F2B83000EA018 /* BGEView.m in Sources */,
+				B5BBFAE81DE416040035AA74 /* AudioServiceHelper.mm in Sources */,
 				B52B760D1CBA183900758249 /* Material.cpp in Sources */,
 				B512AD571D2F7D0400DCE362 /* MaskComponent.cpp in Sources */,
 				B525E3C41C89587000C691C0 /* ShaderProgram.cpp in Sources */,

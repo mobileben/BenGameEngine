@@ -13,6 +13,12 @@
 #include <unordered_map>
 #include <vector>
 
+#import <Foundation/Foundation.h>
+
+#ifdef TARGET_OS_IPHONE
+#import "AudioServiceHelper.h"
+#endif
+
 #include "Audio.h"
 #include "AudioBuffer.h"
 #include "Handle.h"
@@ -50,6 +56,24 @@ namespace BGE {
         Audio *createAudio(std::string name, AudioBufferHandle audioBufferHandle);
         void createAudioBufferFromFile(std::string name, std::string filename, bool streaming, std::function<void(AudioBuffer *, std::shared_ptr<Error>)> callback);
         
+#if TARGET_OS_IPHONE
+        
+        bool		otherAudioPlayingAtStart(void) { return otherAudioPlayingAtStart_; }
+        void		enableExternalAppsAudio(void);
+        void		disableExternalAppsAudio(void);
+
+#endif /* TARGET_OS_IPHONE */
+        
+       
+        void		setMasterVolume(uint32_t volume);
+        uint32_t	getMasterVolume(void);
+        
+        inline bool	isSFXEnabled(void) { return sfxEnabled_; }
+        void		setSFXEnabled(Boolean enabled);
+        
+        inline bool	isMusicEnabled(void) { return musicEnabled_; }
+        void		setMusicEnabled(Boolean enabled);
+
     private:
         static const uint32_t InitialAudioReserve = 256;
         static const uint32_t InitialAudioBufferReserve = 128;
@@ -65,6 +89,16 @@ namespace BGE {
         
         std::vector<AudioHandle> audioHandles_;
         std::unordered_map<std::string, AudioBufferHandle>  audioBufferHandles_;
+        
+        bool sfxEnabled_;
+        bool musicEnabled_;
+        
+#if TARGET_OS_IPHONE
+        AudioServiceHelper  *helper_;
+        Boolean             otherAudioPlayingAtStart_;
+        NSString            *category_;
+#endif /* _PLATFORM_IPHONE */
+
     };
 }
 
