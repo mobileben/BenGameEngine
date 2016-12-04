@@ -57,8 +57,8 @@ namespace BGE {
         std::string             basename;
         
         FilePath() : type(FileUtilities::PathType::builtin) {}
-        FilePath(FileUtilities::PathType t, std::string path) : type(FileUtilities::PathType::builtin), subpath(path) {}
-        FilePath(FileUtilities::PathType t, std::string path, std::string name) : type(FileUtilities::PathType::builtin), subpath(path), basename(name) {}
+        FilePath(FileUtilities::PathType t, std::string path) : type(t), subpath(path) {}
+        FilePath(FileUtilities::PathType t, std::string path, std::string name) : type(t), subpath(path), basename(name) {}
         FilePath(const BaseDirectory &base) : type(base.type), subpath(base.subpath) {}
         
         std::string filename() const;
