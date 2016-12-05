@@ -95,9 +95,11 @@ namespace BGE {
         
         std::vector<TransformComponentHandle> getChildrenHandles() { return childrenHandles_; }
         std::vector<TransformComponentHandle> getOrderedChildrenHandles();
+        std::vector<TransformComponentHandle> getReverseOrderedChildrenHandles();
         
         std::vector<TransformComponent *> getChildren();
         std::vector<TransformComponent *> getOrderedChildren();
+        std::vector<TransformComponent *> getReverseOrderedChildren();
         
         uint32_t getNumChildren() const { return (uint32_t) childrenHandles_.size(); }
         

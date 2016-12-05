@@ -308,6 +308,21 @@ void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
     }
 }
 
+void BGE::Space::getReverseRootGameObjects(std::vector<GameObject *> &objects) {
+    auto handles = getGameObjects();
+    
+    for (int32_t i=static_cast<int32_t>(handles.size())-1;i>=0;--i) {
+        auto obj = getGameObject(handles[i]);
+        auto xform = obj->getComponent<TransformComponent>();
+        
+        if (xform) {
+            if (!xform->getParent()) {
+                objects.push_back(obj);
+            }
+        }
+    }
+}
+
 void BGE::Space::getTransforms(std::vector<TransformComponent *> &xforms) const {
     componentService_->getComponents<TransformComponent>(xforms);
 }

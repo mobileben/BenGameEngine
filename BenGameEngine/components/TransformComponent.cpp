@@ -374,6 +374,21 @@ std::vector<BGE::TransformComponentHandle> BGE::TransformComponent::getOrderedCh
     return children;
 }
 
+std::vector<BGE::TransformComponentHandle> BGE::TransformComponent::getReverseOrderedChildrenHandles() {
+    handleServicesLock();
+    
+    auto xforms = getReverseOrderedChildren();
+    std::vector<TransformComponentHandle> children;
+    
+    for (auto xform : xforms) {
+        children.push_back(xform->getHandle<TransformComponent>());
+    }
+    
+    handleServicesUnlock();
+    
+    return children;
+}
+
 std::vector<BGE::TransformComponent *> BGE::TransformComponent::getChildren() {
     auto space = getSpace();
     std::vector<TransformComponent *> children;
@@ -420,6 +435,40 @@ std::vector<BGE::TransformComponent *> BGE::TransformComponent::getOrderedChildr
     
     handleServicesUnlock();
 
+    return children;
+}
+
+std::vector<BGE::TransformComponent *> BGE::TransformComponent::getReverseOrderedChildren() {
+    handleServicesLock();
+    
+    auto space = getSpace();
+    std::vector<TransformComponent *> children;
+    
+    for (int32_t i=static_cast<int32_t>(childrenHandles_.size())-1;i>=0;--i) {
+        auto xform = space->getComponent<TransformComponent>(childrenHandles_[i].getHandle());
+        
+        if (xform) {
+            children.push_back(xform);
+        }
+    }
+    
+    TransformComponent **xforms = &children[0];
+    
+    int32_t i, j;
+    
+    for (i=1;i<children.size();++i) {
+        j = i;
+        
+        while (j > 0 && xforms[j]->getZ() > xforms[j-1]->getZ()) {
+            auto temp = xforms[j];
+            xforms[j] = xforms[j-1];
+            xforms[j-1] = temp;
+            --j;
+        }
+    }
+    
+    handleServicesUnlock();
+    
     return children;
 }
 
