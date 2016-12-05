@@ -134,6 +134,44 @@ void BGE::GameObject::setVisibility(bool visible) {
     }
 }
 
+bool BGE::GameObject::isClipped(void) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        return xform->isClipped();
+    }
+    
+    return false;
+}
+
+void BGE::GameObject::setClipped(bool clipped) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        return xform->setClipped(clipped);
+    }
+}
+
+bool BGE::GameObject::canRender() {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        return xform->canRender();
+    }
+    
+    return false;
+}
+
+bool BGE::GameObject::canInteract() {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        return xform->canInteract();
+    }
+    
+    return false;
+}
+
 BGE::GameObject * BGE::GameObject::getParent() {
     auto xform = getComponent<TransformComponent>();
     

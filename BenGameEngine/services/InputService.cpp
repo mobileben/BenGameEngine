@@ -167,7 +167,7 @@ void BGE::InputService::spaceReset(Space *space) {
 void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue) {
     auto xform = gameObj->getComponent<TransformComponent>();
     
-    if (xform && xform->isVisible()) {
+    if (xform && xform->canInteract()) {
         auto button = gameObj->getComponent<ButtonComponent>();
         
         if (button && button->isEnabled()) {
@@ -275,7 +275,7 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                 auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
                 
                 // TODO: Have some better means of identifying the right child. For now brute force it
-                if (childObj && childObj->isActive() && childObj->isVisible()) {
+                if (childObj && childObj->isActive() && childObj->canInteract()) {
                     checkInput(input, childObj, queue);
                 }
             }
@@ -309,7 +309,7 @@ void BGE::InputService::update(double deltaTime) {
                 space->getRootGameObjects(objects);
                 
                 for (auto const &obj : objects) {
-                    if (obj && obj->isActive() && obj->isVisible()) {
+                    if (obj && obj->isActive() && obj->canInteract()) {
                         checkInput(input, obj, inputQueue);
                     }
                 }
@@ -463,7 +463,7 @@ void BGE::InputService::update(double deltaTime) {
 }
 
 void BGE::InputService::getInputPoints(GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints) {
-    if (gameObj && gameObj->isActive() && gameObj->isVisible()) {
+    if (gameObj && gameObj->isActive() && gameObj->canInteract()) {
         auto button = gameObj->getComponent<ButtonComponent>();
         auto xform = gameObj->getComponent<TransformComponent>();
         BoundingBoxComponent *bbox = nullptr;
@@ -472,7 +472,7 @@ void BGE::InputService::getInputPoints(GameObject *gameObj, std::vector<Vector3>
             // Buttons need to check their parent because often button's bezels are the ones not visible
             auto parent = gameObj->getParent();
             
-            if (!parent || (parent->isActive() && parent->isVisible())) {
+            if (!parent || (parent->isActive() && parent->canInteract())) {
                 // Compute collision if exists
                 bbox = button->getBoundingBox();
             }

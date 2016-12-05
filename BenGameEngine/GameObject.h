@@ -149,6 +149,12 @@ namespace BGE {
         bool isVisible(void);
         void setVisibility(bool visible);
         
+        bool isClipped(void);
+        void setClipped(bool clipped);
+        
+        bool canRender();
+        bool canInteract();
+        
         inline bool operator==(const GameObject &other) const {
             return getInstanceId() == other.getInstanceId();
         }

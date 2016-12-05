@@ -16,7 +16,7 @@ uint32_t BGE::TransformComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::TransformComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComponent);
 
-BGE::TransformComponent::TransformComponent() : Component(), visible_(true),
+BGE::TransformComponent::TransformComponent() : Component(), visible_(true), clipped_(false),
 bounds_({ 0, 0, 0, 0}), useCollisionRectScale_(false), collisionRectScale_({1, 1}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), useSkew_(false), rotation_(0), localDirty_(false), worldDirty_(false), speed_(1), paused_(false) {
     Matrix4MakeIdentify(localMatrix_);
     Matrix4MakeIdentify(worldMatrix_);
@@ -26,6 +26,7 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
     Component::initialize(handle, spaceHandle);
 
     visible_ = true;
+    clipped_ = false;
     
     bounds_.x = 0;
     bounds_.y = 0;
@@ -56,7 +57,8 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
 
 void BGE::TransformComponent::destroy() {
     visible_ = false;
-    
+    clipped_ = false;
+
     removeFromParent();
     removeAllChildren();
     

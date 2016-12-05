@@ -37,6 +37,12 @@ namespace BGE {
         bool isVisible() const { return visible_; }
         void setVisibility(bool visible) { visible_ = visible; }
         
+        bool isClipped() const { return clipped_; }
+        void setClipped(bool clipped) { clipped_ = clipped; }
+        
+        bool canRender() const { return visible_ && !clipped_; }
+        bool canInteract() const { return visible_ && !clipped_; }
+        
         void getBounds(Rect &bounds) { bounds = bounds_; }
         bool useCollisionRectScale() const { return useCollisionRectScale_; }
         Vector2 getCollisionRectScale() const { return collisionRectScale_; }
@@ -145,6 +151,7 @@ namespace BGE {
         
         // Identity
         bool            visible_;
+        bool            clipped_;
         
         // Bounds
         Rect            bounds_;

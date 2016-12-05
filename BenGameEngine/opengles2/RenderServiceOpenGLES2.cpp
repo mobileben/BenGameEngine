@@ -950,7 +950,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
     auto transformComponent = gameObj->getComponent<TransformComponent>();
     
     if (transformComponent) {
-        if (!transformComponent->isVisible()) {
+        if (!transformComponent->canRender()) {
             return maskValue;
         }
 
