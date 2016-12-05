@@ -45,6 +45,11 @@ namespace BGE {
             auto bitmask = T::bitmask_;
             ComponentHandle handle{T::typeId_, component->getRawHandle()};
             componentBitmask_ |= bitmask;
+#if DEBUG
+            for (auto &h : components_) {
+                assert(h.typeId != T::typeId_);
+            }
+#endif
             components_.push_back(handle);
             getSpace()->setGameObjectHandle(component, getHandle());
             
