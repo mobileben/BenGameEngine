@@ -110,6 +110,8 @@ void BGE::GameObjectService::getAllChildGameObjects(GameObject *root, std::vecto
 
 void BGE::GameObjectService::removeGameObject(GameObject *object) {
     if (object) {
+        object->setActive(false);
+        
         auto xform = object->getComponent<TransformComponent>();
         
         if (xform) {
