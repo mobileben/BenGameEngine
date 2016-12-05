@@ -595,28 +595,30 @@ void BGE::ButtonComponent::useNormalButton() {
     }
 }
 
-BGE::Event BGE::ButtonComponent::handleInput(Input *input, bool inBounds) {
+BGE:: Event BGE::ButtonComponent::shouldHandleInput(Input *input, bool inBounds) {
     Event event = Event::None;
     
     switch (input->type) {
         case TouchType::Down:
-            event = handleTouchDownEvent(inBounds);
+            event = shouldHandleTouchDownEvent(inBounds);
             
-            if (event == Event::TouchDown) {
+            if (event == Event::TouchDownInside) {
                 touch = input->touch;
             }
             break;
             
         case TouchType::Up:
+            // Thouch up always handled as something that needs to be done
             if (touch == input->touch) {
-                event = handleTouchUpEvent(inBounds);
+                event = shouldHandleTouchUpEvent(inBounds);
                 touch = nil;
             }
             break;
             
         case TouchType::Cancel:
+            // Cancel always treated as somethingthat needs to be done
             if (touch == input->touch) {
-                event = handleTouchCancelEvent();
+                event = shouldHandleTouchCancelEvent();
                 touch = nil;
             }
             break;
@@ -628,6 +630,36 @@ BGE::Event BGE::ButtonComponent::handleInput(Input *input, bool inBounds) {
     return event;
 }
 
+BGE::Event BGE::ButtonComponent::shouldHandleTouchDownEvent(bool inBounds) {
+    Event event = Event::None;
+    
+    if (inBounds) {
+        if (isEnabled()) {
+            event = Event::TouchDownInside;
+        }
+    }
+    
+    return event;
+}
+
+BGE::Event BGE::ButtonComponent::shouldHandleTouchCancelEvent() {
+    Event event = Event::TouchCancel;
+    return event;
+}
+
+BGE::Event BGE::ButtonComponent::shouldHandleTouchUpEvent(bool inBounds) {
+    Event event = Event::None;
+    
+    if (isEnabled()) {
+        if (inBounds) {
+            event = Event::TouchUpInside;
+        } else {
+            event = Event::TouchUpOutside;
+        }
+    }
+    
+    return event;
+}
 
 BGE::Event BGE::ButtonComponent::handleTouchDownEvent(bool inBounds) {
     Event event = Event::None;
@@ -635,7 +667,7 @@ BGE::Event BGE::ButtonComponent::handleTouchDownEvent(bool inBounds) {
     if (inBounds) {
         if (isEnabled()) {
             setHighlighted(true);
-            event = Event::TouchDown;
+            event = Event::TouchDownInside;
         }
     }
     

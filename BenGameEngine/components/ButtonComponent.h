@@ -27,6 +27,7 @@ namespace BGE {
     };
     
     class BoundingBoxComponent;
+    class InputService;
     class Input;
     class Space;
     
@@ -65,13 +66,14 @@ namespace BGE {
         bool isToggleable() const;
         void setToggleable(bool on);
         
-        Event handleInput(Input *input, bool inBounds);
+        Event shouldHandleInput(Input *input, bool inBounds);
         
         UITouch *getTouch() const { return touch; }
         void setTouch(UITouch *t) { touch = t; }
         
     private:
         friend Space;
+        friend InputService;
         
         uint32_t    state;
         bool        animate;
@@ -97,6 +99,10 @@ namespace BGE {
         void useNormalButton();
 
         // TODO: If multi-touch then we will need to match touches, if necessary
+        Event shouldHandleTouchDownEvent(bool inBounds);
+        Event shouldHandleTouchCancelEvent();
+        Event shouldHandleTouchUpEvent(bool inBounds);
+        
         Event handleTouchDownEvent(bool inBounds);
         Event handleTouchCancelEvent();
         Event handleTouchUpEvent(bool inBounds);

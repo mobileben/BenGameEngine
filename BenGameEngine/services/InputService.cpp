@@ -187,9 +187,9 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                     }
                 }
                 
-                auto event = button->handleInput(input, inBounds);
+                auto event = button->shouldHandleInput(input, inBounds);
                 
-                if (event == Event::TouchDown || event == Event::TouchUpInside) {
+                if (event != Event::None) {
                     InputEventItem eventItem;
                     
                     eventItem.spaceHandle = gameObj->getSpace()->getHandle();
@@ -200,7 +200,6 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                     eventItem.event = event;
                     eventItem.inBounds = inBounds;
                     
-                    auto space = gameObj->getSpace();
                     queue.push_back(eventItem);
                 }
             }
@@ -232,10 +231,8 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                                 eventItem.touchType = input->type;
                                 eventItem.event = Event::TouchDownInside;
                                 eventItem.inBounds = true;
-                                auto space = gameObj->getSpace();
 
                                 queue.push_back(eventItem);
-                                
                                 inputTouch->touch = input->touch;
                             }
                         }
@@ -258,7 +255,7 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                             eventItem.touchType = input->type;
                             eventItem.event = event;
                             eventItem.inBounds = inBounds;
-                            
+
                             queue.push_back(eventItem);
                             
                             inputTouch->touch = nil;
@@ -321,7 +318,7 @@ void BGE::InputService::update(double deltaTime) {
         
         if (inputQueue.size() > 0) {
             auto spaceService = Game::getInstance()->getSpaceService();
-            
+
             inputEventQueue.push_back(inputQueue.back());
             inputQueue.pop_back();
             
@@ -346,7 +343,6 @@ void BGE::InputService::update(double deltaTime) {
                         }
                     }
                 }
-                
             }
         }
     }
@@ -379,6 +375,24 @@ void BGE::InputService::update(double deltaTime) {
                 
                 printf("Processed button %s::%s (%d)\n", parentName.c_str(), gameObj->getName().c_str(), item.touchType);
 #endif
+                switch(event) {
+                    case Event::TouchDownInside:
+                        button->handleTouchDownEvent(item.inBounds);
+                        break;
+                        
+                    case Event::TouchCancel:
+                        button->handleTouchCancelEvent();
+                        break;
+                        
+                    case Event::TouchUpOutside:
+                    case Event::TouchUpInside:
+                        button->handleTouchUpEvent(item.inBounds);
+                        break;
+                        
+                    default:
+                        break;
+                }
+
                 // Now if we match an event handler, dispatch that too
                 auto it = inputEventHandlers_.find(event);
                 
@@ -399,7 +413,7 @@ void BGE::InputService::update(double deltaTime) {
             } else if (item.event == Event::TouchDownInside){
                 // InputTouchComponent
                 auto event = Event::TouchDownInside;
-                
+
                 // Now if we match an event handler, dispatch that too
                 auto it = inputEventHandlers_.find(event);
                 
