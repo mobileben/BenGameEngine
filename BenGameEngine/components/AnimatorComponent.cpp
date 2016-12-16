@@ -33,6 +33,8 @@ void BGE::AnimatorComponent::initialize(HandleBackingType handle, SpaceHandle sp
     Component::initialize(handle, spaceHandle);
     
     state = AnimState::Done;
+    startFrame = 0;
+    endFrame = 0;
     currentFrame = 0;
     iterations = 0;
     frameRemainderTime = 0;
@@ -42,6 +44,8 @@ void BGE::AnimatorComponent::initialize(HandleBackingType handle, SpaceHandle sp
 
 void BGE::AnimatorComponent::destroy() {
     state = AnimState::Done;
+    startFrame = 0;
+    endFrame = 0;
     currentFrame = 0;
     iterations = 0;
     frameRemainderTime = 0;
@@ -299,25 +303,51 @@ void BGE::AnimatorComponent::animateSequenceByFrame(Space *space, AnimationSeque
     }
 }
 
-
 void BGE::AnimatorComponent::play(int32_t iterations, bool forward, float speed) {
+    auto gameObj = getGameObject();
+    auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+
     this->state = AnimState::Playing;
     this->iterations = iterations;
     this->forward = forward;
     this->speed = speed;
+    this->startFrame = 0;
+    this->endFrame = seq->totalFrames - 1;
     
     if (forward) {
         this->setFrame(0);
     } else {
-        auto gameObj = getGameObject();
-        auto seq = gameObj->getComponent<AnimationSequenceComponent>();
-
         this->setFrame(seq->totalFrames - 1);
     }
 }
 
+void BGE::AnimatorComponent::playToFrame(int32_t endFrame, float speed) {
+    this->state = AnimState::Playing;
+    this->iterations = 1;
+    this->forward = true;
+    this->speed = speed;
+    this->startFrame = 0;
+    this->endFrame = endFrame;
+    
+    this->setFrame(0);
+}
+
+void BGE::AnimatorComponent::reverse(float speed) {
+    this->state = AnimState::Playing;
+    this->iterations = 1;
+    this->forward = !this->forward;
+    this->speed = speed;
+}
+
 void BGE::AnimatorComponent::pause() {
     this->state = AnimState::Paused;
+}
+
+void BGE::AnimatorComponent::resume(float speed) {
+    if (this->state == AnimState::Paused) {
+        this->state = AnimState::Playing;
+        this->speed = speed;
+    }
 }
 
 void BGE::AnimatorComponent::stop() {

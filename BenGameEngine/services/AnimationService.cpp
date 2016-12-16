@@ -185,17 +185,17 @@ void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceCompo
                 if (animator->forward) {
                     frame++;
                     
-                    if (frame >= seq->totalFrames) {
+                    if (frame > animator->endFrame) {
                         // We're done!
-                        frame = handleEndOfAnim(animator, 0, seq->totalFrames - 1);
+                        frame = handleEndOfAnim(animator, animator->startFrame, animator->endFrame);
                         triggerEvent = true;
                     }
                 } else {
                     frame--;
                     
-                    if (frame < 0) {
+                    if (frame < animator->startFrame) {
                         // We're done
-                        frame = handleEndOfAnim(animator, seq->totalFrames - 1, 0);
+                        frame = handleEndOfAnim(animator, animator->endFrame, animator->startFrame);
                         triggerEvent = true;
                     }
                 }
@@ -207,17 +207,17 @@ void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceCompo
                         if (animator->forward) {
                             frame++;
                             
-                            if (frame >= seq->totalFrames) {
+                            if (frame > animator->endFrame) {
                                 // We're done!
-                                frame = handleEndOfAnim(animator, 0, seq->totalFrames - 1);
+                                frame = handleEndOfAnim(animator, animator->startFrame, animator->endFrame);
                                 triggerEvent = true;
                             }
                         } else {
                             frame--;
                             
-                            if (frame < 0) {
+                            if (frame < animator->startFrame) {
                                 // We're done
-                                frame = handleEndOfAnim(animator, seq->totalFrames - 1, 0);
+                                frame = handleEndOfAnim(animator, animator->endFrame, animator->startFrame);
                                 triggerEvent = true;
                             }
                         }

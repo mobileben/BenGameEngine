@@ -42,6 +42,8 @@ namespace BGE {
         void destroy() final;
         
         AnimState   state;
+        int32_t     startFrame;
+        int32_t     endFrame;
         int32_t     currentFrame;
         int32_t     iterations;
         float       frameRemainderTime;
@@ -55,7 +57,13 @@ namespace BGE {
         void setFrame(int32_t frame, bool force=false);
         void setToLastFrame();
         void play(int32_t iterations=1, bool forward=true, float speed=1.0);
+        void playToFrame(int32_t endFrame, float speed=1.0);
+        
+        void reverse(float speed=1.0); // Reverse goes the opposite direction, preserving the currentFrame
+        
         void pause();
+        void resume(float speed=1.0);  // Resumes from pause
+        
         void stop();
         
     private:
