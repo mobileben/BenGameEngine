@@ -782,6 +782,10 @@ BGE::GameObject *BGE::Space::createFlatRect(std::string instanceName, Vector2 &w
 }
 
 BGE::GameObject *BGE::Space::createSprite(std::string instanceName, TextureHandle texHandle) {
+    if (texHandle.isNull()) {
+        return nullptr;
+    }
+    
     spaceService_->lock();
     
     auto obj = createGameObject(instanceName);
@@ -801,6 +805,10 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, TextureHandl
 }
 
 BGE::GameObject *BGE::Space::createSprite(std::string instanceName, Texture *texture) {
+    if (!texture) {
+        return nullptr;
+    }
+    
     spaceService_->lock();
     
     auto obj = createGameObject(instanceName);
