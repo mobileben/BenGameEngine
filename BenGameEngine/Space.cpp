@@ -833,7 +833,6 @@ void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePack
 
 void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
-    auto root = getGameObject(rootHandle);
     auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
     auto animationService = Game::getInstance()->getAnimationService();
     
@@ -911,15 +910,15 @@ void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePac
                 if (elem->hidden) {
                     xform->setVisibility(false);
                 }
+                
+                rootObjHandles.push_back(obj->getHandle());
             }
-
-            rootObjHandles.push_back(obj->getHandle());
         }
         
         TransformComponent *rootXform = nullptr;
         
         // Update root in case allocations moved handles
-        root = getGameObject(rootHandle);
+        auto root = getGameObject(rootHandle);
         
         if (root) {
             rootXform = root->getComponent<TransformComponent>();
