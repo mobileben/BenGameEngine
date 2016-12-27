@@ -41,6 +41,7 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
     scale_.y = 1;
     skew_.x = 0;
     skew_.y = 0;
+    z_ = 0;
     useSkew_ = false;
     rotation_ = 0;
     
