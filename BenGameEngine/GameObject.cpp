@@ -234,6 +234,22 @@ void BGE::GameObject::replaceChild(GameObject *child, uint32_t index) {
     }
 }
 
+void BGE::GameObject::moveToParent(GameObjectHandle handle) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->moveToParent(handle);
+    }
+}
+
+void BGE::GameObject::moveToParent(GameObject *parent) {
+    auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        xform->moveToParent(parent);
+    }
+}
+
 void BGE::GameObject::removeAllChildren() {
     auto xform = getComponent<TransformComponent>();
     

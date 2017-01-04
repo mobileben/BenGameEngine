@@ -132,6 +132,9 @@ namespace BGE {
         void replaceChild(GameObjectHandle handle, uint32_t index);
         void replaceChild(GameObject *child, uint32_t index);
 
+        void moveToParent(GameObjectHandle handle);
+        void moveToParent(GameObject *parent);
+        
         void removeAllChildren();
         void removeFromParent();
 
