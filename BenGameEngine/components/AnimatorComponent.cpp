@@ -281,6 +281,30 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
                             if (childAnimator) {
                                 auto childSeq = childObj->getComponent<AnimationSequenceComponent>();
                                 animateSequenceByFrame(space, childSeq, childAnimator, keyframe->frame);
+                                
+                                
+                                // Update the bounds
+                                for (auto bi=0;i<childSeq->numBounds;bi++) {
+                                    auto bounds = childSeq->bounds[bi];
+                                    
+                                    if (bounds.startFrame >= bi && bi < (bounds.startFrame + bounds.totalFrames)) {
+                                        auto bbox = childObj->getComponent<BoundingBoxComponent>();
+                                        
+                                        if (!bbox) {
+                                            auto space = childObj->getSpace();
+                                            
+                                            bbox = space->createComponent<BGE::BoundingBoxComponent>();
+                                            
+                                            childObj->addComponent(bbox);
+                                        }
+                                        
+                                        bbox->x = bounds.bounds->x;
+                                        bbox->y = bounds.bounds->y;
+                                        bbox->width = bounds.bounds->w;
+                                        bbox->height = bounds.bounds->h;
+                                        break;
+                                    }
+                                }
                                 break;
                             }
                         }

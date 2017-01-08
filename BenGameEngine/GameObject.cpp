@@ -286,11 +286,16 @@ void BGE::GameObject::upgradeToAnimationSequence() {
     if (isAnimationSubSequence()) {
         if (!hasComponent<AnimatorComponent>()) {
             auto space = getSpace();
-            auto boundingBox = space->createComponent<BoundingBoxComponent>();
             auto animator = space->createComponent<AnimatorComponent>();
-            
-            addComponent(boundingBox);
+
             addComponent(animator);
+
+            auto bbox = getComponent<BoundingBoxComponent>();
+            
+            if (!bbox) {
+                bbox = space->createComponent<BoundingBoxComponent>();
+                addComponent(bbox);
+            }
             
             animator->setFrame(0, true);
         }
