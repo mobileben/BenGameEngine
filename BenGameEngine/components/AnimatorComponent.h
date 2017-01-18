@@ -26,14 +26,14 @@ namespace BGE {
         Done
     };
 
+    const int32_t AnimPlayForever = -1;
+    
     class AnimatorComponent : public Component
     {
     public:
         static std::type_index  type_index_;
         static ComponentTypeId  typeId_;
         static uint32_t         bitmask_;
-        
-        static const int32_t AnimPlayForever = -1;
         
         AnimatorComponent();
         ~AnimatorComponent() {}

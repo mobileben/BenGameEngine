@@ -259,7 +259,7 @@ int32_t BGE::AnimationService::handleEndOfAnim(AnimatorComponent *animator, int3
     bool reset = false;
     
     switch (animator->iterations) {
-        case AnimatorComponent::AnimPlayForever:
+        case AnimPlayForever:
             reset = true;
             break;
             

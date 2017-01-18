@@ -468,7 +468,7 @@ void BGE::ButtonComponent::useHighlightedButton() {
                 auto animator = currentButton->getComponent<AnimatorComponent>();
                 
                 if (animator->state == AnimState::Done) {
-                    animator->play(AnimatorComponent::AnimPlayForever);
+                    animator->play(AnimPlayForever);
                 }
             }
         }
@@ -534,7 +534,7 @@ void BGE::ButtonComponent::useDisabledButton() {
             auto animator = currentButton->getComponent<AnimatorComponent>();
             
             if (animator->state == AnimState::Done) {
-                animator->play(AnimatorComponent::AnimPlayForever);
+                animator->play(AnimPlayForever);
             }
         }
     }
@@ -589,7 +589,7 @@ void BGE::ButtonComponent::useNormalButton() {
             auto animator = currentButton->getComponent<AnimatorComponent>();
             
             if (animator->state == AnimState::Done) {
-                animator->play(AnimatorComponent::AnimPlayForever);
+                animator->play(AnimPlayForever);
             }
         }
     }
