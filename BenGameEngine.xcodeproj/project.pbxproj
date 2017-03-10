@@ -80,6 +80,8 @@
 		B5503D701D51A6A700FC77B6 /* CommonLobby-iPh6.json in Resources */ = {isa = PBXBuildFile; fileRef = B5503D551D51A6A700FC77B6 /* CommonLobby-iPh6.json */; };
 		B5503D841D51A6B700FC77B6 /* CommonHUD-iPh6.json in Resources */ = {isa = PBXBuildFile; fileRef = B5503D801D51A6B700FC77B6 /* CommonHUD-iPh6.json */; };
 		B55194A41D28C2B100BDAA5D /* ComponentBitmask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B55194A21D28C2B100BDAA5D /* ComponentBitmask.cpp */; };
+		B5661E0F1E6A2B5F0083717F /* FullColorFontFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5661E0D1E6A2A1B0083717F /* FullColorFontFragment.glsl */; };
+		B5661E101E6A2B630083717F /* FullColorFontVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5661E0E1E6A2A1B0083717F /* FullColorFontVertex.glsl */; };
 		B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */; };
 		B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */; };
 		B571F1771C93B604007F5A90 /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = B571F1761C93B604007F5A90 /* sample.png */; };
@@ -300,6 +302,8 @@
 		B55194A31D28C2B100BDAA5D /* ComponentBitmask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ComponentBitmask.h; path = components/ComponentBitmask.h; sourceTree = "<group>"; };
 		B56470881DB6D7E4003AC11F /* FullColorTextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FullColorTextureFragment.glsl; path = shaders/FullColorTextureFragment.glsl; sourceTree = "<group>"; };
 		B56470891DB6D7E4003AC11F /* FullColorTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FullColorTextureVertex.glsl; path = shaders/FullColorTextureVertex.glsl; sourceTree = "<group>"; };
+		B5661E0D1E6A2A1B0083717F /* FullColorFontFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FullColorFontFragment.glsl; path = shaders/FullColorFontFragment.glsl; sourceTree = "<group>"; };
+		B5661E0E1E6A2A1B0083717F /* FullColorFontVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FullColorFontVertex.glsl; path = shaders/FullColorFontVertex.glsl; sourceTree = "<group>"; };
 		B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureVertex.glsl; path = shaders/ColorMatrixTextureVertex.glsl; sourceTree = "<group>"; };
 		B571F1721C915A69007F5A90 /* ColorMatrixTextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ColorMatrixTextureFragment.glsl; path = shaders/ColorMatrixTextureFragment.glsl; sourceTree = "<group>"; };
 		B571F1761C93B604007F5A90 /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sample.png; path = textures/sample.png; sourceTree = "<group>"; };
@@ -630,6 +634,8 @@
 				B571F1711C915A4B007F5A90 /* ColorMatrixTextureVertex.glsl */,
 				B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */,
 				B571F1941C9E1B94007F5A90 /* FontVertex.glsl */,
+				B5661E0D1E6A2A1B0083717F /* FullColorFontFragment.glsl */,
+				B5661E0E1E6A2A1B0083717F /* FullColorFontVertex.glsl */,
 				B56470881DB6D7E4003AC11F /* FullColorTextureFragment.glsl */,
 				B56470891DB6D7E4003AC11F /* FullColorTextureVertex.glsl */,
 				B5E7B9B41CC35B5000978F1A /* LineFragment.glsl */,
@@ -950,6 +956,7 @@
 				B571F17B1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl in Resources */,
 				B525E3DC1C895A1900C691C0 /* SimpleFragment.glsl in Resources */,
 				B508CD8E1CA8ABA100127B97 /* Arial Black.ttf in Resources */,
+				B5661E101E6A2B630083717F /* FullColorFontVertex.glsl in Resources */,
 				B525E3DD1C895A1900C691C0 /* SimpleVertex.glsl in Resources */,
 				B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */,
 				B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */,
@@ -963,6 +970,7 @@
 				B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */,
 				B571F1791C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl in Resources */,
 				B5E7B9B71CC35B5D00978F1A /* LineFragment.glsl in Resources */,
+				B5661E0F1E6A2B5F0083717F /* FullColorFontFragment.glsl in Resources */,
 				B508CD901CA901B700127B97 /* Avenir.ttc in Resources */,
 				B571F18B1C992B3D007F5A90 /* lazy.ttf in Resources */,
 			);

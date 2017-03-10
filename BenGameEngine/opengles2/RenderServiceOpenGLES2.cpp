@@ -212,6 +212,10 @@ void BGE::RenderServiceOpenGLES2::createShaders()
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, "FontVertex");
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, "FontFragment");
     program = this->getShaderService()->createShaderProgram("Font", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "SourceColor" });
+    
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "FullColorFontVertex");
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "FullColorFontFragment");
+    program = this->getShaderService()->createShaderProgram("FullColorFont", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "SourceColor", "ColorMatrix", "ColorMatOffset", "ColorMultiplier", "ColorOffset" });
 }
 
 std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram(std::string program)
@@ -990,14 +994,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
             Font *font = Game::getInstance()->getFontService()->getFont(text->getFontHandle());
             
             if (font) {
-                if (text->isMultiline()) {
-                    auto multiText = text->getMultiText();
-                    auto yPos = text->getMultiTextY();
-                    
-                    font->drawString(multiText, yPos, transformComponent, (Color&) text->getColor());
-                } else {
-                    font->drawString(text->getText(), transformComponent, (Color&) text->getColor());
-                }
+                font->drawString(text, transformComponent, currentColorMatrix_, currentColorTransform_);
             }
         } else if (gameObj->hasComponent<MaskComponent>()) {
             maskValue = enableMask(gameObj);

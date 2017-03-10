@@ -78,6 +78,11 @@ namespace BGE {
         void setTextReference(const TextReference& textRef);
         
         float getWidth(bool minimum=true);
+        float getBoundsWidth() const { return boundsWidth_; }
+        float getBoundsHeight() const { return boundsHeight_; }
+        
+        FontHorizontalAlignment getHorizontalAlignment() const { return horizAlignment_; }
+        FontVerticalAlignment getVerticalAlignment() const { return vertAlignment_; }
         
         bool isMultiline() const { return multiline_; }
         void setMultiline(bool multi);

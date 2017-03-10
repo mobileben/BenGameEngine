@@ -8,6 +8,7 @@
 
 #include "Font.h"
 #include "Game.h"
+#include "TextComponent.h"
 #include "TransformComponent.h"
 #include "RenderServiceOpenGLES2.h"
 #include "ShaderServiceOpenGLES2.h"
@@ -395,35 +396,46 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
     }
 }
 
-void BGE::Font::drawString(std::string str, Vector2 &position, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+void BGE::Font::drawString(std::string str, Vector2 &position, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     Matrix4 xform;
     Matrix4MakeTranslation(xform, position.x, position.y, 0);
     
-    drawString(str, xform.m, 0, color, horizAlignment, vertAlignment, minimum);
+    drawString(str, xform.m, 0, 0, color, colorMatrix, colorTransform, horizAlignment, vertAlignment, minimum);
 }
 
 
 // TODO: Move to renderer
-void BGE::Font::drawString(std::string str, TransformComponent *transform, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
-    
-    drawString(str, transform->getWorldMatrixRaw(), 0, color, horizAlignment, vertAlignment, minimum);
+void BGE::Font::drawString(TextComponent *text, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum) {
+    if (text->isMultiline()) {
+        auto multiText = text->getMultiText();
+        auto yPos = text->getMultiTextY();
+        
+        drawString(multiText, yPos, text->getBoundsWidth(), transform, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+    } else {
+        drawString(text->getText(), transform->getWorldMatrixRaw(), text->getBoundsWidth(), 0, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+    }
 }
 
-void BGE::Font::drawString(std::vector<std::string> &strs, std::vector<float> &yPos, TransformComponent *transform, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+void BGE::Font::drawString(std::string str, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+    
+    drawString(str, transform->getWorldMatrixRaw(), 0, 0, color, colorMatrix, colorTransform, horizAlignment, vertAlignment, minimum);
+}
+
+void BGE::Font::drawString(std::vector<std::string> &strs, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     const float *rawMatrix = transform->getWorldMatrixRaw();
     auto index = 0;
     
     for (auto &str : strs) {
         float yOffset = yPos[index];
         
-        drawString(str, rawMatrix, yOffset, color, horizAlignment, vertAlignment, minimum);
+        drawString(str, rawMatrix, defWidth, yOffset, color, colorMatrix, colorTransform, horizAlignment, vertAlignment, minimum);
         
         index++;
     }
 }
 
 // TODO: Move to renderer
-void BGE::Font::drawString(std::string str, const float *rawMatrix, float yOffset, Color &color, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+void BGE::Font::drawString(std::string str, const float *rawMatrix, float defWidth, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     auto textureAtlas = Game::getInstance()->getTextureService()->getTextureAtlas(textureAtlasHandle_);
     
     if (str.length() > 0 && textureAtlas && textureAtlas->isValid()) {
@@ -441,7 +453,7 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, float yOffse
         auto texHandle = textureAtlas->getTextureHandle();
         auto tex = Game::getInstance()->getTextureService()->getTexture(texHandle);
         
-        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(renderer->pushShaderProgram("Font"));
+        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(renderer->pushShaderProgram("FullColorFont"));
         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
         GLint positionLocation = glShader->locationForAttribute("Position");
         
@@ -452,9 +464,19 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, float yOffse
         GLint projectionLocation = glShader->locationForUniform("Projection");
         GLint modelLocation = glShader->locationForUniform("ModelView");
         GLint colorUniform = glShader->locationForUniform("SourceColor");
-        
+        GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
+        GLint colorMatOffsetLocation = glShader->locationForUniform("ColorMatOffset");
+        auto colorMultiplierLocation = glShader->locationForUniform("ColorMultiplier");
+        auto colorOffsetLocation = glShader->locationForUniform("ColorOffset");
+
         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) renderer->getProjectionMatrix()->m);
         glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
+      
+        glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
+        glUniform4fv(colorMatOffsetLocation, 1, (GLfloat *) colorMatrix.offset.v);
+        
+        glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) colorTransform.multiplier.v);
+        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorTransform.offset.v);
         
         // Compute the offsets if needed
         switch (horizAlignment) {
@@ -463,10 +485,11 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, float yOffse
                 break;
                 
             case FontHorizontalAlignment::Right:
-                x -= getStringWidth(str, minimum);
+                x -= getStringWidth(str, minimum) - defWidth / 2.0;
                 break;
                 
             default:
+                x -= defWidth / 2.0;
                 break;
         }
         
