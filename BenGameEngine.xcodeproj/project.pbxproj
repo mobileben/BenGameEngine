@@ -149,6 +149,13 @@
 			remoteGlobalIDString = B525E3D51C8959D200C691C0;
 			remoteInfo = BenGameEngineBundle;
 		};
+		B5DD65681EB67D9600E0DB0A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B525E3531C8950DA00C691C0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B525E3D51C8959D200C691C0;
+			remoteInfo = BenGameEngineBundle;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -831,6 +838,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B5DD65691EB67D9600E0DB0A /* PBXTargetDependency */,
 			);
 			name = BenGameEngine;
 			productName = BenGameEngine;
@@ -1100,6 +1108,11 @@
 			isa = PBXTargetDependency;
 			target = B525E3D51C8959D200C691C0 /* BenGameEngineBundle */;
 			targetProxy = B525E3E71C89602A00C691C0 /* PBXContainerItemProxy */;
+		};
+		B5DD65691EB67D9600E0DB0A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B525E3D51C8959D200C691C0 /* BenGameEngineBundle */;
+			targetProxy = B5DD65681EB67D9600E0DB0A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
