@@ -289,7 +289,6 @@
 		B52BFB0F1D0155720040A839 /* FixedArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FixedArray.h; sourceTree = "<group>"; };
 		B545A6021DC01D81000ADD6C /* RawTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RawTexture.cpp; path = dataformats/RawTexture.cpp; sourceTree = "<group>"; };
 		B545A6031DC01D81000ADD6C /* RawTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RawTexture.h; path = dataformats/RawTexture.h; sourceTree = "<group>"; };
-		B545A6051DC020C7000ADD6C /* libpng */ = {isa = PBXFileReference; lastKnownFileType = folder; name = libpng; path = external/libpng; sourceTree = "<group>"; };
 		B545A6061DC0210F000ADD6C /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = BenGameEngine/external/libpng/lib/libpng.a; sourceTree = "<group>"; };
 		B545A6081DC0217F000ADD6C /* libz.1.2.8.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.8.tbd; path = usr/lib/libz.1.2.8.tbd; sourceTree = SDKROOT; };
 		B547F1781D125BB70031AF58 /* ChannelFrameAnimatorComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = ChannelFrameAnimatorComponent.cpp; path = components/ChannelFrameAnimatorComponent.cpp; sourceTree = "<group>"; };
@@ -316,7 +315,6 @@
 		B571F1761C93B604007F5A90 /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sample.png; path = textures/sample.png; sourceTree = "<group>"; };
 		B571F1781C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MaskColorMatrixTextureVertex.glsl; path = shaders/MaskColorMatrixTextureVertex.glsl; sourceTree = "<group>"; };
 		B571F17A1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MaskColorMatrixTextureFragment.glsl; path = shaders/MaskColorMatrixTextureFragment.glsl; sourceTree = "<group>"; };
-		B571F17D1C97CFB3007F5A90 /* freetype */ = {isa = PBXFileReference; lastKnownFileType = folder; name = freetype; path = external/freetype; sourceTree = "<group>"; };
 		B571F17E1C97D88E007F5A90 /* FontService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = FontService.cpp; path = services/FontService.cpp; sourceTree = "<group>"; };
 		B571F17F1C97D88E007F5A90 /* FontService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FontService.h; path = services/FontService.h; sourceTree = "<group>"; };
 		B571F1811C97D92E007F5A90 /* Font.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Font.cpp; sourceTree = "<group>"; };
@@ -558,7 +556,6 @@
 				B525E3851C89587000C691C0 /* Error.cpp */,
 				B525E3861C89587000C691C0 /* Error.h */,
 				B5503D431D4EB5FD00FC77B6 /* Event.h */,
-				B571F17C1C97CF42007F5A90 /* external */,
 				B52BFB0F1D0155720040A839 /* FixedArray.h */,
 				B571F1811C97D92E007F5A90 /* Font.cpp */,
 				B571F1821C97D92E007F5A90 /* Font.h */,
@@ -733,15 +730,6 @@
 				B525E3AA1C89587000C691C0 /* ShaderServiceOpenGLES2.h */,
 			);
 			name = opengles2;
-			sourceTree = "<group>";
-		};
-		B571F17C1C97CF42007F5A90 /* external */ = {
-			isa = PBXGroup;
-			children = (
-				B571F17D1C97CFB3007F5A90 /* freetype */,
-				B545A6051DC020C7000ADD6C /* libpng */,
-			);
-			name = external;
 			sourceTree = "<group>";
 		};
 		B5F1F2BF1D2CCC850034E1B7 /* testPackages */ = {
@@ -1251,12 +1239,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/$(TARGET_NAME)/external/freetype/include",
-					"$(PROJECT_DIR)/$(TARGET_NAME)/external/libpng/include",
+					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
+					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
 			};
 			name = Debug;
 		};
@@ -1264,12 +1253,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/$(TARGET_NAME)/external/freetype/include",
-					"$(PROJECT_DIR)/$(TARGET_NAME)/external/libpng/include",
+					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
+					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
 			};
 			name = Release;
 		};
