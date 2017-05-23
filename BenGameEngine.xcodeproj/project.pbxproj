@@ -347,6 +347,7 @@
 		B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformComponent.cpp; path = components/ColorTransformComponent.cpp; sourceTree = "<group>"; };
 		B5C388E11D24D91B00137CEC /* ColorTransformComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorTransformComponent.h; path = components/ColorTransformComponent.h; sourceTree = "<group>"; };
 		B5C388E41D28635500137CEC /* NamedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NamedObject.h; sourceTree = "<group>"; };
+		B5DC4BDB1ED37A4C003C4B5C /* Observer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Observer.h; sourceTree = "<group>"; };
 		B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = HandleTests.m; path = BGEGameObjectAndComponentTests/HandleTests.m; sourceTree = SOURCE_ROOT; };
 		B5DCDA241CE59F7400CBF0A6 /* ScenePackageService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = ScenePackageService.cpp; path = services/ScenePackageService.cpp; sourceTree = "<group>"; };
 		B5DCDA251CE59F7400CBF0A6 /* ScenePackageService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScenePackageService.h; path = services/ScenePackageService.h; sourceTree = "<group>"; };
@@ -576,6 +577,7 @@
 				B525E3901C89587000C691C0 /* MathTypes.h */,
 				B5C388E41D28635500137CEC /* NamedObject.h */,
 				B508CDAA1CB4DE8E00127B97 /* Object.h */,
+				B5DC4BDB1ED37A4C003C4B5C /* Observer.h */,
 				B571F1741C928BA5007F5A90 /* opengles2 */,
 				B51A56E21D72717E005AA9AB /* Queue.h */,
 				B525E3911C89587000C691C0 /* RenderContext.cpp */,
