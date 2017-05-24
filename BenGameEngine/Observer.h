@@ -19,6 +19,8 @@
 namespace BGE {
     using SignalId = int64_t;
     
+    const SignalId UnassignedSignalId = -1;
+    
     template <typename... Args>
     class Signal {
     public:
@@ -51,6 +53,9 @@ namespace BGE {
         
         void disconnect(SignalId id) const {
             std::lock_guard<std::mutex> lock(mutex_);
+            if (id == UnassignedSignalId) {
+                return;
+            }
             slots_.erase(id);
         }
         
@@ -61,25 +66,21 @@ namespace BGE {
         
         void emit(Args... args) {
             mutex_.lock();
-            
+
+            // Make a copy of what we need to emit against
+            // Any calls to connect or disconnect done by any of the functions called will NOT be affected by this emit
             auto slotsCopy = slots_;
-            std::vector<SignalId> toRemove;
             
             mutex_.unlock();
             
             for (auto& it : slotsCopy) {
                 if (!it.second(args...)) {
-                    toRemove.push_back(it.first);
+                    // This should not be a common occurence
+                    mutex_.lock();
+                    slots_.erase(it.first);
+                    mutex_.unlock();
                 }
             }
- 
-            mutex_.lock();
-            
-            for (auto id : toRemove) {
-                slots_.erase(id);
-            }
-            
-            mutex_.unlock();
         }
         
     private:
