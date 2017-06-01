@@ -45,6 +45,8 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
     highlightedButtonHandle = GameObjectHandle();
     highlightedAnimButtonHandle = GameObjectHandle();
     currentButtonHandle = GameObjectHandle();
+    
+    pressedTime_ = 0;
 }
 
 void BGE::ButtonComponent::destroy() {
@@ -403,6 +405,10 @@ void BGE::ButtonComponent::setToggleable(bool on) {
     toggleable = on;
 }
 
+double BGE::ButtonComponent::pressedTime() const {
+    return pressedTime_;
+}
+
 void BGE::ButtonComponent::useHighlightedButton() {
     auto space = getSpace();
     auto currentButton = space->getGameObject(currentButtonHandle);
@@ -664,10 +670,13 @@ BGE::Event BGE::ButtonComponent::shouldHandleTouchUpEvent(bool inBounds) {
 BGE::Event BGE::ButtonComponent::handleTouchDownEvent(bool inBounds) {
     Event event = Event::None;
     
+    pressedTime_ = 0;
+
     if (inBounds) {
         if (isEnabled()) {
             setHighlighted(true);
             event = Event::TouchDownInside;
+            pressedTimeStart = std::chrono::high_resolution_clock::now();
         }
     }
     
@@ -679,6 +688,8 @@ BGE::Event BGE::ButtonComponent::handleTouchCancelEvent() {
     
     useNormalButton();
     
+    pressedTime_ = 0;
+
     return event;
 }
 
@@ -709,6 +720,13 @@ BGE::Event BGE::ButtonComponent::handleTouchUpEvent(bool inBounds) {
             
             event = Event::TouchUpOutside;
         }
+        
+        auto now = std::chrono::high_resolution_clock::now();
+        auto difference = std::chrono::duration_cast<std::chrono::milliseconds>(now - pressedTimeStart).count();
+        
+        pressedTime_ = difference / 1000.0;
+    } else {
+        pressedTime_ = 0;
     }
     
     return event;

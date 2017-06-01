@@ -12,6 +12,7 @@
 #import <UIKit/UIKit.h>
 #include <stdio.h>
 #include <memory>
+#include <chrono>
 #include "Component.h"
 #include "GraphicFormats.h"
 #include "Input.h"
@@ -65,6 +66,7 @@ namespace BGE {
         void setToggleOn(bool on);
         bool isToggleable() const;
         void setToggleable(bool on);
+        double pressedTime() const;
         
         Event shouldHandleInput(Input *input, bool inBounds);
         
@@ -83,6 +85,9 @@ namespace BGE {
         // For when we want to treat this like a toggle
         bool        toggleable;
         bool        toggleOn;
+        
+        std::chrono::high_resolution_clock::time_point pressedTimeStart;
+        float       pressedTime_;
         
         UITouch     *touch; // We need this to properly track events
         
