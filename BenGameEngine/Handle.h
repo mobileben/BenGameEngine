@@ -31,6 +31,7 @@ namespace BGE {
     class FlatRectRenderComponent;
     class FrameAnimatorComponent;
     class InputTouchComponent;
+    class PolyLineRenderComponent;
     class LineRenderComponent;
     class LogicComponent;
     class MaskComponent;
@@ -132,6 +133,7 @@ namespace BGE {
     using FlatRectRenderComponentHandle = Handle<FlatRectRenderComponent>;
     using FrameAnimatorComponentHandle = Handle<FrameAnimatorComponent>;
     using InputTouchComponentHandle = Handle<InputTouchComponent>;
+    using PolyLineRenderComponentHandle = Handle<PolyLineRenderComponent>;
     using LineRenderComponentHandle = Handle<LineRenderComponent>;
     using LogicComponentHandle = Handle<LogicComponent>;
     using MaskComponentHandle = Handle<MaskComponent>;

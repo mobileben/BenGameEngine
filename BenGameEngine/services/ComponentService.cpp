@@ -17,6 +17,7 @@
 #include "FrameAnimatorComponent.h"
 #include "LineRenderComponent.h"
 #include "LogicComponent.h"
+#include "PolyLineRenderComponent.h"
 #include "SpriteRenderComponent.h"
 #include "TextComponent.h"
 #include "TransformComponent.h"
@@ -48,6 +49,7 @@ void BGE::ComponentService::registerComponents() {
         registerComponent<PlacementComponent>(120, HandleServiceNoMaxLimit);
         registerComponent<ButtonComponent>(1024, HandleServiceNoMaxLimit);
         registerComponent<InputTouchComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<PolyLineRenderComponent>(1024, HandleServiceNoMaxLimit);
         registerComponent<LineRenderComponent>(1024, HandleServiceNoMaxLimit);
         registerComponent<FlatRectRenderComponent>(1024, HandleServiceNoMaxLimit);
         registerComponent<MaskComponent>(1024, HandleServiceNoMaxLimit);
@@ -84,6 +86,7 @@ void BGE::ComponentService::garbageCollect() {
     garbageCollectComponent<PlacementComponent>();
     garbageCollectComponent<ButtonComponent>();
     garbageCollectComponent<InputTouchComponent>();
+    garbageCollectComponent<PolyLineRenderComponent>();
     garbageCollectComponent<LineRenderComponent>();
     garbageCollectComponent<FlatRectRenderComponent>();
     garbageCollectComponent<MaskComponent>();
@@ -131,6 +134,8 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
                 releaseComponentHandle<ButtonComponent>(handle);
             } else if (typeId == InputTouchComponent::typeId_) {
                 releaseComponentHandle<InputTouchComponent>(handle);
+            } else if (typeId == PolyLineRenderComponent::typeId_) {
+                releaseComponentHandle<PolyLineRenderComponent>(handle);
             } else if (typeId == LineRenderComponent::typeId_) {
                 releaseComponentHandle<LineRenderComponent>(handle);
             } else if (typeId == FlatRectRenderComponent::typeId_) {
@@ -181,6 +186,7 @@ uint32_t BGE::ComponentService::totalNumComponents() const {
     total += numComponents<PlacementComponent>();
     total += numComponents<ButtonComponent>();
     total += numComponents<InputTouchComponent>();
+    total += numComponents<PolyLineRenderComponent>();
     total += numComponents<LineRenderComponent>();
     total += numComponents<FlatRectRenderComponent>();
     total += numComponents<MaskComponent>();
@@ -211,6 +217,7 @@ uint32_t BGE::ComponentService::totalMaxHandles() const {
     total += maxComponents<PlacementComponent>();
     total += maxComponents<ButtonComponent>();
     total += maxComponents<InputTouchComponent>();
+    total += maxComponents<PolyLineRenderComponent>();
     total += maxComponents<LineRenderComponent>();
     total += maxComponents<FlatRectRenderComponent>();
     total += maxComponents<MaskComponent>();
@@ -237,6 +244,7 @@ uint32_t BGE::ComponentService::totalMaxHandlesAllocated() const {
     total += maxHandlesAllocated<PlacementComponent>();
     total += maxHandlesAllocated<ButtonComponent>();
     total += maxHandlesAllocated<InputTouchComponent>();
+    total += maxHandlesAllocated<PolyLineRenderComponent>();
     total += maxHandlesAllocated<LineRenderComponent>();
     total += maxHandlesAllocated<FlatRectRenderComponent>();
     total += maxHandlesAllocated<MaskComponent>();
@@ -262,6 +270,15 @@ uint32_t BGE::ComponentService::numMaterials() const {
             auto const &handles = componentHandles_[i];
             for (auto const &handle : handles) {
                 auto component = getComponent<TextComponent>(handle.handle);
+                
+                if (component) {
+                    num += component->getMaterialHandles().size();
+                }
+            }
+        } else if (i == PolyLineRenderComponent::typeId_) {
+            auto const &handles = componentHandles_[i];
+            for (auto const &handle : handles) {
+                auto component = getComponent<PolyLineRenderComponent>(handle.handle);
                 
                 if (component) {
                     num += component->getMaterialHandles().size();
@@ -358,6 +375,9 @@ size_t BGE::ComponentService::usedHandleMemory() const {
         } else if (i == InputTouchComponent::typeId_) {
             auto handleService = static_cast<HandleService<InputTouchComponent, InputTouchComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->usedMemory();
+        } else if (i == PolyLineRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<PolyLineRenderComponent, PolyLineRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->usedMemory();
         } else if (i == LineRenderComponent::typeId_) {
             auto handleService = static_cast<HandleService<LineRenderComponent, LineRenderComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->usedMemory();
@@ -426,6 +446,9 @@ size_t BGE::ComponentService::unusedHandleMemory() const {
             mem += handleService->unusedMemory();
         } else if (i == InputTouchComponent::typeId_) {
             auto handleService = static_cast<HandleService<InputTouchComponent, InputTouchComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->unusedMemory();
+        } else if (i == PolyLineRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<PolyLineRenderComponent, PolyLineRenderComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->unusedMemory();
         } else if (i == LineRenderComponent::typeId_) {
             auto handleService = static_cast<HandleService<LineRenderComponent, LineRenderComponentHandle> *>(componentHandleServices_[i]);
@@ -496,6 +519,9 @@ size_t BGE::ComponentService::totalHandleMemory() const {
         } else if (i == InputTouchComponent::typeId_) {
             auto handleService = static_cast<HandleService<InputTouchComponent, InputTouchComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->totalMemory();
+        } else if (i == PolyLineRenderComponent::typeId_) {
+            auto handleService = static_cast<HandleService<PolyLineRenderComponent, PolyLineRenderComponentHandle> *>(componentHandleServices_[i]);
+            mem += handleService->totalMemory();
         } else if (i == LineRenderComponent::typeId_) {
             auto handleService = static_cast<HandleService<LineRenderComponent, LineRenderComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->totalMemory();
@@ -548,6 +574,8 @@ void BGE::ComponentService::outputResourceBreakdown(uint32_t numTabs) const {
             outputComponentResourceBreakdown<ButtonComponent>(numTabs);
         } else if (i == InputTouchComponent::typeId_) {
             outputComponentResourceBreakdown<InputTouchComponent>(numTabs);
+        } else if (i == PolyLineRenderComponent::typeId_) {
+            outputComponentResourceBreakdown<PolyLineRenderComponent>(numTabs);
         } else if (i == LineRenderComponent::typeId_) {
             outputComponentResourceBreakdown<LineRenderComponent>(numTabs);
         } else if (i == FlatRectRenderComponent::typeId_) {
@@ -594,6 +622,8 @@ void BGE::ComponentService::outputMemoryBreakdown(uint32_t numTabs) const {
             outputComponentMemoryBreakdown<ButtonComponent>(numTabs);
         } else if (i == InputTouchComponent::typeId_) {
             outputComponentMemoryBreakdown<InputTouchComponent>(numTabs);
+        } else if (i == PolyLineRenderComponent::typeId_) {
+            outputComponentMemoryBreakdown<PolyLineRenderComponent>(numTabs);
         } else if (i == LineRenderComponent::typeId_) {
             outputComponentMemoryBreakdown<LineRenderComponent>(numTabs);
         } else if (i == FlatRectRenderComponent::typeId_) {

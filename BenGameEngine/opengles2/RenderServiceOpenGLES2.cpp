@@ -13,6 +13,7 @@
 #include "MathTypes.h"
 #include "Game.h"
 #include "LineRenderComponent.h"
+#include "PolyLineRenderComponent.h"
 #include "FlatRectRenderComponent.h"
 #include "SpriteRenderComponent.h"
 #include "ColorMatrixComponent.h"
@@ -21,6 +22,8 @@
 #include "MaskComponent.h"
 #include "TransformComponent.h"
 #include "TextComponent.h"
+#include "vaser.h"
+#include "backend.h"
 
 const GLubyte Indices[] = {
     0, 1, 2,
@@ -216,6 +219,10 @@ void BGE::RenderServiceOpenGLES2::createShaders()
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, "FullColorFontVertex");
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, "FullColorFontFragment");
     program = this->getShaderService()->createShaderProgram("FullColorFont", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "SourceColor", "ColorMatrix", "ColorMatOffset", "ColorMultiplier", "ColorOffset" });
+    
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "PolyLineVertex");
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "PolyLineFragment");
+    program = this->getShaderService()->createShaderProgram("PolyLine", {vShader,  fShader}, { "Position", "SourceColor" }, { "ModelView", "Projection" });
 }
 
 std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram(std::string program)
@@ -664,7 +671,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
         if (line) {
             auto material = line->getMaterial();
             auto xform = gameObject->getComponent<TransformComponent>();
-            auto points = line->getPoints();
+            const auto& points = line->getPoints();
             Vector3 vertices[points.size()];
 
             uint32_t index = 0;
@@ -716,6 +723,117 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
             }
             
             glDrawArrays(mode, 0, (GLsizei) points.size());
+        }
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::drawPolyLines(GameObject *gameObject) {
+    if (gameObject) {
+        auto line = gameObject->getComponent<PolyLineRenderComponent>();
+        
+        if (line) {
+            auto xform = gameObject->getComponent<TransformComponent>();
+            const auto& points = line->getPoints();
+            const auto& colors = line->getColors();
+            
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("PolyLine"));
+            
+            GLint positionLocation = glShader->locationForAttribute("Position");
+            GLint colorLocation = glShader->locationForAttribute("SourceColor");
+            GLint projectionLocation = glShader->locationForUniform("Projection");
+            GLint modelLocation = glShader->locationForUniform("ModelView");
+            
+            glEnableVertexAttribArray(positionLocation);
+            
+            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+            
+            if (xform) {
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) xform->worldMatrix_.m);
+            } else {
+                // TODO: This is a hack for now
+                Matrix4 mat;
+                
+                Matrix4MakeIdentify(mat);
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+            }
+            
+            // Convert our data to what VASEr needs
+            auto numColors = colors.size();
+            VASEr::Vec2 *vPoints = new VASEr::Vec2[points.size()];
+            VASEr::Color *vColors = new VASEr::Color[points.size()];
+            
+            assert(points.size() == numColors || numColors == 1);
+            
+            for (auto i=0;i<points.size();++i) {
+                auto colorIndex = i;
+                vPoints[i].x = points[i].x;
+                vPoints[i].y = points[i].y;
+                
+                if (numColors == 1) {
+                    colorIndex = 0;
+                }
+                vColors[i].r = colors[colorIndex].r;
+                vColors[i].g = colors[colorIndex].g;
+                vColors[i].b = colors[colorIndex].b;
+                vColors[i].a = colors[colorIndex].a;
+            }
+            
+            VASEr::polyline_opt opt;
+            
+            switch (line->getJoint()) {
+                case PolyLineRenderComponent::Joint::bevel:
+                    opt.joint = VASEr::PLJ_bevel;
+                    break;
+                case PolyLineRenderComponent::Joint::round:
+                    opt.joint = VASEr::PLJ_round;
+                    break;
+                default:
+                    opt.joint = VASEr::PLJ_miter;
+                    break;
+            }
+            
+            switch (line->getCap()) {
+                case PolyLineRenderComponent::Cap::butt:
+                    opt.cap = VASEr::PLC_butt;
+                    break;
+                case PolyLineRenderComponent::Cap::round:
+                    opt.cap = VASEr::PLC_round;
+                    break;
+                case PolyLineRenderComponent::Cap::square:
+                    opt.cap = VASEr::PLC_square;
+                    break;
+                case PolyLineRenderComponent::Cap::rect:
+                    opt.cap = VASEr::PLC_rect;
+                    break;
+                case PolyLineRenderComponent::Cap::both:
+                    opt.cap = VASEr::PLC_both;
+                    break;
+                case PolyLineRenderComponent::Cap::first:
+                    opt.cap = VASEr::PLC_first;
+                    break;
+                case PolyLineRenderComponent::Cap::last:
+                    opt.cap = VASEr::PLC_last;
+                    break;
+                case PolyLineRenderComponent::Cap::none:
+                    opt.cap = VASEr::PLC_none;
+                    break;
+            }
+            
+            opt.tess = nullptr;
+            opt.feather = line->isFeather();
+            opt.feathering = line->getFeathering();
+            opt.no_feather_at_cap = line->getNoFeatherAtCap();
+            opt.no_feather_at_core = line->getNoFeatherAtCore();
+            
+            VASEr::VASErin::backend::set_uniforms(positionLocation, colorLocation);
+            VASEr::polyline(vPoints, vColors, line->getThickness(), static_cast<int>(points.size()), &opt);
+            
+            if (vPoints) {
+                delete [] vPoints;
+            }
+            if (vColors) {
+                delete [] vColors;
+            }
         }
     }
 }
@@ -983,11 +1101,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
             currentColorTransform_ = tColor;
         }
         
-        if (gameObj->hasComponent<LineRenderComponent>()) {
-            drawLines(gameObj);
-        } else if (gameObj->hasComponent<FlatRectRenderComponent>()) {
-            drawFlatRect(gameObj);
-        } else if (gameObj->hasComponent<SpriteRenderComponent>()) {
+        if (gameObj->hasComponent<SpriteRenderComponent>()) {
             drawSprite(gameObj);
         } else if (gameObj->hasComponent<TextComponent>()) {
             auto text = gameObj->getComponent<TextComponent>();
@@ -996,6 +1110,12 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
             if (font) {
                 font->drawString(text, transformComponent, currentColorMatrix_, currentColorTransform_);
             }
+        } else if (gameObj->hasComponent<PolyLineRenderComponent>()) {
+            drawPolyLines(gameObj);
+        } else if (gameObj->hasComponent<LineRenderComponent>()) {
+            drawLines(gameObj);
+        } else if (gameObj->hasComponent<FlatRectRenderComponent>()) {
+            drawFlatRect(gameObj);
         } else if (gameObj->hasComponent<MaskComponent>()) {
             maskValue = enableMask(gameObj);
         }

@@ -62,6 +62,7 @@ namespace BGE {
         void drawFlatRect(GameObject *gameObject);
         void drawMaskRect(GameObject *gameObject);
         void drawLines(GameObject *gameObject);
+        void drawPolyLines(GameObject *gameObject);
         
         void drawSprite(GameObject *gameObject);
 

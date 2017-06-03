@@ -17,6 +17,7 @@
 #include "BoundingBoxComponent.h"
 #include "Material.h"
 #include "LineRenderComponent.h"
+#include "PolyLineRenderComponent.h"
 #include "FlatRectRenderComponent.h"
 #include "SpriteRenderComponent.h"
 #include "TextComponent.h"
@@ -192,6 +193,9 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
                 material = render->getMaterial();
             } else if (gameObj->getComponent<TextComponent>()) {
                 auto render = gameObj->getComponent<TextComponent>();
+                material = render->getMaterial();
+            } else if (gameObj->getComponent<PolyLineRenderComponent>()) {
+                auto render = gameObj->getComponent<PolyLineRenderComponent>();
                 material = render->getMaterial();
             }
             

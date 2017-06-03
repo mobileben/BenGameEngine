@@ -94,6 +94,16 @@
 		B571F1901C9D0A34007F5A90 /* FontGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B571F18E1C9D0A34007F5A90 /* FontGlyph.cpp */; };
 		B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1941C9E1B94007F5A90 /* FontVertex.glsl */; };
 		B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */; };
+		B57331921EE0D5FD00335959 /* vaser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B573318A1EE0D5FD00335959 /* vaser.cpp */; };
+		B57331931EE0DBC800335959 /* agg_curve4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B57331821EE0D5FD00335959 /* agg_curve4.cpp */; };
+		B57331941EE0DBC800335959 /* color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B57331841EE0D5FD00335959 /* color.cpp */; };
+		B57331951EE0DBC800335959 /* curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B57331851EE0D5FD00335959 /* curve.cpp */; };
+		B57331961EE0DBC800335959 /* gradient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B57331861EE0D5FD00335959 /* gradient.cpp */; };
+		B57331971EE0DBC800335959 /* opengl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B57331871EE0D5FD00335959 /* opengl.cpp */; };
+		B57331981EE0DBC800335959 /* polyline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B57331891EE0D5FD00335959 /* polyline.cpp */; };
+		B573319C1EE0FF9100335959 /* PolyLineRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B573319A1EE0FF9100335959 /* PolyLineRenderComponent.cpp */; };
+		B57331A91EE3762E00335959 /* PolyLineFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B57331A71EE3744B00335959 /* PolyLineFragment.glsl */; };
+		B57331AA1EE3762E00335959 /* PolyLineVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B57331A81EE3744B00335959 /* PolyLineVertex.glsl */; };
 		B59BE7891D8622430055800E /* PlacementComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B59BE7871D8622430055800E /* PlacementComponent.cpp */; };
 		B5ACE88F1CBB08D5004B6871 /* TransformComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */; };
 		B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */; };
@@ -325,6 +335,22 @@
 		B571F18F1C9D0A34007F5A90 /* FontGlyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontGlyph.h; sourceTree = "<group>"; };
 		B571F1941C9E1B94007F5A90 /* FontVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontVertex.glsl; path = shaders/FontVertex.glsl; sourceTree = "<group>"; };
 		B571F1961C9E1BA4007F5A90 /* FontFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = FontFragment.glsl; path = shaders/FontFragment.glsl; sourceTree = "<group>"; };
+		B57331821EE0D5FD00335959 /* agg_curve4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agg_curve4.cpp; path = vaserenderer/agg_curve4.cpp; sourceTree = "<group>"; };
+		B57331831EE0D5FD00335959 /* backend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = backend.h; path = vaserenderer/backend.h; sourceTree = "<group>"; };
+		B57331841EE0D5FD00335959 /* color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = color.cpp; path = vaserenderer/color.cpp; sourceTree = "<group>"; };
+		B57331851EE0D5FD00335959 /* curve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = curve.cpp; path = vaserenderer/curve.cpp; sourceTree = "<group>"; };
+		B57331861EE0D5FD00335959 /* gradient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gradient.cpp; path = vaserenderer/gradient.cpp; sourceTree = "<group>"; };
+		B57331871EE0D5FD00335959 /* opengl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = opengl.cpp; path = vaserenderer/opengl.cpp; sourceTree = "<group>"; };
+		B57331881EE0D5FD00335959 /* point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = point.h; path = vaserenderer/point.h; sourceTree = "<group>"; };
+		B57331891EE0D5FD00335959 /* polyline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = polyline.cpp; path = vaserenderer/polyline.cpp; sourceTree = "<group>"; };
+		B573318A1EE0D5FD00335959 /* vaser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vaser.cpp; path = vaserenderer/vaser.cpp; sourceTree = "<group>"; };
+		B573318B1EE0D5FD00335959 /* vaser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vaser.h; path = vaserenderer/vaser.h; sourceTree = "<group>"; };
+		B573318C1EE0D5FD00335959 /* vertex_array_holder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vertex_array_holder.h; path = vaserenderer/vertex_array_holder.h; sourceTree = "<group>"; };
+		B57331991EE0DF1700335959 /* vaserin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = vaserin.h; path = vaserenderer/vaserin.h; sourceTree = "<group>"; };
+		B573319A1EE0FF9100335959 /* PolyLineRenderComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = PolyLineRenderComponent.cpp; path = components/PolyLineRenderComponent.cpp; sourceTree = "<group>"; };
+		B573319B1EE0FF9100335959 /* PolyLineRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolyLineRenderComponent.h; path = components/PolyLineRenderComponent.h; sourceTree = "<group>"; };
+		B57331A71EE3744B00335959 /* PolyLineFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PolyLineFragment.glsl; path = shaders/PolyLineFragment.glsl; sourceTree = "<group>"; };
+		B57331A81EE3744B00335959 /* PolyLineVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PolyLineVertex.glsl; path = shaders/PolyLineVertex.glsl; sourceTree = "<group>"; };
 		B59BE7871D8622430055800E /* PlacementComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = PlacementComponent.cpp; path = components/PlacementComponent.cpp; sourceTree = "<group>"; };
 		B59BE7881D8622430055800E /* PlacementComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlacementComponent.h; path = components/PlacementComponent.h; sourceTree = "<group>"; };
 		B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TransformComponentTests.m; path = BGEGameObjectAndComponentTests/TransformComponentTests.m; sourceTree = SOURCE_ROOT; };
@@ -464,6 +490,8 @@
 				B512AD561D2F7D0400DCE362 /* MaskComponent.h */,
 				B59BE7871D8622430055800E /* PlacementComponent.cpp */,
 				B59BE7881D8622430055800E /* PlacementComponent.h */,
+				B573319A1EE0FF9100335959 /* PolyLineRenderComponent.cpp */,
+				B573319B1EE0FF9100335959 /* PolyLineRenderComponent.h */,
 				B52B760F1CBA2C7F00758249 /* RenderComponent.cpp */,
 				B52B76101CBA2C7F00758249 /* RenderComponent.h */,
 				B5EE9D6A1CC4A4C8005D99CC /* SpriteRenderComponent.cpp */,
@@ -600,6 +628,7 @@
 				B525E3AE1C89587000C691C0 /* TextureAtlas.h */,
 				B52BFB0D1D0138790040A839 /* UniqueArrayBuilder.h */,
 				B5F4564B1D82593700B4E340 /* utilities */,
+				B57331811EE0D5BF00335959 /* vaserenderer */,
 			);
 			path = BenGameEngine;
 			sourceTree = "<group>";
@@ -648,6 +677,8 @@
 				B5E7B9B51CC35B5000978F1A /* LineVertex.glsl */,
 				B571F17A1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl */,
 				B571F1781C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl */,
+				B57331A71EE3744B00335959 /* PolyLineFragment.glsl */,
+				B57331A81EE3744B00335959 /* PolyLineVertex.glsl */,
 				B525E39F1C89587000C691C0 /* Shader.cpp */,
 				B525E3A01C89587000C691C0 /* Shader.h */,
 				B525E3A31C89587000C691C0 /* ShaderProgram.cpp */,
@@ -732,6 +763,25 @@
 				B525E3AA1C89587000C691C0 /* ShaderServiceOpenGLES2.h */,
 			);
 			name = opengles2;
+			sourceTree = "<group>";
+		};
+		B57331811EE0D5BF00335959 /* vaserenderer */ = {
+			isa = PBXGroup;
+			children = (
+				B57331821EE0D5FD00335959 /* agg_curve4.cpp */,
+				B57331831EE0D5FD00335959 /* backend.h */,
+				B57331841EE0D5FD00335959 /* color.cpp */,
+				B57331851EE0D5FD00335959 /* curve.cpp */,
+				B57331861EE0D5FD00335959 /* gradient.cpp */,
+				B57331871EE0D5FD00335959 /* opengl.cpp */,
+				B57331881EE0D5FD00335959 /* point.h */,
+				B57331891EE0D5FD00335959 /* polyline.cpp */,
+				B573318A1EE0D5FD00335959 /* vaser.cpp */,
+				B573318B1EE0D5FD00335959 /* vaser.h */,
+				B573318C1EE0D5FD00335959 /* vertex_array_holder.h */,
+				B57331991EE0DF1700335959 /* vaserin.h */,
+			);
+			name = vaserenderer;
 			sourceTree = "<group>";
 		};
 		B5F1F2BF1D2CCC850034E1B7 /* testPackages */ = {
@@ -960,6 +1010,7 @@
 				B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */,
 				B5B457281DB6DC2D0099CB42 /* FullColorTextureVertex.glsl in Resources */,
 				B5B457271DB6DC2D0099CB42 /* FullColorTextureFragment.glsl in Resources */,
+				B57331A91EE3762E00335959 /* PolyLineFragment.glsl in Resources */,
 				B525E3DE1C895A1900C691C0 /* TextureFragment.glsl in Resources */,
 				B525E3DF1C895A1900C691C0 /* TextureVertex.glsl in Resources */,
 				B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */,
@@ -971,6 +1022,7 @@
 				B5661E0F1E6A2B5F0083717F /* FullColorFontFragment.glsl in Resources */,
 				B508CD901CA901B700127B97 /* Avenir.ttc in Resources */,
 				B571F18B1C992B3D007F5A90 /* lazy.ttf in Resources */,
+				B57331AA1EE3762E00335959 /* PolyLineVertex.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1001,6 +1053,7 @@
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,
 				B5F8716B1D3F2B83000EA018 /* BGEView.m in Sources */,
 				B5BBFAE81DE416040035AA74 /* AudioServiceHelper.mm in Sources */,
+				B57331951EE0DBC800335959 /* curve.cpp in Sources */,
 				B52B760D1CBA183900758249 /* Material.cpp in Sources */,
 				B512AD571D2F7D0400DCE362 /* MaskComponent.cpp in Sources */,
 				B525E3C41C89587000C691C0 /* ShaderProgram.cpp in Sources */,
@@ -1018,10 +1071,13 @@
 				B512AD5D1D3F1C2900DCE362 /* Input.cpp in Sources */,
 				B525E3C91C89587000C691C0 /* TextureAtlas.cpp in Sources */,
 				B59BE7891D8622430055800E /* PlacementComponent.cpp in Sources */,
+				B573319C1EE0FF9100335959 /* PolyLineRenderComponent.cpp in Sources */,
 				B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */,
 				B5F8716E1D406EE5000EA018 /* InputTouchComponent.cpp in Sources */,
 				B525E3C21C89587000C691C0 /* Shader.cpp in Sources */,
+				B57331921EE0D5FD00335959 /* vaser.cpp in Sources */,
 				B5F523131CD9C77E00DE2F82 /* GraphicFormats.cpp in Sources */,
+				B57331941EE0DBC800335959 /* color.cpp in Sources */,
 				B54821F61CD87A8A0073AFCC /* AnimationSequenceComponent.cpp in Sources */,
 				B5F6B16D1CC8B06E00E1FD45 /* SpaceService.cpp in Sources */,
 				B571F1801C97D88E007F5A90 /* FontService.cpp in Sources */,
@@ -1035,10 +1091,12 @@
 				B571F1831C97D92E007F5A90 /* Font.cpp in Sources */,
 				B5EE9D6C1CC4A4C8005D99CC /* SpriteRenderComponent.cpp in Sources */,
 				B547F17D1D125BD00031AF58 /* FrameAnimatorComponent.cpp in Sources */,
+				B57331931EE0DBC800335959 /* agg_curve4.cpp in Sources */,
 				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
 				B50A1F9E1D092A3C004B450E /* TextComponent.cpp in Sources */,
 				B525E3BB1C89587000C691C0 /* RenderContext.cpp in Sources */,
 				B5F871711D41E8CC000EA018 /* BoundingBoxComponent.cpp in Sources */,
+				B57331981EE0DBC800335959 /* polyline.cpp in Sources */,
 				B508CD931CAE285000127B97 /* TransformComponent.cpp in Sources */,
 				B525E3B61C89587000C691C0 /* Game.cpp in Sources */,
 				B5BBFAD81DE15EAB0035AA74 /* AudioBuffer.cpp in Sources */,
@@ -1056,7 +1114,9 @@
 				B525E3C51C89587000C691C0 /* ShaderProgramOpenGLES2.cpp in Sources */,
 				B525E3C11C89587000C691C0 /* Service.cpp in Sources */,
 				B525E3BF1C89587000C691C0 /* RenderView.cpp in Sources */,
+				B57331961EE0DBC800335959 /* gradient.cpp in Sources */,
 				B5BBFAD51DE15E9C0035AA74 /* Audio.cpp in Sources */,
+				B57331971EE0DBC800335959 /* opengl.cpp in Sources */,
 				B525E3C71C89587000C691C0 /* ShaderServiceOpenGLES2.cpp in Sources */,
 				B52B76141CBADF5E00758249 /* MaterialService.cpp in Sources */,
 				B50E4E001D97807F00AE3AEB /* LogicComponent.cpp in Sources */,
