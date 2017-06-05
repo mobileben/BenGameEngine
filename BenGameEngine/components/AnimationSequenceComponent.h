@@ -44,6 +44,7 @@ namespace BGE {
         //  Pointer to meta
         std::vector<GameObjectHandle> channels;
         BoundsReference *bounds;
+        double duration() const { return frameRate ? (1.0 / static_cast<double>(frameRate)) * static_cast<double>(totalFrames) : 0; }
         
     protected:
         friend GameObject;
