@@ -59,7 +59,9 @@ namespace BGE {
         
         Vector2 getPosition() const { return position_; }
         void setPosition(Vector2 &position);
+        void setPosition(const Vector2 &position);
         void setPosition(Vector2 &&position);
+        void setPosition(const Vector2 &&position);
         
         Vector2 getGlobalPosition();
         

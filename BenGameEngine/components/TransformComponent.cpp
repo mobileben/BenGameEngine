@@ -133,7 +133,23 @@ void BGE::TransformComponent::setPosition(Vector2 &position) {
     }
 }
 
+void BGE::TransformComponent::setPosition(const Vector2 &position) {
+    if (position_.x != position.x || position_.y != position.y) {
+        position_ = position;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
 void BGE::TransformComponent::setPosition(Vector2 &&position) {
+    if (position_.x != position.x || position_.y != position.y) {
+        position_ = position;
+        
+        localDirty_ = worldDirty_ = true;
+    }
+}
+
+void BGE::TransformComponent::setPosition(const Vector2 &&position) {
     if (position_.x != position.x || position_.y != position.y) {
         position_ = position;
         
