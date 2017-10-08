@@ -637,6 +637,74 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
     }
 }
 
+void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
+    if (gameObject) {
+        auto mask = gameObject->getComponent<TextureMaskComponent>();
+        
+        if (mask) {
+            VertexTex *const vertices = mask->getVertices();
+            auto material = mask->getMaterial();
+            if (material) {
+                auto textureHandle = material->getTextureHandle();
+                auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
+                
+                if (texture) {
+                    if (texture && texture->isValid()) {
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
+                        
+                        GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
+                        
+                        GLint positionLocation = glShader->locationForAttribute("Position");
+                        //            texCoordLocation = glShader->locationForAttribute("TexCoordIn");
+                        
+                        glEnableVertexAttribArray(positionLocation);
+                        glEnableVertexAttribArray(texCoordLocation);
+                        
+                        GLint textureUniform = glShader->locationForUniform("Texture");
+                        GLint projectionLocation = glShader->locationForUniform("Projection");
+                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+                        auto transformComponent = gameObject->getComponent<TransformComponent>();
+                        GLint modelLocation = glShader->locationForUniform("ModelView");
+                        
+                        if (transformComponent) {
+                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->worldMatrix_.m);
+                        } else {
+                            // TODO: This is a hack for now
+                            Matrix4 mat;
+                            
+                            Matrix4MakeIdentify(mat);
+                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                        }
+                        
+                        glDisable(GL_BLEND);
+                        
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(texture->getTarget(), texture->getHWTextureId());
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                        
+                        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                              sizeof(VertexTex), &vertices[0]);
+                        glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                                              sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
+                        
+                        glUniform1i(textureUniform, 0);
+                        
+                        glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
+                                       GL_UNSIGNED_BYTE, &Indices[0]);
+                    }
+                }
+            } else {
+                NSLog(@"INDEED");
+            }
+        } else {
+            NSLog(@"HWY");
+        }
+    } else {
+        NSLog(@"HWY");
+    }
+}
+
 void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Color &color) {
     std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
     
@@ -757,6 +825,8 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(GameObject *gameObject) {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
             }
             
+            glEnable(GL_BLEND);
+
             // Convert our data to what VASEr needs
             auto numColors = colors.size();
             VASEr::Vec2 *vPoints = new VASEr::Vec2[points.size()];
@@ -949,7 +1019,7 @@ uint8_t BGE::RenderServiceOpenGLES2::enableMask(GameObject *gameObject) {
             if (gameObject->hasComponent<MaskComponent>()) {
                 drawMaskRect(gameObject);
             } else if (gameObject->hasComponent<TextureMaskComponent>()) {
-                
+                drawTextureMask(gameObject);
             }
       
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -1116,7 +1186,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
             drawLines(gameObj);
         } else if (gameObj->hasComponent<FlatRectRenderComponent>()) {
             drawFlatRect(gameObj);
-        } else if (gameObj->hasComponent<MaskComponent>()) {
+        } else if (gameObj->hasComponent<MaskComponent>() || gameObj->hasComponent<TextureMaskComponent>()) {
             maskValue = enableMask(gameObj);
         }
 

@@ -16,6 +16,9 @@
 #include "GraphicFormats.h"
 
 namespace BGE {
+    class RenderService;
+    class RenderServiceOpenGLES2;
+
     class TextureMaskComponent : public RenderComponent
     {
     public:
@@ -32,14 +35,18 @@ namespace BGE {
         
         
     protected:
-        Vertex* const getVertices() { return vertices_; }
+        VertexTex* const getVertices() { return vertices_; }
         
         void materialsUpdated();
         
     private:
+        friend ComponentService;
+        friend RenderService;
+        friend RenderServiceOpenGLES2;
+
         static const uint32_t NumVertices = 4;
         
-        Vertex vertices_[NumVertices];
+        VertexTex vertices_[NumVertices];
         
         void updateLocalBoundsAndVertices();
     };

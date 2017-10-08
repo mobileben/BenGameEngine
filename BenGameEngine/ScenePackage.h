@@ -72,6 +72,7 @@ namespace BGE {
         AnimationSequenceReference *getAnimationSequenceReference(std::string name);
         ButtonReference *getButtonReference(std::string name);
         MaskReference *getMaskReference(std::string name);
+        TextureMaskReference *getTextureMaskReference(std::string name);
         PlacementReference *getPlacementReference(std::string name);
         TextReference *getTextReference(std::string name);
         TextureReference *getTextureReference(std::string name);

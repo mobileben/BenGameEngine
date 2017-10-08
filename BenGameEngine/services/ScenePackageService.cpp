@@ -340,6 +340,22 @@ BGE::MaskReference *BGE::ScenePackageService::getMaskReference(std::string name)
     return nullptr;
 }
 
+BGE::TextureMaskReference *BGE::ScenePackageService::getTextureMaskReference(std::string name) const {
+    for (auto const &packageRef : scenePackages_) {
+        auto package = getScenePackage(packageRef.handle);
+        
+        if (package) {
+            auto mask = package->getTextureMaskReference(name);
+            
+            if (mask) {
+                return mask;
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
 BGE::PlacementReference *BGE::ScenePackageService::getPlacementReference(std::string name) const {
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);

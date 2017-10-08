@@ -126,6 +126,7 @@ namespace BGE {
         GameObject *createButton(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
         GameObject *createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
         GameObject *createMask(std::string name, std::string instanceName, ScenePackageHandle handle);
+        GameObject *createTextureMask(std::string name, std::string instanceName, ScenePackageHandle handle);
         GameObject *createSprite(std::string name, std::string instanceName, ScenePackageHandle handle);
         GameObject *createText(std::string name, std::string instanceName, ScenePackageHandle handle);
         GameObject *createPlacement(std::string name, std::string instanceName, ScenePackageHandle handle);
@@ -209,6 +210,7 @@ namespace BGE {
         GameObject *createButton(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         GameObject *createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         GameObject *createMask(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
+        GameObject *createTextureMask(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         GameObject *createSprite(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         GameObject *createText(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         GameObject *createPlacement(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);

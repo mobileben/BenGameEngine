@@ -547,7 +547,7 @@ BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::stri
     return obj;
 }
 
-BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmap, CreatedGameObjectVector *objects) {
+BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     ExternalPackageReference *extRef;
     
@@ -566,27 +566,29 @@ BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::stri
             
             switch (type) {
                 case GfxReferenceTypeAnimationSequence:
-                    return createAnimSequence(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
+                    return createAnimSequence(refName, instanceName, extPackage->getHandle(), pushBitmask, objects);
                     
                 case GfxReferenceTypeButton:
-                    return createButton(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
+                    return createButton(refName, instanceName, extPackage->getHandle(), pushBitmask, objects);
                     
                 case GfxReferenceTypeExternalReference:
-                    return createExternalReference(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
+                    return createExternalReference(refName, instanceName, extPackage->getHandle(), pushBitmask, objects);
                     
                 case GfxReferenceTypeMask:
-                    return createMask(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
+                    return createMask(refName, instanceName, extPackage->getHandle(), pushBitmask, objects);
                     
                 case GfxReferenceTypePlacement:
-                    return createPlacement(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
+                    return createPlacement(refName, instanceName, extPackage->getHandle(), pushBitmask, objects);
                     
                 case GfxReferenceTypeSprite:
-                    return createSprite(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
+                    return createSprite(refName, instanceName, extPackage->getHandle(), pushBitmask, objects);
                     
                 case GfxReferenceTypeText:
-                    return createText(refName, instanceName, extPackage->getHandle(), pushBitmap, objects);
+                    return createText(refName, instanceName, extPackage->getHandle(), pushBitmask, objects);
                     
                 case GfxReferenceTypeTextureMask:
+                    return createTextureMask(refName, instanceName, extPackage->getHandle(), pushBitmask, objects);
+                    
                 default:
                     assert(false);
                     break;
@@ -634,6 +636,45 @@ BGE::GameObject *BGE::Space::createMask(std::string name, std::string instanceNa
     
     return nullptr;
 
+}
+
+BGE::GameObject *BGE::Space::createTextureMask(std::string name, std::string instanceName, ScenePackageHandle handle) {
+    return createTextureMask(name, instanceName, handle, 0, nullptr);
+}
+
+BGE::GameObject *BGE::Space::createTextureMask(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects) {
+    auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
+    TextureMaskReference *maskRef;
+    
+    if (package) {
+        maskRef = package->getTextureMaskReference(name);
+    } else {
+        maskRef = Game::getInstance()->getScenePackageService()->getTextureMaskReference(name);
+    }
+    
+    if (maskRef) {
+        spaceService_->lock();
+        
+        auto obj = createGameObject(instanceName);
+        auto xform = createComponent<TransformComponent>();
+        auto mask = createComponent<TextureMaskComponent>();
+        
+        obj->addComponent(xform);
+        obj->addComponent(mask);
+        
+        mask->setTextureMaskReference(maskRef);
+        
+        if (objects && pushBitmask & TextureMaskComponent::bitmask_) {
+            addCreatedGameObjectsForRenderComponent<TextureMaskComponent>(obj, objects);
+        }
+        
+        spaceService_->unlock();
+        
+        return obj;
+    }
+    
+    return nullptr;
+    
 }
 
 BGE::GameObject *BGE::Space::createSprite(std::string name, std::string instanceName, ScenePackageHandle handle) {
@@ -879,6 +920,7 @@ void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePac
                     break;
                     
                 case GfxReferenceTypeTextureMask:
+                    obj = createTextureMask(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
                     
                 default:
@@ -1143,6 +1185,19 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                             }
                                 break;
                                 
+                            case GfxReferenceTypeTextureMask: {
+                                auto mask = channelObj->getComponent<TextureMaskComponent>();
+                                
+                                if (mask) {
+                                    if (pushMasks) {
+                                        objects->push_back(std::make_pair(TextureMaskComponent::typeId_, channelObj->getHandle()));
+                                    }
+                                } else {
+                                    assert(false);
+                                }
+                            }
+                                break;
+
                             default:
                                 break;
                         }
@@ -1507,6 +1562,15 @@ void BGE::Space::setAnimationChannelReference(AnimationChannelComponentHandle ch
                         
                         placement->setPlacementReference(placementRef);
                     }
+                }
+                    break;
+                    
+                case GfxReferenceTypeTextureMask: {
+                    auto mask = createComponent<TextureMaskComponent>();
+                    auto maskRef = package->getTextureMaskReference(channel->channel->reference);
+                    
+                    gameObj->addComponent(mask);
+                    mask->setTextureMaskReference(maskRef);
                 }
                     break;
                     

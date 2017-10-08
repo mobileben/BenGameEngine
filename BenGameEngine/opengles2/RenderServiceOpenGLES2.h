@@ -61,6 +61,7 @@ namespace BGE {
         // Using the more updated means
         void drawFlatRect(GameObject *gameObject);
         void drawMaskRect(GameObject *gameObject);
+        void drawTextureMask(GameObject *gameObject);
         void drawLines(GameObject *gameObject);
         void drawPolyLines(GameObject *gameObject);
         

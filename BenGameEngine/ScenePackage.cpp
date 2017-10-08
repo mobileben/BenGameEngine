@@ -1640,6 +1640,20 @@ BGE::MaskReference *BGE::ScenePackage::getMaskReference(std::string name) {
     return nullptr;
 }
 
+BGE::TextureMaskReference *BGE::ScenePackage::getTextureMaskReference(std::string name) {
+    const char *cstr = name.c_str();
+    
+    // TODO: We will sort the names, then binary search the names here later
+    const char **names = textureMaskNames_.baseAddress();
+    
+    for (auto i=0;i<textureMaskNames_.size();i++) {
+        if (!strcmp(names[i], cstr)) {
+            return textureMaskRefs_.addressOf(*textureMaskIndices_.addressOf(i));
+        }
+    }
+    
+    return nullptr;
+}
 BGE::PlacementReference *BGE::ScenePackage::getPlacementReference(std::string name) {
     const char *cstr = name.c_str();
     

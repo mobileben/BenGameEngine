@@ -80,6 +80,7 @@ namespace BGE {
         AnimationSequenceReference *getAnimationSequenceReference(std::string name) const;
         ButtonReference *getButtonReference(std::string name) const;
         MaskReference *getMaskReference(std::string name) const;
+        TextureMaskReference *getTextureMaskReference(std::string name) const;
         PlacementReference *getPlacementReference(std::string name) const;
         TextureReference *getTextureReference(std::string name) const;
         TextReference *getTextReference(std::string name) const;
