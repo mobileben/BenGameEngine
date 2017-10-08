@@ -353,18 +353,23 @@ void BGE::Texture::createFromBuffer(void *buffer, TextureFormat format, uint32_t
             break;
             
         case TextureFormat::RGB565:
+            createTextureFromRGB565Buffer((unsigned char *) buffer, width, height, handler);
             break;
             
         case TextureFormat::RGB888:
+            createTextureFromRGB888Buffer((unsigned char *) buffer, width, height, handler);
             break;
             
         case TextureFormat::RGBA5551:
+            createTextureFromRGBA5551Buffer((unsigned char *) buffer, width, height, handler);
             break;
             
         case TextureFormat::RGBA4444:
+            createTextureFromRGBA4444Buffer((unsigned char *) buffer, width, height, handler);
             break;
             
         case TextureFormat::RGBA8888:
+            createTextureFromRGBA8888Buffer((unsigned char *) buffer, width, height, handler);
             break;
             
         default:
@@ -455,7 +460,33 @@ void BGE::Texture::createTextureFromRGB565Buffer(unsigned char *buffer, uint32_t
 
 void BGE::Texture::createTextureFromRGB888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback) {
     std::shared_ptr<Error> error;
-    
+    if (buffer) {
+        GLuint tex;
+        
+        glGenTextures(1, &tex);
+        GLint alignment;
+        glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+        
+        GLenum glErr = glGetError();
+        
+        if (glErr == GL_NO_ERROR) {
+            valid_ = true;
+            hwId_ = tex;
+        } else {
+            error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorAllocation);
+        }
+    } else {
+        error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorNoBuffer);
+    }
+
     if (callback) {
         callback(error);
     }
@@ -479,7 +510,30 @@ void BGE::Texture::createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32
 
 void BGE::Texture::createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback) {
     std::shared_ptr<Error> error;
-    
+    if (buffer) {
+        GLuint tex;
+        
+        glGenTextures(1, &tex);
+        
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        
+        GLenum glErr = glGetError();
+        
+        if (glErr == GL_NO_ERROR) {
+            valid_ = true;
+            hwId_ = tex;
+        } else {
+            error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorAllocation);
+        }
+    } else {
+        error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorNoBuffer);
+    }
+
     if (callback) {
         callback(error);
     }
