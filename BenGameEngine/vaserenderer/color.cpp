@@ -9,7 +9,7 @@ namespace VASEr {
                 case 0: return C.r;
                 case 1: return C.g;
                 case 2: return C.b;
-                default:return C.r;
+                default:return C.a;
             }
         }
         bool Color_valid_range(float t)
