@@ -287,7 +287,7 @@ void BGE::GameObject::removeComponentPrologue(ComponentTypeId componentTypeId) {
 }
 
 bool BGE::GameObject::isAnimationSubSequence() const {
-    return hasComponent<AnimationSequenceComponent>() && (hasComponent<FrameAnimatorComponent>() || hasComponent<ChannelFrameAnimatorComponent>();
+    return hasComponent<AnimationSequenceComponent>() && (hasComponent<FrameAnimatorComponent>() || hasComponent<ChannelFrameAnimatorComponent>());
 }
 
 void BGE::GameObject::upgradeToAnimationSequence() {
