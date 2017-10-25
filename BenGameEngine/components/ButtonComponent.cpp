@@ -22,7 +22,7 @@ uint32_t BGE::ButtonComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent);
 
-BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), enabled(true), showHighlighted_(true), toggleable(false), toggleOn(false), touch(nil) {
+BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), touchable_(true), enabled(true), showHighlighted_(true), toggleable(false), toggleOn(false), touch(nil) {
 }
 
 void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
@@ -30,6 +30,7 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
     
     state = ButtonStateNormal;
     animate = false;
+    touchable_ = true;
     enabled = true;
     showHighlighted_ = true;
     
@@ -52,6 +53,7 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
 void BGE::ButtonComponent::destroy() {
     state = ButtonStateNormal;
     animate = false;
+    touchable_ = false;
     enabled = false;
     showHighlighted_ = false;
     
@@ -278,6 +280,14 @@ void BGE::ButtonComponent::setAnimate(bool animate) {
     } else {
         useNormalButton();
     }
+}
+
+bool BGE::ButtonComponent::isTouchable() const {
+    return touchable_;
+}
+
+void BGE::ButtonComponent::setTouchable(bool touchable) {
+    touchable_ = touchable;
 }
 
 bool BGE::ButtonComponent::isEnabled() const {
@@ -640,9 +650,7 @@ BGE::Event BGE::ButtonComponent::shouldHandleTouchDownEvent(bool inBounds) {
     Event event = Event::None;
     
     if (inBounds) {
-        if (isEnabled()) {
-            event = Event::TouchDownInside;
-        }
+        event = Event::TouchDownInside;
     }
     
     return event;
@@ -656,12 +664,10 @@ BGE::Event BGE::ButtonComponent::shouldHandleTouchCancelEvent() {
 BGE::Event BGE::ButtonComponent::shouldHandleTouchUpEvent(bool inBounds) {
     Event event = Event::None;
     
-    if (isEnabled()) {
-        if (inBounds) {
-            event = Event::TouchUpInside;
-        } else {
-            event = Event::TouchUpOutside;
-        }
+    if (inBounds) {
+        event = Event::TouchUpInside;
+    } else {
+        event = Event::TouchUpOutside;
     }
     
     return event;
@@ -673,11 +679,11 @@ BGE::Event BGE::ButtonComponent::handleTouchDownEvent(bool inBounds) {
     pressedTime_ = 0;
 
     if (inBounds) {
-        if (isEnabled()) {
+        if (isTouchable() && isEnabled()) {
             setHighlighted(true);
-            event = Event::TouchDownInside;
             pressedTimeStart = std::chrono::high_resolution_clock::now();
         }
+        event = Event::TouchDownInside;
     }
     
     return event;
@@ -686,7 +692,9 @@ BGE::Event BGE::ButtonComponent::handleTouchDownEvent(bool inBounds) {
 BGE::Event BGE::ButtonComponent::handleTouchCancelEvent() {
     Event event = Event::TouchCancel;
     
-    useNormalButton();
+    if (isTouchable() && isEnabled()) {
+        useNormalButton();
+    }
     
     pressedTime_ = 0;
 
@@ -696,7 +704,7 @@ BGE::Event BGE::ButtonComponent::handleTouchCancelEvent() {
 BGE::Event BGE::ButtonComponent::handleTouchUpEvent(bool inBounds) {
     Event event = Event::None;
     
-    if (isEnabled()) {
+    if (isTouchable() && isEnabled()) {
         if (inBounds) {
             if (toggleable) {
                 if (toggleOn) {
@@ -713,12 +721,8 @@ BGE::Event BGE::ButtonComponent::handleTouchUpEvent(bool inBounds) {
             } else {
                 setHighlighted(false);
             }
-            
-            event = Event::TouchUpInside;
         } else {
             setHighlighted(false);
-            
-            event = Event::TouchUpOutside;
         }
         
         auto now = std::chrono::high_resolution_clock::now();
@@ -729,6 +733,12 @@ BGE::Event BGE::ButtonComponent::handleTouchUpEvent(bool inBounds) {
         pressedTime_ = 0;
     }
     
+    if (inBounds) {
+        event = Event::TouchUpInside;
+    } else {
+        event = Event::TouchUpOutside;
+    }
+
     return event;
 }
 

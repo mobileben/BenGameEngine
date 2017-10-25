@@ -54,6 +54,8 @@ namespace BGE {
         
         bool isAnimating() const;
         void setAnimate(bool animate);
+        bool isTouchable() const;
+        void setTouchable(bool touchable);
         bool isEnabled() const;
         void setEnabled(bool enabled);
         bool isHighlighted() const;
@@ -86,6 +88,7 @@ namespace BGE {
         
         uint32_t    state;
         bool        animate;
+        bool        touchable_;
         bool        enabled;
         bool        showHighlighted_;
         

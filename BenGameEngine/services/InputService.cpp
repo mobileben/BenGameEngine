@@ -170,7 +170,7 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
     if (xform && xform->canInteract()) {
         auto button = gameObj->getComponent<ButtonComponent>();
         
-        if (button && button->isEnabled()) {
+        if (button) {
             // Compute collision if exists
             auto bbox = button->getBoundingBox();
             
@@ -363,7 +363,7 @@ void BGE::InputService::update(double deltaTime) {
         if (gameObj) {
             auto button = space->getComponent<ButtonComponent>(item.buttonComponentHandle.getHandle());
             
-            if (button) {
+            if (button && button->isTouchable() && button->isEnabled()) {
                 auto event = item.event;
 #ifdef NOT_YET
                 auto parent = gameObj->getParent();
@@ -377,16 +377,16 @@ void BGE::InputService::update(double deltaTime) {
 #endif
                 switch(event) {
                     case Event::TouchDownInside:
-                        button->handleTouchDownEvent(item.inBounds);
+                        event = button->handleTouchDownEvent(item.inBounds);
                         break;
                         
                     case Event::TouchCancel:
-                        button->handleTouchCancelEvent();
+                        event = button->handleTouchCancelEvent();
                         break;
                         
                     case Event::TouchUpOutside:
                     case Event::TouchUpInside:
-                        button->handleTouchUpEvent(item.inBounds);
+                        event = button->handleTouchUpEvent(item.inBounds);
                         break;
                         
                     default:
@@ -468,7 +468,7 @@ void BGE::InputService::getInputPoints(GameObject *gameObj, std::vector<Vector3>
         auto xform = gameObj->getComponent<TransformComponent>();
         BoundingBoxComponent *bbox = nullptr;
         
-        if (button && button->isEnabled()) {
+        if (button) {
             // Buttons need to check their parent because often button's bezels are the ones not visible
             auto parent = gameObj->getParent();
             
