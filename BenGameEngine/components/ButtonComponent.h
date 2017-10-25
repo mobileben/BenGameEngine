@@ -73,6 +73,13 @@ namespace BGE {
         UITouch *getTouch() const { return touch; }
         void setTouch(UITouch *t) { touch = t; }
         
+        GameObjectHandle getDisabledButtonHandle() const { return disabledButtonHandle; }
+        GameObjectHandle getDisabledAnimButtonHandle() const { return disabledAnimButtonHandle; }
+        GameObjectHandle getNormalButtonHandle() const { return normalButtonHandle; }
+        GameObjectHandle getNormalAnimButtonHandle() const { return normalAnimButtonHandle; }
+        GameObjectHandle getHighlightedButtonHandle() const { return highlightedButtonHandle; }
+        GameObjectHandle getHighlightedAnimButtonHandle() const { return highlightedAnimButtonHandle; }
+
     private:
         friend Space;
         friend InputService;
