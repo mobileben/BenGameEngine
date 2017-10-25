@@ -117,6 +117,7 @@
 		B5BBFAE81DE416040035AA74 /* AudioServiceHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAE71DE416040035AA74 /* AudioServiceHelper.mm */; };
 		B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */; };
 		B5C388E21D24D91B00137CEC /* ColorTransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */; };
+		B5D9DCB01F63266D00661651 /* peachy.otf in Resources */ = {isa = PBXBuildFile; fileRef = B5D9DCAF1F63266D00661651 /* peachy.otf */; };
 		B5DCDA231CE2F9F100CBF0A6 /* HandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */; };
 		B5DCDA261CE59F7400CBF0A6 /* ScenePackageService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA241CE59F7400CBF0A6 /* ScenePackageService.cpp */; };
 		B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5E7B9B51CC35B5000978F1A /* LineVertex.glsl */; };
@@ -373,6 +374,7 @@
 		B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformComponent.cpp; path = components/ColorTransformComponent.cpp; sourceTree = "<group>"; };
 		B5C388E11D24D91B00137CEC /* ColorTransformComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorTransformComponent.h; path = components/ColorTransformComponent.h; sourceTree = "<group>"; };
 		B5C388E41D28635500137CEC /* NamedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NamedObject.h; sourceTree = "<group>"; };
+		B5D9DCAF1F63266D00661651 /* peachy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = peachy.otf; sourceTree = "<group>"; };
 		B5DC4BDB1ED37A4C003C4B5C /* Observer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Observer.h; sourceTree = "<group>"; };
 		B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = HandleTests.m; path = BGEGameObjectAndComponentTests/HandleTests.m; sourceTree = SOURCE_ROOT; };
 		B5DCDA241CE59F7400CBF0A6 /* ScenePackageService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = ScenePackageService.cpp; path = services/ScenePackageService.cpp; sourceTree = "<group>"; };
@@ -694,6 +696,7 @@
 		B525E3D71C8959D200C691C0 /* BenGameEngineBundle */ = {
 			isa = PBXGroup;
 			children = (
+				B5D9DCAF1F63266D00661651 /* peachy.otf */,
 				B508CD8F1CA901B700127B97 /* Avenir.ttc */,
 				B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */,
 				B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */,
@@ -1013,6 +1016,7 @@
 				B57331A91EE3762E00335959 /* PolyLineFragment.glsl in Resources */,
 				B525E3DE1C895A1900C691C0 /* TextureFragment.glsl in Resources */,
 				B525E3DF1C895A1900C691C0 /* TextureVertex.glsl in Resources */,
+				B5D9DCB01F63266D00661651 /* peachy.otf in Resources */,
 				B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */,
 				B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */,
 				B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */,
@@ -1401,6 +1405,324 @@
 			};
 			name = Release;
 		};
+		B547508F1FA00CD50039878D /* DevDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COMPRESS_PNG_FILES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-ObjC";
+				SDKROOT = iphoneos;
+			};
+			name = DevDebug;
+		};
+		B54750901FA00CD50039878D /* DevDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
+					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
+			};
+			name = DevDebug;
+		};
+		B54750911FA00CD50039878D /* DevDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BenGameEngineBundle/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BenGameEngineBundle;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = DevDebug;
+		};
+		B54750921FA00CD50039878D /* DevDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ENABLE_BITCODE = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/BenGameEngine/external/freetype/include",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/include",
+				);
+				INFOPLIST_FILE = BenGameEngineTestApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/BenGameEngine/external/freetype/lib",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/lib",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BenGameEngineTestApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = DevDebug;
+		};
+		B54750931FA00CD50039878D /* DevDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"UNIT_TESTING=1",
+				);
+				INFOPLIST_FILE = BGEGameObjectAndComponentTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BGEGameObjectAndComponentTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = DevDebug;
+		};
+		B54750941FA00CDB0039878D /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COMPRESS_PNG_FILES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-ObjC";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = DevRelease;
+		};
+		B54750951FA00CDB0039878D /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
+					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
+			};
+			name = DevRelease;
+		};
+		B54750961FA00CDB0039878D /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BenGameEngineBundle/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BenGameEngineBundle;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = DevRelease;
+		};
+		B54750971FA00CDB0039878D /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ENABLE_BITCODE = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/BenGameEngine/external/freetype/include",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/include",
+				);
+				INFOPLIST_FILE = BenGameEngineTestApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/BenGameEngine/external/freetype/lib",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/lib",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BenGameEngineTestApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = DevRelease;
+		};
+		B54750981FA00CDB0039878D /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = BGEGameObjectAndComponentTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BGEGameObjectAndComponentTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = DevRelease;
+		};
+		B54750991FA00CE00039878D /* AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COMPRESS_PNG_FILES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-ObjC";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = AppStore;
+		};
+		B547509A1FA00CE00039878D /* AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
+					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
+			};
+			name = AppStore;
+		};
+		B547509B1FA00CE00039878D /* AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BenGameEngineBundle/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BenGameEngineBundle;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = AppStore;
+		};
+		B547509C1FA00CE00039878D /* AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ENABLE_BITCODE = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/BenGameEngine/external/freetype/include",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/include",
+				);
+				INFOPLIST_FILE = BenGameEngineTestApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/BenGameEngine/external/freetype/lib",
+					"$(PROJECT_DIR)/BenGameEngine/external/libpng/lib",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BenGameEngineTestApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = AppStore;
+		};
+		B547509D1FA00CE00039878D /* AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = BGEGameObjectAndComponentTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.2nproductions.BGEGameObjectAndComponentTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = AppStore;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1408,7 +1730,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B508CDA11CAF95A000127B97 /* Debug */,
+				B54750931FA00CD50039878D /* DevDebug */,
 				B508CDA21CAF95A000127B97 /* Release */,
+				B547509D1FA00CE00039878D /* AppStore */,
+				B54750981FA00CDB0039878D /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1417,7 +1742,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B525E3621C8950DA00C691C0 /* Debug */,
+				B547508F1FA00CD50039878D /* DevDebug */,
 				B525E3631C8950DA00C691C0 /* Release */,
+				B54750991FA00CE00039878D /* AppStore */,
+				B54750941FA00CDB0039878D /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1426,7 +1754,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B525E3651C8950DA00C691C0 /* Debug */,
+				B54750901FA00CD50039878D /* DevDebug */,
 				B525E3661C8950DA00C691C0 /* Release */,
+				B547509A1FA00CE00039878D /* AppStore */,
+				B54750951FA00CDB0039878D /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1435,7 +1766,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B525E3801C8957A700C691C0 /* Debug */,
+				B54750921FA00CD50039878D /* DevDebug */,
 				B525E3811C8957A700C691C0 /* Release */,
+				B547509C1FA00CE00039878D /* AppStore */,
+				B54750971FA00CDB0039878D /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1444,7 +1778,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B525E3DA1C8959D200C691C0 /* Debug */,
+				B54750911FA00CD50039878D /* DevDebug */,
 				B525E3DB1C8959D200C691C0 /* Release */,
+				B547509B1FA00CE00039878D /* AppStore */,
+				B54750961FA00CDB0039878D /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
