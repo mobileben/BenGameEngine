@@ -43,6 +43,14 @@ void BGE::GameObject::destroy() {
     spaceHandle_ = SpaceHandle();
 }
 
+void BGE::GameObject::listComponents() const {
+    printf("GameObj %s has components", getName().c_str());
+    for (auto it = components_.begin();it != components_.end();++it) {
+        printf(" %d", it->typeId);
+    }
+    printf("\n");
+}
+
 void BGE::GameObject::removeAllComponents() {
     auto space = getSpace();
     
@@ -279,7 +287,7 @@ void BGE::GameObject::removeComponentPrologue(ComponentTypeId componentTypeId) {
 }
 
 bool BGE::GameObject::isAnimationSubSequence() const {
-    return hasComponent<AnimationSequenceComponent>() && hasComponent<FrameAnimatorComponent>();
+    return hasComponent<AnimationSequenceComponent>() && (hasComponent<FrameAnimatorComponent>() || hasComponent<ChannelFrameAnimatorComponent>();
 }
 
 void BGE::GameObject::upgradeToAnimationSequence() {

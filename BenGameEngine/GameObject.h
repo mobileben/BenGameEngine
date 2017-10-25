@@ -106,6 +106,8 @@ namespace BGE {
             }
         }
         
+        void listComponents() const;
+        
         void removeAllComponents();
         
         template <typename T>
