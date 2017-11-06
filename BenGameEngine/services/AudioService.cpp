@@ -131,6 +131,13 @@ BGE::Audio *BGE::AudioService::createAudio(std::string name, AudioBufferHandle a
 }
 
 void BGE::AudioService::createAudioBufferFromFile(std::string name, std::string filename, bool streaming, std::function<void(AudioBuffer *, std::shared_ptr<Error>)> callback) {
+    if (filename.empty()) {
+        if (callback) {
+            callback(nullptr, std::make_shared<Error>(AudioBuffer::ErrorDomain, AudioBufferErrorOS));
+        }
+        return;
+    }
+
     auto it = audioBufferHandles_.find(name);
     
     if (it == audioBufferHandles_.end()) {
