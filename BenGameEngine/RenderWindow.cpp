@@ -15,7 +15,20 @@ std::string BGE::RenderWindow::DefaultRenderViewName = "DefaultRenderView";
 void BGE::RenderWindow::setView(BGEView *view) {
     if (view != this->view_) {
         this->view_ = view;
-        
+        if (view) {
+            this->x_ = view.frame.origin.x;
+            this->y_ = view.frame.origin.y;
+            this->width_ = view.frame.size.width;
+            this->height_ = view.frame.size.height;
+            this->contentScaleFactor_ = view.contentScaleFactor;
+        } else {
+            this->x_ = 0;
+            this->y_ = 0;
+            this->width_ = 0;
+            this->height_ = 0;
+            this->contentScaleFactor_ = 1;
+        }
+
         this->renderViews_.clear();
 
         if (this->view_) {
@@ -32,41 +45,21 @@ void BGE::RenderWindow::setRenderContext(std::shared_ptr<RenderContext> renderCo
 }
 
 float BGE::RenderWindow::getX() const {
-    if (this->view_) {
-        return this->view_.frame.origin.x;
-    } else {
-        return 0;
-    }
+    return x_;
 }
 
 float BGE::RenderWindow::getY() const {
-    if (this->view_) {
-        return this->view_.frame.origin.y;
-    } else {
-        return 0;
-    }
+    return y_;
 }
 
 float BGE::RenderWindow::getWidth() const {
-    if (this->view_) {
-        return this->view_.frame.size.width;
-    } else {
-        return 0;
-    }
+    return width_;
 }
 
 float BGE::RenderWindow::getHeight() const {
-    if (this->view_) {
-        return this->view_.frame.size.height;
-    } else {
-        return 0;
-    }
+    return height_;
 }
 
 float BGE::RenderWindow::getContentScaleFactor() const {
-    if (this->view_) {
-        return this->view_.contentScaleFactor;
-    } else {
-        return 1;
-    }
+    return contentScaleFactor_;
 }

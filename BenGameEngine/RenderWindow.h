@@ -24,6 +24,7 @@ namespace BGE {
     public:
         static std::string DefaultRenderViewName;
         
+        RenderWindow() : x_(0), y_(0), width_(0), height_(0), contentScaleFactor_(1) {}
         ~RenderWindow() {}
         
         BGEView *getView() { return view_; }
@@ -49,6 +50,7 @@ namespace BGE {
         float y_;
         float width_;
         float height_;
+        float contentScaleFactor_;
         
     private:
         BGEView *view_;
