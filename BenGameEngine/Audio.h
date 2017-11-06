@@ -62,6 +62,7 @@ namespace BGE {
         void destroy();
         
         AudioHandle getHandle() const { return handle_; }
+        AudioBufferHandle getBufferHandle() const { return audioBufferHandle_; }
         
         AudioPlayState getState() const { return state_; }
         void setState(AudioPlayState state) { state_ = state;}
@@ -89,16 +90,18 @@ namespace BGE {
 
 #endif /* TARGET_OS_IPHONE */
         
-        bool isPlaying();
-        bool isPaused(AudioPauseSource source=AudioPauseSource::None);
-        bool isLooping();
-        inline uint32_t	getLoopingCount(void) { return looping_; }
+        bool isPlaying() const;
+        bool isPaused(AudioPauseSource source=AudioPauseSource::None) const;
+        bool isLooping() const;
+        inline uint32_t	getLoopingCount(void) const { return looping_; }
         inline void setLoopingCount(uint32_t looping) { looping_ = looping; }
 
         void play(uint32_t loop = AudioPlayOnce);
         void pause(AudioPauseSource source=AudioPauseSource::None);
         void resume(AudioPauseSource source=AudioPauseSource::None);
         void stop();
+        
+        AudioType getType() const { return type_; }
         
     private:
         AudioHandle                     handle_;

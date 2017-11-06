@@ -257,7 +257,11 @@ void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *a
     }
     
     state_ = AudioPlayState::Off;
-    type_ = AudioType::SFX;
+    if (streaming_) {
+        type_ = AudioType::Music;
+    } else {
+        type_ = AudioType::SFX;
+    }
     pauseSource_ = AudioPauseSource::None;
 }
 
@@ -290,18 +294,18 @@ void BGE::Audio::destroy() {
     pauseSource_ = AudioPauseSource::None;
 }
 
-bool BGE::Audio::isPlaying() {
+bool BGE::Audio::isPlaying() const {
     return (state_ != AudioPlayState::Off && state_ != AudioPlayState::Stopping);
 }
 
-bool BGE::Audio::isPaused(AudioPauseSource source) {
+bool BGE::Audio::isPaused(AudioPauseSource source) const {
     if (source != AudioPauseSource::None && source != pauseSource_) {
         return false;
     }
     
     return (state_ == AudioPlayState::Paused);
 }
-bool BGE::Audio::isLooping() {
+bool BGE::Audio::isLooping() const {
     return looping_ > 1;
 }
 
