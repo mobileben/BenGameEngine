@@ -177,7 +177,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
     __weak typeof(self) weakSelf = self;
     
     dispatch_source_set_event_handler(self.timer, ^{
-        __strong typeof(self) strongSelf = weakSelf;
+        __strong typeof(weakSelf) strongSelf = weakSelf;
         
         if (strongSelf.stage == 0) {
             strongSelf.stage = 1;
@@ -187,8 +187,8 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
             filePath.type = BGE::FileUtilities::PathType::builtin;
             filePath.basename = "Common-iPh6.json";
             
-            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                __strong typeof(self) strongSelf = weakSelf;
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(strongSelf.spaceHandle, "Common", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
                 
                 packageHandles.push_back(packageHandle);
                 
@@ -216,7 +216,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
     __weak typeof(self) weakSelf = self;
     
     dispatch_source_set_event_handler(self.timer, ^{
-        __strong typeof(self) strongSelf = weakSelf;
+        __strong typeof(weakSelf) strongSelf = weakSelf;
         
         if (strongSelf.stage == 0 ) {
             strongSelf.stage = 1;
@@ -235,7 +235,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
             filePath.basename = "CommonLobby-iPh6.json";
             
             BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
-                __strong typeof(self) strongSelf = weakSelf;
+                __strong typeof(weakSelf) strongSelf = weakSelf;
                 packageHandles.push_back(packageHandle);
                 
                 BGE::Game::getInstance()->outputResourceBreakdown();
@@ -264,7 +264,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
     __weak typeof(self) weakSelf = self;
     
     dispatch_source_set_event_handler(self.timer, ^{
-        __strong typeof(self) strongSelf = weakSelf;
+        __strong typeof(weakSelf) strongSelf = weakSelf;
         
         if (strongSelf.stage == 0 ) {
             // Space handle already exists, so remove it
@@ -285,7 +285,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
             filePath.type = BGE::FileUtilities::PathType::builtin;
             filePath.basename = "Common-iPh6.json";
             
-            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Common", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(strongSelf.spaceHandle, "Common", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                 BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                 
                 packageHandles.push_back(packageHandle);
@@ -299,7 +299,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
             
             filePath.basename = "CommonLobby-iPh6.json";
             
-            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonLobby", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(strongSelf.spaceHandle, "CommonLobby", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                 BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                 
                 packageHandles.push_back(packageHandle);
@@ -313,7 +313,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
             
             filePath.basename = "CommonHUD-iPh6.json";
             
-            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "CommonHUD", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(strongSelf.spaceHandle, "CommonHUD", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                 BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                 
                 packageHandles.push_back(packageHandle);
@@ -326,7 +326,7 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
             });
             
             filePath.basename = "Lobby-iPh6.json";
-            BGE::Game::getInstance()->getScenePackageService()->createPackage(self.spaceHandle, "Lobby", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
+            BGE::Game::getInstance()->getScenePackageService()->createPackage(strongSelf.spaceHandle, "Lobby", filePath, [weakSelf](BGE::ScenePackageHandle packageHandle, std::shared_ptr<BGE::Error> error) -> void {
                 __strong typeof(self) strongSelf = weakSelf;
                 BGE::ScenePackage *package = BGE::Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
                 
@@ -338,8 +338,6 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
                 
                 // Now create auto display objects
                 BGE::SceneObjectCreatedDelegate delegate;
-                
-                typeof(self) __weak weakSelf = self;
                 
                 space->createAutoDisplayObjects(BGE::GameObjectHandle(), packageHandle, &delegate, [weakSelf]() {
                     typeof(weakSelf) __strong strongSelf = weakSelf;
