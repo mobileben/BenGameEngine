@@ -37,7 +37,7 @@ BGE::Input *BGE::InputService::createInput() {
 void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view) {
     lock();
     
-    auto scale = [[UIScreen mainScreen] scale];
+    auto scale = [[UIScreen mainScreen] nativeScale];
 
     for (UITouch *touch in touches) {
         Input *input = createInput();
