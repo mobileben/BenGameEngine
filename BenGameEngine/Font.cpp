@@ -89,63 +89,22 @@ uint32_t BGE::Font::getStringWidth(std::string str, bool minimum) {
         const char *chars = str.c_str();
         uint16_t code;
         size_t length = str.length();
-        
-        if (length == 1) {
-            code = chars[0];
-            
+        uint16_t prev = 0;
+
+        for (int i=0;i<length;i++) {
+            code = chars[i];
+
             auto glyph = glyphs_.find(code);
-            
+
             if (glyph != glyphs_.end()) {
-                if (!minimum) {
-                    width = glyph->second.getAdvance();
-                } else {
-                    auto textureHandle = glyph->second.getTextureHandle();
-                    auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
-                    
-                    if (texture) {
-                        width = texture->getWidth();
-                    }
-                }
-            }
-        } else {
-            uint16_t prev = 0;
-            
-            for (int i=0;i<length;i++) {
-                code = chars[i];
-                
-                auto glyph = glyphs_.find(code);
-                
-                if (glyph != glyphs_.end()) {
-                    if (i==0) {
-                        if (!minimum) {
-                            width += glyph->second.getAdvance();
-                        } else {
-                            width += glyph->second.getAdvance() - glyph->second.getOffsetX();
-                        }
-                    } else if (i==(length-1)) {
-                        if (!minimum) {
-                            width += glyph->second.getAdvance();
-                        } else {
-                            auto textureHandle = glyph->second.getTextureHandle();
-                            auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
-                            
-                            width += glyph->second.getOffsetX();
-                            
-                            if (texture) {
-                                width += texture->getWidth();
-                            }
-                        }
-                    } else {
-                        width += glyph->second.getAdvance();
-                    }
-                }
-                
                 if (hasKerning() && prev) {
                     width += kerningForPair(prev, code);
                 }
-                
-                prev = code;
+
+                width += glyph->second.getAdvance();
             }
+
+            prev = code;
         }
         
         if (width < 0) {
@@ -189,7 +148,7 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                 
                 // Go through ASCII. Include extended ASCII. Ignore control characters
                 for (int i=0;i<NumSupportedCharacters;i++) {
-                    error = FT_Load_Char( face, i + InitialSupportedCharacterOffset, FT_LOAD_RENDER|FT_LOAD_FORCE_AUTOHINT );
+                    error = FT_Load_Char( face, i + InitialSupportedCharacterOffset, FT_LOAD_RENDER|FT_LOAD_FORCE_AUTOHINT|FT_LOAD_TARGET_LIGHT );
                     
                     if (!error) {
                         FT_Glyph_Metrics *currMetrics = &face->glyph->metrics;
@@ -477,7 +436,8 @@ void BGE::Font::drawString(std::string str, const float *rawMatrix, float defWid
         
         glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) colorTransform.multiplier.v);
         glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorTransform.offset.v);
-        
+
+
         // Compute the offsets if needed
         switch (horizAlignment) {
             case FontHorizontalAlignment::Center:
