@@ -39,7 +39,6 @@ void BGE::SpriteRenderComponent::setTexture(Texture *tex) {
     auto material = Game::getInstance()->getMaterialService()->createMaterial(tex->getHandle());
     
     this->setMaterials({material});
-
 }
 
 BGE::TextureHandle BGE::SpriteRenderComponent::getTextureHandle() {
@@ -53,13 +52,11 @@ BGE::TextureHandle BGE::SpriteRenderComponent::getTextureHandle() {
 }
 
 void BGE::SpriteRenderComponent::materialsUpdated() {
-    
     // Build vertices
     updateLocalBoundsAndVertices();
 }
 
-
-void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
+void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices(bool force) {
     // Right now we are only supporting one material
     auto material = getMaterial();
     
@@ -72,25 +69,36 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
         assert(texture);
         
         if (texture) {
-            Rect bounds;
+            auto gameObjHandle = getGameObjectHandle();
+            auto gameObj = getSpace()->getGameObject(gameObjHandle);
+            auto bbox = gameObj->getComponent<BoundingBoxComponent>();
+
+            if (bbox->width == 0 || bbox->height == 0 || force) {
+                bbox->x = 0;
+                bbox->y = 0;
+                bbox->width = texture->getWidth();
+                bbox->height = texture->getHeight();
+            }
+
             VertexTex* const vertices = (VertexTex* const) getVertices();
             float x = 0;
             float y = 0;
-            float w = texture->getWidth();
-            float h = texture->getHeight();
-            
+            float w = bbox->width;
+            float h = bbox->height;
+
             switch (getAnchor()) {
                 case RenderComponentAnchor::Center:
                     float w_2 = w / 2.0;
                     float h_2 = h / 2.0;
-                    
+                    Rect bounds;
+
                     bounds.x = x;
                     bounds.y = y;
                     bounds.w = w;
                     bounds.h = h;
-                    
+
                     setLocalBounds(bounds);
-                    
+
                     const Vector2 *uvs = texture->getUVs();
                     
                     if (Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
@@ -179,17 +187,6 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices() {
                         vertices[3].tex.y = uvs[3].y;
                     }
                     break;
-            }
-            
-            auto gameObjHandle = getGameObjectHandle();
-            auto gameObj = getSpace()->getGameObject(gameObjHandle);
-            auto bbox = gameObj->getComponent<BoundingBoxComponent>();
-            
-            if (bbox) {
-                bbox->x = 0;
-                bbox->y = 0;
-                bbox->width = texture->getWidth();
-                bbox->height = texture->getHeight();
             }
         }
     }

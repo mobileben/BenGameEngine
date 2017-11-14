@@ -34,7 +34,9 @@ namespace BGE {
         
         void setTextureHandle(TextureHandle texHandle);
         void setTexture(Texture *tex);
-        
+
+        void updateLocalBoundsAndVertices(bool force=false);
+
     protected:
         void materialsUpdated();
         
@@ -48,8 +50,6 @@ namespace BGE {
         static const uint32_t NumVertices = 4;
         
         VertexTex vertices_[NumVertices];
-        
-        void updateLocalBoundsAndVertices();
     };
 }
 
