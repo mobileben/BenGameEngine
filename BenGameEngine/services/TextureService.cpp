@@ -366,8 +366,6 @@ BGE::TextureHandle BGE::TextureService::getTextureHandle(ScenePackageHandle scen
         if (packageTex != scenePackage->second.end()) {
             return packageTex->second;
         }
-    } else {
-        assert(false);
     }
     
     return TextureHandle();
@@ -382,8 +380,6 @@ BGE::TextureHandle BGE::TextureService::getTextureHandle(SpaceHandle spaceHandle
         if (spaceTex != space->second.end()) {
             return spaceTex->second;
         }
-    } else {
-        assert(false);
     }
     
     return TextureHandle();
@@ -398,8 +394,6 @@ BGE::TextureHandle BGE::TextureService::getTextureHandle(TextureAtlasHandle atla
         if (atlasTex != atlas->second.end()) {
             return atlasTex->second;
         }
-    } else {
-        assert(false);
     }
     
     return TextureHandle();
@@ -414,8 +408,6 @@ BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(ScenePackageH
         if (packageTex != scenePackage->second.end()) {
             return packageTex->second;
         }
-    } else {
-        assert(false);
     }
     
     return TextureAtlasHandle();
@@ -430,8 +422,6 @@ BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(SpaceHandle s
         if (spaceTex != space->second.end()) {
             return spaceTex->second;
         }
-    } else {
-        assert(false);
     }
     
     return TextureAtlasHandle();
@@ -446,8 +436,6 @@ BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(FontHandle fo
         if (fontTex != font->second.end()) {
             return fontTex->second;
         }
-    } else {
-        assert(false);
     }
     
     return TextureAtlasHandle();
@@ -478,6 +466,10 @@ BGE::TextureAtlas *BGE::TextureService::getTextureAtlas(FontHandle fontHandle, s
 }
 
 void BGE::TextureService::removeTexture(ScenePackageHandle scenePackageHandle, TextureHandle handle) {
+    if (handle.isNull()) {
+        return;
+    }
+
     auto scenePackage = packageTextures_.find(scenePackageHandle);
     
     if (scenePackage != packageTextures_.end()) {
@@ -494,6 +486,10 @@ void BGE::TextureService::removeTexture(ScenePackageHandle scenePackageHandle, T
 }
 
 void BGE::TextureService::removeTexture(SpaceHandle spaceHandle, TextureHandle handle) {
+    if (handle.isNull()) {
+        return;
+    }
+
     auto space = spaceTextures_.find(spaceHandle);
     
     if (space != spaceTextures_.end()) {
@@ -510,6 +506,10 @@ void BGE::TextureService::removeTexture(SpaceHandle spaceHandle, TextureHandle h
 }
 
 void BGE::TextureService::removeTexture(TextureAtlasHandle atlasHandle, TextureHandle handle) {
+    if (handle.isNull()) {
+        return;
+    }
+
     auto atlas = atlasTextures_.find(atlasHandle);
     
     if (atlas != atlasTextures_.end()) {
@@ -526,6 +526,10 @@ void BGE::TextureService::removeTexture(TextureAtlasHandle atlasHandle, TextureH
 }
 
 void BGE::TextureService::removeTextureAtlas(ScenePackageHandle scenePackageHandle, TextureAtlasHandle handle) {
+    if (handle.isNull()) {
+        return;
+    }
+
     auto scenePackage = packageTextureAtlases_.find(scenePackageHandle);
     
     if (scenePackage != packageTextureAtlases_.end()) {
@@ -550,6 +554,10 @@ void BGE::TextureService::removeTextureAtlas(ScenePackageHandle scenePackageHand
 }
 
 void BGE::TextureService::removeTextureAtlas(SpaceHandle spaceHandle, TextureAtlasHandle handle) {
+    if (handle.isNull()) {
+        return;
+    }
+
     auto space = spaceTextureAtlases_.find(spaceHandle);
     
     if (space != spaceTextureAtlases_.end()) {
@@ -566,6 +574,10 @@ void BGE::TextureService::removeTextureAtlas(SpaceHandle spaceHandle, TextureAtl
 }
 
 void BGE::TextureService::removeTextureAtlas(FontHandle fontHandle, TextureAtlasHandle handle) {
+    if (handle.isNull()) {
+        return;
+    }
+
     auto font = fontTextureAtlases_.find(fontHandle);
     
     if (font != fontTextureAtlases_.end()) {
@@ -787,29 +799,93 @@ void BGE::TextureService::createTextureFromBuffer(std::string name, void *buffer
     TextureHandle textureHandle;
     Texture *texture;
 
-    texture = textureHandleService_.allocate(textureHandle);
+    if (buffer) {
+        texture = textureHandleService_.allocate(textureHandle);
 
-    if (texture) {
-        texture->initialize(textureHandle, name, format);
+        if (texture) {
+            texture->initialize(textureHandle, name, format);
 
-        texture->createFromBuffer(buffer, format, width, height, [this, textureHandle, callback](Texture *newTexture, std::shared_ptr<Error> error) -> void {
-            if (!newTexture) {
-                // We had a problem, release the handle
-                textureHandleService_.release(textureHandle);
-            }
-            
+            texture->createFromBuffer(buffer, format, width, height, [this, textureHandle, callback](Texture *newTexture, std::shared_ptr<Error> error) -> void {
+                if (!newTexture) {
+                    // We had a problem, release the handle
+                    textureHandleService_.release(textureHandle);
+                }
+
+                if (callback) {
+                    callback(newTexture, error);
+                }
+            });
+        } else {
+            auto bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorClassAllocation);
+
             if (callback) {
-                callback(newTexture, error);
+                callback(nullptr, bgeError);
             }
-        });
+        }
     } else {
-        auto bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorClassAllocation);
-        
+        auto bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorNoBuffer);
+
         if (callback) {
             callback(nullptr, bgeError);
         }
     }
 }
+
+#if TARGET_OS_IPHONE
+void BGE::TextureService::createTextureFromUIImage(SpaceHandle spaceHandle, const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+    if ([NSThread isMainThread]) {
+        _createTextureFromUIImage(spaceHandle, name, image, callback);
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^() {
+            _createTextureFromUIImage(spaceHandle, name, image, callback);
+        });
+    }
+}
+
+void BGE::TextureService::_createTextureFromUIImage(SpaceHandle spaceHandle, const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+    auto &space = spaceTextures_[spaceHandle];
+    auto tex = space.find(name);
+
+    if (tex == space.end()) {
+        CGImageRef imageRef = [image CGImage];
+        uint32_t width = static_cast<uint32_t>(CGImageGetWidth(imageRef));
+        uint32_t height = static_cast<uint32_t>(CGImageGetHeight(imageRef));
+        unsigned char* textureData = (unsigned char *)malloc(width * height * 4); // if 4 components per pixel (RGBA)
+
+        if (textureData) {
+            // This requires the mainthread thread
+            CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+            NSUInteger bytesPerPixel = 4;
+            NSUInteger bytesPerRow = bytesPerPixel * width;
+            NSUInteger bitsPerComponent = 8;
+            CGContextRef context = CGBitmapContextCreate(textureData, width, height,
+                                                         bitsPerComponent, bytesPerRow, colorSpace,
+                                                         kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+
+            CGColorSpaceRelease(colorSpace);
+            CGContextDrawImage(context, CGRectMake(0, 0, width, height), imageRef);
+            CGContextRelease(context);
+
+            createTextureFromBuffer(name, textureData, TextureFormat::RGBA8888, width, height, [this, spaceHandle, name, textureData, callback](Texture *texture, std::shared_ptr<Error> error) {
+                if (texture) {
+                    auto &space = spaceTextures_[spaceHandle];
+                    space[name] = texture->getHandle();
+                }
+                free(textureData);
+                if (callback) {
+                    callback(texture, error);
+                }
+            });
+        } else if (callback) {
+            auto error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorNoBuffer);
+            callback(nullptr, error);
+        }
+    } else if (callback) {
+        callback(textureHandleService_.dereference(tex->second), nullptr);
+    }
+}
+
+#endif /* TARGET_OS_IPHONE */
 
 void BGE::TextureService::createTextureAtlasFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
     auto &scenePackage = packageTextureAtlases_[scenePackageHandle];

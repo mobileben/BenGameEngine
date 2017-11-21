@@ -9,6 +9,10 @@
 #ifndef BGETextureService_h
 #define BGETextureService_h
 
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#endif /* TARGET_OS_IPHONE */
+
 #include <stdio.h>
 #include <unordered_map>
 #include <string>
@@ -105,7 +109,11 @@ namespace BGE {
         
         void createTextureFromFile(TextureAtlasHandle atlasHandle, std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
         void createTextureFromBuffer(TextureAtlasHandle atlasHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
-        
+
+#if TARGET_OS_IPHONE
+        void createTextureFromUIImage(SpaceHandle spaceHandle, const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
+#endif /* TARGET_OS_IPHONE */
+
         void createTextureAtlasFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         void createTextureAtlasFromBuffer(ScenePackageHandle scenePackageHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         
@@ -140,6 +148,8 @@ namespace BGE {
         void createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
         void createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
 
+        void _createTextureFromUIImage(SpaceHandle spaceHandle, const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
+        
         void createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         void createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         BGE::Texture *createSubTexture(std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated);

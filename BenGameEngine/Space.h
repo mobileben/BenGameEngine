@@ -9,6 +9,10 @@
 #ifndef BGESpace_h
 #define BGESpace_h
 
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#endif /* TARGET_OS_IPHONE */
+
 #include <stdio.h>
 #include <memory>
 #include <vector>
@@ -143,6 +147,9 @@ namespace BGE {
         // Texture management
         void createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
         void createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
+#if TARGET_OS_IPHONE
+        void createTextureFromUIImage(const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
+#endif /* TARGET_OS_IPHONE */
         void createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
         void createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
 

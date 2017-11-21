@@ -298,12 +298,16 @@ void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
     
     for (auto const &handle : handles) {
         auto obj = getGameObject(handle);
-        auto xform = obj->getComponent<TransformComponent>();
-        
-        if (xform) {
-            if (!xform->getParent()) {
-                objects.push_back(obj);
+        if (obj) {
+            auto xform = obj->getComponent<TransformComponent>();
+            
+            if (xform) {
+                if (!xform->getParent()) {
+                    objects.push_back(obj);
+                }
             }
+        } else {
+            printf("Discarding nULL\n");
         }
     }
 }
@@ -1366,6 +1370,12 @@ void BGE::Space::createTextureFromFile(std::string name, std::string filename, T
 void BGE::Space::createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
     Game::getInstance()->getTextureService()->createTextureFromBuffer(spaceHandle_, name, buffer, format, width, height, callback);
 }
+
+#if TARGET_OS_IPHONE
+void BGE::Space::createTextureFromUIImage(const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+    Game::getInstance()->getTextureService()->createTextureFromUIImage(spaceHandle_, name, image, callback);
+}
+#endif /* TARGET_OS_IPHONE */
 
 void BGE::Space::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
     Game::getInstance()->getTextureService()->createTextureAtlasFromFile(spaceHandle_, name, filename, subTextureDefs, format, callback);
