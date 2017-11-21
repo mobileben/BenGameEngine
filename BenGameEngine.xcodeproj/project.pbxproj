@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B5018A011DC2F346009D3326 /* HandleService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5018A001DC2F346009D3326 /* HandleService.cpp */; };
-		B508CD8E1CA8ABA100127B97 /* Arial Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */; };
 		B508CD901CA901B700127B97 /* Avenir.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B508CD8F1CA901B700127B97 /* Avenir.ttc */; };
 		B508CD931CAE285000127B97 /* TransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B508CD911CAE285000127B97 /* TransformComponent.cpp */; };
 		B508CD9D1CAF95A000127B97 /* libBenGameEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */; };
@@ -38,7 +37,7 @@
 		B525E3841C8957BD00C691C0 /* libBenGameEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B525E35B1C8950DA00C691C0 /* libBenGameEngine.a */; };
 		B525E3B51C89587000C691C0 /* Error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3851C89587000C691C0 /* Error.cpp */; };
 		B525E3B61C89587000C691C0 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3871C89587000C691C0 /* Game.cpp */; };
-		B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */; };
+		B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.mm */; };
 		B525E3B91C89587000C691C0 /* HeartbeatService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E38D1C89587000C691C0 /* HeartbeatService.cpp */; };
 		B525E3BA1C89587000C691C0 /* MathTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E38F1C89587000C691C0 /* MathTypes.cpp */; };
 		B525E3BB1C89587000C691C0 /* RenderContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B525E3911C89587000C691C0 /* RenderContext.cpp */; };
@@ -104,6 +103,10 @@
 		B573319C1EE0FF9100335959 /* PolyLineRenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B573319A1EE0FF9100335959 /* PolyLineRenderComponent.cpp */; };
 		B57331A91EE3762E00335959 /* PolyLineFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B57331A71EE3744B00335959 /* PolyLineFragment.glsl */; };
 		B57331AA1EE3762E00335959 /* PolyLineVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B57331A81EE3744B00335959 /* PolyLineVertex.glsl */; };
+		B57FC8D71FBA6D6A00F445E0 /* Arial Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8D61FBA6D6A00F445E0 /* Arial Black.ttf */; };
+		B57FC8D91FBA6ED700F445E0 /* Arial Narrow.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8D81FBA6ED700F445E0 /* Arial Narrow.ttf */; };
+		B57FC8DC1FBAA3D400F445E0 /* Arial Narrow Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8DA1FBAA3D400F445E0 /* Arial Narrow Bold.ttf */; };
+		B57FC8DD1FBAA3D400F445E0 /* Avenir Next Condensed.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8DB1FBAA3D400F445E0 /* Avenir Next Condensed.ttc */; };
 		B59BE7891D8622430055800E /* PlacementComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B59BE7871D8622430055800E /* PlacementComponent.cpp */; };
 		B5ACE88F1CBB08D5004B6871 /* TransformComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */; };
 		B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */; };
@@ -133,7 +136,7 @@
 		B5F523131CD9C77E00DE2F82 /* GraphicFormats.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F523111CD9C77E00DE2F82 /* GraphicFormats.cpp */; };
 		B5F6B16A1CC8AF7A00E1FD45 /* Space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B1681CC8AF7A00E1FD45 /* Space.cpp */; };
 		B5F6B16D1CC8B06E00E1FD45 /* SpaceService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F6B16B1CC8B06E00E1FD45 /* SpaceService.cpp */; };
-		B5F8716B1D3F2B83000EA018 /* BGEView.m in Sources */ = {isa = PBXBuildFile; fileRef = B5F8716A1D3F2B83000EA018 /* BGEView.m */; };
+		B5F8716B1D3F2B83000EA018 /* BGEView.mm in Sources */ = {isa = PBXBuildFile; fileRef = B5F8716A1D3F2B83000EA018 /* BGEView.mm */; };
 		B5F8716E1D406EE5000EA018 /* InputTouchComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F8716C1D406EE5000EA018 /* InputTouchComponent.cpp */; };
 		B5F871711D41E8CC000EA018 /* BoundingBoxComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5F8716F1D41E8CC000EA018 /* BoundingBoxComponent.cpp */; };
 /* End PBXBuildFile section */
@@ -184,12 +187,11 @@
 /* Begin PBXFileReference section */
 		B5018A001DC2F346009D3326 /* HandleService.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HandleService.cpp; path = services/HandleService.cpp; sourceTree = "<group>"; };
 		B50326F21D1F4BA100156217 /* FontInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontInfo.h; sourceTree = "<group>"; };
-		B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Black.ttf"; sourceTree = "<group>"; };
 		B508CD8F1CA901B700127B97 /* Avenir.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = Avenir.ttc; sourceTree = "<group>"; };
 		B508CD911CAE285000127B97 /* TransformComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TransformComponent.cpp; path = components/TransformComponent.cpp; sourceTree = "<group>"; };
 		B508CD921CAE285000127B97 /* TransformComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransformComponent.h; path = components/TransformComponent.h; sourceTree = "<group>"; };
 		B508CD981CAF95A000127B97 /* BGEGameObjectAndComponentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BGEGameObjectAndComponentTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B508CD9C1CAF95A000127B97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = BGEGameObjectAndComponentTests/Info.plist; sourceTree = "<group>"; };
+		B508CD9C1CAF95A000127B97 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B508CDA31CB4DD5B00127B97 /* Component.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = Component.cpp; path = components/Component.cpp; sourceTree = "<group>"; };
 		B508CDA41CB4DD5B00127B97 /* Component.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Component.h; path = components/Component.h; sourceTree = "<group>"; };
 		B508CDA61CB4DE6D00127B97 /* GameObject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = GameObject.cpp; sourceTree = "<group>"; };
@@ -240,7 +242,7 @@
 		B525E3871C89587000C691C0 /* Game.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = Game.cpp; sourceTree = "<group>"; };
 		B525E3881C89587000C691C0 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
 		B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEHeartbeatIOS.h; path = ios/BGEHeartbeatIOS.h; sourceTree = "<group>"; };
-		B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEHeartbeatIOS.m; path = ios/BGEHeartbeatIOS.m; sourceTree = "<group>"; };
+		B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEHeartbeatIOS.mm; path = ios/BGEHeartbeatIOS.mm; sourceTree = "<group>"; };
 		B525E38D1C89587000C691C0 /* HeartbeatService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = HeartbeatService.cpp; path = services/HeartbeatService.cpp; sourceTree = "<group>"; };
 		B525E38E1C89587000C691C0 /* HeartbeatService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HeartbeatService.h; path = services/HeartbeatService.h; sourceTree = "<group>"; };
 		B525E38F1C89587000C691C0 /* MathTypes.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = MathTypes.cpp; sourceTree = "<group>"; };
@@ -352,6 +354,10 @@
 		B573319B1EE0FF9100335959 /* PolyLineRenderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolyLineRenderComponent.h; path = components/PolyLineRenderComponent.h; sourceTree = "<group>"; };
 		B57331A71EE3744B00335959 /* PolyLineFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PolyLineFragment.glsl; path = shaders/PolyLineFragment.glsl; sourceTree = "<group>"; };
 		B57331A81EE3744B00335959 /* PolyLineVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PolyLineVertex.glsl; path = shaders/PolyLineVertex.glsl; sourceTree = "<group>"; };
+		B57FC8D61FBA6D6A00F445E0 /* Arial Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Black.ttf"; sourceTree = "<group>"; };
+		B57FC8D81FBA6ED700F445E0 /* Arial Narrow.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Narrow.ttf"; sourceTree = "<group>"; };
+		B57FC8DA1FBAA3D400F445E0 /* Arial Narrow Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Narrow Bold.ttf"; sourceTree = "<group>"; };
+		B57FC8DB1FBAA3D400F445E0 /* Avenir Next Condensed.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Avenir Next Condensed.ttc"; sourceTree = "<group>"; };
 		B59BE7871D8622430055800E /* PlacementComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = PlacementComponent.cpp; path = components/PlacementComponent.cpp; sourceTree = "<group>"; };
 		B59BE7881D8622430055800E /* PlacementComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlacementComponent.h; path = components/PlacementComponent.h; sourceTree = "<group>"; };
 		B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TransformComponentTests.m; path = BGEGameObjectAndComponentTests/TransformComponentTests.m; sourceTree = SOURCE_ROOT; };
@@ -399,7 +405,7 @@
 		B5F6B16B1CC8B06E00E1FD45 /* SpaceService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = SpaceService.cpp; path = services/SpaceService.cpp; sourceTree = "<group>"; };
 		B5F6B16C1CC8B06E00E1FD45 /* SpaceService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SpaceService.h; path = services/SpaceService.h; sourceTree = "<group>"; };
 		B5F871691D3F2B83000EA018 /* BGEView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BGEView.h; path = ios/BGEView.h; sourceTree = "<group>"; };
-		B5F8716A1D3F2B83000EA018 /* BGEView.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEView.m; path = ios/BGEView.m; sourceTree = "<group>"; };
+		B5F8716A1D3F2B83000EA018 /* BGEView.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = BGEView.mm; path = ios/BGEView.mm; sourceTree = "<group>"; };
 		B5F8716C1D406EE5000EA018 /* InputTouchComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = InputTouchComponent.cpp; path = components/InputTouchComponent.cpp; sourceTree = "<group>"; };
 		B5F8716D1D406EE5000EA018 /* InputTouchComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputTouchComponent.h; path = components/InputTouchComponent.h; sourceTree = "<group>"; };
 		B5F8716F1D41E8CC000EA018 /* BoundingBoxComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BoundingBoxComponent.cpp; path = components/BoundingBoxComponent.cpp; sourceTree = "<group>"; };
@@ -444,15 +450,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B508CD991CAF95A000127B97 /* BGEGameObejctAndComponentTests */ = {
+		B508CD991CAF95A000127B97 /* BGEGameObjectAndComponentTests */ = {
 			isa = PBXGroup;
 			children = (
 				B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */,
 				B508CD9C1CAF95A000127B97 /* Info.plist */,
 				B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */,
 			);
-			name = BGEGameObejctAndComponentTests;
-			path = BGERenderNodeTests;
+			path = BGEGameObjectAndComponentTests;
 			sourceTree = "<group>";
 		};
 		B508CDAF1CB8B2EA00127B97 /* components */ = {
@@ -557,7 +562,7 @@
 				B525E35D1C8950DA00C691C0 /* BenGameEngine */,
 				B525E36C1C8957A700C691C0 /* BenGameEngineTestApp */,
 				B525E3D71C8959D200C691C0 /* BenGameEngineBundle */,
-				B508CD991CAF95A000127B97 /* BGEGameObejctAndComponentTests */,
+				B508CD991CAF95A000127B97 /* BGEGameObjectAndComponentTests */,
 				B525E35C1C8950DA00C691C0 /* Products */,
 				B545A5FD1DC01CAC000ADD6C /* Frameworks */,
 			);
@@ -696,9 +701,12 @@
 		B525E3D71C8959D200C691C0 /* BenGameEngineBundle */ = {
 			isa = PBXGroup;
 			children = (
+				B57FC8DA1FBAA3D400F445E0 /* Arial Narrow Bold.ttf */,
+				B57FC8DB1FBAA3D400F445E0 /* Avenir Next Condensed.ttc */,
+				B57FC8D81FBA6ED700F445E0 /* Arial Narrow.ttf */,
+				B57FC8D61FBA6D6A00F445E0 /* Arial Black.ttf */,
 				B5D9DCAF1F63266D00661651 /* peachy.otf */,
 				B508CD8F1CA901B700127B97 /* Avenir.ttc */,
-				B508CD8D1CA8ABA100127B97 /* Arial Black.ttf */,
 				B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */,
 				B571F18A1C992B3D007F5A90 /* lazy.ttf */,
 				B525E3D81C8959D200C691C0 /* Info.plist */,
@@ -842,9 +850,9 @@
 			isa = PBXGroup;
 			children = (
 				B525E38B1C89587000C691C0 /* BGEHeartbeatIOS.h */,
-				B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.m */,
+				B525E38C1C89587000C691C0 /* BGEHeartbeatIOS.mm */,
 				B5F871691D3F2B83000EA018 /* BGEView.h */,
-				B5F8716A1D3F2B83000EA018 /* BGEView.m */,
+				B5F8716A1D3F2B83000EA018 /* BGEView.mm */,
 			);
 			name = ios;
 			sourceTree = "<group>";
@@ -1006,11 +1014,13 @@
 			files = (
 				B571F17B1C95258A007F5A90 /* MaskColorMatrixTextureFragment.glsl in Resources */,
 				B525E3DC1C895A1900C691C0 /* SimpleFragment.glsl in Resources */,
-				B508CD8E1CA8ABA100127B97 /* Arial Black.ttf in Resources */,
 				B5661E101E6A2B630083717F /* FullColorFontVertex.glsl in Resources */,
+				B57FC8DD1FBAA3D400F445E0 /* Avenir Next Condensed.ttc in Resources */,
 				B525E3DD1C895A1900C691C0 /* SimpleVertex.glsl in Resources */,
 				B571F1971C9E1BA4007F5A90 /* FontFragment.glsl in Resources */,
 				B571F1751C929DCE007F5A90 /* ColorMatrixTextureFragment.glsl in Resources */,
+				B57FC8DC1FBAA3D400F445E0 /* Arial Narrow Bold.ttf in Resources */,
+				B57FC8D91FBA6ED700F445E0 /* Arial Narrow.ttf in Resources */,
 				B5B457281DB6DC2D0099CB42 /* FullColorTextureVertex.glsl in Resources */,
 				B5B457271DB6DC2D0099CB42 /* FullColorTextureFragment.glsl in Resources */,
 				B57331A91EE3762E00335959 /* PolyLineFragment.glsl in Resources */,
@@ -1021,6 +1031,7 @@
 				B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */,
 				B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */,
 				B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */,
+				B57FC8D71FBA6D6A00F445E0 /* Arial Black.ttf in Resources */,
 				B571F1791C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl in Resources */,
 				B5E7B9B71CC35B5D00978F1A /* LineFragment.glsl in Resources */,
 				B5661E0F1E6A2B5F0083717F /* FullColorFontFragment.glsl in Resources */,
@@ -1055,7 +1066,7 @@
 				B525E3BE1C89587000C691C0 /* RenderServiceOpenGLES2.cpp in Sources */,
 				B525E3C61C89587000C691C0 /* ShaderService.cpp in Sources */,
 				B525E3BD1C89587000C691C0 /* RenderService.cpp in Sources */,
-				B5F8716B1D3F2B83000EA018 /* BGEView.m in Sources */,
+				B5F8716B1D3F2B83000EA018 /* BGEView.mm in Sources */,
 				B5BBFAE81DE416040035AA74 /* AudioServiceHelper.mm in Sources */,
 				B57331951EE0DBC800335959 /* curve.cpp in Sources */,
 				B52B760D1CBA183900758249 /* Material.cpp in Sources */,
@@ -1096,7 +1107,7 @@
 				B5EE9D6C1CC4A4C8005D99CC /* SpriteRenderComponent.cpp in Sources */,
 				B547F17D1D125BD00031AF58 /* FrameAnimatorComponent.cpp in Sources */,
 				B57331931EE0DBC800335959 /* agg_curve4.cpp in Sources */,
-				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.m in Sources */,
+				B525E3B81C89587000C691C0 /* BGEHeartbeatIOS.mm in Sources */,
 				B50A1F9E1D092A3C004B450E /* TextComponent.cpp in Sources */,
 				B525E3BB1C89587000C691C0 /* RenderContext.cpp in Sources */,
 				B5F871711D41E8CC000EA018 /* BoundingBoxComponent.cpp in Sources */,
@@ -1308,6 +1319,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1322,6 +1334,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1458,6 +1471,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1565,6 +1579,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1668,6 +1683,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

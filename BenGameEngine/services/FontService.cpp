@@ -40,6 +40,10 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
     
     fontResources_["default"] = "Arial Black.ttf";
     fontResources_["Avenir"] = "Avenir.ttc";
+    fontResources_["Avenir Next Condensed"] = "Avenir Next Condensed.ttc";
+    fontResources_["Arial Narrow"] = "Arial Narrow.ttf";
+    fontResources_["Arial Narrow Bold"] = "Arial Narrow Bold.ttf";
+    fontResources_["PeachyKeenJF"] = "peachy.otf";
     fontResources_.insert(resources.begin(), resources.end());
     
     // Build FontInfo for all font resources
@@ -202,10 +206,8 @@ void BGE::FontService::buildFontInfoForAsset(std::string asset) {
 
                         if (face->family_name) {
                             fontInfo->family = face->family_name;
-                            
                             if (face->style_name) {
                                 fontInfo->style = face->style_name;
-                                
                                 if (!strcmp(face->style_name, "Regular")) {
                                     // "Regular" style will also have an extra blank version
                                     std::shared_ptr<FontInfo> extra = std::make_shared<FontInfo>();
