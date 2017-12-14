@@ -33,7 +33,14 @@ namespace BGE {
         void setTextureMaskReference(TextureMaskReference *maskRef);
         void setTextureMaskReference(const TextureMaskReference &maskRef);
         
-        
+        void setWidth(float width);
+        void setHeight(float height);
+
+        void reposition(Vector2 position);
+        void resetPosition();
+        void resize(Vector2 size);
+        void resetSize();
+
     protected:
         VertexTex* const getVertices() { return vertices_; }
         
@@ -46,9 +53,12 @@ namespace BGE {
 
         static const uint32_t NumVertices = 4;
         
+        Vector2 originalSize_;
         VertexTex vertices_[NumVertices];
         
+        void setWidthHeight(Vector2 &wh);
         void updateLocalBoundsAndVertices();
+        void updateLocalBoundsAndVertices(Vector2& wh);
     };
 }
 

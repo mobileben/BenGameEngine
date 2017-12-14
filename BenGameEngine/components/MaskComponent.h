@@ -33,7 +33,6 @@ namespace BGE {
         
         void setWidth(float width);
         void setHeight(float height);
-        void setWidthHeight(Vector2 &wh);
 
         void reposition(Vector2 position);
         void resetPosition();
@@ -53,6 +52,7 @@ namespace BGE {
         Vector2 originalSize_;
         Vertex vertices_[NumVertices];
         
+        void setWidthHeight(Vector2 &wh);
         void updateLocalBoundsAndVertices(Vector2& wh);
     };
 }
