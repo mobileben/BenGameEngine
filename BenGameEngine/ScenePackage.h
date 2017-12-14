@@ -81,6 +81,8 @@ namespace BGE {
         
         // Get the reference type for the item, if it exists
         GfxReferenceType getReferenceType(std::string name);
+
+        std::string textureFilename(const std::string& name);
         
     protected:
         void setStatus(ScenePackageStatus status) { status_ = status; }

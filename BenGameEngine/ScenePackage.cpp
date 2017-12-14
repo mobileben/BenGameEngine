@@ -1751,6 +1751,15 @@ BGE::GfxReferenceType BGE::ScenePackage::getReferenceType(std::string name) {
     }
 }
 
+std::string BGE::ScenePackage::textureFilename(const std::string& name) {
+    for (auto& t : textureQueue_) {
+        if (name == t.name) {
+            return t.filePath.filename();
+        }
+    }
+    return std::string();
+}
+
 BGE::GfxReferenceType BGE::ScenePackage::referenceTypeForString(std::string type) {
     GfxReferenceType value;
     
