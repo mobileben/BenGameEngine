@@ -997,20 +997,23 @@ void BGE::Space::createFont(std::string name, uint32_t pxSize, std::function<voi
     
     auto fontService = Game::getInstance()->getFontService();
     auto font = fontService->getFont(name, pxSize);
-    auto fontHandle = font->getHandle();
-    
-    // Now search to see if our handle exists already
-    for (auto const &handle : fonts_) {
-        if (handle == fontHandle) {
-            if (callback) {
-                callback(handle, nullptr);
+    if (font) {
+        auto fontHandle = font->getHandle();
+
+        // Now search to see if our handle exists already
+        for (auto const &handle : fonts_) {
+            if (handle == fontHandle) {
+                if (callback) {
+                    callback(handle, nullptr);
+                }
+
+                spaceService_->unlock();
+
+                return;
             }
-            
-            spaceService_->unlock();
-            
-            return;
         }
     }
+
     
     // Not found, so try and allocate it
     Game::getInstance()->getFontService()->createFont(name, pxSize, spaceHandle_, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
