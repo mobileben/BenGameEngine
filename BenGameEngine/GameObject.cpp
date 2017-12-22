@@ -194,6 +194,24 @@ BGE::GameObject * BGE::GameObject::getParent() {
     return nullptr;
 }
 
+bool BGE::GameObject::hasChildren() {
+    auto xform = getComponent<TransformComponent>();
+
+    if (xform) {
+        return xform->getNumChildren() != 0;
+    }
+    return false;
+}
+
+uint32_t BGE::GameObject::numChildren() {
+    auto xform = getComponent<TransformComponent>();
+
+    if (xform) {
+        xform->getNumChildren();
+    }
+    return 0;
+}
+
 void BGE::GameObject::addChild(GameObjectHandle handle) {
     auto xform = getComponent<TransformComponent>();
     
