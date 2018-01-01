@@ -112,7 +112,6 @@ static void AudioQueueIsRunningOutputBuffer(void* data, AudioQueueRef inAQ, Audi
             case BGE::AudioPlayState::Paused:
                 audio->setState(BGE::AudioPlayState::Playing);
                 break;
-                
             default:
                 audio->setState(BGE::AudioPlayState::Off);
                 break;
@@ -152,11 +151,25 @@ static void DeriveBufferSize (AudioStreamBasicDescription &ASBDesc,
 
 #endif /* TARGET_OS_IPHONE */
 
+BGE::Audio::Audio() : valid_(false), state_(AudioPlayState::Off), type_(AudioType::SFX), streaming_(false), looping_(0), pauseSource_(AudioPauseSource::None)
+#if TARGET_OS_IPHONE
+, audioFileId_(nullptr), audioBuffer_(nullptr), audioBufferSize_(0), queue_(nullptr), actualBuffersUsed_(0), bufferSize_(0), currPacket_(0), numPacketsToRead_(0), packetDesc_(nullptr), memoryImageIndex_(0)
+#endif /* TARGET_OS_IPHONE */
+{
+#if TARGET_OS_IPHONE
+    for (auto i=0;i<kAudioQueueNumBuffers;++i) {
+        buffers_[i] = nullptr;
+    }
+
+    memset(&streamBasicDesc_, 0, sizeof(streamBasicDesc_));
+#endif /* TARGET_OS_IPHONE */
+}
+
 void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *audioBuffer) {
     setName(name);
     handle_ = handle;
     valid_ = false;
-    
+
     if (audioBuffer && audioBuffer->valid_) {
         audioBufferHandle_ = audioBuffer->getHandle();
         streaming_ = audioBuffer->streaming_;
@@ -249,7 +262,7 @@ void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *a
         audioBufferSize_ = 0;
         queue_ = nullptr;
         packetDesc_ = nullptr;
-        
+
         for (auto i=0;i<kAudioQueueNumBuffers;i++) {
             buffers_[i] = nullptr;
         }
@@ -313,20 +326,21 @@ void BGE::Audio::play(uint32_t loop) {
     if (!valid_) {
         return;
     }
-    
-    if (loop == 0 || isPlaying())
+
+    if (loop == 0 || isPlaying()) {
         return;
+    }
 
     looping_ = loop;
     pauseSource_ = AudioPauseSource::None;
-    
+
 #if TARGET_OS_IPHONE
     state_= AudioPlayState::Queued;
-    
+
     prime();
-    
+
     auto status = AudioQueuePrime(queue_, 0, NULL);
-    
+
     status = AudioQueueStart(queue_, NULL);
 #endif /* TARGET_OS_IPHONE */
 }
@@ -368,7 +382,9 @@ void BGE::Audio::stop() {
         state_ = AudioPlayState::Stopping;
         pauseSource_ = AudioPauseSource::None;
 #if TARGET_OS_IPHONE
+        AudioQueueFlush(queue_);
         AudioQueueStop(queue_, YES);
+        AudioQueueReset(queue_);
 #endif /* TARGET_OS_IPHONE */
     }
 }

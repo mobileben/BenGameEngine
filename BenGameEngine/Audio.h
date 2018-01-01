@@ -55,7 +55,8 @@ namespace BGE {
     
     class Audio : public NamedObject {
     public:
-        Audio() {}
+        Audio();
+
         ~Audio() {}
         
         void initialize(AudioHandle handle, std::string name, AudioBuffer *audioBuffer);
@@ -102,7 +103,7 @@ namespace BGE {
         void stop();
         
         AudioType getType() const { return type_; }
-        
+
     private:
         AudioHandle                     handle_;
         bool                            valid_;
@@ -123,9 +124,9 @@ namespace BGE {
         AudioQueueRef                   queue_;
         uint32_t                        actualBuffersUsed_;
         AudioQueueBufferRef				buffers_[kAudioQueueNumBuffers];
-        int32_t						bufferSize_;
+        int32_t						    bufferSize_;
         int32_t							currPacket_;
-        int32_t                        numPacketsToRead_;
+        int32_t                         numPacketsToRead_;
         AudioStreamPacketDescription    *packetDesc_;
         AudioStreamBasicDescription     streamBasicDesc_;
         int32_t							memoryImageIndex_;
