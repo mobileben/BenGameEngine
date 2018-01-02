@@ -90,6 +90,8 @@ namespace BGE {
         void						prime(void);
 
 #endif /* TARGET_OS_IPHONE */
+
+        double getDuration() const;
         
         bool isPlaying() const;
         bool isPaused(AudioPauseSource source=AudioPauseSource::None) const;

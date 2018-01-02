@@ -10,11 +10,22 @@
 
 const std::string BGE::AudioBuffer::ErrorDomain = "AudioBuffer";
 
+BGE::AudioBuffer::AudioBuffer() : valid_(false), streaming_(false), duration_(0), memUsage_(0)
+#if TARGET_OS_IPHONE
+    , audioFileId_(nullptr), maxPacketSize_(0), audioBuffer_(nullptr), audioBufferSize_(0)
+#endif /* TARGET_OS_IPHONE */
+{
+#if TARGET_OS_IPHONE
+    memset(&streamBasicDesc_, 0, sizeof(streamBasicDesc_));
+#endif /* TARGET_OS_IPHONE */
+}
+
 void BGE::AudioBuffer::initialize(AudioBufferHandle handle, std::string name) {
     setName(name);
     handle_ = handle;
     valid_ = false;
     streaming_ = false;
+    duration_ = 0;
 #if TARGET_OS_IPHONE
     audioFileId_ = nullptr;
     audioBuffer_ = nullptr;
@@ -51,19 +62,26 @@ void BGE::AudioBuffer::createFromFile(std::string filename, bool streaming, std:
         auto result = AudioFileOpenURL((__bridge CFURLRef)url, kAudioFileReadPermission, 0, &audioFileId_);
         
         if (!result) {
-            UInt32 data = sizeof(streamBasicDesc_);
-            AudioFileGetProperty(audioFileId_, kAudioFilePropertyDataFormat, &data, &streamBasicDesc_);
+            UInt32 dataSize = sizeof(streamBasicDesc_);
+            AudioFileGetProperty(audioFileId_, kAudioFilePropertyDataFormat, &dataSize, &streamBasicDesc_);
             
-            data = sizeof(maxPacketSize_);
+            dataSize = sizeof(maxPacketSize_);
             
-            AudioFileGetProperty(audioFileId_, kAudioFilePropertyPacketSizeUpperBound, &data, &maxPacketSize_);
-            
+            AudioFileGetProperty(audioFileId_, kAudioFilePropertyPacketSizeUpperBound, &dataSize, &maxPacketSize_);
+
+            Float64 duration = 0;
+            dataSize = sizeof(duration);
+
+            AudioFileGetProperty(audioFileId_, kAudioFilePropertyEstimatedDuration, &dataSize, &duration);
+
+            duration_ = duration;
+
             if (!streaming_) {
                 uint64_t bufSize;
 
-                data = sizeof(bufSize);
+                dataSize = sizeof(bufSize);
                 
-                if (!AudioFileGetProperty(audioFileId_, kAudioFilePropertyAudioDataByteCount, &data, &bufSize)) {
+                if (!AudioFileGetProperty(audioFileId_, kAudioFilePropertyAudioDataByteCount, &dataSize, &bufSize)) {
                     UInt32 bytesRead = static_cast<UInt32>(bufSize);
                     
                     audioBuffer_ = (uint8_t *)malloc(bytesRead);

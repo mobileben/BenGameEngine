@@ -307,6 +307,14 @@ void BGE::Audio::destroy() {
     pauseSource_ = AudioPauseSource::None;
 }
 
+double BGE::Audio::getDuration() const {
+    auto buffer = Game::getInstance()->getAudioService()->getAudioBuffer(audioBufferHandle_);
+    if (buffer) {
+        return buffer->getDuration();
+    }
+    return 0;
+}
+
 bool BGE::Audio::isPlaying() const {
     return (state_ != AudioPlayState::Off && state_ != AudioPlayState::Stopping);
 }
@@ -336,12 +344,11 @@ void BGE::Audio::play(uint32_t loop) {
 
 #if TARGET_OS_IPHONE
     state_= AudioPlayState::Queued;
-
     prime();
-
     auto status = AudioQueuePrime(queue_, 0, NULL);
-
     status = AudioQueueStart(queue_, NULL);
+#else
+    state_= AudioPlayState::Playing;
 #endif /* TARGET_OS_IPHONE */
 }
 
@@ -353,6 +360,9 @@ void BGE::Audio::pause(AudioPauseSource source) {
     if (isPlaying()) {
         state_ = AudioPlayState::Paused;
         pauseSource_ = source;
+#if TARGET_OS_IPHONE
+        AudioQueuePause(queue_);
+#endif /* TARGET_OS_IPHONE */
     }
 }
 
@@ -364,11 +374,12 @@ void BGE::Audio::resume(AudioPauseSource source) {
     if (pauseSource_ == AudioPauseSource::None || source != pauseSource_) {
         return;
     }
-    
+
+    state_ = AudioPlayState::Playing;
+    pauseSource_ = AudioPauseSource::None;
+
 #if TARGET_OS_IPHONE
     OSStatus	status;
-    
-    state_ = AudioPlayState::Playing;
     status = AudioQueueStart(queue_, NULL);
 #endif /* TARGET_OS_IPHONE */
 }

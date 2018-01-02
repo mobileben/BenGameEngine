@@ -47,7 +47,8 @@ namespace BGE {
     public:
         static const std::string ErrorDomain;
         
-        AudioBuffer() : valid_(false), memUsage_(0) {}
+        AudioBuffer();
+
         ~AudioBuffer() {}
         
         void initialize(AudioBufferHandle handle, std::string name);
@@ -58,6 +59,7 @@ namespace BGE {
         void createFromFile(std::string filename, bool streaming, std::function<void(AudioBuffer *, std::shared_ptr<Error>)>callback);
         
         size_t getMemoryUsage();
+        double  getDuration() const { return duration_; }
         
     private:
         friend Audio;
@@ -65,6 +67,7 @@ namespace BGE {
         AudioBufferHandle           handle_;
         bool                        valid_;
         bool                        streaming_;
+        double                      duration_;
 #if TARGET_OS_IPHONE
         AudioFileID                 audioFileId_;
         AudioStreamBasicDescription streamBasicDesc_;
