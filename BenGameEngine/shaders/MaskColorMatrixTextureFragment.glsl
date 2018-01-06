@@ -13,6 +13,7 @@ void main()
     lowp float maskAlpha = texture2D(MaskTexture, MaskTexCoordOut).a;
     lowp vec4 frag = (textureColor * ColorMatrix) + ColorMatOffset;
     lowp vec4 destColor = gl_LastFragData[0];
-    
-    gl_FragColor =  frag * frag.a + destColor * ( 1.0 - frag.a);
+
+    gl_FragColor = vec4(frag.rgb * maskAlpha + destColor.rgb * (1.0 - maskAlpha), maskAlpha);
+    //gl_FragColor =  frag * frag.a + destColor * ( 1.0 - frag.a);
 }
