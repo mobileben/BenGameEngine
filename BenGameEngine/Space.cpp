@@ -298,16 +298,15 @@ void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
     
     for (auto const &handle : handles) {
         auto obj = getGameObject(handle);
-        if (obj) {
+        // Only active root game objects can be returned
+        if (obj && obj->isActive()) {
             auto xform = obj->getComponent<TransformComponent>();
-            
+
             if (xform) {
                 if (!xform->getParent()) {
                     objects.push_back(obj);
                 }
             }
-        } else {
-            printf("Discarding nULL\n");
         }
     }
 }
@@ -317,11 +316,14 @@ void BGE::Space::getReverseRootGameObjects(std::vector<GameObject *> &objects) {
     
     for (int32_t i=static_cast<int32_t>(handles.size())-1;i>=0;--i) {
         auto obj = getGameObject(handles[i]);
-        auto xform = obj->getComponent<TransformComponent>();
-        
-        if (xform) {
-            if (!xform->getParent()) {
-                objects.push_back(obj);
+        // Only active root game objects can be returned
+        if (obj && obj->isActive()) {
+            auto xform = obj->getComponent<TransformComponent>();
+
+            if (xform) {
+                if (!xform->getParent()) {
+                    objects.push_back(obj);
+                }
             }
         }
     }
