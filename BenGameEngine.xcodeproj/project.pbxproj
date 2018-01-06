@@ -107,6 +107,7 @@
 		B57FC8D91FBA6ED700F445E0 /* Arial Narrow.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8D81FBA6ED700F445E0 /* Arial Narrow.ttf */; };
 		B57FC8DC1FBAA3D400F445E0 /* Arial Narrow Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8DA1FBAA3D400F445E0 /* Arial Narrow Bold.ttf */; };
 		B57FC8DD1FBAA3D400F445E0 /* Avenir Next Condensed.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8DB1FBAA3D400F445E0 /* Avenir Next Condensed.ttc */; };
+		B58237C21FECB9E500B99E2A /* GillSans.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B58237C11FECB9E400B99E2A /* GillSans.ttc */; };
 		B59BE7891D8622430055800E /* PlacementComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B59BE7871D8622430055800E /* PlacementComponent.cpp */; };
 		B5ACE88F1CBB08D5004B6871 /* TransformComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */; };
 		B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */; };
@@ -358,6 +359,7 @@
 		B57FC8D81FBA6ED700F445E0 /* Arial Narrow.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Narrow.ttf"; sourceTree = "<group>"; };
 		B57FC8DA1FBAA3D400F445E0 /* Arial Narrow Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Arial Narrow Bold.ttf"; sourceTree = "<group>"; };
 		B57FC8DB1FBAA3D400F445E0 /* Avenir Next Condensed.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Avenir Next Condensed.ttc"; sourceTree = "<group>"; };
+		B58237C11FECB9E400B99E2A /* GillSans.ttc */ = {isa = PBXFileReference; lastKnownFileType = file; path = GillSans.ttc; sourceTree = "<group>"; };
 		B59BE7871D8622430055800E /* PlacementComponent.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = PlacementComponent.cpp; path = components/PlacementComponent.cpp; sourceTree = "<group>"; };
 		B59BE7881D8622430055800E /* PlacementComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlacementComponent.h; path = components/PlacementComponent.h; sourceTree = "<group>"; };
 		B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = TransformComponentTests.m; path = BGEGameObjectAndComponentTests/TransformComponentTests.m; sourceTree = SOURCE_ROOT; };
@@ -701,15 +703,16 @@
 		B525E3D71C8959D200C691C0 /* BenGameEngineBundle */ = {
 			isa = PBXGroup;
 			children = (
-				B57FC8DA1FBAA3D400F445E0 /* Arial Narrow Bold.ttf */,
-				B57FC8DB1FBAA3D400F445E0 /* Avenir Next Condensed.ttc */,
-				B57FC8D81FBA6ED700F445E0 /* Arial Narrow.ttf */,
-				B57FC8D61FBA6D6A00F445E0 /* Arial Black.ttf */,
-				B5D9DCAF1F63266D00661651 /* peachy.otf */,
-				B508CD8F1CA901B700127B97 /* Avenir.ttc */,
 				B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */,
-				B571F18A1C992B3D007F5A90 /* lazy.ttf */,
+				B57FC8D61FBA6D6A00F445E0 /* Arial Black.ttf */,
+				B57FC8DA1FBAA3D400F445E0 /* Arial Narrow Bold.ttf */,
+				B57FC8D81FBA6ED700F445E0 /* Arial Narrow.ttf */,
+				B57FC8DB1FBAA3D400F445E0 /* Avenir Next Condensed.ttc */,
+				B508CD8F1CA901B700127B97 /* Avenir.ttc */,
+				B58237C11FECB9E400B99E2A /* GillSans.ttc */,
 				B525E3D81C8959D200C691C0 /* Info.plist */,
+				B571F18A1C992B3D007F5A90 /* lazy.ttf */,
+				B5D9DCAF1F63266D00661651 /* peachy.otf */,
 			);
 			path = BenGameEngineBundle;
 			sourceTree = "<group>";
@@ -1026,6 +1029,7 @@
 				B57331A91EE3762E00335959 /* PolyLineFragment.glsl in Resources */,
 				B525E3DE1C895A1900C691C0 /* TextureFragment.glsl in Resources */,
 				B525E3DF1C895A1900C691C0 /* TextureVertex.glsl in Resources */,
+				B58237C21FECB9E500B99E2A /* GillSans.ttc in Resources */,
 				B5D9DCB01F63266D00661651 /* peachy.otf in Resources */,
 				B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */,
 				B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */,
