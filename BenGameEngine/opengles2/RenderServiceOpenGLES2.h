@@ -16,6 +16,7 @@
 #include "Texture.h"
 #include "Material.h"
 #include "GameObject.h"
+#include "Font.h"
 
 // TODO: REmove
 #include <GLKit/GLKit.h>
@@ -48,8 +49,9 @@ namespace BGE {
         void bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window);
         void resizeRenderWindow();
         void createShaders();
-        
-        std::shared_ptr<ShaderProgram> pushShaderProgram(std::string program);
+
+        std::shared_ptr<ShaderProgram> useShaderProgram(const std::string& program);
+        std::shared_ptr<ShaderProgram> pushShaderProgram(const std::string& program);
         std::shared_ptr<ShaderProgram> popShaderProgram();
         
         const Matrix4 *getProjectionMatrix() { return &projectionMatrix_; }
@@ -68,7 +70,11 @@ namespace BGE {
         void drawSprite(GameObject *gameObject);
 
         void drawDebugQuads(std::vector<Vector3> points, Color &color);
-        
+
+        void drawString(TextComponent *text, Font *font, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum=true);
+
+        void drawString(std::vector<std::string> &strs, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+
         uint8_t enableMask(GameObject *gameObject);
         void disableMask(uint8_t maskBits);
         
@@ -87,7 +93,11 @@ namespace BGE {
         Matrix4 projectionMatrix_;
         GLKTextureInfo *textureInfo_;
         uint8_t activeMasks_;
-        
+
+        // TODO: Proper way for maintaining texture state would be for each texture unit as well as tracking the target
+        GLuint currentTextureId_;
+        std::shared_ptr<ShaderProgram> currentShader_;
+
         void queueRender(double deltaTime);
         
         int8_t renderGameObject(GameObject *gameObj, bool root, bool hasNextSibling = false);
@@ -99,6 +109,10 @@ namespace BGE {
         
         void pushColorTransform();
         void popColorTransform();
+
+        void setTexture(GLenum target, GLuint texId);
+
+        void drawString(std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
     };
 }
 

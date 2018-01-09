@@ -68,7 +68,31 @@ namespace BGE {
         void setColor(Color&& color) {
             color_ = color;
         }
-        
+
+        const Color& getDropShadowColor() const {
+            return dropShadowColor_;
+        }
+
+        void setDropShadowColor(Color& color) {
+            dropShadowColor_ = color;
+        }
+
+        void setDropShadowColor(Color&& color) {
+            dropShadowColor_ = color;
+        }
+
+        const Vector2& getDropShadowOffset() const {
+            return dropShadowOffset_;
+        }
+
+        void setDropShadowOffset(Vector2& offset) {
+            dropShadowOffset_ = offset;
+        }
+
+        void setDropShadowOffset(Vector2&& offset) {
+            dropShadowOffset_ = offset;
+        }
+
         void setTextReference(TextReference *textRef) {
             if (textRef) {
                 setTextReference(*textRef);
@@ -78,6 +102,7 @@ namespace BGE {
         void setTextReference(const TextReference& textRef);
         
         float getWidth(bool minimum=true);
+        void getWidthHeight(float &width, float &height);
         float getBoundsWidth() const { return boundsWidth_; }
         float getBoundsHeight() const { return boundsHeight_; }
         
@@ -86,7 +111,10 @@ namespace BGE {
         
         bool isMultiline() const { return multiline_; }
         void setMultiline(bool multi);
-        
+
+        bool isDropShadow() const { return dropShadow_; }
+        void setDropShadow(bool dropShadow) { dropShadow_ = dropShadow; }
+
         const auto &getMultiText() const { return multiText_; }
         const auto &getMultiTextY() const { return textY_; }
         
@@ -104,14 +132,15 @@ namespace BGE {
         float                       boundsWidth_;
         float                       boundsHeight_;
         Color                       color_;
+        Color                       dropShadowColor_;
+        Vector2                     dropShadowOffset_;
         FontHandle                  fontHandle_;
         FontHorizontalAlignment     horizAlignment_;
         FontVerticalAlignment       vertAlignment_;
         float                       leading_;
         bool                        multiline_;
+        bool                        dropShadow_;
         
-        
-        void getWidthHeight(float &width, float &height);
         void updateBoundingBox();
         
         void buildLines();

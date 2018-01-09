@@ -80,6 +80,11 @@ namespace BGE {
         void unregisterEventHandler(EventHandlerHandle handle);
         void spaceReset(Space *space);
 
+#ifdef SUPPORT_PROFILING
+        int32_t getNumProcessedObjects() const { return numProcessedObjects_; }
+        int64_t getProcessingTime() const { return processingTime_; }
+#endif /* SUPPORT_PROFILING */
+
     private:
         InputService() = delete;
         
@@ -117,6 +122,11 @@ namespace BGE {
         InputVector                                                                         inputs_;
         std::vector<InputButtonHandler>                                                     inputButtonHandlers_;
         std::unordered_map<Event, std::vector<EventHandlerHandle>>                          inputEventHandlers_;
+
+#ifdef SUPPORT_PROFILING
+        int32_t     numProcessedObjects_;
+        int64_t     processingTime_;
+#endif /* SUPPORT_PROFILING  */
         
         Input *createInput();
         void touchEvent(TouchType type, NSSet* touches, UIView* view);

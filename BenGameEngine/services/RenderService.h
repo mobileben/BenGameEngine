@@ -17,6 +17,7 @@
 #include "RenderContext.h"
 #include "ShaderService.h"
 #include "MathTypes.h"
+#include "Profiling.h"
 
 namespace BGE {
     class ComponentService;
@@ -87,12 +88,32 @@ namespace BGE {
         void setBackgroundColor(Color color) { backgroundColor_ = color; }
         
         Vector2 getWindowWidthHeight() const;
-        
+
         Vector2 deviceCoordinatesFromRenderCoordinates(Vector2 pos);
         
         void setComponentService(std::shared_ptr<ComponentService> componentService);
-        
-        virtual std::shared_ptr<ShaderProgram> pushShaderProgram(std::string program) =0;
+
+#ifdef SUPPORT_PROFILING
+        double getFps(void) const { return frameRateCalculator_.getFps(); }
+        int64_t getCurrentFrameTime(void) { return frameRateCalculator_.getCurrentFrameTime(); }
+
+        int32_t getNumGameObjectsDrawn() const { return numGameObjectsDrawn_; }
+        int32_t getNumGameObjectsIgnored() const { return numGameObjectsIgnored_; }
+        int32_t getNumDrawCalls() const { return numDrawCalls_; }
+        int32_t getNumSpritesDrawn() const { return numSpritesDrawn_; }
+        int32_t getNumFontCharactersDrawn() const { return numFontCharactersDrawn_; }
+        int32_t getNumPolylinesDrawn() const { return numPolylinesDrawn_; }
+        int32_t getNumLinesDrawn() const { return numLinesDrawn_; }
+        int32_t getNumRectsDrawn() const { return numRectsDrawn_; }
+        int32_t getNumMasksDrawn() const { return numMasksDrawn_; }
+        int32_t getNumShadersChanged() const { return numShadersChanged_; }
+        int32_t getNumTexturesChanged() const { return numTexturesChanged_; }
+        int32_t getNumProcessedObjects() const { return numProcessedObjects_; }
+        int64_t getProcessingTime() const { return processingTime_; }
+#endif /* SUPPORT_PROFILING */
+
+        virtual std::shared_ptr<ShaderProgram> useShaderProgram(const std::string& program) =0;
+        virtual std::shared_ptr<ShaderProgram> pushShaderProgram(const std::string& program) =0;
         virtual std::shared_ptr<ShaderProgram> popShaderProgram() =0;
         
         virtual void render() =0;
@@ -108,6 +129,27 @@ namespace BGE {
         
         std::vector<Vector3> boundingBoxPoints_;
         std::vector<Vector3> scaledBoundingBoxPoints_;
+
+#ifdef SUPPORT_PROFILING
+        profiling::FrameRateCalculator frameRateCalculator_;
+
+        int32_t numGameObjectsDrawn_;
+        int32_t numGameObjectsIgnored_;
+        int32_t numDrawCalls_;
+        int32_t numSpritesDrawn_;
+        int32_t numFontCharactersDrawn_;
+        int32_t numPolylinesDrawn_;
+        int32_t numLinesDrawn_;
+        int32_t numRectsDrawn_;
+        int32_t numMasksDrawn_;
+        int32_t numShadersChanged_;
+        int32_t numTexturesChanged_;
+        int32_t numProcessedObjects_;
+        int64_t processingTime_;
+
+        virtual void resetProfilingStats();
+#endif /* SUPPORT_PROFILING */
+
         
     private:
         bool ready_;

@@ -13,6 +13,9 @@
 #include "TransformComponent.h"
 #include "BoundingBoxComponent.h"
 #include "Space.h"
+#ifdef SUPPORT_PROFILING
+#include "Profiling.h"
+#endif /* SUPPORT_PROFILING */
 
 BGE::InputService::InputService(std::shared_ptr<EventService> eventService) : handleService_(InitialInputReserve, HandleServiceNoMaxLimit), eventService_(eventService) {
     inputs_.reserve(InitialInputReserve);
@@ -168,6 +171,9 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
     auto xform = gameObj->getComponent<TransformComponent>();
     
     if (xform && xform->canInteract()) {
+#ifdef SUPPORT_PROFILING
+        ++numProcessedObjects_;
+#endif /* SUPPORT_PROFILING */
         auto button = gameObj->getComponent<ButtonComponent>();
         
         if (button) {
@@ -289,7 +295,11 @@ bool compareInputPointers(BGE::Input *lhs, BGE::Input *rhs) {
 
 void BGE::InputService::update(double deltaTime) {
     lock();
-    
+
+#ifdef SUPPORT_PROFILING
+    auto startTime = profiling::EpochTime::timeInMicroSec();
+    numProcessedObjects_ = 0;
+#endif /* SUPPORT_PROFILING */
     // Sort inputs
     std::sort(inputs_.begin(), inputs_.end(), compareInputPointers);
     
@@ -458,7 +468,12 @@ void BGE::InputService::update(double deltaTime) {
             }
         }
     }
-    
+
+#ifdef SUPPORT_PROFILING
+    auto now = profiling::EpochTime::timeInMicroSec();
+    processingTime_ = now - startTime;
+#endif /* SUPPORT_PROFILING */
+
     unlock();
 }
 

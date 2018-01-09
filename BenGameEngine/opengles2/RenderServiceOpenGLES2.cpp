@@ -25,6 +25,10 @@
 #include "vaser.h"
 #include "backend.h"
 
+#ifdef SUPPORT_PROFILING
+#include "Profiling.h"
+#endif /* SUPPORT_PROFILING */
+
 const GLubyte Indices[] = {
     0, 1, 2,
     2, 3, 0
@@ -42,13 +46,17 @@ static uint8_t MaskIdToMaskValue[] = {
     128
 };
 
-BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0) {
+BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), currentTextureId_(0) {
     shaderService_ = std::make_shared<ShaderServiceOpenGLES2>();
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
     
     Matrix4MakeIdentify(projectionMatrix_);
     
     Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this, std::placeholders::_1), 1);
+
+#ifdef SUPPORT_PROFILING
+    resetProfilingStats();
+#endif /* SUPPORT_PROFILING */
 }
 
 void BGE::RenderServiceOpenGLES2::initialize() {}
@@ -224,8 +232,21 @@ void BGE::RenderServiceOpenGLES2::createShaders()
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, "PolyLineFragment");
     program = this->getShaderService()->createShaderProgram("PolyLine", {vShader,  fShader}, { "Position", "SourceColor" }, { "ModelView", "Projection" });
 }
+std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::useShaderProgram(const std::string& program) {
+    auto shaderProgram = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(shaderService_->getShaderProgram(program));
+    if (shaderProgram) {
+        if (currentShader_ != shaderProgram) {
+            glUseProgram(shaderProgram->getProgram());
+            currentShader_ = shaderProgram;
+#ifdef SUPPORT_PROFILING
+            ++numShadersChanged_;
+#endif /* SUPPORT_PROFILING */
+        }
+    }
+    return currentShader_;
+}
 
-std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram(std::string program)
+std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram(const std::string& program)
 {
     std::string currShader;
     
@@ -354,8 +375,8 @@ void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vec
         vertices[3].position.z = 0;
         vertices[3].color = color;
     }
-    
-    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Default"));
+
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Default"));
     
     GLint positionLocation = glShader->locationForAttribute("Position");
     GLint colorLocation = glShader->locationForAttribute("SourceColor");
@@ -367,6 +388,10 @@ void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vec
     
     glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
                    GL_UNSIGNED_BYTE, &indices[0]);
+#ifdef SUPPORT_PROFILING
+    ++numRectsDrawn_;
+    ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
 }
 
 void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &size, Vector4 color[4])
@@ -452,7 +477,7 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
         vertices[3].color = color[3];
     }
     
-    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Default"));
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Default"));
     
     GLint positionLocation = glShader->locationForAttribute("Position");
     GLint colorLocation = glShader->locationForAttribute("SourceColor");
@@ -464,6 +489,10 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
     
     glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
                    GL_UNSIGNED_BYTE, &indices[0]);
+#ifdef SUPPORT_PROFILING
+    ++numRectsDrawn_;
+    ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
 }
 
 void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr<Texture> texture)
@@ -500,7 +529,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             vertices[3].tex.x = uvs[3].x;
             vertices[3].tex.y = uvs[3].y;
 
-            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Texture"));
             
             GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
             
@@ -527,7 +556,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             glEnable(GL_BLEND);
             
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(texture->getTarget(), texture->getHWTextureId());
+            setTexture(texture->getTarget(), texture->getHWTextureId());
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             
@@ -540,6 +569,10 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             
             glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
                            GL_UNSIGNED_BYTE, &indices[0]);
+#ifdef SUPPORT_PROFILING
+            ++numSpritesDrawn_; // Treated like a sprite
+            ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
         }
     }
 }
@@ -553,7 +586,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
             auto material = flatRect->getMaterial();
             
             if (material) {
-                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
 
                 GLint positionLocation = glShader->locationForAttribute("Position");
                 GLint projectionLocation = glShader->locationForUniform("Projection");
@@ -585,7 +618,10 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
 
                 glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
                                GL_UNSIGNED_BYTE, &Indices[0]);
-
+#ifdef SUPPORT_PROFILING
+                ++numRectsDrawn_;
+                ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
             }
         }
     }
@@ -601,7 +637,7 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
             auto material = maskRect->getMaterial();
             
             if (material) {
-                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
                 auto transformComponent = gameObject->getComponent<TransformComponent>();
                 
                 GLint positionLocation = glShader->locationForAttribute("Position");
@@ -631,7 +667,10 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
                 glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
                                GL_UNSIGNED_BYTE, &Indices[0]);
-                
+#ifdef SUPPORT_PROFILING
+                ++numMasksDrawn_;
+                ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
             }
         }
     }
@@ -650,7 +689,7 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
                 
                 if (texture) {
                     if (texture && texture->isValid()) {
-                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Texture"));
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Texture"));
                         
                         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
                         
@@ -679,7 +718,7 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
                         glDisable(GL_BLEND);
                         
                         glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(texture->getTarget(), texture->getHWTextureId());
+                        setTexture(texture->getTarget(), texture->getHWTextureId());
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                         
@@ -692,6 +731,10 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
                         
                         glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
                                        GL_UNSIGNED_BYTE, &Indices[0]);
+#ifdef SUPPORT_PROFILING
+                        ++numMasksDrawn_;
+                        ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
                     }
                 }
             } else {
@@ -706,7 +749,7 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
 }
 
 void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Color &color) {
-    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
     
     GLint positionLocation = glShader->locationForAttribute("Position");
     GLint projectionLocation = glShader->locationForUniform("Projection");
@@ -729,6 +772,10 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                               sizeof(Vertex), &points[index]);
         glDrawArrays(GL_LINE_LOOP, 0, (GLsizei) 4);
+#ifdef SUPPORT_PROFILING
+        ++numRectsDrawn_;
+        ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
     }
 }
 
@@ -752,7 +799,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
                 index++;
             }
             
-            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("Line"));
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
             
             GLint positionLocation = glShader->locationForAttribute("Position");
             GLint projectionLocation = glShader->locationForUniform("Projection");
@@ -791,6 +838,10 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
             }
             
             glDrawArrays(mode, 0, (GLsizei) points.size());
+#ifdef SUPPORT_PROFILING
+            ++numLinesDrawn_;
+            ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
         }
     }
 }
@@ -804,7 +855,7 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(GameObject *gameObject) {
             const auto& points = line->getPoints();
             const auto& colors = line->getColors();
             
-            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("PolyLine"));
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("PolyLine"));
             
             GLint positionLocation = glShader->locationForAttribute("Position");
             GLint colorLocation = glShader->locationForAttribute("SourceColor");
@@ -904,6 +955,10 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(GameObject *gameObject) {
             if (vColors) {
                 delete [] vColors;
             }
+#ifdef SUPPORT_PROFILING
+            ++numPolylinesDrawn_;
+            ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
         }
     }
 }
@@ -926,9 +981,9 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                     
                     if (texture && texture->isValid()) {
 #if 0
-                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("ColorMatrixTexture"));
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("ColorMatrixTexture"));
 #else
-                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(pushShaderProgram("FullColorTexture"));
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("FullColorTexture"));
 #endif
                         
                         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
@@ -968,7 +1023,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                         glDisable(GL_BLEND);
                         
                         glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(texture->getTarget(), texture->getHWTextureId());
+                        setTexture(texture->getTarget(), texture->getHWTextureId());
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                         
@@ -981,6 +1036,10 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                         
                         glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
                                        GL_UNSIGNED_BYTE, &Indices[0]);
+#ifdef SUPPORT_PROFILING
+                        ++numSpritesDrawn_;
+                        ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
                     }
                 }
             } else {
@@ -993,6 +1052,211 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
         NSLog(@"HWY");
     }
 }
+
+void BGE::RenderServiceOpenGLES2::drawString(TextComponent *text, Font *font, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum) {
+    if (text->isMultiline()) {
+        auto multiText = text->getMultiText();
+        auto yPos = text->getMultiTextY();
+
+        if (text->isDropShadow()) {
+            auto off = text->getDropShadowOffset();
+            drawString(multiText, font, off.x, off.y, yPos, text->getBoundsWidth(), transform, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+        }
+
+        drawString(multiText, font, 0, 0, yPos, text->getBoundsWidth(), transform, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+    } else {
+        if (text->isDropShadow()) {
+            auto off = text->getDropShadowOffset();
+            drawString(text->getText(), font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), off.x, off.y, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+        }
+
+        drawString(text->getText(), font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), 0, 0, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::drawString(std::vector<std::string> &strs, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+    const float *rawMatrix = transform->getWorldMatrixRaw();
+    auto index = 0;
+
+    for (auto &str : strs) {
+        float yOff = yPos[index] + yOffset;
+
+        drawString(str, font, rawMatrix, defWidth, xOffset, yOff, color, colorMatrix, colorTransform, horizAlignment, vertAlignment, minimum);
+
+        index++;
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::drawString(std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+    auto textureAtlas = Game::getInstance()->getTextureService()->getTextureAtlas(font->getTextureAtlasHandle());
+
+    if (str.length() > 0 && textureAtlas && textureAtlas->isValid()) {
+        VertexTex vertices[4];
+        GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
+        // TODO: Adjustment based on alignment to be done here
+        float x = xOffset;
+        float y = yOffset;
+        std::shared_ptr<RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<RenderServiceOpenGLES2>(Game::getInstance()->getRenderService());
+
+        const char *chars = str.c_str();
+        FontGlyph glyph;
+        uint16_t code;
+        size_t length = str.length();
+        auto texHandle = textureAtlas->getTextureHandle();
+        auto tex = Game::getInstance()->getTextureService()->getTexture(texHandle);
+
+        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(renderer->useShaderProgram("FullColorFont"));
+        GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
+        GLint positionLocation = glShader->locationForAttribute("Position");
+
+        glEnableVertexAttribArray(positionLocation);
+        glEnableVertexAttribArray(texCoordLocation);
+
+        GLint textureUniform = glShader->locationForUniform("Texture");
+        GLint projectionLocation = glShader->locationForUniform("Projection");
+        GLint modelLocation = glShader->locationForUniform("ModelView");
+        GLint colorUniform = glShader->locationForUniform("SourceColor");
+        GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
+        GLint colorMatOffsetLocation = glShader->locationForUniform("ColorMatOffset");
+        auto colorMultiplierLocation = glShader->locationForUniform("ColorMultiplier");
+        auto colorOffsetLocation = glShader->locationForUniform("ColorOffset");
+
+        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) renderer->getProjectionMatrix()->m);
+        glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
+
+        glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
+        glUniform4fv(colorMatOffsetLocation, 1, (GLfloat *) colorMatrix.offset.v);
+
+        glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) colorTransform.multiplier.v);
+        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorTransform.offset.v);
+
+
+        // Compute the offsets if needed
+        switch (horizAlignment) {
+            case FontHorizontalAlignment::Center:
+                x -= font->getStringWidth(str, minimum) / 2.0;
+                break;
+
+            case FontHorizontalAlignment::Right:
+                x -= font->getStringWidth(str, minimum) - defWidth / 2.0;
+                break;
+
+            default:
+                x -= defWidth / 2.0;
+                break;
+        }
+
+        float deltaY = 0;
+
+        switch (vertAlignment) {
+            case FontVerticalAlignment::Center:
+                deltaY = font->getHeight() / 2.0;
+                break;
+
+            case FontVerticalAlignment::Bottom:
+                deltaY = font->getHeight();
+                break;
+
+            case FontVerticalAlignment::Baseline:
+                deltaY = font->getBaseline();
+                break;
+
+            default:
+                break;
+        }
+
+        y -= deltaY;
+
+        float gridX = x;
+        float gridY = y;
+
+        glDisable(GL_BLEND);
+
+        glActiveTexture(GL_TEXTURE0);
+
+        uint16_t prev = 0;
+
+        setTexture(tex->getTarget(), tex->getHWTextureId());
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glUniform1i(textureUniform, 0);
+        glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
+
+        for (int i=0;i<length;i++) {
+            code = chars[i];
+
+            auto glyph = font->glyphs_.find(code);
+
+            if (glyph != font->glyphs_.end()) {
+                if (i == 0 && !minimum) {
+                    x += glyph->second.getOffsetX();
+                } else {
+                    x += glyph->second.getOffsetX();
+                }
+
+                if (font->hasKerning() && prev) {
+                    int32_t kerning = font->kerningForPair(prev, code);
+                    x += kerning;
+                    gridX += kerning;
+                }
+
+                y += glyph->second.getOffsetY();
+
+                auto texHandle = glyph->second.getTextureHandle();
+                auto tex = Game::getInstance()->getTextureService()->getTexture(texHandle);
+
+                if (tex) {
+                    const Vector2 *xys = tex->getXYs();
+                    const Vector2 *uvs = tex->getUVs();
+
+                    vertices[0].position.x = x + xys[0].x;
+                    vertices[0].position.y = y + xys[0].y;
+                    vertices[0].position.z = 0;
+                    vertices[0].tex.x = uvs[0].x;
+                    vertices[0].tex.y = uvs[0].y;
+
+                    vertices[1].position.x = x + xys[1].x;
+                    vertices[1].position.y = y + xys[1].y;
+                    vertices[1].position.z = 0;
+                    vertices[1].tex.x = uvs[1].x;
+                    vertices[1].tex.y = uvs[1].y;
+
+                    vertices[2].position.x = x + xys[2].x;
+                    vertices[2].position.y = y + xys[2].y;
+                    vertices[2].position.z = 0;
+                    vertices[2].tex.x = uvs[2].x;
+                    vertices[2].tex.y = uvs[2].y;
+
+                    vertices[3].position.x = x + xys[3].x;
+                    vertices[3].position.y = y + xys[3].y;
+                    vertices[3].position.z = 0;
+                    vertices[3].tex.x = uvs[3].x;
+                    vertices[3].tex.y = uvs[3].y;
+
+                    glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                          sizeof(VertexTex), &vertices[0]);
+                    glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                                          sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
+
+                    glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
+                                   GL_UNSIGNED_BYTE, &indices[0]);
+#ifdef SUPPORT_PROFILING
+                    ++numFontCharactersDrawn_;
+                    ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
+                }
+
+                gridX += glyph->second.getAdvance();
+                x = gridX;
+                y = gridY;
+            }
+
+            prev = code;
+        }
+    }
+}
+
 
 uint8_t BGE::RenderServiceOpenGLES2::enableMask(GameObject *gameObject) {
     uint8_t maskValue = 0;
@@ -1060,13 +1324,19 @@ void BGE::RenderServiceOpenGLES2::render()
 {
     handleServicesLock();
     lock();
- 
+
     if (isBackgrounded()) {
         unlock();
         handleServicesUnlock();
         return;
     }
-    
+
+#ifdef SUPPORT_PROFILING
+    auto startTime = profiling::EpochTime::timeInMicroSec();
+
+    resetProfilingStats();
+#endif /* SUPPORT_PROFILING */
+
     std::shared_ptr<RenderContextOpenGLES2> glContext = std::dynamic_pointer_cast<RenderContextOpenGLES2>(getRenderContext());
     auto bkgColor = getBackgroundColor();
     
@@ -1126,14 +1396,25 @@ void BGE::RenderServiceOpenGLES2::render()
         
         [glContext->getContext() presentRenderbuffer:GL_RENDERBUFFER];
     }
-    
+
+#ifdef SUPPORT_PROFILING
+    auto now = profiling::EpochTime::timeInMicroSec();
+    processingTime_ = now - startTime;
+    frameRateCalculator_.nextFrame();
+#endif /* SUPPORT_PROFILING */
+
     unlock();
     handleServicesUnlock();
 }
 
 int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool root, bool hasNextSibling) {
     uint8_t maskValue = 0;
-    
+
+#ifdef SUPPORT_PROFILING
+    ++numGameObjectsIgnored_;
+    ++numProcessedObjects_;
+#endif /* SUPPORT_PROFILING */
+
     if (!gameObj->isActive()) {
         return maskValue;
     }
@@ -1173,21 +1454,45 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         
         if (gameObj->hasComponent<SpriteRenderComponent>()) {
             drawSprite(gameObj);
+#ifdef SUPPORT_PROFILING
+            ++numGameObjectsDrawn_;
+            --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
+#endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<TextComponent>()) {
             auto text = gameObj->getComponent<TextComponent>();
             Font *font = Game::getInstance()->getFontService()->getFont(text->getFontHandle());
             
             if (font) {
-                font->drawString(text, transformComponent, currentColorMatrix_, currentColorTransform_);
+                drawString(text, font, transformComponent, currentColorMatrix_, currentColorTransform_);
             }
+#ifdef SUPPORT_PROFILING
+            ++numGameObjectsDrawn_;
+            --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
+#endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<PolyLineRenderComponent>()) {
             drawPolyLines(gameObj);
+#ifdef SUPPORT_PROFILING
+            ++numGameObjectsDrawn_;
+            --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
+#endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<LineRenderComponent>()) {
             drawLines(gameObj);
+#ifdef SUPPORT_PROFILING
+            ++numGameObjectsDrawn_;
+            --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
+#endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<FlatRectRenderComponent>()) {
             drawFlatRect(gameObj);
+#ifdef SUPPORT_PROFILING
+            ++numGameObjectsDrawn_;
+            --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
+#endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<MaskComponent>() || gameObj->hasComponent<TextureMaskComponent>()) {
             maskValue = enableMask(gameObj);
+#ifdef SUPPORT_PROFILING
+            ++numGameObjectsDrawn_;
+            --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
+#endif /* SUPPORT_PROFILING */
         }
 
         uint8_t childrenMasks = 0;;
@@ -1243,3 +1548,22 @@ void BGE::RenderServiceOpenGLES2::popColorTransform() {
     currentColorTransform_ = colorTransformStack_.back();
     colorTransformStack_.pop_back();
 }
+
+void BGE::RenderServiceOpenGLES2::setTexture(GLenum target, GLuint texId) {
+    if (currentTextureId_ != texId) {
+        glBindTexture(target, texId);
+        currentTextureId_ = texId;
+#ifdef SUPPORT_PROFILING
+        ++numTexturesChanged_;
+#endif /* SUPPORT_PROFILING */
+    }
+}
+
+#ifdef SUPPORT_PROFILING
+
+void BGE::RenderService::resetProfilingStats() {
+    RenderService::resetProfilingStats();
+}
+
+#endif /* SUPPORT_PROFILING */
+

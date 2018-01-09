@@ -87,7 +87,9 @@ namespace BGE {
         
         void queueSpaceReset(Space *space, std::function<void()> callback);
         void servicesSpaceReset(Space *space);
-        
+
+        uint32_t numGameObjects () const { return gameObjectService_->numGameObjects(); }
+
         void outputResourceUsage() const;
         void outputMemoryUsage() const;
 

@@ -12,7 +12,9 @@
 #include "GameObject.h"
 #include "LogicComponent.h"
 #include "Space.h"
-
+#ifdef SUPPORT_PROFILING
+#include "Profiling.h"
+#endif /* SUPPORT_PROFILING */
 BGE::LogicService::LogicService() :  Service() {
     pthread_mutexattr_t attr;
     
@@ -32,7 +34,12 @@ BGE::LogicService::LogicService() :  Service() {
 
 void BGE::LogicService::update(double deltaTime) {
     addRemoveLock();
-    
+
+#ifdef SUPPORT_PROFILING
+    auto startTime = profiling::EpochTime::timeInMicroSec();
+    numProcessedObjects_ = 0;
+#endif /* SUPPORT_PROFILING */
+
     // Update our list based on our array
     for (auto &element : addRemoveQueue_) {
         auto item = std::make_pair(element.spaceHandle, element.gameObjHandle);
@@ -110,11 +117,19 @@ void BGE::LogicService::update(double deltaTime) {
                 
                 if (logic) {
                     logic->update(gameObj, deltaTime);
+#ifdef SUPPORT_PROFILING
+                    ++numProcessedObjects_;
+#endif /* SUPPORT_PROFILING */
                 }
             }
         }
     }
-    
+
+#ifdef SUPPORT_PROFILING
+    auto now = profiling::EpochTime::timeInMicroSec();
+    processingTime_ = now - startTime;
+#endif /* SUPPORT_PROFILING */
+
     spaceService->unlock();
 }
 

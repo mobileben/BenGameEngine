@@ -42,7 +42,12 @@ namespace BGE {
         EventHandlerHandle registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function);
         void unregisterEventHandler(EventHandlerHandle handle);
         void spaceReset(Space *space);
-        
+
+#ifdef SUPPORT_PROFILING
+        int32_t getNumProcessedObjects() const { return numProcessedObjects_;}
+        int64_t getProcessingTime() const { return processingTime_; }
+#endif /* SUPPORT_PROFILING */
+
     private:
         AnimationService() = delete;
         
@@ -55,6 +60,11 @@ namespace BGE {
         std::shared_ptr<EventService>                               eventService_;
         std::unordered_map<Event, std::vector<EventHandlerHandle>>  eventHandlers_;
         std::vector<AnimationEvent>                                 events_;
+
+#ifdef SUPPORT_PROFILING
+        int32_t     numProcessedObjects_;
+        int64_t     processingTime_;
+#endif /* SUPPORT_PROFILING */
         
         void queueEvent(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, Event event);
         void processEvents();

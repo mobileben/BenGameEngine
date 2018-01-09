@@ -19,12 +19,20 @@
 #include "SpriteRenderComponent.h"
 #include "TextComponent.h"
 #include "LineRenderComponent.h"
+#ifdef SUPPORT_PROFILING
+#include "Profiling.h"
+#endif /* SUPPORT_PROFILING */
 
 void BGE::AnimationService::update(double deltaTime) {
     auto spaceService = Game::getInstance()->getSpaceService();
     
     lock();
     spaceService->lock();
+
+#ifdef SUPPORT_PROFILING
+    auto startTime = profiling::EpochTime::timeInMicroSec();
+    numProcessedObjects_ = 0;
+#endif /* SUPPORT_PROFILING */
     
     float dt = (float)deltaTime;
 
@@ -42,6 +50,9 @@ void BGE::AnimationService::update(double deltaTime) {
                     
                     if (animSeq && animator) {
                         animateSequence(space, animSeq, animator, dt);
+#ifdef SUPPORT_PROFILING
+                        ++numProcessedObjects_;
+#endif /* SUPPORT_PROFILING */
                     }
                 }
             }
@@ -51,6 +62,11 @@ void BGE::AnimationService::update(double deltaTime) {
     spaceService->unlock();
     
     processEvents();
+
+#ifdef SUPPORT_PROFILING
+    auto now = profiling::EpochTime::timeInMicroSec();
+    processingTime_ = now - startTime;
+#endif /* SUPPORT_PROFILING */
 
     // TODO: Does unlocking happen before processing events?
     unlock();

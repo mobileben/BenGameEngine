@@ -65,6 +65,7 @@ namespace BGE {
         void destroy();
         
         FontHandle getHandle() const { return handle_; }
+        TextureAtlasHandle getTextureAtlasHandle() const { return textureAtlasHandle_; }
         uint32_t getGlyphW() const { return glyphW_; }
         uint32_t getGlyphH() const { return glyphH_; }
         int32_t getBaseline() const { return baseline_; }
@@ -83,14 +84,8 @@ namespace BGE {
         
         virtual void load(std::string filename, uint32_t faceIndex, std::function<void(FontHandle, std::shared_ptr<Error>)> callback);
 
-        // TODO: Determine if font rendering should be done else where, like in the renderer versus the font.
-        // TODO: We will want to cache the width/height of the string. So this is probably not the best place for the drawString to exist
-        // TODO: Move to renderer
-        virtual void drawString(TextComponent *text, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum=true);
-
-        virtual void drawString(std::string str, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform,  FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
-        virtual void drawString(std::string str, Vector2 &position, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
-        void drawString(std::vector<std::string> &strs, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        // We allow glyphs_ to be public here so the renderer can access it directly
+        std::map<uint16_t, FontGlyph>                       glyphs_;
 
     protected:
         uint32_t    pixelSize_;
@@ -106,10 +101,7 @@ namespace BGE {
         bool hasKerning_;
         
         TextureAtlasHandle                                  textureAtlasHandle_;
-        std::map<uint16_t, FontGlyph>                       glyphs_;
         std::map<std::pair<uint16_t, uint16_t>, int32_t>    kerning_;
-
-        void drawString(std::string str, const float *rawMatrix, float defWidth, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
 
     private:
         friend class FontService;

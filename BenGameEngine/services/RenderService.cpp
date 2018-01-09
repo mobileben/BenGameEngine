@@ -86,4 +86,25 @@ void BGE::RenderService::setComponentService(std::shared_ptr<ComponentService> c
     componentService_ = componentService;
 }
 
+#ifdef SUPPORT_PROFILING
+
+void BGE::RenderService::resetProfilingStats() {
+    numGameObjectsDrawn_ = 0;
+    numGameObjectsIgnored_ = 0;
+    numDrawCalls_ = 0;
+    numSpritesDrawn_ = 0;
+    numFontCharactersDrawn_ = 0;
+    numPolylinesDrawn_ = 0;
+    numLinesDrawn_= 0;
+    numRectsDrawn_ = 0;
+    numMasksDrawn_ = 0;
+    numShadersChanged_ = 0;
+    numTexturesChanged_ = 0;
+    numProcessedObjects_ = 0;
+    processingTime_ = 0;
+}
+
+#endif /* SUPPORT_PROFILING */
+
+
 

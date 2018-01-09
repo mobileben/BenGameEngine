@@ -121,6 +121,7 @@
 		B5BBFAE81DE416040035AA74 /* AudioServiceHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAE71DE416040035AA74 /* AudioServiceHelper.mm */; };
 		B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */; };
 		B5C388E21D24D91B00137CEC /* ColorTransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */; };
+		B5C8024420019882005ED480 /* Profiling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C8024220019882005ED480 /* Profiling.cpp */; };
 		B5D9DCB01F63266D00661651 /* peachy.otf in Resources */ = {isa = PBXBuildFile; fileRef = B5D9DCAF1F63266D00661651 /* peachy.otf */; };
 		B5DCDA231CE2F9F100CBF0A6 /* HandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */; };
 		B5DCDA261CE59F7400CBF0A6 /* ScenePackageService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA241CE59F7400CBF0A6 /* ScenePackageService.cpp */; };
@@ -382,6 +383,8 @@
 		B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformComponent.cpp; path = components/ColorTransformComponent.cpp; sourceTree = "<group>"; };
 		B5C388E11D24D91B00137CEC /* ColorTransformComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorTransformComponent.h; path = components/ColorTransformComponent.h; sourceTree = "<group>"; };
 		B5C388E41D28635500137CEC /* NamedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NamedObject.h; sourceTree = "<group>"; };
+		B5C8024220019882005ED480 /* Profiling.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Profiling.cpp; sourceTree = "<group>"; };
+		B5C8024320019882005ED480 /* Profiling.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Profiling.h; sourceTree = "<group>"; };
 		B5D9DCAF1F63266D00661651 /* peachy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = peachy.otf; sourceTree = "<group>"; };
 		B5DC4BDB1ED37A4C003C4B5C /* Observer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Observer.h; sourceTree = "<group>"; };
 		B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = HandleTests.m; path = BGEGameObjectAndComponentTests/HandleTests.m; sourceTree = SOURCE_ROOT; };
@@ -616,6 +619,8 @@
 				B508CDAA1CB4DE8E00127B97 /* Object.h */,
 				B5DC4BDB1ED37A4C003C4B5C /* Observer.h */,
 				B571F1741C928BA5007F5A90 /* opengles2 */,
+				B5C8024220019882005ED480 /* Profiling.cpp */,
+				B5C8024320019882005ED480 /* Profiling.h */,
 				B51A56E21D72717E005AA9AB /* Queue.h */,
 				B525E3911C89587000C691C0 /* RenderContext.cpp */,
 				B525E3921C89587000C691C0 /* RenderContext.h */,
@@ -1126,6 +1131,7 @@
 				B512AD541D2F6DF200DCE362 /* ButtonComponent.cpp in Sources */,
 				B525E3B51C89587000C691C0 /* Error.cpp in Sources */,
 				B5F4564E1D82597E00B4E340 /* FileUtilities.cpp in Sources */,
+				B5C8024420019882005ED480 /* Profiling.cpp in Sources */,
 				B508CDAE1CB78DA100127B97 /* GameObjectService.cpp in Sources */,
 				B508CDA81CB4DE6D00127B97 /* GameObject.cpp in Sources */,
 				B55194A41D28C2B100BDAA5D /* ComponentBitmask.cpp in Sources */,
@@ -1259,6 +1265,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"DEBUG=1",
+					"SUPPORT_PROFILING=1",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1452,6 +1459,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"DEBUG=1",
+					"SUPPORT_PROFILING=1",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1560,7 +1568,10 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"SUPPORT_PROFILING=1",
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;

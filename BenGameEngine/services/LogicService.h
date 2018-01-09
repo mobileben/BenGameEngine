@@ -36,6 +36,11 @@ namespace BGE {
         void addGameObject(GameObject *gameObject);
         void removeGameObject(GameObject *gameObject);
         void spaceReset(Space *space);
+
+#ifdef SUPPORT_PROFILING
+        int32_t getNumProcessedObjects() const { return numProcessedObjects_; }
+        int64_t getProcessingTime() const { return processingTime_; }
+#endif /* SUPPORT_PROFILING */
         
     private:
         enum class Operation : uint32_t {
@@ -54,7 +59,12 @@ namespace BGE {
         pthread_mutex_t                                         executeMutex_;
         std::vector<std::pair<SpaceHandle, GameObjectHandle>>   gameObjectHandles_;
         std::vector<LogicElement>                               addRemoveQueue_;
-        
+
+#ifdef SUPPORT_PROFILING
+        int32_t     numProcessedObjects_;
+        int64_t     processingTime_;
+#endif /* SUPPORT_PROFILING */
+
         void addRemoveLock();
         void addRemoveUnlock();
         void executeLock();
