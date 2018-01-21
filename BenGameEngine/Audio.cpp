@@ -46,6 +46,9 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
                         AudioQueueHandleOutputBuffer(data, inAQ, inBuffer);
                     } else {
                         audio->setLoopingCount(0);
+                        if (audio->doneCallback) {
+                            audio->doneCallback(audio);
+                        }
                         AudioQueueFlush(audio->getAudioQueueRef());
                         AudioQueueStop(audio->getAudioQueueRef(), false);
                     }
@@ -70,10 +73,11 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
                     index = audio->getCurrentMemoryImageIndex();
                 } else {
                     audio->setLoopingCount(0);
-                    
+                    if (audio->doneCallback) {
+                        audio->doneCallback(audio);
+                    }
                     AudioQueueFlush(audio->getAudioQueueRef());
                     AudioQueueStop(audio->getAudioQueueRef(), false);
-                    
                     go = false;
                 }
             }
@@ -151,7 +155,7 @@ static void DeriveBufferSize (AudioStreamBasicDescription &ASBDesc,
 
 #endif /* TARGET_OS_IPHONE */
 
-BGE::Audio::Audio() : valid_(false), state_(AudioPlayState::Off), type_(AudioType::SFX), streaming_(false), looping_(0), pauseSource_(AudioPauseSource::None)
+BGE::Audio::Audio() : doneCallback(nullptr), valid_(false), state_(AudioPlayState::Off), type_(AudioType::SFX), streaming_(false), looping_(0), pauseSource_(AudioPauseSource::None)
 #if TARGET_OS_IPHONE
 , audioFileId_(nullptr), audioBuffer_(nullptr), audioBufferSize_(0), queue_(nullptr), actualBuffersUsed_(0), bufferSize_(0), currPacket_(0), numPacketsToRead_(0), packetDesc_(nullptr), memoryImageIndex_(0)
 #endif /* TARGET_OS_IPHONE */
@@ -169,6 +173,7 @@ void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *a
     setName(name);
     handle_ = handle;
     valid_ = false;
+    doneCallback = nullptr;
 
     if (audioBuffer && audioBuffer->valid_) {
         audioBufferHandle_ = audioBuffer->getHandle();
@@ -279,6 +284,8 @@ void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *a
 }
 
 void BGE::Audio::destroy() {
+    doneCallback = nullptr;
+
 #if TARGET_OS_IPHONE
     if (queue_) {
         AudioQueueFlush(queue_);
@@ -305,6 +312,14 @@ void BGE::Audio::destroy() {
     state_ = AudioPlayState::Off;
     audioBufferHandle_.nullify();
     pauseSource_ = AudioPauseSource::None;
+}
+
+void BGE::Audio::setDoneCallback(std::function<void(Audio *)> callback) {
+    doneCallback = callback;
+}
+
+void BGE::Audio::clearDoneCallback() {
+    doneCallback = nullptr;
 }
 
 double BGE::Audio::getDuration() const {

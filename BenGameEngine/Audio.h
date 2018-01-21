@@ -16,6 +16,8 @@
 
 #include <Foundation/Foundation.h>
 
+#include <functional>
+
 #if TARGET_OS_IPHONE
 
 #include "AudioToolbox/AudioFile.h"
@@ -50,7 +52,13 @@ namespace BGE {
     const uint32_t AudioPlayForever = static_cast<uint32_t>(-1);
     const uint32_t AudioPlayOnce = 1;
     
-    
+
+#if TARGET_OS_IPHONE
+
+    typedef void (*AudioDoneCallbackFunction)(__weak id, SEL, Audio *);
+
+#endif /* TARGET_OS_IPHONE */
+
     class AudioBuffer;
     
     class Audio : public NamedObject {
@@ -67,7 +75,10 @@ namespace BGE {
         
         AudioPlayState getState() const { return state_; }
         void setState(AudioPlayState state) { state_ = state;}
-        
+
+        void setDoneCallback(std::function<void(Audio *)> callback);
+        void clearDoneCallback();
+
 #if TARGET_OS_IPHONE
 
         inline bool                 isStreaming(void) const { return streaming_; }
@@ -106,6 +117,8 @@ namespace BGE {
         
         AudioType getType() const { return type_; }
 
+        std::function<void(Audio *)>    doneCallback;
+
     private:
         AudioHandle                     handle_;
         bool                            valid_;
@@ -117,7 +130,7 @@ namespace BGE {
         
         uint32_t                        looping_;
         AudioPauseSource                pauseSource_;
-        
+
 #if TARGET_OS_IPHONE
         AudioFileID                     audioFileId_;
         uint8_t                         *audioBuffer_;
