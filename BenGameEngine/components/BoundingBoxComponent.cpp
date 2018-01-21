@@ -18,27 +18,27 @@ BGE::BoundingBoxComponent::BoundingBoxComponent() : Component(), x(0), y(0), wid
 void BGE::BoundingBoxComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
     Component::initialize(handle, spaceHandle);
     
-    x = 0;
-    y = 0;
-    width = 0;
-    height = 0;
+    x = 0.0F;
+    y = 0.0F;
+    width = 0.0F;
+    height = 0.0F;
     
-    aabbMinX = 0;
-    aabbMinY = 0;
-    aabbMaxX = 0;
-    aabbMaxY = 0;
+    aabbMinX = 0.0F;
+    aabbMinY = 0.0F;
+    aabbMaxX = 0.0F;
+    aabbMaxY = 0.0F;
 }
 
 void BGE::BoundingBoxComponent::destroy() {
-    x = 0;
-    y = 0;
-    width = 0;
-    height = 0;
+    x = 0.0F;
+    y = 0.0F;
+    width = 0.0F;
+    height = 0.0F;
     
-    aabbMinX = 0;
-    aabbMinY = 0;
-    aabbMaxX = 0;
-    aabbMaxY = 0;
+    aabbMinX = 0.0F;
+    aabbMinY = 0.0F;
+    aabbMaxX = 0.0F;
+    aabbMaxY = 0.0F;
 
     // Component::destroy last
     Component::destroy();
@@ -52,8 +52,8 @@ void BGE::BoundingBoxComponent::computeAABB(Matrix4 &transform, float w, float h
     Vector2 pt;
     Vector2 newPt;
     
-    pt.x = x - w/2.0;
-    pt.y = y - h/2.0;
+    pt.x = x - w/2.0F;
+    pt.y = y - h/2.0F;
     
     Matrix4MultiplyVector2(newPt, transform, pt);
     

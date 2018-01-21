@@ -889,5 +889,160 @@ namespace BGE {
         
         return true;
     }
+
+    // Some helpful arguments in regards to
+    // https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
+    // http://floating-point-gui.de/errors/comparison/
+    // https://bitbashing.io/comparing-floats.html
+    // https://randomascii.wordpress.com/2012/06/26/doubles-are-not-floats-so-dont-compare-them/
+    // https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html
+    //
+    // Keep in mind that float has 7 decimal digits of precision whereas double has 15.
+
+
+    // ulpsDistance from https://bitbashing.io/comparing-floats.html
+    static int32_t ulpsDistance(const float a, const float b)
+    {
+        // Save work if the floats are equal.
+        // Also handles +0 == -0
+        if (a == b) return 0;
+
+        const auto max =
+        std::numeric_limits<int32_t>::max();
+
+        // Max distance for NaN
+        if (isnan(a) || isnan(b)) return max;
+
+        // If one's infinite and they're not equal, max distance.
+        if (isinf(a) || isinf(b)) return max;
+
+        int32_t ia, ib;
+        memcpy(&ia, &a, sizeof(float));
+        memcpy(&ib, &b, sizeof(float));
+
+        // Don't compare differently-signed floats.
+        if ((ia < 0) != (ib < 0)) return max;
+
+        // Return the absolute value of the distance in ULPs.
+        int32_t distance = ia - ib;
+        if (distance < 0) distance = -distance;
+        return distance;
+    }
+
+    // ulpsDistance from https://bitbashing.io/comparing-floats.html
+    static int64_t ulpsDistance(const double a, const double b)
+    {
+        // Save work if the doubles are equal.
+        // Also handles +0 == -0
+        if (a == b) return 0;
+
+        const auto max =
+        std::numeric_limits<int64_t>::max();
+
+        // Max distance for NaN
+        if (isnan(a) || isnan(b)) return max;
+
+        // If one's infinite and they're not equal, max distance.
+        if (isinf(a) || isinf(b)) return max;
+
+        int64_t ia, ib;
+        memcpy(&ia, &a, sizeof(double));
+        memcpy(&ib, &b, sizeof(double));
+
+        // Don't compare differently-signed floats.
+        if ((ia < 0) != (ib < 0)) return max;
+
+        // Return the absolute value of the distance in ULPs.
+        int64_t distance = ia - ib;
+        if (distance < 0) distance = -distance;
+        return distance;
+    }
+
+    bool nearlyZero(float a, float epsilon) {
+        if (a < 0.0F) {
+            a = -a;
+        }
+        return a <= epsilon;
+    }
+
+    bool nearlyZero(double a, double epsilon) {
+        if (a < 0.0) {
+            a = -a;
+        }
+        return a <= epsilon;
+    }
+
+    bool nearlyEqual(float a, float b, float epsilon, int32_t ulpsEpsilon) {
+        const auto diff = fabs(a-b);
+        if (diff <= epsilon) {
+            return true;
+        }
+        return ulpsDistance(a, b) <= ulpsEpsilon;
+    }
+
+    bool nearlyEqual(double a, double b, double epsilon, int64_t ulpsEpsilon) {
+        const auto diff = fabs(a-b);
+        if (diff <= epsilon) {
+            return true;
+        }
+        return ulpsDistance(a, b) <= ulpsEpsilon;
+    }
+    bool notNearlyZero(float a, float epsilon) {
+        if (a < 0.0F) {
+            a = -a;
+        }
+        return a > epsilon;
+    }
+
+    bool notNearlyZero(double a, double epsilon) {
+        if (a < 0.0) {
+            a = -a;
+        }
+        return a > epsilon;
+    }
+
+    bool notNearlyEqual(float a, float b, float epsilon, int32_t ulpsEpsilon) {
+        const auto diff = fabs(a-b);
+        if (diff <= epsilon) {
+            return false;
+        }
+        return ulpsDistance(a, b) > ulpsEpsilon;
+    }
+
+    bool notNearlyEqual(double a, double b, double epsilon, int64_t ulpsEpsilon) {
+        const auto diff = fabs(a-b);
+        if (diff <= epsilon) {
+            return false;
+        }
+        return ulpsDistance(a, b) > ulpsEpsilon;
+    }
+
+    bool nearlyGreaterThanOrEqual(float a, float b, float epsilon, int32_t ulpsEpsilon) {
+        if (a > b) {
+            return true;
+        }
+        return nearlyEqual(a, b, epsilon, ulpsEpsilon);
+    }
+
+    bool nearlyGreaterThanOrEqual(double a, double b, double epsilon, int64_t ulpsEpsilon) {
+        if (a > b) {
+            return true;
+        }
+        return nearlyEqual(a, b, epsilon, ulpsEpsilon);
+    }
+
+    bool nearlyLessThanOrEqual(float a, float b, float epsilon, int32_t ulpsEpsilon) {
+        if (a < b) {
+            return true;
+        }
+        return nearlyEqual(a, b, epsilon, ulpsEpsilon);
+    }
+
+    bool nearlyLessThanOrEqual(double a, double b, double epsilon, int64_t ulpsEpsilon) {
+        if (a < b) {
+            return true;
+        }
+        return nearlyEqual(a, b, epsilon, ulpsEpsilon);
+    }
 }
 

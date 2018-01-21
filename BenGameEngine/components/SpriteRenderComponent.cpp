@@ -73,16 +73,16 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices(bool force) {
             auto gameObj = getSpace()->getGameObject(gameObjHandle);
             auto bbox = gameObj->getComponent<BoundingBoxComponent>();
 
-            if (bbox->width == 0 || bbox->height == 0 || force) {
-                bbox->x = 0;
-                bbox->y = 0;
+            if (BGE::nearlyZero(bbox->width) || BGE::nearlyZero(bbox->height) || force) {
+                bbox->x = 0.0F;
+                bbox->y = 0.0F;
                 bbox->width = texture->getWidth();
                 bbox->height = texture->getHeight();
             }
 
             VertexTex* const vertices = (VertexTex* const) getVertices();
-            float x = 0;
-            float y = 0;
+            float x = 0.0F;
+            float y = 0.0F;
             float w = bbox->width;
             float h = bbox->height;
 
@@ -122,25 +122,25 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices(bool force) {
                         
                         vertices[0].position.x = x - w_2;
                         vertices[0].position.y = y + h_2;
-                        vertices[0].position.z = 0;
+                        vertices[0].position.z = 0.0F;
                         vertices[0].tex.x = uvs[0].x;
                         vertices[0].tex.y = uvs[0].y;
                         
                         vertices[1].position.x = x + w_2;
                         vertices[1].position.y = y + h_2;
-                        vertices[1].position.z = 0;
+                        vertices[1].position.z = 0.0F;
                         vertices[1].tex.x = uvs[1].x;
                         vertices[1].tex.y = uvs[1].y;
                         
                         vertices[2].position.x = x + w_2;
                         vertices[2].position.y = y - h_2;
-                        vertices[2].position.z = 0;
+                        vertices[2].position.z = 0.0F;
                         vertices[2].tex.x = uvs[2].x;
                         vertices[2].tex.y = uvs[2].y;
                         
                         vertices[3].position.x = x - w_2;
                         vertices[3].position.y = y - h_2;
-                        vertices[3].position.z = 0;
+                        vertices[3].position.z = 0.0F;
                         vertices[3].tex.x = uvs[3].x;
                         vertices[3].tex.y = uvs[3].y;
                     } else {
@@ -164,25 +164,25 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices(bool force) {
                         
                         vertices[0].position.x = x - w_2;
                         vertices[0].position.y = y - h_2;
-                        vertices[0].position.z = 0;
+                        vertices[0].position.z = 0.0F;
                         vertices[0].tex.x = uvs[0].x;
                         vertices[0].tex.y = uvs[0].y;
                         
                         vertices[1].position.x = x + w_2;
                         vertices[1].position.y = y - h_2;
-                        vertices[1].position.z = 0;
+                        vertices[1].position.z = 0.0F;
                         vertices[1].tex.x = uvs[1].x;
                         vertices[1].tex.y = uvs[1].y;
                         
                         vertices[2].position.x = x + w_2;
                         vertices[2].position.y = y + h_2;
-                        vertices[2].position.z = 0;
+                        vertices[2].position.z = 0.0F;
                         vertices[2].tex.x = uvs[2].x;
                         vertices[2].tex.y = uvs[2].y;
                         
                         vertices[3].position.x = x - w_2;
                         vertices[3].position.y = y + h_2;
-                        vertices[3].position.z = 0;
+                        vertices[3].position.z = 0.0F;
                         vertices[3].tex.x = uvs[3].x;
                         vertices[3].tex.y = uvs[3].y;
                     }

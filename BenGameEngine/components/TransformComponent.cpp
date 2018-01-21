@@ -10,6 +10,7 @@
 #include "ComponentBitmask.h"
 #include "Space.h"
 #include "GameObject.h"
+#include "MathTypes.h"
 #include <cassert>
 
 uint32_t BGE::TransformComponent::bitmask_ = Component::InvalidBitmask;
@@ -83,119 +84,197 @@ void BGE::TransformComponent::setParent(TransformComponent *parent) {
 
 void BGE::TransformComponent::setCollisionRectScale(Vector2 &scale) {
     collisionRectScale_ = scale;
-    
-    if (scale.x != 1.0 || scale.y != 1.0) {
+
+    if (BGE::notNearlyEqual(scale.x, 1.0F) || BGE::notNearlyEqual(scale.y, 1.0F)) {
         useCollisionRectScale_ = true;
     } else {
+        collisionRectScale_.x = 1.0F;
+        collisionRectScale_.y = 1.0F;
         useCollisionRectScale_ = false;
     }
 }
 
 void BGE::TransformComponent::setCollisionRectScale(Vector2 &&scale) {
     collisionRectScale_ = scale;
-    
-    if (scale.x != 1.0 || scale.y != 1.0) {
+
+    if (BGE::notNearlyEqual(scale.x, 1.0F) || BGE::notNearlyEqual(scale.y, 1.0F)) {
         useCollisionRectScale_ = true;
     } else {
+        collisionRectScale_.x = 1.0F;
+        collisionRectScale_.y = 1.0F;
         useCollisionRectScale_ = false;
     }
 }
 
 void BGE::TransformComponent::setX(float x) {
-    if (position_.x != x) {
-        position_.x = x;
+    if (BGE::notNearlyEqual(position_.x, x)) {
+        if (BGE::nearlyZero(x)) {
+            position_.x = 0.0F;
+        } else {
+            position_.x = x;
+        }
 
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setY(float y) {
-    if (position_.y != y) {
-        position_.y = y;
-        
+    if (BGE::notNearlyEqual(position_.y, y)) {
+        if (BGE::nearlyZero(y)) {
+            position_.y = 0.0F;
+        } else {
+            position_.y = y;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setZ(float z) {
-    if (z_ != z) {
-        z_ = z;
-        
+    if (BGE::notNearlyEqual(z_, z)) {
+        if (BGE::nearlyZero(z)) {
+            z_ = 0.0F;
+        } else {
+            z_ = z;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setPosition(Vector2 &position) {
-    if (position_.x != position.x || position_.y != position.y) {
-        position_ = position;
-        
+    if (BGE::notNearlyEqual(position_.x, position.x) || BGE::notNearlyEqual(position_.y, position.y)) {
+        if (BGE::nearlyZero(position.x)) {
+            position_.x = 0.0F;
+        } else {
+            position_.x = position.x;
+        }
+        if (BGE::nearlyZero(position.y)) {
+            position_.y = 0.0F;
+        } else {
+            position_.y = position.y;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setPosition(const Vector2 &position) {
-    if (position_.x != position.x || position_.y != position.y) {
-        position_ = position;
-        
+    if (BGE::notNearlyEqual(position_.x, position.x) || BGE::notNearlyEqual(position_.y, position.y)) {
+        if (BGE::nearlyZero(position.x)) {
+            position_.x = 0.0F;
+        } else {
+            position_.x = position.x;
+        }
+        if (BGE::nearlyZero(position.y)) {
+            position_.y = 0.0F;
+        } else {
+            position_.y = position.y;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setPosition(Vector2 &&position) {
-    if (position_.x != position.x || position_.y != position.y) {
-        position_ = position;
-        
+    if (BGE::notNearlyEqual(position_.x, position.x) || BGE::notNearlyEqual(position_.y, position.y)) {
+        if (BGE::nearlyZero(position.x)) {
+            position_.x = 0.0F;
+        } else {
+            position_.x = position.x;
+        }
+        if (BGE::nearlyZero(position.y)) {
+            position_.y = 0.0F;
+        } else {
+            position_.y = position.y;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setPosition(const Vector2 &&position) {
-    if (position_.x != position.x || position_.y != position.y) {
-        position_ = position;
-        
+    if (BGE::notNearlyEqual(position_.x, position.x) || BGE::notNearlyEqual(position_.y, position.y)) {
+        if (BGE::nearlyZero(position.x)) {
+            position_.x = 0.0F;
+        } else {
+            position_.x = position.x;
+        }
+        if (BGE::nearlyZero(position.y)) {
+            position_.y = 0.0F;
+        } else {
+            position_.y = position.y;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setScaleX(float x) {
-    if (scale_.x != x) {
-        scale_.x = x;
-        
+    if (BGE::notNearlyEqual(scale_.x, x)) {
+        if (BGE::nearlyEqual(x, 1.0F)) {
+            scale_.x = 1.0F;
+        } else {
+            scale_.x = x;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setScaleY(float y) {
-    if (scale_.y != y) {
-        scale_.y = y;
-        
+    if (BGE::notNearlyEqual(scale_.y, y)) {
+        if (BGE::nearlyEqual(y, 1.0F)) {
+            scale_.y = 1.0F;
+        } else {
+            scale_.y = y;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setScale(Vector2 &scale) {
-    if (scale_.x != scale.x || scale_.y != scale.y) {
-        scale_ = scale;
-        
+    if (BGE::notNearlyEqual(scale_.x, scale.x) || BGE::notNearlyEqual(scale_.y, scale.y)) {
+        if (BGE::nearlyEqual(scale.x, 1.0F)) {
+            scale_.x = 1.0F;
+        } else {
+            scale_.x = scale.x;
+        }
+        if (BGE::nearlyEqual(scale.y, 1.0F)) {
+            scale_.y = 1.0F;
+        } else {
+            scale_.y = scale.y;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setScale(Vector2 &&scale) {
-    if (scale_.x != scale.x || scale_.y != scale.y) {
-        scale_ = scale;
-        
+    if (BGE::notNearlyEqual(scale_.x, scale.x) || BGE::notNearlyEqual(scale_.y, scale.y)) {
+        if (BGE::nearlyEqual(scale.x, 1.0F)) {
+            scale_.x = 1.0F;
+        } else {
+            scale_.x = scale.x;
+        }
+        if (BGE::nearlyEqual(scale.y, 1.0F)) {
+            scale_.y = 1.0F;
+        } else {
+            scale_.y = scale.y;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
 
 void BGE::TransformComponent::setSkewX(float x) {
-    if (skew_.x != x) {
-        skew_.x = x;
-        
-        if (skew_.x != 0 || skew_.y != 0) {
+    if (BGE::notNearlyEqual(skew_.x, x)) {
+        if (BGE::notNearlyZero(skew_.x) || BGE::notNearlyZero(skew_.y)) {
             useSkew_ = true;
         } else {
+            skew_.x = 0.0F;
+            skew_.y = 0.0F;
             useSkew_ = false;
         }
         
@@ -204,12 +283,12 @@ void BGE::TransformComponent::setSkewX(float x) {
 }
 
 void BGE::TransformComponent::setSkewY(float y) {
-    if (skew_.y != y) {
-        skew_.y = y;
-        
-        if (skew_.x != 0 || skew_.y != 0) {
+    if (BGE::notNearlyEqual(skew_.y, y)) {
+        if (BGE::notNearlyZero(skew_.x) || BGE::notNearlyZero(skew_.y)) {
             useSkew_ = true;
         } else {
+            skew_.x = 0.0F;
+            skew_.y = 0.0F;
             useSkew_ = false;
         }
         
@@ -218,12 +297,12 @@ void BGE::TransformComponent::setSkewY(float y) {
 }
 
 void BGE::TransformComponent::setSkew(Vector2 &skew) {
-    if (skew_.x != skew.x || skew_.y != skew.y) {
-        skew_ = skew;
-        
-        if (skew_.x != 0 || skew_.y != 0) {
+    if (BGE::notNearlyEqual(skew_.x, skew.x) || BGE::notNearlyEqual(skew_.y, skew.y)) {
+        if (BGE::notNearlyZero(skew_.x) || BGE::notNearlyZero(skew_.y)) {
             useSkew_ = true;
         } else {
+            skew_.x = 0.0F;
+            skew_.y = 0.0F;
             useSkew_ = false;
         }
         
@@ -232,12 +311,12 @@ void BGE::TransformComponent::setSkew(Vector2 &skew) {
 }
 
 void BGE::TransformComponent::setSkew(Vector2 &&skew) {
-    if (skew_.x != skew.x || skew_.y != skew.y) {
-        skew_ = skew;
-        
-        if (skew_.x != 0 || skew_.y != 0) {
+    if (BGE::notNearlyEqual(skew_.x, skew.x) || BGE::notNearlyEqual(skew_.y, skew.y)) {
+        if (BGE::notNearlyZero(skew_.x) || BGE::notNearlyZero(skew_.y)) {
             useSkew_ = true;
         } else {
+            skew_.x = 0.0F;
+            skew_.y = 0.0F;
             useSkew_ = false;
         }
         
@@ -252,9 +331,13 @@ void BGE::TransformComponent::setRotationInDegrees(float rotation) {
 }
 
 void BGE::TransformComponent::setRotationInRadians(float rotation) {
-    if (rotation_ != rotation) {
-        rotation_ = rotation;
-        
+    if (BGE::notNearlyEqual(rotation_, rotation)) {
+        if (BGE::nearlyZero(rotation)) {
+            rotation_ = 0.0F;
+        } else {
+            rotation_ = rotation;
+        }
+
         localDirty_ = worldDirty_ = true;
     }
 }
@@ -269,6 +352,11 @@ void BGE::TransformComponent::updateMatrix() {
         Matrix4 mat1;
         Matrix4 mat2;
 
+        auto gameObj = getGameObject();
+        if (gameObj) {
+            auto name= gameObj->getName();
+            //printf("Xforming %s\n", name.c_str());
+        }
         Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
 
         if (useSkew_) {
@@ -282,15 +370,17 @@ void BGE::TransformComponent::updateMatrix() {
         localMatrix_ = mat1 * localMatrix_;
     }
 
-    auto parent = getParent();
-    
-    if (parent) {
-        parent->updateMatrix();
-        worldMatrix_ = parent->worldMatrix_ * localMatrix_;
-    } else {
-        worldMatrix_ = localMatrix_;
+    if (worldDirty_ || localDirty_ || true) {
+        auto parent = getParent();
+
+        if (parent) {
+            parent->updateMatrix();
+            worldMatrix_ = parent->worldMatrix_ * localMatrix_;
+        } else {
+            worldMatrix_ = localMatrix_;
+        }
     }
-    
+
     localDirty_ = worldDirty_ = false;
 }
 

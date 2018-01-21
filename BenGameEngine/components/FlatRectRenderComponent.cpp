@@ -48,13 +48,13 @@ void BGE::FlatRectRenderComponent::materialsUpdated() {
 void BGE::FlatRectRenderComponent::updateLocalBoundsAndVertices(Vector2& wh) {
     Rect bounds;
     Vertex* const vertices = (Vertex* const) getVertices();
-    float x = 0;
-    float y = 0;
+    float x = 0.0F;
+    float y = 0.0F;
     
     switch (getAnchor()) {
         case RenderComponentAnchor::Center:
-            float w_2 = wh.w / 2.0;
-            float h_2 = wh.h / 2.0;
+            float w_2 = wh.w / 2.0F;
+            float h_2 = wh.h / 2.0F;
             
             bounds.x = x;
             bounds.y = y;
@@ -85,19 +85,19 @@ void BGE::FlatRectRenderComponent::updateLocalBoundsAndVertices(Vector2& wh) {
                 
                 vertices[0].x = x - w_2;
                 vertices[0].y = y + h_2;
-                vertices[0].z = 0;
+                vertices[0].z = 0.0F;
                 
                 vertices[1].x = x + w_2;
                 vertices[1].y = y + h_2;
-                vertices[1].z = 0;
+                vertices[1].z = 0.0F;
                 
                 vertices[2].x = x + w_2;
                 vertices[2].y = y - h_2;
-                vertices[2].z = 0;
+                vertices[2].z = 0.0F;
                 
                 vertices[3].x = x - w_2;
                 vertices[3].y = y - h_2;
-                vertices[3].z = 0;
+                vertices[3].z = 0.0F;
             } else {
                 /*
                  
@@ -120,19 +120,19 @@ void BGE::FlatRectRenderComponent::updateLocalBoundsAndVertices(Vector2& wh) {
                 
                 vertices[0].x = x - w_2;
                 vertices[0].y = y - h_2;
-                vertices[0].z = 0;
+                vertices[0].z = 0.0F;
                 
                 vertices[1].x = x + w_2;
                 vertices[1].y = y - h_2;
-                vertices[1].z = 0;
+                vertices[1].z = 0.0F;
                 
                 vertices[2].x = x + w_2;
                 vertices[2].y = y + h_2;
-                vertices[2].z = 0;
+                vertices[2].z = 0.0F;
                 
                 vertices[3].x = x - w_2;
                 vertices[3].y = y + h_2;
-                vertices[3].z = 0;
+                vertices[3].z = 0.0F;
             }
             break;
     }

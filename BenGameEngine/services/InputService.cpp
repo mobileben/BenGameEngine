@@ -187,8 +187,8 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                 xform->getWorldMatrix(matrix);
                 bbox->computeAABB(matrix, xform->getCollisionRectScale());
                 
-                if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
-                    if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {
+                if (BGE::nearlyGreaterThanOrEqual(input->x, bbox->aabbMinX) && input->x < bbox->aabbMaxX) {
+                    if (BGE::nearlyGreaterThanOrEqual(input->y, bbox->aabbMinY) && input->y < bbox->aabbMaxY) {
                         inBounds = true;
                     }
                 }
@@ -222,8 +222,8 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                     xform->getWorldMatrix(matrix);
                     bbox->computeAABB(matrix, xform->getCollisionRectScale());
 
-                    if (input->x >= bbox->aabbMinX && input->x < bbox->aabbMaxX) {
-                        if (input->y >= bbox->aabbMinY && input->y < bbox->aabbMaxY) {
+                    if (BGE::nearlyGreaterThanOrEqual(input->x, bbox->aabbMinX) && input->x < bbox->aabbMaxX) {
+                        if (BGE::nearlyGreaterThanOrEqual(input->y, bbox->aabbMinY) && input->y < bbox->aabbMaxY) {
                             inBounds = true;
                             
                             if (input->type == TouchType::Down) {

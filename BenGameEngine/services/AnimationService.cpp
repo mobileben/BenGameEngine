@@ -33,7 +33,7 @@ void BGE::AnimationService::update(double deltaTime) {
     auto startTime = profiling::EpochTime::timeInMicroSec();
     numProcessedObjects_ = 0;
 #endif /* SUPPORT_PROFILING */
-    
+
     float dt = (float)deltaTime;
 
     // For all the spaces
@@ -44,7 +44,7 @@ void BGE::AnimationService::update(double deltaTime) {
             for (auto const &handle : space->getGameObjects()) {
                 auto obj = space->getGameObject(handle);
                 
-                if (obj) {
+                if (obj && obj->isActive() && obj->isVisible()) {
                     auto animSeq = obj->getComponent<AnimationSequenceComponent>();
                     auto animator = obj->getComponent<AnimatorComponent>();
                     
@@ -58,7 +58,7 @@ void BGE::AnimationService::update(double deltaTime) {
             }
         }
     }
-    
+
     spaceService->unlock();
     
     processEvents();
@@ -193,7 +193,7 @@ void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceCompo
             float adjustedDeltaTime = animator->speed * deltaTime;
             
             // Are we going to step past our current frame?
-            if (adjustedDeltaTime >= animator->frameRemainderTime) {
+            if (BGE::nearlyGreaterThanOrEqual(adjustedDeltaTime, animator->frameRemainderTime)) {
                 // Trim off the time left in the frame
                 adjustedDeltaTime -= animator->frameRemainderTime;
 
@@ -219,7 +219,7 @@ void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceCompo
                 // Make sure we're still playing
                 if (animator->state == AnimState::Playing) {
                     // Resolve our time by stepping over any frames we missed
-                    while (animator->state == AnimState::Playing && adjustedDeltaTime >= animator->secPerFrame) {
+                    while (animator->state == AnimState::Playing && BGE::nearlyGreaterThanOrEqual(adjustedDeltaTime, animator->secPerFrame)) {
                         if (animator->forward) {
                             frame++;
                             

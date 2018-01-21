@@ -38,8 +38,8 @@ void BGE::AnimatorComponent::initialize(HandleBackingType handle, SpaceHandle sp
     endFrame = 0;
     currentFrame = 0;
     iterations = 0;
-    frameRemainderTime = 0;
-    speed = 1;
+    frameRemainderTime = 0.0F;
+    speed = 1.0F;
     forward = true;
 }
 
@@ -49,8 +49,8 @@ void BGE::AnimatorComponent::destroy() {
     endFrame = 0;
     currentFrame = 0;
     iterations = 0;
-    frameRemainderTime = 0;
-    speed = 1;
+    frameRemainderTime = 0.0F;
+    speed = 1.0F;
     forward = true;
 
     // Component::destroy last

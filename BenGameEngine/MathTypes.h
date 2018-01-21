@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <functional>
+#include <limits>
 
 namespace BGE {
     typedef struct {
@@ -134,6 +135,20 @@ namespace BGE {
     bool operator==(const ColorTransform& lhs, const ColorTransform& rhs);
     bool operator!=(const ColorTransform& lhs, const ColorTransform& rhs);
     ColorTransform operator*(ColorTransform& lhs, ColorTransform& rhs);
+
+    bool nearlyZero(float a, float epsilon=std::numeric_limits<float>::epsilon());
+    bool nearlyZero(double a, double epsilon=std::numeric_limits<double>::epsilon());
+    bool nearlyEqual(float a, float b, float epsilon=std::numeric_limits<float>::epsilon(), int32_t ulpsEpsilon=2);     // float a == float b
+    bool nearlyEqual(double a, double b, double epsilon=std::numeric_limits<double>::epsilon(), int64_t ulpsEpsilon=4);   // double a == double b
+    bool notNearlyZero(float a, float epsilon=std::numeric_limits<float>::epsilon());
+    bool notNearlyZero(double a, double epsilon=std::numeric_limits<double>::epsilon());
+    bool notNearlyEqual(float a, float b, float epsilon=std::numeric_limits<float>::epsilon(), int32_t ulpsEpsilon=2);     // float a == float b
+    bool notNearlyEqual(double a, double b, double epsilon=std::numeric_limits<double>::epsilon(), int64_t ulpsEpsilon=4);   // double a == double b
+
+    bool nearlyGreaterThanOrEqual(float a, float b, float epsilon=std::numeric_limits<float>::epsilon(), int32_t ulpsEpsilon=2);
+    bool nearlyGreaterThanOrEqual(double a, double b, double epsilon=std::numeric_limits<double>::epsilon(), int64_t ulpsEpsilon=4);
+    bool nearlyLessThanOrEqual(float a, float b, float epsilon=std::numeric_limits<float>::epsilon(), int32_t ulpsEpsilon=2);
+    bool nearlyLessThanOrEqual(double a, double b, double epsilon=std::numeric_limits<double>::epsilon(), int64_t ulpsEpsilon=4);
 
     extern void ColorTransformMakeIdentity(ColorTransform &transform);
     
