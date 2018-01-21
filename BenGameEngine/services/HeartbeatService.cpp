@@ -8,6 +8,9 @@
 
 #include <cassert>
 #include "HeartbeatService.h"
+#ifdef SUPPORT_PROFILING
+#include "Profiling.h"
+#endif /* SUPPORT_PROFILING */
 
 BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0) {
     iosHeartbeat_ = [[BGEHeartbeatIOS alloc] init];
@@ -56,6 +59,9 @@ void BGE::HeartbeatService::setRunning(bool running) {
 }
 
 void BGE::HeartbeatService::tickHandler() {
+#ifdef SUPPORT_PROFILING
+    auto startTime = profiling::EpochTime::timeInMicroSec();
+#endif /* SUPPORT_PROFILING */
     if (!isBackgrounded() && running_) {
         counter_ = mach_absolute_time();
         
@@ -68,6 +74,10 @@ void BGE::HeartbeatService::tickHandler() {
             entry.first(elapsedTime);
         }
     }
+#ifdef SUPPORT_PROFILING
+    auto now = profiling::EpochTime::timeInMicroSec();
+    processingTime_ = now - startTime;
+#endif /* SUPPORT_PROFILING */
 }
 
 void BGE::HeartbeatService::registerListener(std::string name, std::function<void(double dt)> listener, uint32_t order) {
