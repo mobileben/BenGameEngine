@@ -270,7 +270,8 @@ void BGE::TransformComponent::setScale(Vector2 &&scale) {
 
 void BGE::TransformComponent::setSkewX(float x) {
     if (BGE::notNearlyEqual(skew_.x, x)) {
-        if (BGE::notNearlyZero(skew_.x) || BGE::notNearlyZero(skew_.y)) {
+        if (BGE::notNearlyZero(x) || BGE::notNearlyZero(skew_.y)) {
+            skew_.x = x;
             useSkew_ = true;
         } else {
             skew_.x = 0.0F;
@@ -284,7 +285,8 @@ void BGE::TransformComponent::setSkewX(float x) {
 
 void BGE::TransformComponent::setSkewY(float y) {
     if (BGE::notNearlyEqual(skew_.y, y)) {
-        if (BGE::notNearlyZero(skew_.x) || BGE::notNearlyZero(skew_.y)) {
+        if (BGE::notNearlyZero(skew_.x) || BGE::notNearlyZero(y)) {
+            skew_.y = y;
             useSkew_ = true;
         } else {
             skew_.x = 0.0F;
@@ -298,7 +300,9 @@ void BGE::TransformComponent::setSkewY(float y) {
 
 void BGE::TransformComponent::setSkew(Vector2 &skew) {
     if (BGE::notNearlyEqual(skew_.x, skew.x) || BGE::notNearlyEqual(skew_.y, skew.y)) {
-        if (BGE::notNearlyZero(skew_.x) || BGE::notNearlyZero(skew_.y)) {
+        if (BGE::notNearlyZero(skew.x) || BGE::notNearlyZero(skew.y)) {
+            skew_.x = skew.x;
+            skew_.y = skew.y;
             useSkew_ = true;
         } else {
             skew_.x = 0.0F;
@@ -312,7 +316,9 @@ void BGE::TransformComponent::setSkew(Vector2 &skew) {
 
 void BGE::TransformComponent::setSkew(Vector2 &&skew) {
     if (BGE::notNearlyEqual(skew_.x, skew.x) || BGE::notNearlyEqual(skew_.y, skew.y)) {
-        if (BGE::notNearlyZero(skew_.x) || BGE::notNearlyZero(skew_.y)) {
+        if (BGE::notNearlyZero(skew.x) || BGE::notNearlyZero(skew.y)) {
+            skew_.x = skew.x;
+            skew_.y = skew.y;
             useSkew_ = true;
         } else {
             skew_.x = 0.0F;
