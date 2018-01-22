@@ -987,6 +987,7 @@ namespace BGE {
         }
         return ulpsDistance(a, b) <= ulpsEpsilon;
     }
+
     bool notNearlyZero(float a, float epsilon) {
         if (a < 0.0F) {
             a = -a;
