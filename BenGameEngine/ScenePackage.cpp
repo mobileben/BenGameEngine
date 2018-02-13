@@ -773,8 +773,6 @@ void BGE::ScenePackage::sortChannels(AnimationChannelReferenceIntermediate *chan
 
 void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback) {
     if (status_ < ScenePackageStatus::Valid) {
-        float platformScale = 2.0;
-        
         // Textures
         NSArray *subtextures = jsonDict[@"subtextures"];
         NSArray *textures = jsonDict[@"textures"];
@@ -798,13 +796,18 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
         ArrayBuilder<BoundsReferenceIntermediate, BoundsReferenceIntermediate> boundsRefIntBuilder;
         ArrayBuilder<AnimationKeyframeReferenceIntermediate, AnimationKeyframeReferenceIntermediate> keyframeIntBuilder;
         ArrayBuilder<AnimationChannelReferenceIntermediate, AnimationChannelReferenceIntermediate> channelRefIntBuilder;
-        
-        width_ = [jsonDict[@"width"] floatValue] * platformScale;
-        height_ = [jsonDict[@"height"] floatValue] * platformScale;
+
+        if (jsonDict[@"pixelsPerPoint"]) {
+            pixelsPerPoint_ = [jsonDict[@"pixelsPerPoint"] floatValue];
+        } else {
+            pixelsPerPoint_ = 1.0;
+        }
+        width_ = [jsonDict[@"width"] floatValue] * pixelsPerPoint_;
+        height_ = [jsonDict[@"height"] floatValue] * pixelsPerPoint_;
         source_ = [jsonDict[@"source"] UTF8String];
         frameRate_ = [jsonDict[@"frameRate"] floatValue];
-        position_.x = [jsonDict[@"position"][@"x"] floatValue] * platformScale;
-        position_.y = [jsonDict[@"position"][@"y"] floatValue] * platformScale;
+        position_.x = [jsonDict[@"position"][@"x"] floatValue] * pixelsPerPoint_;
+        position_.y = [jsonDict[@"position"][@"y"] floatValue] * pixelsPerPoint_;
         
         defaultPositionIndex_ = vector2Builder.add(Vector2{0, 0});
         defaultScaleIndex_ = vector2Builder.add(Vector2{1, 1});
@@ -824,10 +827,10 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
             SubTextureDef subTexDef;
             
             subTexDef.name = [subTexDict[@"name"] UTF8String];
-            subTexDef.x = [subTexDict[@"x"] floatValue] * platformScale;
-            subTexDef.y = [subTexDict[@"y"] floatValue] * platformScale;
-            subTexDef.width = [subTexDict[@"width"] floatValue] * platformScale;
-            subTexDef.height = [subTexDict[@"height"] floatValue] * platformScale;
+            subTexDef.x = [subTexDict[@"x"] floatValue] * pixelsPerPoint_;
+            subTexDef.y = [subTexDict[@"y"] floatValue] * pixelsPerPoint_;
+            subTexDef.width = [subTexDict[@"width"] floatValue] * pixelsPerPoint_;
+            subTexDef.height = [subTexDict[@"height"] floatValue] * pixelsPerPoint_;
             subTexDef.rotated = [subTexDict[@"rotated"] boolValue];
             
             NSString *atlasName = subTexDict[@"atlas"];
@@ -854,8 +857,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
             if (name) {
                 texRef->name = stringBuilder.add(name);
                 texRef->atlasName = NullPtrIndex;
-                texRef->width = [texDict[@"width"] floatValue] * platformScale;
-                texRef->height = [texDict[@"height"] floatValue] * platformScale;
+                texRef->width = [texDict[@"width"] floatValue] * pixelsPerPoint_;
+                texRef->height = [texDict[@"height"] floatValue] * pixelsPerPoint_;
                 
                 auto subTex = subTextures_.find(name);
                 
@@ -895,9 +898,9 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                 
                 textRef->name = stringBuilder.add(name);
                 textRef->text = stringBuilder.add(text);
-                textRef->width = [textDict[@"width"] floatValue] * platformScale;
-                textRef->height = [textDict[@"height"] floatValue] * platformScale;
-                textRef->leading = [formatDict[@"leading"] floatValue] * platformScale;
+                textRef->width = [textDict[@"width"] floatValue] * pixelsPerPoint_;
+                textRef->height = [textDict[@"height"] floatValue] * pixelsPerPoint_;
+                textRef->leading = [formatDict[@"leading"] floatValue] * pixelsPerPoint_;
                 textRef->multiline = [textDict[@"multiline"] boolValue];
                 
                 if (textRef->multiline) {
@@ -913,7 +916,7 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                     textRef->alignment = FontHorizontalAlignment::Center;
                 }
                 
-                uint32_t size = [formatDict[@"fontSize"] unsignedIntValue] * platformScale;
+                uint32_t size = [formatDict[@"fontSize"] unsignedIntValue] * pixelsPerPoint_;
                 uint32_t color = [formatDict[@"fontColor"] unsignedIntValue];
                 uint32_t blue = color & 0xff;
                 uint32_t green = color >> 8 & 0xff;
@@ -981,17 +984,17 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                     NSArray *children = frameDict[@"children"];
                     
                     if (fi == 0) {
-                        currRect.x = [frameDict[@"bounds"][@"x"] floatValue] * platformScale;
-                        currRect.y = [frameDict[@"bounds"][@"y"] floatValue] * platformScale;
-                        currRect.w = [frameDict[@"bounds"][@"width"] floatValue] * platformScale;
-                        currRect.h = [frameDict[@"bounds"][@"height"] floatValue] * platformScale;
+                        currRect.x = [frameDict[@"bounds"][@"x"] floatValue] * pixelsPerPoint_;
+                        currRect.y = [frameDict[@"bounds"][@"y"] floatValue] * pixelsPerPoint_;
+                        currRect.w = [frameDict[@"bounds"][@"width"] floatValue] * pixelsPerPoint_;
+                        currRect.h = [frameDict[@"bounds"][@"height"] floatValue] * pixelsPerPoint_;
                     } else {
                         newBounds.startFrame = 0;
                         newBounds.totalFrames = 1;
-                        newRect.x = [frameDict[@"bounds"][@"x"] floatValue] * platformScale;
-                        newRect.y = [frameDict[@"bounds"][@"y"] floatValue] * platformScale;
-                        newRect.w = [frameDict[@"bounds"][@"width"] floatValue] * platformScale;
-                        newRect.h = [frameDict[@"bounds"][@"height"] floatValue] * platformScale;
+                        newRect.x = [frameDict[@"bounds"][@"x"] floatValue] * pixelsPerPoint_;
+                        newRect.y = [frameDict[@"bounds"][@"y"] floatValue] * pixelsPerPoint_;
+                        newRect.w = [frameDict[@"bounds"][@"width"] floatValue] * pixelsPerPoint_;
+                        newRect.h = [frameDict[@"bounds"][@"height"] floatValue] * pixelsPerPoint_;
                         
                         if (newRect.x != currRect.x || newRect.y != currRect.y || newRect.w != currRect.w || newRect.h != currRect.h) {
                             currRect = newRect;
@@ -1062,10 +1065,10 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                             
                             // Bounds
                             
-                            boundsBacking.x = [childDict[@"bounds"][@"x"] floatValue] * platformScale;
-                            boundsBacking.y = [childDict[@"bounds"][@"y"] floatValue] * platformScale;
-                            boundsBacking.w = [childDict[@"bounds"][@"width"] floatValue] * platformScale;
-                            boundsBacking.h = [childDict[@"bounds"][@"height"] floatValue] * platformScale;
+                            boundsBacking.x = [childDict[@"bounds"][@"x"] floatValue] * pixelsPerPoint_;
+                            boundsBacking.y = [childDict[@"bounds"][@"y"] floatValue] * pixelsPerPoint_;
+                            boundsBacking.w = [childDict[@"bounds"][@"width"] floatValue] * pixelsPerPoint_;
+                            boundsBacking.h = [childDict[@"bounds"][@"height"] floatValue] * pixelsPerPoint_;
                             
                             // Color
                             if (childDict[@"color"]) {
@@ -1134,8 +1137,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
                             // Position
                             if (childDict[@"position"]) {
                                 
-                                positionBacking.x = [childDict[@"position"][@"x"] floatValue] * platformScale;
-                                positionBacking.y = [childDict[@"position"][@"y"] floatValue] * platformScale;
+                                positionBacking.x = [childDict[@"position"][@"x"] floatValue] * pixelsPerPoint_;
+                                positionBacking.y = [childDict[@"position"][@"y"] floatValue] * pixelsPerPoint_;
                                 
                                 keyframe.position = (int32_t) vector2Builder.add(positionBacking);
                             } else {
@@ -1305,8 +1308,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
             
             if (name) {
                 placement->name = stringBuilder.add(name);
-                placement->width = [dict[@"width"] floatValue] * platformScale;
-                placement->height = [dict[@"height"] floatValue] * platformScale;
+                placement->width = [dict[@"width"] floatValue] * pixelsPerPoint_;
+                placement->height = [dict[@"height"] floatValue] * pixelsPerPoint_;
             }
         }
         
@@ -1377,8 +1380,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
             
             if (name) {
                 mask->name = stringBuilder.add(name);
-                mask->width = [dict[@"width"] floatValue] * platformScale;
-                mask->height = [dict[@"height"] floatValue] * platformScale;
+                mask->width = [dict[@"width"] floatValue] * pixelsPerPoint_;
+                mask->height = [dict[@"height"] floatValue] * pixelsPerPoint_;
             }
         }
         
@@ -1451,8 +1454,8 @@ void BGE::ScenePackage::create(NSDictionary *jsonDict, std::function<void(SceneP
             if (dict[@"position"]) {
                 Vector2 pos;
                 
-                pos.x = [dict[@"position"][@"x"] floatValue] * platformScale;
-                pos.y = [dict[@"position"][@"y"] floatValue] * platformScale;
+                pos.x = [dict[@"position"][@"x"] floatValue] * pixelsPerPoint_;
+                pos.y = [dict[@"position"][@"y"] floatValue] * pixelsPerPoint_;
                 
                 elem->position = vector2Builder.add(pos);
             } else {

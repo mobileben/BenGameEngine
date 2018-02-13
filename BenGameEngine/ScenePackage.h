@@ -104,6 +104,7 @@ namespace BGE {
         
         std::string                                         source_;
         float                                               frameRate_;
+        float                                               pixelsPerPoint_;
         float                                               width_;
         float                                               height_;
         Vector2                                             position_;
