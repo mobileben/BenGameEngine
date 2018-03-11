@@ -29,7 +29,7 @@ namespace BGE {
         GameObject(ObjectId objId);
         ~GameObject() {}
         
-        void initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, std::string name);
+        void initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, const std::string& name);
         void destroy();
         
         inline GameObjectHandle getHandle() const { return handle_; }
@@ -111,17 +111,17 @@ namespace BGE {
         void removeAllComponents();
         
         template <typename T>
-        GameObject *find(std::string name) {
+        GameObject *find(const std::string& name) {
             return find(T::typeId_, name);
         }
         
         template <typename T>
-        GameObject *findWithPrefix(std::string name) {
+        GameObject *findWithPrefix(const std::string& name) {
             return findWithPrefix(T::typeId_, name);
         }
         
-        GameObject *find(ComponentTypeId componentTypeId, std::string name);
-        GameObject *findWithPrefix(ComponentTypeId componentTypeId, std::string name);
+        GameObject *find(ComponentTypeId componentTypeId, const std::string& name);
+        GameObject *findWithPrefix(ComponentTypeId componentTypeId, const std::string& name);
         
         GameObject *getParent();
 

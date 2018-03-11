@@ -15,7 +15,7 @@ static const int32_t kTextureAlignment = 4;
 
 static const uint32_t kPNGHeaderSize = 8;
 
-BGE::RawTexture *BGE::RawTexture::createFromPng(std::string filename) {
+BGE::RawTexture *BGE::RawTexture::createFromPng(const std::string& filename) {
     // PNG header is 8 bytes
     png_byte header[kPNGHeaderSize];
     FILE *fp = fopen(filename.c_str(), "rb");

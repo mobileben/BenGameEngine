@@ -32,7 +32,7 @@ namespace BGE {
         RawTexture(Format format, uint32_t width, uint32_t height, unsigned char *buffer);
         ~RawTexture();
         
-        static RawTexture *createFromPng(std::string filename);
+        static RawTexture *createFromPng(const std::string& filename);
         
         inline auto getFormat() const { return format_; }
         inline auto getWidth() const { return width_; }

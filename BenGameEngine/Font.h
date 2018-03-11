@@ -58,10 +58,10 @@ namespace BGE {
 
         Font();
         Font(ObjectId fontId);
-        Font(std::string name, uint32_t pixelSize);
+        Font(const std::string& name, uint32_t pixelSize);
         virtual ~Font() {}
         
-        void initialize(FontHandle handle, std::string name, uint32_t pixelSize);
+        void initialize(FontHandle handle, const std::string& name, uint32_t pixelSize);
         void destroy();
         
         FontHandle getHandle() const { return handle_; }

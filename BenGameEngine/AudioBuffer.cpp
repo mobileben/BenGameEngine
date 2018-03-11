@@ -20,7 +20,7 @@ BGE::AudioBuffer::AudioBuffer() : valid_(false), streaming_(false), duration_(0)
 #endif /* TARGET_OS_IPHONE */
 }
 
-void BGE::AudioBuffer::initialize(AudioBufferHandle handle, std::string name) {
+void BGE::AudioBuffer::initialize(AudioBufferHandle handle, const std::string& name) {
     setName(name);
     handle_ = handle;
     valid_ = false;

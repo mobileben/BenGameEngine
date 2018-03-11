@@ -51,7 +51,7 @@ namespace BGE {
 
         ~AudioBuffer() {}
         
-        void initialize(AudioBufferHandle handle, std::string name);
+        void initialize(AudioBufferHandle handle, const std::string& name);
         void destroy();
         
         AudioBufferHandle getHandle() const { return handle_; }

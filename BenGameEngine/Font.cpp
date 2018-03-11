@@ -28,10 +28,10 @@ BGE::Font::Font() : NamedObject(), handle_(FontHandle()), pixelSize_(0), status_
 BGE::Font::Font(ObjectId fontId) : NamedObject(fontId), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
 }
 
-BGE::Font::Font(std::string name, uint32_t pixelSize) : NamedObject(0, name), handle_(FontHandle()), pixelSize_(pixelSize), status_(FontStatus::Invalid), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
+BGE::Font::Font(const std::string& name, uint32_t pixelSize) : NamedObject(0, name), handle_(FontHandle()), pixelSize_(pixelSize), status_(FontStatus::Invalid), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
 }
 
-void BGE::Font::initialize(FontHandle handle, std::string name, uint32_t pixelSize) {
+void BGE::Font::initialize(FontHandle handle, const std::string& name, uint32_t pixelSize) {
     setName(name);
     handle_ = handle;
     pixelSize_ = pixelSize;

@@ -23,7 +23,7 @@ BGE::GameObject::GameObject() : NamedObject(), active_(false), componentBitmask_
 BGE::GameObject::GameObject(ObjectId objId) : NamedObject(objId), active_(false), componentBitmask_(0) {
 }
 
-void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, std::string name) {
+void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, const std::string& name) {
     setName(name);
 
     active_ = false;
@@ -68,7 +68,7 @@ BGE::Space *BGE::GameObject::getSpace() const {
     return Game::getInstance()->getSpaceService()->getSpace(spaceHandle_);
 }
 
-BGE::GameObject *BGE::GameObject::find(ComponentTypeId componentTypeId, std::string name) {
+BGE::GameObject *BGE::GameObject::find(ComponentTypeId componentTypeId, const std::string& name) {
     if (getName() == name) {
         for (auto &componentHandle : components_) {
             if (componentHandle.typeId == componentTypeId) {
@@ -96,7 +96,7 @@ BGE::GameObject *BGE::GameObject::find(ComponentTypeId componentTypeId, std::str
     return nullptr;
 }
 
-BGE::GameObject *BGE::GameObject::findWithPrefix(ComponentTypeId componentTypeId, std::string name) {
+BGE::GameObject *BGE::GameObject::findWithPrefix(ComponentTypeId componentTypeId, const std::string& name) {
     if (getName().find(name) != std::string::npos) {
         for (auto &componentHandle : components_) {
             if (componentHandle.typeId == componentTypeId) {
