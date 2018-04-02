@@ -97,7 +97,8 @@ namespace BGE {
         
         void getLocalMatrix(Matrix4 &matrix);
         const float *getLocalMatrixRaw();
-        
+        void setLocalMatrix(const Matrix4& matrix);
+
         TransformComponentHandle getParentHandle() const { return parentHandle_; }
         TransformComponent *getParent() const;
         

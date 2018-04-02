@@ -468,6 +468,11 @@ const float *BGE::TransformComponent::getLocalMatrixRaw() {
     return localMatrix_.m;
 }
 
+void BGE::TransformComponent::setLocalMatrix(const Matrix4& matrix) {
+    localMatrix_ = matrix;
+    localDirty_ = false;
+}
+
 BGE::TransformComponent *BGE::TransformComponent::getParent() const {
     auto space = getSpace();
     
