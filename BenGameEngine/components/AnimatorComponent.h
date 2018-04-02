@@ -26,6 +26,7 @@ namespace BGE {
         Done
     };
 
+    const int32_t AnimPlayOnce = 1;
     const int32_t AnimPlayForever = -1;
     
     class AnimatorComponent : public Component
