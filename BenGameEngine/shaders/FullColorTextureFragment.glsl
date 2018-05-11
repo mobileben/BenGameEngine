@@ -10,12 +10,19 @@ uniform lowp vec4 ColorOffset;
 void main()
 {
     lowp vec4 textureColor = texture2D(Texture, TexCoordOut);
-    lowp vec4 frag = (textureColor * ColorMatrix) + ColorMatOffset;
-    
-    frag = (frag * ColorMultiplier) + ColorOffset;
-    frag = clamp(frag, vec4(0.0, 0.0, 0.0, 0.0), vec4(1.0, 1.0, 1.0, 1.0));
-    
+    lowp vec4 frag = (textureColor * ColorMatrix);
     lowp vec4 destColor = gl_LastFragData[0];
 
+    if (textureColor.a > 0.0) {
+        frag = frag + ColorMatOffset;
+    }
+    
+    frag = (frag * ColorMultiplier);
+    if (frag.a > 0.0) {
+        frag = frag + ColorOffset;
+    }
+    // Look at https://stackoverflow.com/questions/5713830/colortransform-equivalent-color-matrix
+    frag = clamp(frag, vec4(0.0, 0.0, 0.0, 0.0), vec4(1.0, 1.0, 1.0, 1.0));
+    
     gl_FragColor =  frag * frag.a + destColor * ( 1.0 - frag.a);
 }

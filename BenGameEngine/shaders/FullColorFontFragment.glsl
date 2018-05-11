@@ -13,9 +13,15 @@ void main(void) {
     lowp vec4 texel = texture2D(Texture, TexCoordOut);
     lowp vec4 frag = vec4(SourceColor.rgb, texel.a * SourceColor.a);
 
-    frag = (frag * ColorMatrix) + ColorMatOffset;
-    frag = (frag * ColorMultiplier) + ColorOffset;
-    
+    frag = (frag * ColorMatrix);
+    if (frag.a > 0.0) {
+        frag = frag + ColorMatOffset;
+    }
+    frag = (frag * ColorMultiplier);
+    if (frag.a > 0.0) {
+        frag = frag + ColorOffset;
+    }
+
     frag = clamp(frag, vec4(0.0, 0.0, 0.0, 0.0), vec4(1.0, 1.0, 1.0, 1.0));
 
     //gl_FragColor = mix(destColor, frag, frag.a);
