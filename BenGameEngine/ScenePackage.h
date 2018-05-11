@@ -10,7 +10,6 @@
 #define ScenePackage_h
 
 #include <stdio.h>
-#import <Foundation/Foundation.h>
 #include <vector>
 #include <atomic>
 #include <functional>
@@ -21,7 +20,86 @@
 #include "MathTypes.h"
 #include "FileUtilities.h"
 
+#ifdef NOT_YET
 namespace BGE {
+    struct RapidJsonException : public std::exception {
+        virtual const char *what() const throw() {
+            return "rapidjson exception";
+        }
+    };
+}
+
+#ifdef RAPIDJSON_ASSERT
+#undef RAPIDJSON_ASSERT
+#endif
+
+#define RAPIDJSON_ASSERT(x) if (!(x)) throw BGE::RapidJsonException();
+#endif
+
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/document.h"
+
+namespace BGE {
+    extern const char *kScenePackageKeyAlignment;
+    extern const char *kScenePackageKeyAlphaMultiplier;
+    extern const char *kScenePackageKeyAlphaOffset;
+    extern const char *kScenePackageKeyAtlas;
+    extern const char *kScenePackageKeyAutoDisplayList;
+    extern const char *kScenePackageKeyBlueMultiplier;
+    extern const char *kScenePackageKeyBlueOffset;
+    extern const char *kScenePackageKeyBounds;
+    extern const char *kScenePackageKeyButtons;
+    extern const char *kScenePackageKeyCenter;
+    extern const char *kScenePackageKeyChildren;
+    extern const char *kScenePackageKeyCollRectScale;
+    extern const char *kScenePackageKeyColor;
+    extern const char *kScenePackageKeyColorMatrixFilter;
+    extern const char *kScenePackageKeyExternalPackage;
+    extern const char *kScenePackageKeyExternalReferences;
+    extern const char *kScenePackageKeyFilename;
+    extern const char *kScenePackageKeyFilters;
+    extern const char *kScenePackageKeyFlags;
+    extern const char *kScenePackageKeyFontColor;
+    extern const char *kScenePackageKeyFontName;
+    extern const char *kScenePackageKeyFontSize;
+    extern const char *kScenePackageKeyFormat;
+    extern const char *kScenePackageKeyFrame;
+    extern const char *kScenePackageKeyFrameRate;
+    extern const char *kScenePackageKeyFrames;
+    extern const char *kScenePackageKeyGreenMultiplier;
+    extern const char *kScenePackageKeyGreenOffset;
+    extern const char *kScenePackageKeyHeight;
+    extern const char *kScenePackageKeyHidden;
+    extern const char *kScenePackageKeyLeading;
+    extern const char *kScenePackageKeyLeft;
+    extern const char *kScenePackageKeyMasks;
+    extern const char *kScenePackageKeyMatrix;
+    extern const char *kScenePackageKeyMultiline;
+    extern const char *kScenePackageKeyName;
+    extern const char *kScenePackageKeyPixelsPerPoint;
+    extern const char *kScenePackageKeyPlacements;
+    extern const char *kScenePackageKeyPosition;
+    extern const char *kScenePackageKeyRedMultiplier;
+    extern const char *kScenePackageKeyRedOffset;
+    extern const char *kScenePackageKeyReference;
+    extern const char *kScenePackageKeyReferenceType;
+    extern const char *kScenePackageKeyRight;
+    extern const char *kScenePackageKeyRotated;
+    extern const char *kScenePackageKeyRotation;
+    extern const char *kScenePackageKeyScale;
+    extern const char *kScenePackageKeySkew;
+    extern const char *kScenePackageKeySource;
+    extern const char *kScenePackageKeyState;
+    extern const char *kScenePackageKeyStates;
+    extern const char *kScenePackageKeySubtextures;
+    extern const char *kScenePackageKeySymbols;
+    extern const char *kScenePackageKeyText;
+    extern const char *kScenePackageKeyTextureMasks;
+    extern const char *kScenePackageKeyTextures;
+    extern const char *kScenePackageKeyWidth;
+    extern const char *kScenePackageKeyX;
+    extern const char *kScenePackageKeyY;
+
     enum class ScenePackageStatus {
         Invalid,
         Loading,
@@ -34,6 +112,134 @@ namespace BGE {
         DoesNotExist,
         Loading,
         NoAvailableHandles
+    };
+
+    class ScenePackage;
+
+    const int32_t   kScenePackageFormatHeaderMagicSize = 8;
+    const uint32_t  kScenePackageFormatVersion = 0;
+    const uint32_t  kScenePackageFormatEndian = 1;
+    extern const uint8_t   kScenePackageFormatMagic[kScenePackageFormatHeaderMagicSize];
+
+    struct ScenePackageFormatHeader {
+        uint8_t         magic[kScenePackageFormatHeaderMagicSize];
+        uint32_t        endian;
+        uint32_t        version;
+        float           frameRate;
+        float           pixelsPerPoint;
+        float           width;
+        float           height;
+        Vector2         position;
+
+        int32_t         emptyStringIndex;
+        int32_t         defaultPositionIndex;
+        int32_t         defaultScaleIndex;
+        int32_t         defaultSkewIndex;
+        int32_t         defaultCollisionRectScaleIndex;
+
+        int32_t         sourceIndex;
+
+        uint32_t        stringsOffset;
+        uint32_t        stringsSize;
+        uint32_t        atlasSubtexturesOffset;
+        uint32_t        atlasSubtexturesSize;
+        uint32_t        subTextureDefsOffset;
+        uint32_t        subTextureDefsSize;
+        uint32_t        texturesOffset;
+        uint32_t        texturesSize;
+        uint32_t        textOffset;
+        uint32_t        textSize;
+        uint32_t        animationSequencesOffset;
+        uint32_t        animationSequencesSize;
+        uint32_t        placementsOffset;
+        uint32_t        placementsSize;
+        uint32_t        masksOffset;
+        uint32_t        masksSize;
+        uint32_t        textureMasksOffset;
+        uint32_t        textureMasksSize;
+        uint32_t        buttonsOffset;
+        uint32_t        buttonsSize;
+        uint32_t        buttonStatesOffset;
+        uint32_t        buttonStatesSize;
+        uint32_t        externalPackagesOffset;
+        uint32_t        externalPackagesSize;
+        uint32_t        autoDisplayElementsOffset;
+        uint32_t        autoDisplayElementsSize;
+        uint32_t        rectsOffset;
+        uint32_t        rectsSize;
+        uint32_t        colorTransformsOffset;
+        uint32_t        colorTransformsSize;
+        uint32_t        colorMatricesOffset;
+        uint32_t        colorMatricesSize;
+        uint32_t        vector2sOffset;
+        uint32_t        vector2sSize;
+        uint32_t        keyframeIndicesOffset;
+        uint32_t        keyframeIndicesSize;
+        uint32_t        boundsOffset;
+        uint32_t        boundsSize;
+        uint32_t        keyframesOffset;
+        uint32_t        keyframesSize;
+        uint32_t        channelsOffset;
+        uint32_t        channelsSize;
+    } __attribute__((aligned(4)));
+
+    static_assert(sizeof(struct ScenePackageFormatHeader) == 58*4, "Check your assumptions");
+    static_assert(std::is_pod<ScenePackageFormatHeader>::value, "Must be a POD type.");
+
+    struct ScenePackageFormat {
+        float                                                   frameRate_;
+        float                                                   pixelsPerPoint_;
+        float                                                   width_;
+        float                                                   height_;
+        Vector2                                                 position_;
+
+        int32_t                                                 emptyStringIndex_;
+        int32_t                                                 defaultPositionIndex_;
+        int32_t                                                 defaultScaleIndex_;
+        int32_t                                                 defaultSkewIndex_;
+        int32_t                                                 defaultCollisionRectScaleIndex_;
+
+        int32_t                                                 sourceIndex_;
+
+        FixedArray<char>                                        strings_;
+        FixedArray<TextureAtlasSubTextureDefIntermediate>       atlasSubtextures_;
+        FixedArray<SubTextureDefIntermediate>                   subTextureDefs_;
+        FixedArray<TextureReferenceIntermediate>                textures_;
+        FixedArray<TextReferenceIntermediate>                   text_;
+        FixedArray<AnimationSequenceReferenceIntermediate>      animationSequences_;
+        FixedArray<PlacementIntermediate>                       placements_;
+        FixedArray<MaskIntermediate>                            masks_;
+        FixedArray<TextureMaskIntermediate>                     textureMasks_;
+        FixedArray<ButtonIntermediate>                          buttons_;
+        FixedArray<ButtonStateIntermediate>                     buttonStates_;
+        FixedArray<ExternalPackageIntermediate>                 externalPackages_;
+        FixedArray<AutoDisplayElementIntermediate>              autoDisplayElements_;
+
+        FixedArray<Rect>                                        rects_;
+        FixedArray<ColorTransform>                              colorTransforms_;
+        FixedArray<ColorMatrix>                                 colorMatrices_;
+        FixedArray<Vector2>                                     vector2s_;
+        FixedArray<int32_t>                                     keyframeIndices_;
+
+        FixedArray<BoundsReferenceIntermediate>                 bounds_;
+        FixedArray<AnimationKeyframeReferenceIntermediate>      keyframes_;
+        FixedArray<AnimationChannelReferenceIntermediate>       channels_;
+
+        bool                                                    managed_;
+        ScenePackageFormatHeader                                *header_;
+        uint64_t                                                *buffer_;
+        size_t                                                  bufferSize_;
+
+        ScenePackageFormat();
+        ScenePackageFormat(const ScenePackage& package);
+        ScenePackageFormat(const uint64_t *buffer, size_t bufferSize, bool managed = true);
+        ~ScenePackageFormat();
+
+        bool isAligned8Memory(size_t size) const;
+        size_t aligned8MemorySize(size_t size) const;
+
+        void load(const uint64_t *buffer, size_t bufferSize, bool managed = true);
+        void save(const std::string& filename);
     };
 
     class ScenePackage : public NamedObject {
@@ -83,13 +289,20 @@ namespace BGE {
         GfxReferenceType getReferenceType(std::string name);
 
         std::string textureFilename(const std::string& name);
-        
+
+        // This is for debugging
+        void saveAsBinary(const std::string& filename);
+
     protected:
         void setStatus(ScenePackageStatus status) { status_ = status; }
-        void create(NSDictionary *jsonDict, std::function<void(ScenePackage *)> callback);
+        void create(const ScenePackageFormat& format, std::function<void(ScenePackage *)> callback);
+        void create(const uint64_t *buffer, size_t bufferSize, bool managed, std::function<void(ScenePackage *)> callback);
+        void create(const std::shared_ptr<rapidjson::Document> jsonDict, std::function<void(ScenePackage *)> callback);
+        void loadAllTextures(std::function<void()> callback);
 
     private:
         friend class ScenePackageService;
+        friend class ScenePackageFormat;
         
         struct TextureQueueItem {
             std::string     name;
@@ -99,6 +312,8 @@ namespace BGE {
         
         ScenePackageStatus                                  status_;
         ScenePackageHandle                                  handle_;
+
+        std::shared_ptr<ScenePackageFormat>                 format_;
         
         BaseDirectory                                       baseDirectory_;
         
@@ -108,18 +323,26 @@ namespace BGE {
         float                                               width_;
         float                                               height_;
         Vector2                                             position_;
-        bool                                                fontsLoaded_;
-        bool                                                texturesLoaded_;
-        bool                                                hasExternal_;
-        
+
+        int32_t                                             emptyStringIndex_;
         int32_t                                             defaultPositionIndex_;
         int32_t                                             defaultScaleIndex_;
         int32_t                                             defaultSkewIndex_;
         int32_t                                             defaultCollisionRectScaleIndex_;
-        
+
+        int32_t                                             sourceIndex_;
+
+        bool                                                fontsLoaded_;
+        bool                                                texturesLoaded_;
+        bool                                                hasExternal_;
+
         size_t                                              memoryUsage_;
 
+        // Binary Data -- Start --
+
         FixedArray<char>                                    strings_;
+        FixedArray<TextureAtlasSubTextureDefIntermediate>   atlasSubtextures_;
+        FixedArray<SubTextureDefIntermediate>               subTextureDefs_;
         FixedArray<TextureReferenceIntermediate>            textures_;
         FixedArray<TextReferenceIntermediate>               text_;
         FixedArray<AnimationSequenceReferenceIntermediate>  animationSequences_;
@@ -135,11 +358,14 @@ namespace BGE {
         FixedArray<ColorTransform>                          colorTransforms_;
         FixedArray<ColorMatrix>                             colorMatrices_;
         FixedArray<Vector2>                                 vector2s_;
+        FixedArray<int32_t>                                 keyframeIndices_;
         
         FixedArray<BoundsReferenceIntermediate>             bounds_;
         FixedArray<AnimationKeyframeReferenceIntermediate>  keyframes_;
         FixedArray<AnimationChannelReferenceIntermediate>   channels_;
-        
+
+        // Binary Data -- End --
+
         std::unordered_map<std::string, std::vector<SubTextureDef>> subTextures_;
         
         std::shared_ptr<std::atomic_int>                    textureCount_;

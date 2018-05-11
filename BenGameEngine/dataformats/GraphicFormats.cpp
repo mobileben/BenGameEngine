@@ -156,7 +156,7 @@ bool BGE::operator==(const TextureReference& lhs, const TextureReference& rhs) {
             }
         }
     }
-    
+
     if (lhs.textureHandle != rhs.textureHandle) {
         return false;
     }
@@ -176,7 +176,7 @@ bool BGE::operator!=(const TextureReference& lhs, const TextureReference& rhs) {
             }
         }
     }
-    
+
     if (lhs.textureHandle != rhs.textureHandle) {
         return true;
     }
@@ -188,7 +188,11 @@ bool BGE::operator==(const TextureReferenceIntermediate& lhs, const TextureRefer
     if (lhs.name != rhs.name) {
         return false;
     }
-    
+
+    if (lhs.filename != rhs.filename) {
+        return false;
+    }
+
     if (lhs.height != rhs.height) {
         return false;
     }
@@ -204,7 +208,11 @@ bool BGE::operator!=(const TextureReferenceIntermediate& lhs, const TextureRefer
     if (lhs.name != rhs.name) {
         return true;
     }
-    
+
+    if (lhs.filename != rhs.filename) {
+        return false;
+    }
+
     if (lhs.height != rhs.height) {
         return true;
     }

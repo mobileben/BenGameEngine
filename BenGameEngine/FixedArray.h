@@ -43,43 +43,48 @@ namespace BGE {
         
     private:
         int32_t              pos_;
-        const FixedArray<T> *array_;
-    
+        const FixedArray<T> *array_;    
     };
     
     template <typename T>
     class FixedArray {
     public:
-        FixedArray() : array_(nullptr), size_(0) {}
+        FixedArray() : managed_(false), array_(nullptr), size_(0) {}
         
-        FixedArray(int32_t size) : array_(nullptr), size_(size) {
+        FixedArray(int32_t size) : managed_(false), array_(nullptr), size_(size) {
             if (size > 0) {
                 array_ = new T[size_];
             }
         }
         
-        FixedArray(const FixedArray &arr) : array_(nullptr), size_(0) {
+        FixedArray(const FixedArray &arr) : managed_(false), array_(nullptr), size_(0) {
             if (arr.array_ && arr.size_) {
-                array_ = new T[arr.size_];
+                managed_ = arr.managed_;
                 size_ = arr.size_;
-                
-                if (std::is_pod<T>::value) {
-                    memcpy(array_, arr.array_, sizeof(T) * size_);
+                if (managed_){
+                    array_ = arr.array_;
                 } else {
-                    std::copy(&arr.array_[0], &arr.array_[size_], array_);
+                    array_ = new T[arr.size_];
+                    if (std::is_pod<T>::value) {
+                        memcpy(array_, arr.array_, sizeof(T) * size_);
+                    } else {
+                        std::copy(&arr.array_[0], &arr.array_[size_], array_);
+                    }
                 }
             }
         }
 
-        FixedArray(FixedArray &&arr) : array_(nullptr), size_(0) {
+        FixedArray(FixedArray &&arr) : managed_(false), array_(nullptr), size_(0) {
+            managed_ = arr.managed_;
             array_ = arr.array_;
             size_ = arr.size_;
-            
+
+            arr.managed_ = false;
             arr.array_ = nullptr;
             arr.size_ = 0;
         }
 
-        FixedArray(const std::vector<T>& vec) : array_(nullptr), size_(0) {
+        FixedArray(const std::vector<T>& vec) : managed_(false), array_(nullptr), size_(0) {
             if (vec.size()) {
                 array_ = new T[vec.size];
                 size_ = vec.size;
@@ -92,7 +97,7 @@ namespace BGE {
             }
         }
         
-        FixedArray(const std::vector<const std::vector<T> *>& vec) : array_(nullptr), size_(0) {
+        FixedArray(const std::vector<const std::vector<T> *>& vec) : managed_(false), array_(nullptr), size_(0) {
             int32_t total = 0;
             
             for (auto const &v : vec) {
@@ -121,41 +126,54 @@ namespace BGE {
             }
         }
         
-        FixedArray(const T *array, int32_t size) : array_(nullptr), size_(0) {
+        FixedArray(const T *array, int32_t size, bool managed = false) : managed_(managed), array_(nullptr), size_(0) {
             if (array && size > 0) {
-                array_ = new T[size];
                 size_ = size;
-                if (std::is_pod<T>::value) {
-                    memcpy(array_, array, sizeof(T) * size);
+                if (managed_) {
+                    array_ = array;
                 } else {
-                    std::copy(&array[0], &array[size], array_);
+                    array_ = new T[size];
+                    if (std::is_pod<T>::value) {
+                        memcpy(array_, array, sizeof(T) * size);
+                    } else {
+                        std::copy(&array[0], &array[size], array_);
+                    }
                 }
+            } else {
+                managed_ = false;
             }
         }
 
-        FixedArray(T *array, int32_t size) : array_(nullptr), size_(0) {
+        FixedArray(T *array, int32_t size, bool managed = false) : managed_(managed), array_(nullptr), size_(0) {
             if (array && size > 0) {
-                array_ = new T[size];
                 size_ = size;
-                if (std::is_pod<T>::value) {
-                    memcpy(array_, array, sizeof(T) * size);
+                if (managed) {
+                    array_ = array;
                 } else {
-                    std::copy(&array[0], &array[size], array_);
+                    array_ = new T[size];
+                    if (std::is_pod<T>::value) {
+                        memcpy(array_, array, sizeof(T) * size);
+                    } else {
+                        std::copy(&array[0], &array[size], array_);
+                    }
                 }
+            } else {
+                managed_ = false;
             }
         }
         
         virtual ~FixedArray() {
-            if (array_) {
+            if (!managed_ && array_) {
                 delete [] array_;
             }
         }
         
         void clear() {
-            if (array_) {
+            if (!managed_ && array_) {
                 delete [] array_;
             }
-            
+
+            managed_ = false;
             array_ = nullptr;
             size_ = 0;
         }
@@ -166,19 +184,25 @@ namespace BGE {
         
         FixedArray& operator=(const FixedArray& op) {
             if (this != &op) {
-                if (array_) {
+                if (!managed_ && array_) {
                     delete [] array_;
                 }
-                
+
                 if (op.array_ && op.size_) {
-                    array_ = new T[op.size_];
+                    managed_ = op.managed_;
                     size_ = op.size_;
-                    if (std::is_pod<T>::value) {
-                        memcpy(array_, op.array_, sizeof(T) * size_);
+                    if (managed_) {
+                        array_ = op.array_;
                     } else {
-                        std::copy(&op.array_[0], &op.array_[size_], array_);
+                        array_ = new T[op.size_];
+                        if (std::is_pod<T>::value) {
+                            memcpy(array_, op.array_, sizeof(T) * size_);
+                        } else {
+                            std::copy(&op.array_[0], &op.array_[size_], array_);
+                        }
                     }
                 } else {
+                    managed_ = false;
                     array_ = nullptr;
                     size_ = 0;
                 }
@@ -189,13 +213,15 @@ namespace BGE {
         
         FixedArray& operator=(FixedArray&& op) {
             if (this != &op) {
-                if (array_) {
+                if (!managed_ && array_) {
                     delete [] array_;
                 }
-                
+
+                managed_ = op.managed_;
                 array_ = op.array_;
                 size_ = op.size_;
-                
+
+                op.managed_ = false;
                 op.array_ = nullptr;
                 op.size_ = 0;
             }
@@ -236,6 +262,7 @@ namespace BGE {
         }
         
         int32_t getSize() const { return size_; }
+        int32_t getElementSize() const { return sizeof(T); }
         
         size_t getMemoryUsage() const { return size_ * sizeof(T); }
         
@@ -248,6 +275,7 @@ namespace BGE {
         }
         
     protected:
+        bool    managed_;
         T       *array_;
         int32_t  size_;
     };

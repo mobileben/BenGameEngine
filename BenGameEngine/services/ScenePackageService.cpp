@@ -8,7 +8,6 @@
 
 #include "ScenePackageService.h"
 #include "Game.h"
-#import <Foundation/Foundation.h>
 #include <future>
 #include <functional>
 
@@ -72,6 +71,36 @@ uint32_t BGE::ScenePackageService::numScenePackages() const {
     return num;
 }
 
+bool BGE::ScenePackageService::isAligned8Memory(size_t size) const {
+    return !(size&7);
+}
+
+size_t BGE::ScenePackageService::aligned8MemorySize(size_t size) const {
+    size_t fixed = size;
+    if (!isAligned8Memory(size)) {
+        size_t tmp = size / 8;
+        fixed = (tmp + 1) * 8;
+    }
+    return fixed;
+}
+
+void BGE::ScenePackageService::loadPackageTextures(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
+    if (loadable.type == ScenePackageLoadItem::LoadType::Textures) {
+        auto package = getScenePackage(loadable.packageHandle);
+        if (package) {
+            package->loadAllTextures([loadable]() {
+                if (loadable.completionHandler) {
+                    loadable.completionHandler(loadable.packageHandle, nullptr);
+                }
+            });
+        } else if (loadable.completionHandler) {
+            loadable.completionHandler(loadable.packageHandle, std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::DoesNotExist)));
+        }
+    } else if (loadable.completionHandler) {
+        loadable.completionHandler(loadable.packageHandle, std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::DoesNotExist)));
+    }
+}
+
 void BGE::ScenePackageService::createPackage(SpaceHandle spaceHandle, std::string name, const FilePath &filePath, ScenePackageLoadCompletionHandler callback) {
     ScenePackageLoadItem loadable{spaceHandle, name, filePath, callback};
     
@@ -119,43 +148,111 @@ void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, Scen
     }
 }
 
-void BGE::ScenePackageService::createPackageFromJSONDict(SpaceHandle spaceHandle, std::string name, NSDictionary *jsonDict, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback) {
-    if (jsonDict) {
+void BGE::ScenePackageService::createPackageFromSPKGBinary(SpaceHandle spaceHandle, std::string name, const uint64_t *buffer, size_t bufferSize, bool managed, const BaseDirectory& baseDirectory, ScenePackageLoadCompletionHandler callback) {
+    if (buffer) {
+        uint64_t *packageBuffer = const_cast<uint64_t *>(buffer);
+        if (!managed) {
+            bufferSize = aligned8MemorySize(bufferSize);
+            packageBuffer = new uint64_t[bufferSize / sizeof(uint64_t)];
+            memcpy(packageBuffer, buffer, bufferSize);
+        }
+
         ScenePackageHandle handle;
         ScenePackage *package = handleService_.allocate(handle);
-        
+
         if (package) {
             package->initialize(handle, name);
             package->setBaseDirectory(baseDirectory);
             package->setStatus(ScenePackageStatus::Loading);
-            
+
             // Now create an entry for this
             ScenePackageReference ref{ handle, { spaceHandle }};
             scenePackages_.push_back(ref);
-            
+
             // The loading system relies on having the package initalized with handle
-            package->create(jsonDict, [this, spaceHandle, callback, handle](ScenePackage * package) {
+            package->create(packageBuffer, bufferSize, managed, [this, spaceHandle, managed, packageBuffer, callback, handle](ScenePackage * package) {
                 auto tHandle = handle;
                 std::shared_ptr<Error> error = nullptr;
-                
+
                 if (package) {
                     package->setStatus(ScenePackageStatus::Valid);
-                    
+
                     auto space = Game::getInstance()->getSpaceService()->getSpace(spaceHandle);
-                    
+
                     if (space) {
                         space->scenePackageAdded(tHandle);
                     }
                 } else {
                     error = std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::Loading));
-                    
+
                     // There is no package, so we need to release this
                     removePackage(spaceHandle, tHandle);
-                    
+
                     // Reset handle
                     tHandle.nullify();
                 }
-                
+
+                if (callback) {
+                    callback(tHandle, error);
+                }
+            });
+        } else {
+            if (callback) {
+                callback(handle, std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::NoAvailableHandles)));
+            }
+        }
+    }
+}
+
+void BGE::ScenePackageService::createPackageFromJSONBinary(SpaceHandle spaceHandle, std::string name, const uint8_t *buffer, size_t bufferSize, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback) {
+    rapidjson::MemoryStream memStream((const rapidjson::MemoryStream::Ch *)buffer, bufferSize);
+    rapidjson::AutoUTFInputStream<unsigned, rapidjson::MemoryStream> is(memStream);
+    std::shared_ptr<rapidjson::Document> doc = std::make_shared<rapidjson::Document>();
+    doc->ParseStream(is);
+    if (!doc->HasParseError()) {
+        BGE::Game::getInstance()->getScenePackageService()->createPackageFromJSONDict(spaceHandle, name, doc, baseDirectory, callback);
+    } else if (callback) {
+        callback(BGE::ScenePackageHandle(), std::make_shared<BGE::Error>(BGE::ScenePackage::ErrorDomain, static_cast<int32_t>(BGE::ScenePackageError::DoesNotExist)));
+    }
+}
+
+void BGE::ScenePackageService::createPackageFromJSONDict(SpaceHandle spaceHandle, std::string name, const std::shared_ptr<rapidjson::Document> jsonDict, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback) {
+    if (jsonDict) {
+        ScenePackageHandle handle;
+        ScenePackage *package = handleService_.allocate(handle);
+
+        if (package) {
+            package->initialize(handle, name);
+            package->setBaseDirectory(baseDirectory);
+            package->setStatus(ScenePackageStatus::Loading);
+
+            // Now create an entry for this
+            ScenePackageReference ref{ handle, { spaceHandle }};
+            scenePackages_.push_back(ref);
+
+            // The loading system relies on having the package initalized with handle
+            package->create(jsonDict, [this, spaceHandle, callback, handle](ScenePackage * package) {
+                auto tHandle = handle;
+                std::shared_ptr<Error> error = nullptr;
+
+                if (package) {
+                    package->setStatus(ScenePackageStatus::Valid);
+
+                    auto space = Game::getInstance()->getSpaceService()->getSpace(spaceHandle);
+
+                    if (space) {
+                        space->scenePackageAdded(tHandle);
+                    }
+                } else {
+                    error = std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::Loading));
+
+                    // There is no package, so we need to release this
+                    removePackage(spaceHandle, tHandle);
+
+                    // Reset handle
+                    tHandle.nullify();
+                }
+
                 if (callback) {
                     callback(tHandle, error);
                 }
@@ -173,25 +270,44 @@ void BGE::ScenePackageService::createPackageFromJSONDict(SpaceHandle spaceHandle
 }
 
 void BGE::ScenePackageService::createPackageFromJSON(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
-    // Does not exist, to load
-    // For now we are doing this via iOS methods for faster dev
-    NSFileManager *defaultMgr = [NSFileManager defaultManager];
-    NSString *filePath = [[NSString alloc] initWithCString:loadable.filePath.filename().c_str() encoding:NSUTF8StringEncoding];
-    
-    if ([defaultMgr fileExistsAtPath:filePath]) {
-        NSData *data = [defaultMgr contentsAtPath:filePath];
-        NSError *err = nil;
-        NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
-        
-        createPackageFromJSONDict(loadable.spaceHandle, loadable.name, jsonDict, BaseDirectory{loadable.filePath.type, loadable.filePath.subpath}, callback);
-    } else {
-        if (callback) {
-            callback(ScenePackageHandle(), std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::DoesNotExist)));
-        }
+    FILE *fp = fopen(loadable.filePath.filename().c_str(), "rb");
+    if (fp) {
+        fseek(fp, 0L, SEEK_END);
+        auto bufferSize = ftell(fp);
+        fseek(fp, 0L, SEEK_SET);
+        auto buffer = new uint8_t[bufferSize];
+        fread(buffer, sizeof(uint8_t), bufferSize, fp);
+        fclose(fp);
+
+        createPackageFromJSONBinary(loadable.spaceHandle, loadable.name, buffer, bufferSize, BaseDirectory{loadable.filePath.type, loadable.filePath.subpath}, callback);
+        delete [] buffer;
+    } else if (callback) {
+        callback(ScenePackageHandle(), std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::DoesNotExist)));
     }
 }
 
 void BGE::ScenePackageService::createPackageFromSPKG(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
+    FILE *fp = fopen(loadable.filePath.filename().c_str(), "rb");
+    if (fp) {
+        // We want 64-bit aligned memory
+        fseek(fp, 0L, SEEK_END);
+        auto bufferSize = aligned8MemorySize(ftell(fp));
+        fseek(fp, 0L, SEEK_SET);
+        auto buffer = new uint64_t[bufferSize / sizeof(uint64_t)];
+        fread(buffer, sizeof(uint8_t), bufferSize, fp);
+        fclose(fp);
+
+        createPackageFromSPKGBinary(loadable.spaceHandle, loadable.name, buffer, bufferSize, false, BaseDirectory{loadable.filePath.type, loadable.filePath.subpath}, callback);
+        delete [] buffer;
+    } else if (callback) {
+        callback(ScenePackageHandle(), std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::DoesNotExist)));
+    }
+}
+
+void BGE::ScenePackageService::completionPackage(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
+    if (loadable.completionHandler) {
+        loadable.completionHandler(ScenePackageHandle(), nullptr);
+    }
 }
 
 BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::string name) const {
@@ -455,13 +571,28 @@ BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string nam
 void BGE::ScenePackageService::loadThreadFunction() {
     while (true) {
         auto loadable = queuedLoadItems_.pop();
-        
-        auto f = std::async(std::launch::async, static_cast<void(ScenePackageService::*)(ScenePackageLoadItem, ScenePackageLoadCompletionHandler)>(&ScenePackageService::createPackage), this, loadable, [loadable](ScenePackageHandle packageHandle, std::shared_ptr<Error> error) {
 
-            if (loadable.completionHandler) {
-                loadable.completionHandler(packageHandle, error);
-            }
-        });
+        if (loadable.type == ScenePackageLoadItem::LoadType::Package) {
+            auto f = std::async(std::launch::async, static_cast<void(ScenePackageService::*)(ScenePackageLoadItem, ScenePackageLoadCompletionHandler)>(&ScenePackageService::createPackage), this, loadable, [loadable](ScenePackageHandle packageHandle, std::shared_ptr<Error> error) {
+
+                if (loadable.completionHandler) {
+                    loadable.completionHandler(packageHandle, error);
+                }
+            });
+        } else if (loadable.type == ScenePackageLoadItem::LoadType::Textures) {
+            auto f = std::async(std::launch::async, static_cast<void(ScenePackageService::*)(ScenePackageLoadItem, ScenePackageLoadCompletionHandler)>(&ScenePackageService::loadPackageTextures), this, loadable, [loadable](ScenePackageHandle packageHandle, std::shared_ptr<Error> error) {
+
+                if (loadable.completionHandler) {
+                    loadable.completionHandler(packageHandle, error);
+                }
+            });
+        } else if (loadable.type == ScenePackageLoadItem::LoadType::Completion) {
+            auto f = std::async(std::launch::async, static_cast<void(ScenePackageService::*)(ScenePackageLoadItem, ScenePackageLoadCompletionHandler)>(&ScenePackageService::completionPackage), this, loadable, [loadable](ScenePackageHandle packageHandle, std::shared_ptr<Error> error) {
+                if (loadable.completionHandler) {
+                    loadable.completionHandler(packageHandle, error);
+                }
+            });
+        }
     }
 }
 

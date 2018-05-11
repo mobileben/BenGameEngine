@@ -24,14 +24,23 @@
 #include "FileUtilities.h"
 #include <thread>
 
+#include "rapidjson/document.h"
+
 namespace BGE {
     using ScenePackageLoadCompletionHandler = std::function<void(ScenePackageHandle, std::shared_ptr<Error>)>;
-    
+
     struct ScenePackageLoadItem {
-        SpaceHandle spaceHandle;
-        std::string name;
-        FilePath    filePath;
+        enum class LoadType { Package, Textures, Completion };
+        LoadType            type;
+        SpaceHandle         spaceHandle;
+        ScenePackageHandle  packageHandle;
+        std::string         name;
+        FilePath            filePath;
         ScenePackageLoadCompletionHandler completionHandler;
+
+        ScenePackageLoadItem(SpaceHandle spaceHandle, const std::string& name, const FilePath& filePath, ScenePackageLoadCompletionHandler callback) : type(LoadType::Package), spaceHandle(spaceHandle), name(name), filePath(filePath), completionHandler(callback) {}
+        ScenePackageLoadItem(ScenePackageHandle packageHandle, ScenePackageLoadCompletionHandler callback) : type(LoadType::Textures), packageHandle(packageHandle), completionHandler(callback) {}
+        ScenePackageLoadItem(ScenePackageLoadCompletionHandler callback) : type(LoadType::Completion), completionHandler(callback) {}
     };
     
     class ScenePackageService : public Service {
@@ -58,11 +67,16 @@ namespace BGE {
         size_t unusedHandleMemory() const final;
         size_t totalHandleMemory() const final;
         size_t totalMemory() const;
-        
+
         uint32_t numScenePackages() const;
-        
+
+        bool isAligned8Memory(size_t size) const;
+        size_t aligned8MemorySize(size_t size) const;
+
         void createPackage(SpaceHandle spaceHandle, std::string name, const FilePath &filePath, ScenePackageLoadCompletionHandler callback);
-        void createPackageFromJSONDict(SpaceHandle spaceHandle, std::string name, NSDictionary *jsonDict, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback);
+        void createPackageFromSPKGBinary(SpaceHandle spaceHandle, std::string name, const uint64_t *buffer, size_t bufferSize, bool managed, const BaseDirectory& baseDirectory, ScenePackageLoadCompletionHandler callback);
+        void createPackageFromJSONBinary(SpaceHandle spaceHandle, std::string name, const uint8_t *buffer, size_t bufferSize, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback);
+        void createPackageFromJSONDict(SpaceHandle spaceHandle, std::string name, const std::shared_ptr<rapidjson::Document> jsonDict, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback);
 
         void addSpaceHandleReference(SpaceHandle spaceHandle, ScenePackageHandle packageHandle);
 
@@ -111,9 +125,11 @@ namespace BGE {
         Queue<ScenePackageLoadItem>         queuedLoadItems_;
         
         void loadThreadFunction();
+        void loadPackageTextures(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback);
         void createPackage(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback);
         void createPackageFromJSON(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback);
         void createPackageFromSPKG(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback);
+        void completionPackage(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback);
         void releasePackage(ScenePackage *package);
     };
 }

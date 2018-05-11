@@ -1273,12 +1273,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"$(THIRD_PARTY_PREBUILTS_DIR)/rapidjson/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
 			};
 			name = Debug;
 		};
@@ -1314,11 +1316,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"$(THIRD_PARTY_PREBUILTS_DIR)/rapidjson/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -1327,6 +1331,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
@@ -1342,6 +1347,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
@@ -1467,12 +1473,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"$(THIRD_PARTY_PREBUILTS_DIR)/rapidjson/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
 			};
 			name = DevDebug;
 		};
@@ -1480,6 +1488,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
@@ -1578,11 +1587,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"$(THIRD_PARTY_PREBUILTS_DIR)/rapidjson/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = DevRelease;
@@ -1591,6 +1602,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
@@ -1682,11 +1694,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"$(THIRD_PARTY_PREBUILTS_DIR)/rapidjson/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
+				THIRD_PARTY_PREBUILTS_DIR = "~/Development/third-party-prebuilts-ios";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = AppStore;
@@ -1695,6 +1709,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/freetype/include",
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);

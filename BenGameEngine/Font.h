@@ -32,20 +32,20 @@ namespace BGE {
         FontErrorExistingTextureWrongType,
     } FontError;
 
-    enum class FontHorizontalAlignment {
+    enum class FontHorizontalAlignment : uint32_t {
         Left,
         Center,
         Right
     };
     
-    enum class FontVerticalAlignment {
+    enum class FontVerticalAlignment : uint32_t {
         Top,
         Center,
         Bottom,
         Baseline
     };
     
-    enum class FontStatus {
+    enum class FontStatus : uint32_t {
         Invalid,
         Loading,
         Valid
