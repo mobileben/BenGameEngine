@@ -108,13 +108,13 @@ namespace BGE {
         int32_t skew;
         int32_t collisionRectScale;
         float rotation;
-        int32_t matrix;
+        //int32_t matrix;
         int32_t colorMatrix;
         int32_t colorTransform;
         int32_t bounds;
     } __attribute__((aligned(4)));
 
-    static_assert(sizeof(struct AnimationKeyframeReferenceIntermediate) == 14*4, "Check your assumptions");
+    static_assert(sizeof(struct AnimationKeyframeReferenceIntermediate) == 13*4, "Check your assumptions");
     static_assert(std::is_pod<AnimationKeyframeReferenceIntermediate>::value, "Must be a POD type.");
 
     struct AnimationKeyframeReference {
@@ -128,11 +128,16 @@ namespace BGE {
         Vector2 *skew;
         Vector2 *collisionRectScale;
         float  rotation;
-        Matrix4 *matrix;
+        //Matrix4 *matrix;
         ColorMatrix *colorMatrix;
         ColorTransform *colorTransform;
         Rect *bounds;
     };
+
+    bool operator==(const AnimationKeyframeReference& lhs, const AnimationKeyframeReference& rhs);
+    bool operator!=(const AnimationKeyframeReference& lhs, const AnimationKeyframeReference& rhs);
+    bool operator==(const AnimationKeyframeReferenceIntermediate& lhs, const AnimationKeyframeReferenceIntermediate& rhs);
+    bool operator!=(const AnimationKeyframeReferenceIntermediate& lhs, const AnimationKeyframeReferenceIntermediate& rhs);
 
     struct BoundsReference {
         uint32_t    startFrame;
@@ -318,7 +323,6 @@ namespace BGE {
         int32_t             skew;
         int32_t             collisionRectScale;
         float               rotation;
-        int32_t             matrix;
         int32_t             colorMatrix;
         int32_t             colorTransform;
         int32_t             reference;
@@ -326,7 +330,7 @@ namespace BGE {
         GfxReferenceType    referenceType;
     } __attribute__((aligned(4)));
 
-    static_assert(sizeof(struct AutoDisplayElementIntermediate) == 14*4, "Check your assumptions");
+    static_assert(sizeof(struct AutoDisplayElementIntermediate) == 13*4, "Check your assumptions");
     static_assert(std::is_pod<AutoDisplayElementIntermediate>::value, "Must be a POD type.");
 
     struct AutoDisplayElementReference {
@@ -339,7 +343,6 @@ namespace BGE {
         Vector2             *collisionRectScale;
         float               rotation;
         bool                hidden;
-        Matrix4             *matrix;
         ColorMatrix         *colorMatrix;
         ColorTransform      *colorTransform;
         const char          *reference;

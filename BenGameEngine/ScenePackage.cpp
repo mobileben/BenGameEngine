@@ -1177,7 +1177,6 @@ void BGE::ScenePackage::link() {
             keyframeRef->collisionRectScale = nullptr;
         }
         keyframeRef->rotation = keyframeRefInt->rotation;
-        keyframeRef->matrix = nullptr;  // TODO
         if (keyframeRefInt->colorMatrix != NullPtrIndex) {
             keyframeRef->colorMatrix = keyframeRefInt->colorMatrix + colorMatrices_.baseAddress();
         } else {
@@ -1417,7 +1416,6 @@ void BGE::ScenePackage::link() {
             elem->collisionRectScale = nullptr;
         }
         elem->rotation = elemInt->rotation;
-        elem->matrix = nullptr;  // TODO default matrix and default color matrix and default color transform
         if (elemInt->colorMatrix != NullPtrIndex) {
             elem->colorMatrix = elemInt->colorMatrix + colorMatrices_.baseAddress();
         } else {
@@ -1540,7 +1538,7 @@ void BGE::ScenePackage::create(const uint64_t *buffer, size_t bufferSize, bool m
         source_ = strings_.addressOf(sourceIndex_);
 
         computeMemoryUsage();
-        
+
         loadAllTextures([this, callback]() {
             if (callback) {
                 callback(this);
