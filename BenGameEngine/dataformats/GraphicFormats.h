@@ -108,7 +108,6 @@ namespace BGE {
         int32_t skew;
         int32_t collisionRectScale;
         float rotation;
-        //int32_t matrix;
         int32_t colorMatrix;
         int32_t colorTransform;
         int32_t bounds;
@@ -128,7 +127,6 @@ namespace BGE {
         Vector2 *skew;
         Vector2 *collisionRectScale;
         float  rotation;
-        //Matrix4 *matrix;
         ColorMatrix *colorMatrix;
         ColorTransform *colorTransform;
         Rect *bounds;
@@ -153,6 +151,11 @@ namespace BGE {
 
     static_assert(sizeof(struct BoundsReferenceIntermediate) == 3*4, "Check your assumptions");
     static_assert(std::is_pod<BoundsReferenceIntermediate>::value, "Must be a POD type.");
+
+    bool operator==(const BoundsReference& lhs, const BoundsReference& rhs);
+    bool operator!=(const BoundsReference& lhs, const BoundsReference& rhs);
+    bool operator==(const BoundsReferenceIntermediate& lhs, const BoundsReferenceIntermediate& rhs);
+    bool operator!=(const BoundsReferenceIntermediate& lhs, const BoundsReferenceIntermediate& rhs);
 
     typedef enum : uint32_t {
         GfxReferenceTypeUnknown = 0,
@@ -347,6 +350,42 @@ namespace BGE {
         ColorTransform      *colorTransform;
         const char          *reference;
         GfxReferenceType    referenceType;
+    };
+}
+
+namespace std {
+    template<>
+    struct hash<BGE::AnimationKeyframeReferenceIntermediate> {
+        size_t operator()(const BGE::AnimationKeyframeReferenceIntermediate& k) const {
+            size_t prime = 31;
+            size_t result = 1;
+            result = prime * result + hash<float>()(k.startFrame);
+            result = prime * result + hash<float>()(k.totalFrames);
+            result = prime * result + hash<float>()(k.order);
+            result = prime * result + hash<float>()(k.flags);
+            result = prime * result + hash<float>()(k.frame);
+            result = prime * result + hash<float>()(k.position);
+            result = prime * result + hash<float>()(k.scale);
+            result = prime * result + hash<float>()(k.skew);
+            result = prime * result + hash<float>()(k.collisionRectScale);
+            result = prime * result + hash<float>()(k.rotation);
+            result = prime * result + hash<float>()(k.colorMatrix);
+            result = prime * result + hash<float>()(k.colorTransform);
+            result = prime * result + hash<float>()(k.bounds);
+            return result;
+        }
+    };
+
+    template<>
+    struct hash<BGE::BoundsReferenceIntermediate> {
+        size_t operator()(const BGE::BoundsReferenceIntermediate& b) const {
+            size_t prime = 31;
+            size_t result = 1;
+            result = prime * result + hash<float>()(b.startFrame);
+            result = prime * result + hash<float>()(b.totalFrames);
+            result = prime * result + hash<float>()(b.bounds);
+            return result;
+        }
     };
 }
 

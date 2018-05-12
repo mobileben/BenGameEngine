@@ -430,14 +430,12 @@ bool BGE::operator!=(const AnimationKeyframeReference& lhs, const AnimationKeyfr
 
 bool BGE::operator==(const AnimationKeyframeReferenceIntermediate& lhs, const AnimationKeyframeReferenceIntermediate& rhs) {
     // For now ignore startFrames and totalFrames
-#ifdef NOT_YET
     if (lhs.startFrame != rhs.startFrame) {
         return false;
     }
-    if (lhs.totalFrames !+ rhs.totalFrames) {
+    if (lhs.totalFrames != rhs.totalFrames) {
         return false;
     }
-#endif
     if (lhs.order != rhs.order) {
         return false;
     }
@@ -462,11 +460,6 @@ bool BGE::operator==(const AnimationKeyframeReferenceIntermediate& lhs, const An
     if (lhs.rotation != rhs.rotation) {
         return false;
     }
-#ifdef NOT_YET
-    if (lhs.matrix != rhs.matrix) {
-        return false;
-    }
-#endif
     if (lhs.colorMatrix != rhs.colorMatrix) {
         return false;
     }
@@ -476,18 +469,17 @@ bool BGE::operator==(const AnimationKeyframeReferenceIntermediate& lhs, const An
     if (lhs.bounds != rhs.bounds) {
         return false;
     }
-    return true;}
+    return true;
+}
 
 bool BGE::operator!=(const AnimationKeyframeReferenceIntermediate& lhs, const AnimationKeyframeReferenceIntermediate& rhs) {
     // For now ignore startFrames and totalFrames
-#ifdef NOT_YET
     if (lhs.startFrame != rhs.startFrame) {
         return true;
     }
-    if (lhs.totalFrames !+ rhs.totalFrames) {
+    if (lhs.totalFrames != rhs.totalFrames) {
         return true;
     }
-#endif
     if (lhs.order != rhs.order) {
         return true;
     }
@@ -512,11 +504,6 @@ bool BGE::operator!=(const AnimationKeyframeReferenceIntermediate& lhs, const An
     if (lhs.rotation != rhs.rotation) {
         return true;
     }
-#ifdef NOT_YET
-    if (lhs.matrix != rhs.matrix) {
-        return true;
-    }
-#endif
     if (lhs.colorMatrix != rhs.colorMatrix) {
         return true;
     }
@@ -529,4 +516,71 @@ bool BGE::operator!=(const AnimationKeyframeReferenceIntermediate& lhs, const An
     return false;
 }
 
+bool BGE::operator==(const BoundsReference& lhs, const BoundsReference& rhs) {
+    if (lhs.startFrame != rhs.startFrame) {
+        return false;
+    }
+    if (lhs.totalFrames != rhs.totalFrames) {
+        return false;
+    }
+    if (lhs.bounds) {
+        if (rhs.bounds) {
+            if (*lhs.bounds != *rhs.bounds) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    } else if (rhs.bounds) {
+        return false;
+    }
+    return true;
+}
+
+bool BGE::operator!=(const BoundsReference& lhs, const BoundsReference& rhs) {
+    if (lhs.startFrame != rhs.startFrame) {
+        return true;
+    }
+    if (lhs.totalFrames != rhs.totalFrames) {
+        return true;
+    }
+    if (lhs.bounds) {
+        if (rhs.bounds) {
+            if (*lhs.bounds != *rhs.bounds) {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    } else if (rhs.bounds) {
+        return true;
+    }
+    return false;
+}
+
+bool BGE::operator==(const BoundsReferenceIntermediate& lhs, const BoundsReferenceIntermediate& rhs) {
+    if (lhs.startFrame != rhs.startFrame) {
+        return false;
+    }
+    if (lhs.totalFrames != rhs.totalFrames) {
+        return false;
+    }
+    if (lhs.bounds != rhs.bounds) {
+        return false;
+    }
+    return true;
+}
+
+bool BGE::operator!=(const BoundsReferenceIntermediate& lhs, const BoundsReferenceIntermediate& rhs) {
+    if (lhs.startFrame != rhs.startFrame) {
+        return true;
+    }
+    if (lhs.totalFrames != rhs.totalFrames) {
+        return true;
+    }
+    if (lhs.bounds != rhs.bounds) {
+        return true;
+    }
+    return false;
+}
 
