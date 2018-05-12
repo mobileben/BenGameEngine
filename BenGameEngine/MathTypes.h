@@ -33,7 +33,10 @@ namespace BGE {
         };
         float m[16];
     } Matrix4;
-    
+
+    bool operator==(const Matrix4& lhs, const Matrix4& rhs);
+    bool operator!=(const Matrix4& lhs, const Matrix4& rhs);
+
     typedef union {
         struct {
             float m00, m01, m02;
@@ -42,7 +45,10 @@ namespace BGE {
         };
         float m[9];
     } Matrix3;
-    
+
+    bool operator==(const Matrix3& lhs, const Matrix3& rhs);
+    bool operator!=(const Matrix3& lhs, const Matrix3& rhs);
+
     typedef union {
         struct {
             float m00, m01;
@@ -51,7 +57,10 @@ namespace BGE {
         float m2[2][2];
         float m[4];
     } Matrix2;
-    
+
+    bool operator==(const Matrix2& lhs, const Matrix2& rhs);
+    bool operator!=(const Matrix2& lhs, const Matrix2& rhs);
+
     typedef union  {
         struct {
             float x, y, z, w;
