@@ -1603,12 +1603,18 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                 pixelsPerPoint_ = 1.0;
             }
 
-            width_ = (*jsonDict)[kScenePackageKeyWidth].GetFloat() * pixelsPerPoint_;
-            height_ = (*jsonDict)[kScenePackageKeyHeight].GetFloat() * pixelsPerPoint_;
             source_ = (*jsonDict)[kScenePackageKeySource].GetString();
             frameRate_ = (*jsonDict)[kScenePackageKeyFrameRate].GetFloat();
-            position_.x = (*jsonDict)[kScenePackageKeyPosition][kScenePackageKeyX].GetFloat() * pixelsPerPoint_;
-            position_.y = (*jsonDict)[kScenePackageKeyPosition][kScenePackageKeyY].GetFloat() * pixelsPerPoint_;
+            if (jsonDict->HasMember(kScenePackageKeyWidth)) {
+                width_ = (*jsonDict)[kScenePackageKeyWidth].GetFloat() * pixelsPerPoint_;
+            }
+            if (jsonDict->HasMember(kScenePackageKeyHeight)) {
+                height_ = (*jsonDict)[kScenePackageKeyHeight].GetFloat() * pixelsPerPoint_;
+            }
+            if (jsonDict->HasMember(kScenePackageKeyPosition)) {
+                position_.x = (*jsonDict)[kScenePackageKeyPosition][kScenePackageKeyX].GetFloat() * pixelsPerPoint_;
+                position_.y = (*jsonDict)[kScenePackageKeyPosition][kScenePackageKeyY].GetFloat() * pixelsPerPoint_;
+            }
 
             emptyStringIndex_ = stringBuilder.add("");
             defaultPositionIndex_ = vector2Builder.add(Vector2{0, 0});
@@ -1745,7 +1751,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                             textRef->alignment = FontHorizontalAlignment::Center;
                         }
 
-                        uint32_t size = formatDict[kScenePackageKeyFontSize].GetUint() * pixelsPerPoint_;
+                        uint32_t size = formatDict[kScenePackageKeyFontSize].GetFloat() * pixelsPerPoint_;
                         uint32_t color = formatDict[kScenePackageKeyFontColor].GetUint();
                         uint32_t blue = color & 0xff;
                         uint32_t green = color >> 8 & 0xff;
