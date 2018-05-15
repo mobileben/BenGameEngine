@@ -108,7 +108,8 @@ namespace BGE {
     };
     
     enum class ScenePackageError : int32_t {
-        UnsupportedFormat = 0,
+        None = 0,
+        UnsupportedFormat,
         DoesNotExist,
         Loading,
         NoAvailableHandles
@@ -368,9 +369,7 @@ namespace BGE {
 
         std::unordered_map<std::string, std::vector<SubTextureDef>> subTextures_;
         
-        std::shared_ptr<std::atomic_int>                    textureCount_;
         std::vector<TextureQueueItem>                       textureQueue_;
-        std::shared_ptr<std::atomic_int>                    fontCount_;
         std::vector<std::pair<std::string, uint32_t>>       fontQueue_;
         
         // Linked versions

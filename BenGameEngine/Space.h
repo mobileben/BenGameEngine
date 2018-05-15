@@ -122,7 +122,8 @@ namespace BGE {
         
         inline uint32_t getOrder() const { return order_; }
         inline void setOrder(uint32_t order) { order_ = order; }
-        
+
+        void loadAllTextures(std::function<void()> callback);
         void linkAll();
         
         // Component management
@@ -142,16 +143,16 @@ namespace BGE {
         void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback);
 
         // Font management
-        void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+        std::pair<FontHandle, std::shared_ptr<Error>> createFont(std::string name, uint32_t pxSize);
 
         // Texture management
-        void createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
-        void createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
+        std::pair<Texture *, std::shared_ptr<Error>> createTextureFromFile(std::string name, std::string filename, TextureFormat format);
+        std::pair<Texture *, std::shared_ptr<Error>> createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height);
 #if TARGET_OS_IPHONE
-        void createTextureFromUIImage(const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
+        std::pair<Texture *, std::shared_ptr<Error>> createTextureFromUIImage(const std::string& name, UIImage *image);
 #endif /* TARGET_OS_IPHONE */
-        void createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
-        void createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback);
+        std::pair<TextureAtlas *, std::shared_ptr<Error>> createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format);
+        std::pair<TextureAtlas *, std::shared_ptr<Error>> createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs);
 
         TextureHandle getTextureHandle(std::string name) const;
         TextureAtlasHandle getTextureAtlasHandle(std::string name) const;

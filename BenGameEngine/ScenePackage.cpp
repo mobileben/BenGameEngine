@@ -14,6 +14,7 @@
 #include "rapidjson/document.h"
 #include <type_traits>
 #include <cstdlib>
+#include <future>
 
 #import <Foundation/Foundation.h>
 
@@ -685,16 +686,12 @@ void BGE::ScenePackageFormat::save(const std::string& filename) {
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-BGE::ScenePackage::ScenePackage() : NamedObject(), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), emptyStringIndex_(NullPtrIndex), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), sourceIndex_(NullPtrIndex), fontCount_(nullptr) {
+BGE::ScenePackage::ScenePackage() : NamedObject(), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), emptyStringIndex_(NullPtrIndex), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), sourceIndex_(NullPtrIndex) {
     position_ = Vector2{0, 0};
-    textureCount_ = std::make_shared<std::atomic_int>(0);
-    fontCount_ = std::make_shared<std::atomic_int>(0);
 }
 
-BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), memoryUsage_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), emptyStringIndex_(NullPtrIndex), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), sourceIndex_(NullPtrIndex), fontCount_(nullptr) {
+BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), memoryUsage_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), emptyStringIndex_(NullPtrIndex), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), sourceIndex_(NullPtrIndex) {
     position_ = Vector2{0, 0};
-    textureCount_ = std::make_shared<std::atomic_int>(0);
-    fontCount_ = std::make_shared<std::atomic_int>(0);
 }
 
 void BGE::ScenePackage::initialize(ScenePackageHandle handle, std::string name) {
@@ -707,9 +704,6 @@ void BGE::ScenePackage::initialize(ScenePackageHandle handle, std::string name) 
     hasExternal_ = false;
 
     memoryUsage_ = 0;
-    
-    textureCount_ = std::make_shared<std::atomic_int>(0);
-    fontCount_ = std::make_shared<std::atomic_int>(0);
     
     baseDirectory_.type = FileUtilities::PathType::builtin;
     baseDirectory_.subpath.clear();
@@ -752,10 +746,8 @@ void BGE::ScenePackage::destroy() {
 
     subTextures_.clear();
     
-    textureCount_ = 0;
     textureQueue_.clear();
     
-    fontCount_ = 0;
     fontQueue_.clear();
 
     textureNames_.clear();
@@ -2605,42 +2597,29 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
         }
 
         if (textureQueue_.size() > 0) {
-            textureCount_->store(0);
-
             for (auto const &tex : textureQueue_) {
                 // Do we have subtextures affiliated with this?
                 auto it = subTextures_.find(tex.name);
 
                 if (it != subTextures_.end()) {
-                    Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.name, tex.filePath.filename(), it->second, tex.format, [this, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
-                        int val = textureCount_->fetch_add(1) + 1;
-
-                        if (atlas) {
-                            loadedTextureAtlases_.push_back(atlas->getHandle());
-                        }
-
-                        if (val == textureQueue_.size()) {
-                            texturesLoaded_ = true;
-                            if (callback) {
-                                callback();
-                            }
-                        }
-                    });
+                    TextureAtlas *atlas;
+                    std::shared_ptr<Error> error;
+                    std::tie(atlas, error) = Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.name, tex.filePath.filename(), it->second, tex.format);
+                    if (atlas) {
+                        loadedTextureAtlases_.push_back(atlas->getHandle());
+                    }
                 } else {
-                    Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), tex.name, tex.filePath.filename(), tex.format, [this, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
-                        int val = textureCount_->fetch_add(1) + 1;
-
-                        if (texture) {
-                            loadedTextures_.push_back(texture->getHandle());
-                        }
-                        if (val == textureQueue_.size()) {
-                            texturesLoaded_ = true;
-                            if (callback) {
-                                callback();
-                            }
-                        }
-                    });
+                    Texture *texture;
+                    std::shared_ptr<Error> error;
+                    std::tie(texture, error) = Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), tex.name, tex.filePath.filename(), tex.format);
+                    if (texture) {
+                        loadedTextures_.push_back(texture->getHandle());
+                    }
                 }
+            }
+            texturesLoaded_ = true;
+            if (callback) {
+                callback();
             }
         } else if (callback) {
             callback();
@@ -2671,23 +2650,17 @@ void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
             }
         }
         if (fontQueue_.size() > 0) {
-            fontCount_->store(0);
-
             for (auto const &font : fontQueue_) {
-                Game::getInstance()->getFontService()->createFont(font.first, font.second, handle_, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
-                    int val = fontCount_->fetch_add(1) + 1;
-
-                    if (!font.isNull()) {
-                        loadedFonts_.push_back(font);
-                    }
-
-                    if (val == fontQueue_.size()) {
-                        fontsLoaded_ = true;
-                        if (callback) {
-                            callback();
-                        }
-                    }
-                });
+                FontHandle fontHandle;
+                std::shared_ptr<Error> error;
+                std::tie(fontHandle, error) = Game::getInstance()->getFontService()->createFont(font.first, font.second, handle_);
+                if (!fontHandle.isNull()) {
+                    loadedFonts_.push_back(fontHandle);
+                }
+            }
+            fontsLoaded_ = true;
+            if (callback) {
+                callback();
             }
         } else if (callback) {
             callback();

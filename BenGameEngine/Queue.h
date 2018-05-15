@@ -55,19 +55,49 @@ public:
         mlock.unlock();
         cond_.notify_one();
     }
-    
-    bool empty() const {
-        bool e = false;
-        
+
+    void pushIfEmpty(const T& item) {
         std::unique_lock<std::mutex> mlock(mutex_);
-        
-        e = queue_.empty();
-        
+        bool notify = false;
+        if (queue_.empty()) {
+            queue_.push(item);
+            notify = true;
+        }
         mlock.unlock();
-        
+        if (notify) {
+            cond_.notify_one();
+        }
+    }
+
+    void pushIfEmpty(T&&item) {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        bool notify = false;
+        if (queue_.empty()) {
+            queue_.push(item);
+            notify = true;
+        }
+        mlock.unlock();
+        if (notify) {
+            cond_.notify_one();
+        }
+    }
+
+    bool empty() {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        bool e = false;
+        e = queue_.empty();
+        mlock.unlock();
         return e;
     }
-    
+
+    size_t size() {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        size_t count = 0;
+        count = queue_.size();
+        mlock.unlock();
+        return count;
+    }
+
     Queue() = default;
     Queue(const Queue &) = delete;
     Queue &operator=(const Queue &) = delete;

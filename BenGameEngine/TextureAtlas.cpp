@@ -90,110 +90,103 @@ size_t BGE::TextureAtlas::getMemoryUsage() const {
     return 0;
 }
 
-void BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
-    Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), atlasTextureKey(), filename, format, [this, &subTextures, callback](Texture *texture, std::shared_ptr<Error> error) {
-        if (!error) {
-            std::shared_ptr<Error> bgeError;
-            TextureAtlas *atlas = this;
-            
-            if (texture) {
-                // Texture needs to be set before processing subTex
-                this->textureHandle_ = texture->getHandle();
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format) {
+    Texture *texture;
+    std::shared_ptr<Error> error;
+    std::tie(texture, error) = Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), atlasTextureKey(), filename, format);
+    if (!error) {
+        TextureAtlas *atlas = this;
 
-                this->valid_ = true;
-                this->format_ = texture->getFormat();
-                this->alphaState_ = texture->getAlphaState();
-                this->width_ = texture->getWidth();
-                this->height_ = texture->getHeight();
-                this->hwId_ = texture->getHWTextureId();
-                this->target_ = texture->getTarget();
+        if (texture) {
+            // Texture needs to be set before processing subTex
+            this->textureHandle_ = texture->getHandle();
 
-                if (subTextures.size() > 0) {
-                    for (auto const &st : subTextures) {
-                        std::string key = st.name;
-                        auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
-                        
-                        if (subTex) {
-                            this->subTextures_[key] = subTex->getHandle();
-                        }
+            this->valid_ = true;
+            this->format_ = texture->getFormat();
+            this->alphaState_ = texture->getAlphaState();
+            this->width_ = texture->getWidth();
+            this->height_ = texture->getHeight();
+            this->hwId_ = texture->getHWTextureId();
+            this->target_ = texture->getTarget();
+
+            if (subTextures.size() > 0) {
+                for (auto const &st : subTextures) {
+                    std::string key = st.name;
+                    auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
+
+                    if (subTex) {
+                        this->subTextures_[key] = subTex->getHandle();
                     }
-                } else {
-                    valid_ = false;
-                    format_ = TextureFormat::Undefined;
-                    alphaState_ = TextureAlphaState::None;
-                    width_ = 0;
-                    height_ = 0;
-                    hwId_ = 0;
-                    target_ = GL_TEXTURE_2D;
-
-                    atlas = nullptr;
-                    bgeError = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorInvalidSubTexture);
                 }
             } else {
+                valid_ = false;
+                format_ = TextureFormat::Undefined;
+                alphaState_ = TextureAlphaState::None;
+                width_ = 0;
+                height_ = 0;
+                hwId_ = 0;
+                target_ = GL_TEXTURE_2D;
+
                 atlas = nullptr;
-                bgeError = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorExistingTextureWrongType);
+                error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorInvalidSubTexture);
             }
-            
-            if (callback) {
-                callback(atlas, bgeError);
-            }
-        } else if (callback) {
-            callback(nullptr, error);
+        } else {
+            atlas = nullptr;
+            error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorExistingTextureWrongType);
         }
-    });
+        return std::make_pair(atlas, error);
+    } else {
+        return std::make_pair(nullptr, error);
+    }
 }
 
-void BGE::TextureAtlas::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
-    Game::getInstance()->getTextureService()->createTextureFromBuffer(getHandle(), atlasTextureKey(), buffer, format, width, height, [this, &subTextures, &callback](Texture *texture, std::shared_ptr<Error> error) {
-        if (!error) {
-            std::shared_ptr<Error> bgeError;
-            TextureAtlas *atlas = this;
-            
-            if (texture) {
-                // Texture needs to be set before processing subTex
-                this->textureHandle_ = texture->getHandle();
-                
-                this->valid_ = true;
-                this->format_ = texture->getFormat();
-                this->alphaState_ = texture->getAlphaState();
-                this->width_ = texture->getWidth();
-                this->height_ = texture->getHeight();
-                this->hwId_ = texture->getHWTextureId();
-                this->target_ = texture->getTarget();
-                
-                if (subTextures.size() > 0) {
-                    for (auto const &st : subTextures) {
-                        std::string key = st.name;
-                        auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
-                        
-                        if (subTex) {
-                            subTextures_[key] = subTex->getHandle();
-                        }
-                    }
-                } else {
-                    valid_ = false;
-                    format_ = TextureFormat::Undefined;
-                    alphaState_ = TextureAlphaState::None;
-                    width_ = 0;
-                    height_ = 0;
-                    hwId_ = 0;
-                    target_ = GL_TEXTURE_2D;
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures) {
+    Texture *texture;
+    std::shared_ptr<Error> error;
+    std::tie(texture, error) = Game::getInstance()->getTextureService()->createTextureFromBuffer(getHandle(), atlasTextureKey(), buffer, format, width, height);
+    if (!error) {
+        TextureAtlas *atlas = this;
+        if (texture) {
+            // Texture needs to be set before processing subTex
+            this->textureHandle_ = texture->getHandle();
 
-                    atlas = nullptr;
-                    bgeError = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorInvalidSubTexture);
+            this->valid_ = true;
+            this->format_ = texture->getFormat();
+            this->alphaState_ = texture->getAlphaState();
+            this->width_ = texture->getWidth();
+            this->height_ = texture->getHeight();
+            this->hwId_ = texture->getHWTextureId();
+            this->target_ = texture->getTarget();
+
+            if (subTextures.size() > 0) {
+                for (auto const &st : subTextures) {
+                    std::string key = st.name;
+                    auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
+
+                    if (subTex) {
+                        subTextures_[key] = subTex->getHandle();
+                    }
                 }
             } else {
+                valid_ = false;
+                format_ = TextureFormat::Undefined;
+                alphaState_ = TextureAlphaState::None;
+                width_ = 0;
+                height_ = 0;
+                hwId_ = 0;
+                target_ = GL_TEXTURE_2D;
+
                 atlas = nullptr;
-                bgeError = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorExistingTextureWrongType);
+                error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorInvalidSubTexture);
             }
-            
-            if (callback) {
-                callback(atlas, bgeError);
-            }
-        } else if (callback) {
-            callback(nullptr, error);
+        } else {
+            atlas = nullptr;
+            error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorExistingTextureWrongType);
         }
-    });
+        return std::make_pair(atlas, error);
+    } else {
+        return std::make_pair(nullptr, error);
+    }
 }
 
 const std::map<std::string, BGE::TextureHandle>& BGE::TextureAtlas::getSubTextures() const {

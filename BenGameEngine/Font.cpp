@@ -123,12 +123,14 @@ uint32_t BGE::Font::getHeight() const {
     }
 }
 
-void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<void(FontHandle, std::shared_ptr<Error>)> callback)  {
+std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::Font::load(std::string filename, uint32_t faceIndex)  {
     FT_Face face = NULL;
     FT_Error error = 0;
     FT_Library library;
     error = FT_Init_FreeType(&library);
-    
+    std::shared_ptr<Error> bgeError;
+    FontHandle fontHandle;
+
     if (!error) {
         error = FT_New_Face(library, filename.c_str(), faceIndex, &face);
         
@@ -291,67 +293,63 @@ void BGE::Font::load(std::string filename, uint32_t faceIndex, std::function<voi
                             }
                         }
                     }
-                    
-                    Game::getInstance()->getTextureService()->createTextureAtlasFromBuffer(getHandle(), FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, TextureFormat::Alpha, atlasW, atlasH, subTexDefs, [=](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
-                        if (atlas) {
-                            textureAtlasHandle_ = atlas->getHandle();
-                            glyphs_.clear();
-                            
-                            // Our space is used whenever we don't have a match
-                            uint16_t code;
-                            std::string key = fontKeyBase + std::to_string(InitialSupportedCharacterOffset);
-                            auto subTexHandle = atlas->getSubTextureHandle(key);
-                            FontGlyph space = FontGlyph(this, subTexHandle, glyphDefs[0].offsetX, glyphDefs[0].offsetY, glyphDefs[0].advance);
-                            
-                            glyphs_[InitialSupportedCharacterOffset] = space;
-                            
-                            // Space is already done
-                            for (int i=0;i<NumSupportedCharacters + 1;i++) {
-                                code = i + InitialSupportedCharacterOffset;
-                                key = fontKeyBase + std::to_string(code);
-                                subTexHandle = atlas->getSubTextureHandle(key);
-                                
-                                if (!subTexHandle.isNull()) {
-                                    auto glyph = FontGlyph(this, subTexHandle, glyphDefs[i].offsetX, glyphDefs[i].offsetY, glyphDefs[i].advance);
-                                    
-                                    glyphs_[code] = glyph;
-                                } else {
-                                    // Replace with SPACE
-                                    glyphs_[code] = space;
-                                }
-                            }
-                        } else {
-                            textureAtlasHandle_ = TextureAtlasHandle();
-                        }
-                        
-                        for (int i=0;i<NumSupportedCharacters;i++) {
-                            if (bitmaps[i].buffer) {
-                                free(bitmaps[i].buffer);
+
+                    TextureAtlas *atlas;
+                    std::tie(atlas, bgeError) = Game::getInstance()->getTextureService()->createTextureAtlasFromBuffer(getHandle(), FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, TextureFormat::Alpha, atlasW, atlasH, subTexDefs);
+                    if (atlas) {
+                        textureAtlasHandle_ = atlas->getHandle();
+                        glyphs_.clear();
+
+                        // Our space is used whenever we don't have a match
+                        uint16_t code;
+                        std::string key = fontKeyBase + std::to_string(InitialSupportedCharacterOffset);
+                        auto subTexHandle = atlas->getSubTextureHandle(key);
+                        FontGlyph space = FontGlyph(this, subTexHandle, glyphDefs[0].offsetX, glyphDefs[0].offsetY, glyphDefs[0].advance);
+
+                        glyphs_[InitialSupportedCharacterOffset] = space;
+
+                        // Space is already done
+                        for (int i=0;i<NumSupportedCharacters + 1;i++) {
+                            code = i + InitialSupportedCharacterOffset;
+                            key = fontKeyBase + std::to_string(code);
+                            subTexHandle = atlas->getSubTextureHandle(key);
+
+                            if (!subTexHandle.isNull()) {
+                                auto glyph = FontGlyph(this, subTexHandle, glyphDefs[i].offsetX, glyphDefs[i].offsetY, glyphDefs[i].advance);
+
+                                glyphs_[code] = glyph;
+                            } else {
+                                // Replace with SPACE
+                                glyphs_[code] = space;
                             }
                         }
-                        
-                        free(atlasBuffer);
-                        
-                        if (callback) {
-                            status_ = FontStatus::Valid;
-                            callback(handle_, nullptr);
+                    } else {
+                        textureAtlasHandle_ = TextureAtlasHandle();
+                    }
+
+                    for (int i=0;i<NumSupportedCharacters;i++) {
+                        if (bitmaps[i].buffer) {
+                            free(bitmaps[i].buffer);
                         }
-                    });
-                } else if (callback) {
-                    callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorAllocation));
+                    }
+
+                    free(atlasBuffer);
+                    status_ = FontStatus::Valid;
+                    fontHandle = handle_;
+                } else {
+                    bgeError = std::make_shared<Error>(Font::ErrorDomain, FontErrorAllocation);
                 }
-            } else if (callback) {
-                callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
+            } else {
+                bgeError = std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType);
             }
-            
             FT_Done_Face(face);
-        } else if (callback) {
-            callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
+        } else  {
+            bgeError = std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType);
         }
-        
         FT_Done_FreeType(library);
-    } else if (callback) {
-        callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType));
+    } else {
+        bgeError = std::make_shared<Error>(Font::ErrorDomain, FontErrorFreeType);
     }
+    return std::make_pair(fontHandle, bgeError);
 }
 

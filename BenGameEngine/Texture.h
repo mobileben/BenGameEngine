@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 
-#include <functional>
 #include <string>
 
 #include "Error.h"
@@ -26,6 +25,7 @@
 namespace BGE {
     typedef enum {
         TextureErrorNone = 0,
+        TextureErrorUnsupported,
         TextureErrorOS,
         TextureErrorNoBuffer,
         TextureErrorZeroWidthOrHeight,
@@ -74,7 +74,7 @@ namespace BGE {
         ~Texture() {}
         
         void initialize(TextureHandle handle, std::string name, TextureFormat format);
-        void initialize(TextureHandle handle, std::string name, RawTexture *rawTexture, std::function<void(Texture *)> callback);
+        std::shared_ptr<Error> initialize(TextureHandle handle, std::string name, RawTexture *rawTexture);
         void initialize(TextureHandle handle, std::string name, TextureFormat format, GLKTextureInfo *texInfo);
         void destroy();
         
@@ -98,7 +98,7 @@ namespace BGE {
 
         inline size_t getMemoryUsage() const { return memoryUsage_; }
         
-        void createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback);
+        std::shared_ptr<Error> createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height);
         std::shared_ptr<Error> createSubTexture(TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated=false);
         
         inline TextureAtlasHandle getTextureAtlasHandle() { return atlasHandle_; }
@@ -161,12 +161,12 @@ namespace BGE {
         void updateUVs(bool rotated = false);
         void updateXYs();
 
-        void createTextureFromAlphaBuffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
-        void createTextureFromRGB565Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
-        void createTextureFromRGB888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
-        void createTextureFromRGBA5551Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
-        void createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
-        void createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height, std::function<void(std::shared_ptr<Error>)> callback);
+        std::shared_ptr<Error> createTextureFromAlphaBuffer(unsigned char *buffer, uint32_t width, uint32_t height);
+        std::shared_ptr<Error> createTextureFromRGB565Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
+        std::shared_ptr<Error> createTextureFromRGB888Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
+        std::shared_ptr<Error> createTextureFromRGBA5551Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
+        std::shared_ptr<Error> createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
+        std::shared_ptr<Error> createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
         
         size_t computeMemoryUsage(TextureFormat format, uint32_t width, uint32_t height);
     };

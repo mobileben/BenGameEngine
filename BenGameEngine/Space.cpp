@@ -66,13 +66,17 @@ void BGE::Space::unlock() {
 
 void BGE::Space::reset(std::function<void()> callback) {
     // TODO: For now, on iOS, this needs to be done on the main thread
+#ifdef NOT_YET
     dispatch_async(dispatch_get_main_queue(), ^() {
-        spaceService_->lock();
+#endif
+        lock();
         
         BGE::Game::getInstance()->queueSpaceReset(this, callback);
         
-        spaceService_->unlock();
+        unlock();
+#ifdef NOT_YET
     });
+#endif
 }
 
 void BGE::Space::reset_() {
@@ -248,11 +252,11 @@ void BGE::Space::outputMemoryBreakdown(uint32_t numTabs) const {
 }
 
 BGE::GameObject *BGE::Space::createGameObject(std::string name ) {
-    spaceService_->lock();
+    lock();
     
     auto obj = gameObjectService_->createGameObject(name);
     
-    spaceService_->unlock();
+    unlock();
     
     return obj;
 }
@@ -278,15 +282,15 @@ BGE::GameObject *BGE::Space::getGameObject(GameObjectHandle handle) const {
 }
 
 void BGE::Space::removeGameObject(GameObjectHandle handle) {
-    spaceService_->lock();
+    lock();
     gameObjectService_->removeGameObject(handle);
-    spaceService_->unlock();
+    unlock();
 }
 
 void BGE::Space::removeGameObject(GameObject *object) {
-    spaceService_->lock();
+    lock();
     gameObjectService_->removeGameObject(object);
-    spaceService_->unlock();
+    unlock();
 }
 
 const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
@@ -348,6 +352,18 @@ void BGE::Space::getRootTransforms(std::vector<TransformComponent *> &xforms) co
     componentService_->getComponents<TransformComponent>(xforms);
 }
 
+void BGE::Space::loadAllTextures(std::function<void()> callback) {
+    auto scenePackageService = Game::getInstance()->getScenePackageService();
+
+    for (auto &packageHandle : scenePackages_) {
+        auto package = scenePackageService->getScenePackage(packageHandle);
+
+        if (package) {
+            package->link();
+        }
+    }
+}
+
 // TODO: Add in support for dependency validation as well as linking in order of dependencies
 void BGE::Space::linkAll() {
     auto scenePackageService = Game::getInstance()->getScenePackageService();
@@ -362,7 +378,7 @@ void BGE::Space::linkAll() {
 }
 
 BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
-    spaceService_->lock();
+    lock();
     
     CreatedGameObjectVector objects;
     auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
@@ -370,7 +386,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
     
     dispatchCreatedHandlers(&objects, delegate);
     
-    spaceService_->unlock();
+    unlock();
     
     return obj;
 }
@@ -387,7 +403,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
     }
     
     if (animSeqRef) {
-        spaceService_->lock();
+        lock();
 
         auto obj = createGameObject(instanceName);
         auto objHandle = obj->getHandle();
@@ -412,7 +428,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
         
         addCreatedGameObjectsForAnimSequence(obj, pushBitmask, objects);
         
-        spaceService_->unlock();
+        unlock();
         
         return obj;
     }
@@ -422,7 +438,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
 
 BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string instanceName, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate) {
     if (channelRef) {
-        spaceService_->lock();
+        lock();
         
         auto obj = createGameObject(instanceName);
         auto objHandle = obj->getHandle();
@@ -441,7 +457,7 @@ BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string ins
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
 
-        spaceService_->unlock();
+        unlock();
 
         return obj;
     }
@@ -460,7 +476,7 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
     }
     
     if (animSeqRef) {
-        spaceService_->lock();
+        lock();
         
         auto obj = createGameObject(instanceName);
         auto objHandle = obj->getHandle();
@@ -478,7 +494,7 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
         
-        spaceService_->unlock();
+        unlock();
 
         return obj;
     }
@@ -487,7 +503,7 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
 }
 
 BGE::GameObject *BGE::Space::createButton(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
-    spaceService_->lock();
+    lock();
 
     CreatedGameObjectVector objects;
     
@@ -496,7 +512,7 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
     
     dispatchCreatedHandlers(&objects, delegate);
 
-    spaceService_->unlock();
+    unlock();
 
     return obj;
 }
@@ -512,7 +528,7 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
     }
     
     if (buttonRef) {
-        spaceService_->lock();
+        lock();
         
         auto obj = createGameObject(instanceName);
         auto objHandle = obj->getHandle();
@@ -531,7 +547,7 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
         
         addCreatedGameObjectsForButton(obj, pushBitmask, objects);
 
-        spaceService_->unlock();
+        unlock();
 
         return obj;
     }
@@ -540,7 +556,7 @@ BGE::GameObject *BGE::Space::createButton(std::string name, std::string instance
 }
 
 BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
-    spaceService_->lock();
+    lock();
 
     CreatedGameObjectVector objects;
     uint32_t pushBitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
@@ -548,7 +564,7 @@ BGE::GameObject *BGE::Space::createExternalReference(std::string name, std::stri
     
     dispatchCreatedHandlers(&objects, delegate);
     
-    spaceService_->unlock();
+    unlock();
 
     return obj;
 }
@@ -620,7 +636,7 @@ BGE::GameObject *BGE::Space::createMask(std::string name, std::string instanceNa
     }
     
     if (maskRef) {
-        spaceService_->lock();
+        lock();
         
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
@@ -635,7 +651,7 @@ BGE::GameObject *BGE::Space::createMask(std::string name, std::string instanceNa
             addCreatedGameObjectsForRenderComponent<MaskComponent>(obj, objects);
         }
 
-        spaceService_->unlock();
+        unlock();
         
         return obj;
     }
@@ -659,7 +675,7 @@ BGE::GameObject *BGE::Space::createTextureMask(std::string name, std::string ins
     }
     
     if (maskRef) {
-        spaceService_->lock();
+        lock();
         
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
@@ -674,7 +690,7 @@ BGE::GameObject *BGE::Space::createTextureMask(std::string name, std::string ins
             addCreatedGameObjectsForRenderComponent<TextureMaskComponent>(obj, objects);
         }
         
-        spaceService_->unlock();
+        unlock();
         
         return obj;
     }
@@ -698,7 +714,7 @@ BGE::GameObject *BGE::Space::createSprite(std::string name, std::string instance
     }
     
     if (texRef) {
-        spaceService_->lock();
+        lock();
         
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
@@ -715,7 +731,7 @@ BGE::GameObject *BGE::Space::createSprite(std::string name, std::string instance
             addCreatedGameObjectsForRenderComponent<SpriteRenderComponent>(obj, objects);
         }
         
-        spaceService_->unlock();
+        unlock();
         
         return obj;
     }
@@ -738,7 +754,7 @@ BGE::GameObject *BGE::Space::createText(std::string name, std::string instanceNa
     }
     
     if (textRef) {
-        spaceService_->lock();
+        lock();
         
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
@@ -755,7 +771,7 @@ BGE::GameObject *BGE::Space::createText(std::string name, std::string instanceNa
             addCreatedGameObjectsForRenderComponent<TextComponent>(obj, objects);
         }
         
-        spaceService_->unlock();
+        unlock();
         
         return obj;
     }
@@ -778,7 +794,7 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string insta
     }
     
     if (placementRef) {
-        spaceService_->lock();
+        lock();
         
         auto obj = createGameObject(instanceName);
         auto xform = createComponent<TransformComponent>();
@@ -794,7 +810,7 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string insta
             addCreatedGameObjectsForRenderComponent<PlacementComponent>(obj, objects);
         }
         
-        spaceService_->unlock();
+        unlock();
         
         return obj;
     }
@@ -803,7 +819,7 @@ BGE::GameObject *BGE::Space::createPlacement(std::string name, std::string insta
 }
 
 BGE::GameObject *BGE::Space::createFlatRect(std::string instanceName, Vector2 &wh, Color &color) {
-    spaceService_->lock();
+    lock();
     
     auto obj = createGameObject(instanceName);
     auto xform = createComponent<TransformComponent>();
@@ -823,7 +839,7 @@ BGE::GameObject *BGE::Space::createFlatRect(std::string instanceName, Vector2 &w
     obj->addComponent(flat);
     obj->addComponent(bbox);
     
-    spaceService_->unlock();
+    unlock();
     
     return obj;
 }
@@ -833,7 +849,7 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, TextureHandl
         return nullptr;
     }
     
-    spaceService_->lock();
+    lock();
     
     auto obj = createGameObject(instanceName);
     auto xform = createComponent<TransformComponent>();
@@ -846,7 +862,7 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, TextureHandl
 
     sprite->setTextureHandle(texHandle);
     
-    spaceService_->unlock();
+    unlock();
     
     return obj;
 }
@@ -856,7 +872,7 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, Texture *tex
         return nullptr;
     }
     
-    spaceService_->lock();
+    lock();
     
     auto obj = createGameObject(instanceName);
     auto xform = createComponent<TransformComponent>();
@@ -869,7 +885,7 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, Texture *tex
     
     sprite->setTexture(texture);
     
-    spaceService_->unlock();
+    unlock();
     
     return obj;
 }
@@ -885,7 +901,7 @@ void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePac
     
     if (package) {
         animationService->lock();
-        spaceService_->lock();
+        lock();
         
         auto autoDisplayList = package->getAutoDisplayList();
         auto num = package->getAutoDisplayListSize();
@@ -985,7 +1001,7 @@ void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePac
 
         // Now notifiy all create handlers
         dispatchCreatedHandlers(&createdObjects, delegate);
-        spaceService_->unlock();
+        unlock();
         animationService->unlock();
     }
     
@@ -994,39 +1010,32 @@ void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePac
     }
 }
 
-void BGE::Space::createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback) {
-    spaceService_->lock();
+std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::Space::createFont(std::string name, uint32_t pxSize) {
+    lock();
     
     auto fontService = Game::getInstance()->getFontService();
     auto font = fontService->getFont(name, pxSize);
     if (font) {
         auto fontHandle = font->getHandle();
-
         // Now search to see if our handle exists already
         for (auto const &handle : fonts_) {
             if (handle == fontHandle) {
-                if (callback) {
-                    callback(handle, nullptr);
-                }
-
-                spaceService_->unlock();
-
-                return;
+                unlock();
+                return std::make_pair(handle, nullptr);
             }
         }
     }
 
-    
     // Not found, so try and allocate it
-    Game::getInstance()->getFontService()->createFont(name, pxSize, spaceHandle_, [this, callback](FontHandle font, std::shared_ptr<Error> error) -> void {
-        fonts_.push_back(font);
-        
-        spaceService_->unlock();
+    FontHandle fontHandle;
+    std::shared_ptr<Error> error;
+    std::tie(fontHandle, error) = Game::getInstance()->getFontService()->createFont(name, pxSize, spaceHandle_);
+    if (!fontHandle.isNull()) {
+        fonts_.push_back(fontHandle);
+    }
 
-        if (callback) {
-            callback(font, error);
-        }
-    });
+    unlock();
+    return std::make_pair(fontHandle, error);
 }
 
 void BGE::Space::scenePackageAdded(ScenePackageHandle handle) {
@@ -1368,26 +1377,26 @@ void BGE::Space::dispatchCreatedHandlers(CreatedGameObjectVector *objects, Scene
     }
 }
 
-void BGE::Space::createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
-    Game::getInstance()->getTextureService()->createTextureFromFile(spaceHandle_, name, filename, format, callback);
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::Space::createTextureFromFile(std::string name, std::string filename, TextureFormat format) {
+    return Game::getInstance()->getTextureService()->createTextureFromFile(spaceHandle_, name, filename, format);
 }
 
-void BGE::Space::createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
-    Game::getInstance()->getTextureService()->createTextureFromBuffer(spaceHandle_, name, buffer, format, width, height, callback);
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::Space::createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height) {
+    return Game::getInstance()->getTextureService()->createTextureFromBuffer(spaceHandle_, name, buffer, format, width, height);
 }
 
 #if TARGET_OS_IPHONE
-void BGE::Space::createTextureFromUIImage(const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
-    Game::getInstance()->getTextureService()->createTextureFromUIImage(spaceHandle_, name, image, callback);
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::Space::createTextureFromUIImage(const std::string& name, UIImage *image) {
+    return Game::getInstance()->getTextureService()->createTextureFromUIImage(spaceHandle_, name, image);
 }
 #endif /* TARGET_OS_IPHONE */
 
-void BGE::Space::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
-    Game::getInstance()->getTextureService()->createTextureAtlasFromFile(spaceHandle_, name, filename, subTextureDefs, format, callback);
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::Space::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
+    return Game::getInstance()->getTextureService()->createTextureAtlasFromFile(spaceHandle_, name, filename, subTextureDefs, format);
 }
 
-void BGE::Space::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
-    Game::getInstance()->getTextureService()->createTextureAtlasFromBuffer(spaceHandle_, name, buffer, format, width, height, subTextureDefs, callback);
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::Space::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
+    return Game::getInstance()->getTextureService()->createTextureAtlasFromBuffer(spaceHandle_, name, buffer, format, width, height, subTextureDefs);
 }
 
 BGE::TextureHandle BGE::Space::getTextureHandle(std::string name) const {

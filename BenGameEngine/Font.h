@@ -82,7 +82,7 @@ namespace BGE {
         uint32_t getStringWidth(std::string str, bool minimum=true);
         uint32_t getHeight() const;
         
-        virtual void load(std::string filename, uint32_t faceIndex, std::function<void(FontHandle, std::shared_ptr<Error>)> callback);
+        virtual std::pair<FontHandle, std::shared_ptr<Error>> load(std::string filename, uint32_t faceIndex);
 
         // We allow glyphs_ to be public here so the renderer can access it directly
         std::map<uint16_t, FontGlyph>                       glyphs_;

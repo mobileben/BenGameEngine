@@ -593,135 +593,125 @@ void BGE::TextureService::removeTextureAtlas(FontHandle fontHandle, TextureAtlas
     }
 }
 
-void BGE::TextureService::createTextureFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, TextureFormat format) {
     auto &scenePackage = packageTextures_[scenePackageHandle];
     auto tex = scenePackage.find(name);
     
     if (tex == scenePackage.end()) {
-        createTextureFromFile(name, filename, format, [this, name, scenePackageHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
-            if (texture) {
-                auto &scenePackage = packageTextures_[scenePackageHandle];
-                scenePackage[name] = texture->getHandle();
-            }
-            
-            if (callback) {
-                callback(texture, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureHandleService_.dereference(tex->second), nullptr);
+        Texture *texture;
+        std::shared_ptr<Error> error;
+        std::tie(texture, error) = createTextureFromFile(name, filename, format);
+        if (texture) {
+            auto &scenePackage = packageTextures_[scenePackageHandle];
+            scenePackage[name] = texture->getHandle();
+        }
+        return std::make_pair(texture, error);
+    } else {
+        return std::make_pair(textureHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureFromBuffer(ScenePackageHandle scenePackageHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromBuffer(ScenePackageHandle scenePackageHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height) {
     auto &scenePackage = packageTextures_[scenePackageHandle];
     auto tex = scenePackage.find(name);
     
     if (tex == scenePackage.end()) {
-        createTextureFromBuffer(name, buffer, format, width, height, [this, name, scenePackageHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
-            if (texture) {
-                auto &scenePackage = packageTextures_[scenePackageHandle];
-                scenePackage[name] = texture->getHandle();
-            }
-            
-            if (callback) {
-                callback(texture, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureHandleService_.dereference(tex->second), nullptr);
+        Texture *texture;
+        std::shared_ptr<Error> error;
+        std::tie(texture, error) = createTextureFromBuffer(name, buffer, format, width, height);
+        if (texture) {
+            auto &scenePackage = packageTextures_[scenePackageHandle];
+            scenePackage[name] = texture->getHandle();
+        }
+        return std::make_pair(texture, error);
+    } else {
+        return std::make_pair(textureHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, TextureFormat format) {
     auto &space = spaceTextures_[spaceHandle];
     auto tex = space.find(name);
     
     if (tex == space.end()) {
-        createTextureFromFile(name, filename, format, [this, name, spaceHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
-            if (texture) {
-                auto &space = spaceTextures_[spaceHandle];
-                space[name] = texture->getHandle();
-            }
-            
-            if (callback) {
-                callback(texture, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureHandleService_.dereference(tex->second), nullptr);
+        Texture *texture;
+        std::shared_ptr<Error> error;
+        std::tie(texture, error) = createTextureFromFile(name, filename, format);
+        if (texture) {
+            auto &space = spaceTextures_[spaceHandle];
+            space[name] = texture->getHandle();
+        }
+        return std::make_pair(texture, error);
+    } else {
+        return std::make_pair(textureHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureFromBuffer(SpaceHandle spaceHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromBuffer(SpaceHandle spaceHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height) {
     auto &space = spaceTextures_[spaceHandle];
     auto tex = space.find(name);
     
     if (tex == space.end()) {
-        createTextureFromBuffer(name, buffer, format, width, height, [this, name, spaceHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
-            if (texture) {
-                auto &space = spaceTextures_[spaceHandle];
-                space[name] = texture->getHandle();
-            }
-            
-            if (callback) {
-                callback(texture, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureHandleService_.dereference(tex->second), nullptr);
+        Texture *texture;
+        std::shared_ptr<Error> error;
+        std::tie(texture, error) = createTextureFromBuffer(name, buffer, format, width, height);
+        if (texture) {
+            auto &space = spaceTextures_[spaceHandle];
+            space[name] = texture->getHandle();
+        }
+        return std::make_pair(texture, error);
+    } else {
+        return std::make_pair(textureHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureFromFile(TextureAtlasHandle atlasHandle, std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromFile(TextureAtlasHandle atlasHandle, std::string name, std::string filename, TextureFormat format) {
     auto &atlas = atlasTextures_[atlasHandle];
     auto tex = atlas.find(name);
     
     if (tex == atlas.end()) {
-        createTextureFromFile(name, filename, format, [this, name, atlasHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
-            if (texture) {
-                auto &atlas = atlasTextures_[atlasHandle];
-                atlas[name] = texture->getHandle();
-            }
-            
-            if (callback) {
-                callback(texture, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureHandleService_.dereference(tex->second), nullptr);
+        Texture *texture;
+        std::shared_ptr<Error> error;
+        std::tie(texture, error) = createTextureFromFile(name, filename, format);
+        if (texture) {
+            auto &atlas = atlasTextures_[atlasHandle];
+            atlas[name] = texture->getHandle();
+        }
+        return std::make_pair(texture, error);
+    } else {
+        return std::make_pair(textureHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureFromBuffer(TextureAtlasHandle atlasHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromBuffer(TextureAtlasHandle atlasHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height) {
     auto &atlas = atlasTextures_[atlasHandle];
     auto tex = atlas.find(name);
     
     if (tex == atlas.end()) {
-        createTextureFromBuffer(name, buffer, format, width, height, [this, name, atlasHandle, callback](Texture *texture, std::shared_ptr<Error> error) -> void {
-            if (texture) {
-                auto &atlas = atlasTextures_[atlasHandle];
-                atlas[name] = texture->getHandle();
-            }
-            
-            if (callback) {
-                callback(texture, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureHandleService_.dereference(tex->second), nullptr);
-    }}
+        Texture *texture;
+        std::shared_ptr<Error> error;
+        std::tie(texture, error) = createTextureFromBuffer(name, buffer, format, width, height);
+        if (texture) {
+            auto &atlas = atlasTextures_[atlasHandle];
+            atlas[name] = texture->getHandle();
+        }
+        return std::make_pair(texture, error);
+    } else {
+        return std::make_pair(textureHandleService_.dereference(tex->second), nullptr);
+    }
+}
 
-void BGE::TextureService::createTextureFromFile(std::string name, std::string filename, TextureFormat format, std::function<void(Texture *, std::shared_ptr<Error>)> callback)
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromFile(std::string name, std::string filename, TextureFormat format)
 {
 #ifdef SUPPORT_GLKTEXTURELOADER
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+    __block std::shared_ptr<Error> bgeError;
+    __block Texture *texture = nullptr;
     [textureLoader_ textureWithContentsOfFile:[[NSString alloc] initWithCString:filename.c_str() encoding:NSUTF8StringEncoding] options:@{ GLKTextureLoaderApplyPremultiplication: @(NO) } queue:nil completionHandler:^(GLKTextureInfo *textureInfo, NSError *error) {
-        std::shared_ptr<Error> bgeError;
-        
         if (textureInfo) {
             TextureHandle textureHandle;
-            Texture *texture;
-            
+
             texture = textureHandleService_.allocate(textureHandle);
             
             if (texture) {
@@ -749,100 +739,64 @@ void BGE::TextureService::createTextureFromFile(std::string name, std::string fi
                 callback(nullptr, bgeError);
             }
         }
+        dispatch_group_leave(group);
     }];
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 #else
     auto rawTex = RawTexture::createFromPng(filename);
-    std::shared_ptr<Error> bgeError;
 
     if (rawTex) {
         TextureHandle textureHandle;
         Texture *texture;
-        
+        std::shared_ptr<Error> error;
+
         texture = textureHandleService_.allocate(textureHandle);
         
         if (texture) {
-            texture->initialize(textureHandle, name, rawTex, [rawTex, textureHandle, callback](Texture * tex) {
-                std::shared_ptr<Error> bgeError;
-
-                if (!tex) {
-                    bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorOS);
-                }
-                
-                if (callback) {
-                    callback(tex, bgeError);
-                }
-                
-                delete rawTex;
-            });
+            error = texture->initialize(textureHandle, name, rawTex);
+            if (error) {
+                // We had a problem, release the handle
+                textureHandleService_.release(textureHandle);
+                texture = nullptr;
+            }
         } else {
-            bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorOS);
-            
             // We had a problem, release the handle
             textureHandleService_.release(textureHandle);
-            
-            if (callback) {
-                callback(texture, bgeError);
-            }
+            error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorOS);
         }
+        delete rawTex;
+        return std::make_pair(texture, error);
     } else {
-        bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorOS);
-        
-        if (callback) {
-            callback(nullptr, bgeError);
-        }
+        return std::make_pair(nullptr, std::make_shared<Error>(Texture::ErrorDomain, TextureErrorOS));
     }
 #endif
 }
 
-void BGE::TextureService::createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::function<void(Texture *, std::shared_ptr<Error>)> callback)
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height)
 {
     TextureHandle textureHandle;
-    Texture *texture;
-
+    Texture *texture = nullptr;
+    std::shared_ptr<Error> error;
     if (buffer) {
         texture = textureHandleService_.allocate(textureHandle);
-
         if (texture) {
             texture->initialize(textureHandle, name, format);
-
-            texture->createFromBuffer(buffer, format, width, height, [this, textureHandle, callback](Texture *newTexture, std::shared_ptr<Error> error) -> void {
-                if (!newTexture) {
-                    // We had a problem, release the handle
-                    textureHandleService_.release(textureHandle);
-                }
-
-                if (callback) {
-                    callback(newTexture, error);
-                }
-            });
-        } else {
-            auto bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorClassAllocation);
-
-            if (callback) {
-                callback(nullptr, bgeError);
+            error = texture->createFromBuffer(buffer, format, width, height);
+            if (error) {
+                textureHandleService_.release(textureHandle);
+                texture = nullptr;
             }
+        } else {
+            error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorClassAllocation);
         }
     } else {
-        auto bgeError = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorNoBuffer);
-
-        if (callback) {
-            callback(nullptr, bgeError);
-        }
+        error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorNoBuffer);
     }
+    return std::make_pair(texture, error);
 }
 
 #if TARGET_OS_IPHONE
-void BGE::TextureService::createTextureFromUIImage(SpaceHandle spaceHandle, const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
-    if ([NSThread isMainThread]) {
-        _createTextureFromUIImage(spaceHandle, name, image, callback);
-    } else {
-        dispatch_async(dispatch_get_main_queue(), ^() {
-            _createTextureFromUIImage(spaceHandle, name, image, callback);
-        });
-    }
-}
-
-void BGE::TextureService::_createTextureFromUIImage(SpaceHandle spaceHandle, const std::string& name, UIImage *image, std::function<void(Texture *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromUIImage(SpaceHandle spaceHandle, const std::string& name, UIImage *image) {
     auto &space = spaceTextures_[spaceHandle];
     auto tex = space.find(name);
 
@@ -851,7 +805,8 @@ void BGE::TextureService::_createTextureFromUIImage(SpaceHandle spaceHandle, con
         uint32_t width = static_cast<uint32_t>(CGImageGetWidth(imageRef));
         uint32_t height = static_cast<uint32_t>(CGImageGetHeight(imageRef));
         unsigned char* textureData = (unsigned char *)malloc(width * height * 4); // if 4 components per pixel (RGBA)
-
+        Texture *texture = nullptr;
+        std::shared_ptr<Error> error;
         if (textureData) {
             // This requires the mainthread thread
             CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -866,209 +821,174 @@ void BGE::TextureService::_createTextureFromUIImage(SpaceHandle spaceHandle, con
             CGContextDrawImage(context, CGRectMake(0, 0, width, height), imageRef);
             CGContextRelease(context);
 
-            createTextureFromBuffer(name, textureData, TextureFormat::RGBA8888, width, height, [this, spaceHandle, name, textureData, callback](Texture *texture, std::shared_ptr<Error> error) {
-                if (texture) {
-                    auto &space = spaceTextures_[spaceHandle];
-                    space[name] = texture->getHandle();
-                }
-                free(textureData);
-                if (callback) {
-                    callback(texture, error);
-                }
-            });
-        } else if (callback) {
-            auto error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorNoBuffer);
-            callback(nullptr, error);
+            std::tie(texture, error) = createTextureFromBuffer(name, textureData, TextureFormat::RGBA8888, width, height);
+            if (texture) {
+                auto &space = spaceTextures_[spaceHandle];
+                space[name] = texture->getHandle();
+            }
+            free(textureData);
+        } else {
+            error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorNoBuffer);
         }
-    } else if (callback) {
-        callback(textureHandleService_.dereference(tex->second), nullptr);
+        return std::make_pair(texture, error);
+    } else {
+        return std::make_pair(textureHandleService_.dereference(tex->second), nullptr);
     }
 }
 
 #endif /* TARGET_OS_IPHONE */
 
-void BGE::TextureService::createTextureAtlasFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
     auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
     auto tex = scenePackage.find(name);
     
     if (tex == scenePackage.end()) {
-        createTextureAtlasFromFile(name, filename, subTextureDefs, format, [this, name, scenePackageHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
-            if (atlas) {
-                auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
-                scenePackage[name] = atlas->getHandle();
-                
-                // Now for each item in the atlas, add it to normal textures
-                auto &sceneTex = packageTextures_[scenePackageHandle];
-                auto subTextures = atlas->getSubTextures();
-                
-                sceneTex.insert(subTextures.begin(), subTextures.end());
-            }
-            
-            if (callback) {
-                callback(atlas, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureAtlasHandleService_.dereference(tex->second), nullptr);
+        TextureAtlas *atlas;
+        std::shared_ptr<Error> error;
+        std::tie(atlas, error) = createTextureAtlasFromFile(name, filename, subTextureDefs, format);
+        if (atlas) {
+            auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
+            scenePackage[name] = atlas->getHandle();
+
+            // Now for each item in the atlas, add it to normal textures
+            auto &sceneTex = packageTextures_[scenePackageHandle];
+            auto subTextures = atlas->getSubTextures();
+
+            sceneTex.insert(subTextures.begin(), subTextures.end());
+        }
+
+        return std::make_pair(atlas, error);
+    } else {
+        return std::make_pair(textureAtlasHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromBuffer(ScenePackageHandle scenePackageHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(ScenePackageHandle scenePackageHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
     auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
     auto tex = scenePackage.find(name);
     
     if (tex == scenePackage.end()) {
-        createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs, [this, name, scenePackageHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
-            if (atlas) {
-                auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
-                scenePackage[name] = atlas->getHandle();
-            }
-            
-            if (callback) {
-                callback(atlas, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureAtlasHandleService_.dereference(tex->second), nullptr);
+        TextureAtlas *atlas;
+        std::shared_ptr<Error> error;
+        std::tie(atlas, error) = createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs);
+        if (atlas) {
+            auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
+            scenePackage[name] = atlas->getHandle();
+        }
+        return std::make_pair(atlas, error);
+    } else {
+        return std::make_pair(textureAtlasHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
     auto &space = spaceTextureAtlases_[spaceHandle];
     auto tex = space.find(name);
     
     if (tex == space.end()) {
-        createTextureAtlasFromFile(name, filename, subTextureDefs, format, [this, name, spaceHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
-            if (atlas) {
-                auto &space = spaceTextureAtlases_[spaceHandle];
-                space[name] = atlas->getHandle();
-            }
-            
-            if (callback) {
-                callback(atlas, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureAtlasHandleService_.dereference(tex->second), nullptr);
+        TextureAtlas *atlas;
+        std::shared_ptr<Error> error;
+        std::tie(atlas, error) = createTextureAtlasFromFile(name, filename, subTextureDefs, format);
+        if (atlas) {
+            auto &space = spaceTextureAtlases_[spaceHandle];
+            space[name] = atlas->getHandle();
+        }
+        return std::make_pair(atlas, error);
+    } else {
+        return std::make_pair(textureAtlasHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromBuffer(SpaceHandle spaceHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(SpaceHandle spaceHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
     auto &space = spaceTextureAtlases_[spaceHandle];
     auto tex = space.find(name);
     
     if (tex == space.end()) {
-        createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs, [this, name, spaceHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
-            if (atlas) {
-                auto &space = spaceTextureAtlases_[spaceHandle];
-                space[name] = atlas->getHandle();
-            }
-            
-            if (callback) {
-                callback(atlas, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureAtlasHandleService_.dereference(tex->second), nullptr);
+        TextureAtlas *atlas;
+        std::shared_ptr<Error> error;
+        std::tie(atlas, error) = createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs);
+        if (atlas) {
+            auto &space = spaceTextureAtlases_[spaceHandle];
+            space[name] = atlas->getHandle();
+        }
+        return std::make_pair(atlas, error);
+    } else {
+        return std::make_pair(textureAtlasHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromFile(FontHandle fontHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(FontHandle fontHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
     auto &font = fontTextureAtlases_[fontHandle];
     auto tex = font.find(name);
     
     if (tex == font.end()) {
-        createTextureAtlasFromFile(name, filename, subTextureDefs, format, [this, name, fontHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
-            if (atlas) {
-                auto &font = fontTextureAtlases_[fontHandle];
-                font[name] = atlas->getHandle();
-            }
-            
-            if (callback) {
-                callback(atlas, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureAtlasHandleService_.dereference(tex->second), nullptr);
+        TextureAtlas *atlas;
+        std::shared_ptr<Error> error;
+        std::tie(atlas, error) = createTextureAtlasFromFile(name, filename, subTextureDefs, format);
+        if (atlas) {
+            auto &font = fontTextureAtlases_[fontHandle];
+            font[name] = atlas->getHandle();
+        }
+        return std::make_pair(atlas, error);
+    } else {
+        return std::make_pair(textureAtlasHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromBuffer(FontHandle fontHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(FontHandle fontHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
     auto &font = fontTextureAtlases_[fontHandle];
     auto tex = font.find(name);
     
     if (tex == font.end()) {
-        createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs, [this, name, fontHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
-            if (atlas) {
-                auto &font = fontTextureAtlases_[fontHandle];
-                font[name] = atlas->getHandle();
-            }
-            
-            if (callback) {
-                callback(atlas, error);
-            }
-        });
-    } else if (callback) {
-        callback(textureAtlasHandleService_.dereference(tex->second), nullptr);
+        TextureAtlas *atlas;
+        std::shared_ptr<Error> error;
+        std::tie(atlas, error) = createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs);
+        if (atlas) {
+            auto &font = fontTextureAtlases_[fontHandle];
+            font[name] = atlas->getHandle();
+        }
+        return std::make_pair(atlas, error);
+    } else {
+        return std::make_pair(textureAtlasHandleService_.dereference(tex->second), nullptr);
     }
 }
 
-void BGE::TextureService::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
-    std::shared_ptr<Error> bgeError;
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
+    std::shared_ptr<Error> error;
     TextureAtlasHandle atlasHandle;
     TextureAtlas *atlas;
-    
     atlas = textureAtlasHandleService_.allocate(atlasHandle);
     
     if (atlas) {
         atlas->initialize(atlasHandle, name);
-        
-        atlas->createFromFile(filename, subTextureDefs, format, [this, atlasHandle, callback](TextureAtlas * atlas, std::shared_ptr<Error> error) -> void {
-            if (!atlas) {
-                // We had a problem, release the handle
-                textureAtlasHandleService_.release(atlasHandle);
-            }
-            
-            if (callback) {
-                callback(atlas, error);
-            }
-        });
-    } else {
-        bgeError = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorClassAllocation);
-        
-        if (callback) {
-            callback(atlas, bgeError);
+        std::tie(atlas, error) = atlas->createFromFile(filename, subTextureDefs, format);
+        if (!atlas) {
+            // We had a problem, release the handle
+            textureAtlasHandleService_.release(atlasHandle);
         }
+    } else {
+        error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorClassAllocation);
     }
+    return std::make_pair(atlas, error);
 }
 
-void BGE::TextureService::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, std::function<void(TextureAtlas *, std::shared_ptr<Error>)> callback) {
-    std::shared_ptr<Error> bgeError;
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
+    std::shared_ptr<Error> error;
     TextureAtlasHandle atlasHandle;
     TextureAtlas *atlas;
-    
     atlas = textureAtlasHandleService_.allocate(atlasHandle);
-    
     if (atlas) {
         atlas->initialize(atlasHandle, name);
         
-        atlas->createFromBuffer(buffer, format, width, height, subTextureDefs, [this, atlasHandle, callback](TextureAtlas *atlas, std::shared_ptr<Error> error) -> void {
-            if (!atlas) {
-                // We had a problem, release the handle
-                textureAtlasHandleService_.release(atlasHandle);
-            }
-            
-            if (callback) {
-                callback(atlas, error);
-            }
-        });
-    } else {
-        bgeError = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorClassAllocation);
-        
-        if (callback) {
-            callback(atlas, bgeError);
+        std::tie(atlas, error) = atlas->createFromBuffer(buffer, format, width, height, subTextureDefs);
+        if (!atlas) {
+            // We had a problem, release the handle
+            textureAtlasHandleService_.release(atlasHandle);
         }
+    } else {
+        error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorClassAllocation);
     }
+    return std::make_pair(atlas, error);
 }
 
 BGE::Texture *BGE::TextureService::createSubTexture(TextureAtlasHandle atlasHandle, std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated) {
