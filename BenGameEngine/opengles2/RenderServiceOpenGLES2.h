@@ -81,7 +81,15 @@ namespace BGE {
         void render();
         
         void setGLKTextureInfo(GLKTextureInfo *info) { textureInfo_ = info; }
-        
+
+#ifdef SUPPORT_PROFILING
+        virtual void resetProfilingStats();
+#endif /* SUPPORT_PROFILING */
+
+    protected:
+        virtual void createTexture(const RenderCommandItem& item);
+        virtual void destroyTexture(const RenderCommandItem& item);
+
     private:
         ColorMatrix currentColorMatrix_;
         std::vector<ColorMatrix> colorMatrixStack_;

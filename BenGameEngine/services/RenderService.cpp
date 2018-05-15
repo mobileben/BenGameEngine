@@ -9,7 +9,14 @@
 #include "RenderService.h"
 #include "FontService.h"
 
+#if DEBUG
+#include <pthread.h>
+#endif
+
+const std::string BGE::RenderService::ErrorDomain = "RenderService";
+
 BGE::RenderService::RenderService() : ready_(false), backgroundColor_({0, 0, 0, 1}) {
+    thread_ = std::thread(&RenderService::threadFunction, this);
 }
 
 void BGE::RenderService::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)
@@ -84,6 +91,124 @@ BGE::Vector2 BGE::RenderService::deviceCoordinatesFromRenderCoordinates(Vector2 
 
 void BGE::RenderService::setComponentService(std::shared_ptr<ComponentService> componentService) {
     componentService_ = componentService;
+}
+
+void BGE::RenderService::queueBindRenderWindow(const std::shared_ptr<RenderContext>& context, const std::shared_ptr<RenderWindow>& window) {
+    auto data = std::make_shared<RenderCommandBindWindowData>(context, window);
+    auto command = RenderCommandItem(RenderCommand::BindWindow, data);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueCreateBuiltinShaders() {
+    auto command = RenderCommandItem(RenderCommand::CreateBuiltinShaders);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueSetIsReady() {
+    auto command = RenderCommandItem(RenderCommand::SetIsReady);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueCreateTexture(TextureHandle texHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto data = std::make_shared<RenderTextureCommandData>(texHandle, format, buffer, width, height, glFormat);
+    auto command = RenderCommandItem(RenderCommand::TextureCreate, data, callback);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueDestroyTexture(TextureHandle texHandle, GLuint hwId, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto data = std::make_shared<RenderTextureCommandData>(texHandle, hwId);
+    auto command = RenderCommandItem(RenderCommand::TextureDestroy, data, callback);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueRender() {
+    auto command = RenderCommandItem(RenderCommand::Render);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::createTexture(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
+}
+
+void BGE::RenderService::destroyTexture(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
+}
+
+void BGE::RenderService::threadFunction() {
+#if DEBUG
+    auto native = thread_.native_handle();
+    if (native == pthread_self()) {
+        pthread_setname_np("render");
+    }
+#endif
+    while(true) {
+        auto command = renderQueue_.pop();
+        switch (command.command) {
+            case RenderCommand::BindWindow: {
+                std::shared_ptr<RenderCommandBindWindowData> data = std::dynamic_pointer_cast<RenderCommandBindWindowData>(command.data);
+                if (data) {
+                    bindRenderWindow(data->context, data->window);
+                    if (command.callback) {
+                        command.callback(command, nullptr);
+                    }
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+            case RenderCommand::CreateBuiltinShaders:
+                createShaders();
+                if (command.callback) {
+                    command.callback(command, nullptr);
+                }
+                break;
+
+            case RenderCommand::SetIsReady:
+                setIsReady();
+                if (command.callback) {
+                    command.callback(command, nullptr);
+                }
+                break;
+
+            case RenderCommand::TextureCreate: {
+                auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(command.data);
+                if (data) {
+                    createTexture(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+
+            case RenderCommand::TextureDestroy: {
+                auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(command.data);
+                if (data) {
+                    destroyTexture(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+
+            case RenderCommand::Render:
+                render();
+                break;
+                
+            default:
+                if (command.callback) {
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unsupported)));
+                }
+                break;
+
+        }
+    }
 }
 
 #ifdef SUPPORT_PROFILING

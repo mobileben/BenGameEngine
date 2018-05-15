@@ -11,6 +11,10 @@
 #include <future>
 #include <functional>
 
+#if DEBUG
+#include <pthread.h>
+#endif
+
 BGE::ScenePackageService::ScenePackageService() : handleService_(InitialScenePackageReserve, HandleServiceNoMaxLimit) {
     loadThread_ = std::thread(&ScenePackageService::loadThreadFunction, this);
 }
@@ -569,6 +573,12 @@ BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string nam
 }
 
 void BGE::ScenePackageService::loadThreadFunction() {
+#if DEBUG
+    auto native = loadThread_.native_handle();
+    if (native == pthread_self()) {
+        pthread_setname_np("scenepackage");
+    }
+#endif
     while (true) {
         auto loadable = queuedLoadItems_.pop();
 

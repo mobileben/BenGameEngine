@@ -17,8 +17,10 @@
 #include <vector>
 #include <QuartzCore/QuartzCore.h>
 #include "BGEHeartbeatIOS.h"
+#include "Queue.h"
 #include <mach/mach.h>
 #include <mach/mach_time.h>
+#include <thread>
 
 #include "Service.h"
 
@@ -54,18 +56,22 @@ namespace BGE {
         
         BGEHeartbeatIOS *iosHeartbeat_;
         
-        bool running_;
-        uint64_t counter_;
-        uint64_t lastCounter_;
-        mach_timebase_info_data_t timebaseInfo_;
-        double timebaseMultiplier_;
-
+        bool                        running_;
+        uint64_t                    counter_;
+        uint64_t                    lastCounter_;
+        mach_timebase_info_data_t   timebaseInfo_;
+        double                      timebaseMultiplier_;
+        std::thread                 thread_;
+        Queue<HeartbeatService *>   queuedItems_;
+        
 #ifdef SUPPORT_PROFILING
         int64_t     processingTime_;
 #endif /* SUPPORT_PROFILING */
 
         void rebuildOrderedListeners();
+        void queueTickHandler();
         void tickHandler();
+        void threadFunction();
     };
 }
 

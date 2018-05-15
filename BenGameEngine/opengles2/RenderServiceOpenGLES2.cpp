@@ -29,6 +29,8 @@
 #include "Profiling.h"
 #endif /* SUPPORT_PROFILING */
 
+#define RENDER_QUEUE
+
 const GLubyte Indices[] = {
     0, 1, 2,
     2, 3, 0
@@ -51,9 +53,11 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), current
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
     
     Matrix4MakeIdentify(projectionMatrix_);
-    
-    Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this, std::placeholders::_1), 1);
 
+#ifndef RENDER_QUEUE
+    Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this, std::placeholders::_1), 1);
+#endif
+    
 #ifdef SUPPORT_PROFILING
     resetProfilingStats();
 #endif /* SUPPORT_PROFILING */
@@ -165,11 +169,12 @@ void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(Render2DCoordinateSystem
 
 void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)
 {
+    auto glContext = std::dynamic_pointer_cast<RenderContextOpenGLES2>(context);
+
+    [EAGLContext setCurrentContext:glContext->getContext()];
+
     RenderService::bindRenderWindow(context, window);
-    std::shared_ptr<RenderContextOpenGLES2> glContext;
-    
-    glContext = std::dynamic_pointer_cast<RenderContextOpenGLES2>(context);
-    
+
     if (glContext) {
         window->getView().context = glContext->getContext();
         window->getView().drawableStencilFormat = GLKViewDrawableStencilFormat8;
@@ -1043,7 +1048,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                     }
                 }
             } else {
-                NSLog(@"INDEED");
+                NSLog(@"INDEED SPRITE");
             }
         } else {
             NSLog(@"HWY");
@@ -1434,7 +1439,9 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         } else if (!root && !parent) {
             return maskValue;
         }
-        
+
+        transformComponent->updateMatrix();
+
         // Since we have the transform, push our
         pushColorMatrix();
         pushColorTransform();
@@ -1559,9 +1566,48 @@ void BGE::RenderServiceOpenGLES2::setTexture(GLenum target, GLuint texId) {
     }
 }
 
+void BGE::RenderServiceOpenGLES2::createTexture(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(item.data);
+    GLuint tex;
+    GLint alignment = 0;
+    auto glFormat = data->glFormat;
+    std::shared_ptr<Error> error;
+    glGenTextures(1, &tex);
+    if (glFormat == GL_RGB) {
+        glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    }
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, glFormat, data->textureWidth, data->textureHeight, 0, glFormat, GL_UNSIGNED_BYTE, data->textureBuffer);
+    if (glFormat == GL_RGB) {
+        glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+    }
+    GLenum glErr = glGetError();
+    if (glErr == GL_NO_ERROR) {
+        data->glHwId = tex;
+    } else {
+        error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorAllocation);
+    }
+    if (item.callback) {
+        item.callback(item, error);
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::destroyTexture(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(item.data);
+    glDeleteTextures(1, &data->glHwId);
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
+}
+
 #ifdef SUPPORT_PROFILING
 
-void BGE::RenderService::resetProfilingStats() {
+void BGE::RenderServiceOpenGLES2::resetProfilingStats() {
     RenderService::resetProfilingStats();
 }
 

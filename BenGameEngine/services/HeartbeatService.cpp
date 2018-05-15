@@ -8,9 +8,17 @@
 
 #include <cassert>
 #include "HeartbeatService.h"
+#include "Game.h"
+
+#if DEBUG
+#include <pthread.h>
+#endif
+
 #ifdef SUPPORT_PROFILING
 #include "Profiling.h"
 #endif /* SUPPORT_PROFILING */
+
+#define RENDER_QUEUE
 
 BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0) {
     iosHeartbeat_ = [[BGEHeartbeatIOS alloc] init];
@@ -22,9 +30,15 @@ BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCou
     counter_ = mach_absolute_time();
     
     lastCounter_ = counter_;
-    
+
+    thread_ = std::thread(&HeartbeatService::threadFunction, this);
+
     // Attach
+#ifdef RENDER_QUEUE
+    iosHeartbeat_.tickHandler = std::bind(&HeartbeatService::queueTickHandler, this);
+#else
     iosHeartbeat_.tickHandler = std::bind(&HeartbeatService::tickHandler, this);
+#endif
 }
 
 void BGE::HeartbeatService::initialize() {}
@@ -58,6 +72,23 @@ void BGE::HeartbeatService::setRunning(bool running) {
     running_ = running;
 }
 
+void BGE::HeartbeatService::threadFunction() {
+#if DEBUG
+    auto native = thread_.native_handle();
+    if (native == pthread_self()) {
+        pthread_setname_np("heartbeat");
+    }
+#endif
+    while (true) {
+        queuedItems_.pop();
+        tickHandler();
+    }
+}
+
+void BGE::HeartbeatService::queueTickHandler() {
+    queuedItems_.pushIfEmpty(this);
+}
+
 void BGE::HeartbeatService::tickHandler() {
 #ifdef SUPPORT_PROFILING
     auto startTime = profiling::EpochTime::timeInMicroSec();
@@ -67,12 +98,15 @@ void BGE::HeartbeatService::tickHandler() {
         
         double delta = counter_ - lastCounter_;
         double elapsedTime = delta * timebaseMultiplier_;
-        
+
         lastCounter_ = counter_;
         
         for (auto const& entry : orderedListeners_) {
             entry.first(elapsedTime);
         }
+#ifdef RENDER_QUEUE
+        Game::getInstance()->getRenderService()->queueRender();
+#endif
     }
 #ifdef SUPPORT_PROFILING
     auto now = profiling::EpochTime::timeInMicroSec();

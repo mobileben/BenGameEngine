@@ -17,10 +17,15 @@
 #include "RenderContext.h"
 #include "ShaderService.h"
 #include "MathTypes.h"
+#include "Texture.h"
 #include "Profiling.h"
+#include "Queue.h"
+
+#include <thread>
 
 namespace BGE {
     class ComponentService;
+    class Texture;
     
     typedef Vector3 Vertex;
     
@@ -53,12 +58,66 @@ namespace BGE {
         OpenGL,                 // Lower left (X-right, Y-up)
         OpenGLCentered          // Center of screen (X-right, Y-up)
     };
-    
+
+    enum class RenderCommand { None, BindWindow, SetIsReady, CreateBuiltinShaders, CreateShader, Render, TextureCreate, TextureDestroy };
+
+    struct RenderCommandData {
+        virtual ~RenderCommandData() {}
+    };
+
+    struct RenderCommandBindWindowData : public RenderCommandData {
+        std::shared_ptr<RenderContext>  context;
+        std::shared_ptr<RenderWindow>   window;
+
+        RenderCommandBindWindowData() = delete;
+        RenderCommandBindWindowData(const std::shared_ptr<RenderContext>& context, const std::shared_ptr<RenderWindow>& window) : context(context), window(window) {}
+    };
+
+    struct RenderShaderCommandData : public RenderCommandData {
+        std::string                 vertexShaderName;
+        std::string                 fragmentShaderName;
+        std::string                 programName;
+        std::vector<std::string>    attributes;
+        std::vector<std::string>    uniforms;
+    };
+
+    struct RenderTextureCommandData : public RenderCommandData {
+        TextureHandle               textureHandle;
+        TextureFormat               textureFormat;
+        uint8_t                     *textureBuffer;
+        uint32_t                    textureWidth;
+        uint32_t                    textureHeight;
+        GLint                       glFormat;
+        GLuint                      glHwId;
+
+        RenderTextureCommandData() : textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0), glFormat(0), glHwId(0) {}
+        RenderTextureCommandData(TextureHandle textureHandle) : textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0), glFormat(0), glHwId(0) {}
+        RenderTextureCommandData(TextureHandle textureHandle, GLuint hwId) : textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0), glFormat(0), glHwId(hwId) {}
+        RenderTextureCommandData(TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height) : textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height), glFormat(0), glHwId(0) {}
+        RenderTextureCommandData(TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat) : textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height), glFormat(glFormat), glHwId(0) {}
+    };
+
+    struct RenderCommandItem {
+        RenderCommand                                                   command;
+        std::shared_ptr<RenderCommandData>                              data;
+        std::function<void(RenderCommandItem, std::shared_ptr<Error>)>  callback;
+
+        RenderCommandItem() : command(RenderCommand::None) {}
+        RenderCommandItem(RenderCommand command) : command(command) {}
+        RenderCommandItem(RenderCommand command, const std::shared_ptr<RenderCommandData>& data) : command(command), data(data) {}
+        RenderCommandItem(RenderCommand command, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) : command(command), callback(callback) {}
+        RenderCommandItem(RenderCommand command, const std::shared_ptr<RenderCommandData>& data, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) : command(command), data(data), callback(callback) {}
+    };
+
+    enum class RenderServiceError : int32_t { None = 0, Unsupported, Unimplemented, IllegalRenderCommand, RenderCommandMissingData, RenderCommandMalformed };
+
     class RenderService: public Service
     {
     public:
+        static const std::string ErrorDomain;
+
         RenderService();
-        
+
         virtual void bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window);
         virtual void resizeRenderWindow();
         virtual void createShaders();
@@ -117,7 +176,15 @@ namespace BGE {
         virtual std::shared_ptr<ShaderProgram> popShaderProgram() =0;
         
         virtual void render() =0;
-        
+
+        // Queuing methods
+        void queueBindRenderWindow(const std::shared_ptr<RenderContext>& context, const std::shared_ptr<RenderWindow>& window);
+        void queueCreateBuiltinShaders();
+        void queueSetIsReady();
+        void queueCreateTexture(TextureHandle texHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueDestroyTexture(TextureHandle texHandle, GLuint hwId, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueRender();
+
     protected:
         std::shared_ptr<RenderContext> renderContext_;
         std::shared_ptr<RenderWindow> renderWindow_;
@@ -129,6 +196,11 @@ namespace BGE {
         
         std::vector<Vector3> boundingBoxPoints_;
         std::vector<Vector3> scaledBoundingBoxPoints_;
+
+        Queue<RenderCommandItem>    renderQueue_;
+
+        virtual void createTexture(const RenderCommandItem& item);
+        virtual void destroyTexture(const RenderCommandItem& item);
 
 #ifdef SUPPORT_PROFILING
         profiling::FrameRateCalculator frameRateCalculator_;
@@ -150,13 +222,16 @@ namespace BGE {
         virtual void resetProfilingStats();
 #endif /* SUPPORT_PROFILING */
 
-        
     private:
         bool ready_;
         bool invertedYAxis_;    // Y-up is inverted, Y-down is normal
         Render2DCoordinateSystem coordSystem2D_;
         
         Color backgroundColor_;
+
+        std::thread  thread_;
+
+        virtual void threadFunction();
     };
 }
 
