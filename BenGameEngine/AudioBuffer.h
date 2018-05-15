@@ -34,7 +34,7 @@ namespace BGE {
         PCMMono8,
         PCMMono16,
         PCMStereo8,
-        PCMSterio16,
+        PCMStereo16,
         WAV,
         CAF,
         MP3,
@@ -70,6 +70,7 @@ namespace BGE {
         double                      duration_;
 #if TARGET_OS_IPHONE
         AudioFileID                 audioFileId_;
+        AudioFilePacketTableInfo    packetInfo_;
         AudioStreamBasicDescription streamBasicDesc_;
         uint32_t                    maxPacketSize_;
         uint8_t                     *audioBuffer_;

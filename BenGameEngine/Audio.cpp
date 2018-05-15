@@ -8,6 +8,7 @@
 
 #include "Audio.h"
 #include "AudioBuffer.h"
+#include "MathTypes.h"
 
 #include "Game.h"
 
@@ -18,6 +19,9 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
     BGE::Audio *audio = BGE::Game::getInstance()->getAudioService()->getAudio(handle);
     
     if (audio) {
+        if (audio->getState() == BGE::AudioPlayState::Off) {
+            return;
+        }
         UInt32      numBytesReadFromFile = 0;
         UInt32      numPackets = audio->getNumPacketsToRead();
         OSStatus	status;
@@ -45,60 +49,87 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
                         audio->setCurrentPacket(0);
                         AudioQueueHandleOutputBuffer(data, inAQ, inBuffer);
                     } else {
+                        audio->setCurrentPacket(0);
                         audio->setLoopingCount(0);
+                        AudioQueueStop(audio->getAudioQueueRef(), false);
                         if (audio->doneCallback) {
                             audio->doneCallback(audio);
                         }
-                        AudioQueueFlush(audio->getAudioQueueRef());
-                        AudioQueueStop(audio->getAudioQueueRef(), false);
                     }
                 }
             }
         } else {
+            bool needsStop = false;
+            auto packetDesc = audio->getAudioStreamBasicDescription();
             int32_t	index = audio->getCurrentMemoryImageIndex();
-            int32_t	xferSize;
+            int32_t extraIndex = 0;
+            int32_t extraXferSize = 0;
+            int32_t nextIndex = index;
+            int32_t	xferSize = packetDesc->mBytesPerPacket * numPackets;
             int32_t	totalSize = audio->getAudioMemoryImageSize();
             uint8_t *audioData = audio->getAudioMemoryImage();
             uint8_t *dst = (uint8_t *) inBuffer->mAudioData;
             bool go = true;
-            
-            if (index >= totalSize) {
+
+            if (xferSize > totalSize) {
+                xferSize = totalSize;
+            }
+            if (xferSize > inBuffer->mAudioDataBytesCapacity) {
+                xferSize = inBuffer->mAudioDataBytesCapacity;
+            }
+
+            if ((index + xferSize) >= totalSize) {
+                auto diff = totalSize - index;
+
                 if (loopForever || loopCount > 1) {
                     if (loopForever == false) {
                         audio->setLoopingCount(loopCount - 1);
                     }
-                    
-                    audio->setCurrentMemoryImageIndex(0);
-                    
-                    index = audio->getCurrentMemoryImageIndex();
-                } else {
-                    audio->setLoopingCount(0);
-                    if (audio->doneCallback) {
-                        audio->doneCallback(audio);
+
+                    if (xferSize > diff) {
+                        extraIndex = 0;
+                        extraXferSize = xferSize - diff;
+                        nextIndex = extraXferSize;
+                        xferSize = diff;
+                    } else {
+                        // We happen to perfectly line up to the end of file
+                        xferSize = diff;
+                        nextIndex = 0;
                     }
-                    AudioQueueFlush(audio->getAudioQueueRef());
-                    AudioQueueStop(audio->getAudioQueueRef(), false);
-                    go = false;
+                } else {
+                    if (diff > 0) {
+                        xferSize = diff;
+                        nextIndex = 0;
+                    } else {
+                        go = false;
+                    }
+                    needsStop = true;
                 }
+            } else {
+                nextIndex = index + xferSize;
             }
-            
+
             if (go) {
-                xferSize = totalSize - index;
-                
-                if (xferSize > inBuffer->mAudioDataBytesCapacity) {
-                    xferSize = inBuffer->mAudioDataBytesCapacity;
+                memcpy((uint8_t*) dst, &audioData[index], xferSize);
+
+                if (extraXferSize) {
+                    memcpy((uint8_t*) &dst[xferSize], &audioData[nextIndex], extraXferSize);
                 }
-                
-                if (xferSize < totalSize) {
-                    memcpy((uint8_t*) dst, &audioData[index], xferSize);	//	This implies we are using a queue size that will require multiple loads
-                }
-                
-                inBuffer->mAudioDataByteSize = xferSize;
+
+                inBuffer->mAudioDataByteSize = xferSize + extraXferSize;
                 inBuffer->mPacketDescriptionCount = 0;
-                
-                status = AudioQueueEnqueueBuffer(audio->getAudioQueueRef(), inBuffer, 0, audio->getAudioStreamPacketDescription());
-                
-                audio->setCurrentMemoryImageIndex(index + xferSize);
+
+                status = AudioQueueEnqueueBuffer(audio->getAudioQueueRef(), inBuffer, (audio->getAudioStreamPacketDescription() ? numPackets : 0), audio->getAudioStreamPacketDescription());
+                audio->setCurrentMemoryImageIndex(nextIndex);
+            }
+
+            if (needsStop) {
+                audio->setLoopingCount(0);
+                audio->setCurrentMemoryImageIndex(0);
+                AudioQueueStop(audio->getAudioQueueRef(), false);
+                if (audio->doneCallback) {
+                    audio->doneCallback(audio);
+                }
             }
         }
     }
@@ -117,7 +148,9 @@ static void AudioQueueIsRunningOutputBuffer(void* data, AudioQueueRef inAQ, Audi
                 audio->setState(BGE::AudioPlayState::Playing);
                 break;
             default:
+                audio->setCurrentPacket(0);
                 audio->setState(BGE::AudioPlayState::Off);
+                AudioQueueReset(audio->getAudioQueueRef());
                 break;
         }
     }
@@ -155,7 +188,7 @@ static void DeriveBufferSize (AudioStreamBasicDescription &ASBDesc,
 
 #endif /* TARGET_OS_IPHONE */
 
-BGE::Audio::Audio() : doneCallback(nullptr), valid_(false), state_(AudioPlayState::Off), type_(AudioType::SFX), streaming_(false), looping_(0), pauseSource_(AudioPauseSource::None)
+BGE::Audio::Audio() : doneCallback(nullptr), valid_(false), state_(AudioPlayState::Off), type_(AudioType::SFX), streaming_(false), looping_(0), pauseSource_(AudioPauseSource::None), playbackRate_(1.0)
 #if TARGET_OS_IPHONE
 , audioFileId_(nullptr), audioBuffer_(nullptr), audioBufferSize_(0), queue_(nullptr), actualBuffersUsed_(0), bufferSize_(0), currPacket_(0), numPacketsToRead_(0), packetDesc_(nullptr), memoryImageIndex_(0)
 #endif /* TARGET_OS_IPHONE */
@@ -169,7 +202,7 @@ BGE::Audio::Audio() : doneCallback(nullptr), valid_(false), state_(AudioPlayStat
 #endif /* TARGET_OS_IPHONE */
 }
 
-void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *audioBuffer) {
+void BGE::Audio::initialize(AudioHandle handle, const std::string& name, AudioBuffer *audioBuffer) {
     setName(name);
     handle_ = handle;
     valid_ = false;
@@ -182,6 +215,7 @@ void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *a
         audioFileId_ = audioBuffer->audioFileId_;
         audioBuffer_ = audioBuffer->audioBuffer_;
         audioBufferSize_ = audioBuffer->audioBufferSize_;
+        packetInfo_ = audioBuffer->packetInfo_;
         memcpy(&streamBasicDesc_, &audioBuffer->streamBasicDesc_, sizeof(streamBasicDesc_));
         
         OSStatus status;
@@ -196,7 +230,7 @@ void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *a
         
         if (status == noErr) {
             DeriveBufferSize(streamBasicDesc_, audioBuffer->maxPacketSize_, 0.5, &bufferSize_, &numPacketsToRead_);
-            
+
             isFormatVBR = (streamBasicDesc_.mBytesPerPacket == 0 || streamBasicDesc_.mFramesPerPacket == 0);
             
             if (isFormatVBR) {
@@ -221,7 +255,7 @@ void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *a
                     invalid = true;
                 }
             }
-            
+
             if (isStreaming()) {
                 actualBuffersUsed_ = 0;
                 
@@ -239,14 +273,16 @@ void BGE::Audio::initialize(AudioHandle handle, std::string name, AudioBuffer *a
                     }
                 }				
             } else {
-                actualBuffersUsed_ = 1;
-                bufferSize_ = audioBufferSize_;
-                
-                status = AudioQueueAllocateBuffer(queue_, bufferSize_, &buffers_[0]);
-                memcpy((uint8_t *) buffers_[0]->mAudioData, audioBuffer_, bufferSize_);
-                
-                buffers_[1] = nullptr;
-                buffers_[2] = nullptr;
+                for (i=0;i<kAudioQueueNumBuffers;i++) {
+                    status = AudioQueueAllocateBuffer(queue_, bufferSize_, &buffers_[i]);
+
+                    if (status == noErr) {
+                        actualBuffersUsed_++;
+                    } else {
+                        invalid = true;
+                        break;
+                    }
+                }
             }
             
             status = AudioQueueAddPropertyListener(queue_, kAudioQueueProperty_IsRunning, AudioQueueIsRunningOutputBuffer, reinterpret_cast<void *>(static_cast<intptr_t>(getHandle().getHandle())));
@@ -288,8 +324,6 @@ void BGE::Audio::destroy() {
 
 #if TARGET_OS_IPHONE
     if (queue_) {
-        AudioQueueFlush(queue_);
-        
         if (state_ != AudioPlayState::Off) {
             AudioQueueStop(queue_, YES);
             
@@ -359,8 +393,9 @@ void BGE::Audio::play(uint32_t loop) {
 
 #if TARGET_OS_IPHONE
     state_= AudioPlayState::Queued;
+    OSStatus status;
     prime();
-    auto status = AudioQueuePrime(queue_, 0, NULL);
+    status = AudioQueuePrime(queue_, 0, NULL);
     status = AudioQueueStart(queue_, NULL);
 #else
     state_= AudioPlayState::Playing;
@@ -408,11 +443,51 @@ void BGE::Audio::stop() {
         state_ = AudioPlayState::Stopping;
         pauseSource_ = AudioPauseSource::None;
 #if TARGET_OS_IPHONE
-        AudioQueueFlush(queue_);
         AudioQueueStop(queue_, YES);
         AudioQueueReset(queue_);
 #endif /* TARGET_OS_IPHONE */
     }
+}
+
+void BGE::Audio::setEnablePlaybackRate(bool enable) {
+#if TARGET_OS_IPHONE
+    UInt32 trueValue = enable ? 1 : 0;
+    AudioQueueSetProperty(queue_, kAudioQueueProperty_EnableTimePitch, &trueValue, sizeof(trueValue));
+    UInt32 propValue = !trueValue;
+    AudioQueueSetProperty(queue_, kAudioQueueProperty_TimePitchBypass, &propValue, sizeof(propValue));
+    UInt32 timePitchAlgorithm = kAudioQueueTimePitchAlgorithm_Spectral; // supports rate and pitch
+    AudioQueueSetProperty(queue_, kAudioQueueProperty_TimePitchAlgorithm, &timePitchAlgorithm, sizeof(timePitchAlgorithm));
+#endif /* TARGET_OS_IPHONE */
+    enablePlaybackRate_ = enable;
+}
+
+void BGE::Audio::setPlaybackRate(float rate) {
+#if TARGET_OS_IPHONE
+    if (rate < 0.5) {
+        rate = 0.5F;
+    } else if (nearlyEqual(rate, 1.0F)) {
+        rate = 1.0F;
+    } else if (rate > 2.0) {
+        rate = 2.0F;
+    }
+
+    if (playbackRate_ != rate) {
+        AudioQueueSetParameter(queue_, kAudioQueueParam_PlayRate, rate);
+    }
+#endif
+    playbackRate_ = rate;
+}
+
+void BGE::Audio::setVolume(float vol) {
+#if TARGET_OS_IPHONE
+    if (vol < 0.0F) {
+        vol = 0.0F;
+    } else if (vol > 1.0F) {
+        vol = 1.0F;
+    }
+    AudioQueueSetParameter(queue_, kAudioQueueParam_Volume, vol);
+#endif
+    volume_ = vol;
 }
 
 #if TARGET_OS_IPHONE

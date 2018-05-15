@@ -43,6 +43,8 @@ void BGE::AudioBuffer::destroy() {
         AudioFileClose(audioFileId_);
         audioFileId_ = nullptr;
     }
+
+    memset(&packetInfo_, 0, sizeof(packetInfo_));
 #endif /* TARGET_OS_IPHONE */
 }
 
@@ -92,6 +94,14 @@ void BGE::AudioBuffer::createFromFile(std::string filename, bool streaming, std:
                                 audioBufferSize_ = bytesRead;
                                 memUsage_ = bytesRead;
                                 valid_ = true;
+
+                                AudioFilePacketTableInfo pInfo;
+                                UInt32 propSize = sizeof(pInfo);
+                                auto status = AudioFileGetProperty(audioFileId_, kAudioFilePropertyPacketTableInfo, &propSize, &pInfo);
+                                if (!status) {
+                                    packetInfo_ = pInfo;
+                                }
+
                             } else {
                                 error = std::make_shared<Error>(AudioBuffer::ErrorDomain, AudioBufferErrorOS);
                             }

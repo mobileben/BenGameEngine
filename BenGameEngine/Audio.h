@@ -67,7 +67,7 @@ namespace BGE {
 
         ~Audio() {}
         
-        void initialize(AudioHandle handle, std::string name, AudioBuffer *audioBuffer);
+        void initialize(AudioHandle handle, const std::string& name, AudioBuffer *audioBuffer);
         void destroy();
         
         AudioHandle getHandle() const { return handle_; }
@@ -91,7 +91,7 @@ namespace BGE {
         inline void					setCurrentMemoryImageIndex(int32_t index) { memoryImageIndex_ = index; }
         inline AudioQueueRef		getAudioQueueRef(void) { return queue_; }
         inline AudioStreamPacketDescription* getAudioStreamPacketDescription(void) { return packetDesc_; }
-        
+        inline AudioStreamBasicDescription *getAudioStreamBasicDescription(void) { return &streamBasicDesc_; }
         inline uint32_t				getNumActualAudioQueueBuferRefUsed(void) const { return actualBuffersUsed_; }
         inline AudioQueueBufferRef	getAudioQueueBufferRefAtIndex(uint32_t index) { return buffers_[index]; }
         
@@ -114,6 +114,15 @@ namespace BGE {
         void pause(AudioPauseSource source=AudioPauseSource::None);
         void resume(AudioPauseSource source=AudioPauseSource::None);
         void stop();
+
+        bool getEnablePlaybackRate() const { return enablePlaybackRate_; }
+        void setEnablePlaybackRate(bool enable);
+
+        float getPlaybackRate() const { return enablePlaybackRate_ ? playbackRate_ : 1.0F; }
+        void setPlaybackRate(float rate);
+
+        float getVolume() const { return volume_; }
+        void setVolume(float vol);
         
         AudioType getType() const { return type_; }
 
@@ -130,6 +139,10 @@ namespace BGE {
         
         uint32_t                        looping_;
         AudioPauseSource                pauseSource_;
+        bool                            enablePlaybackRate_;
+        float                           playbackRate_;
+
+        float                           volume_;
 
 #if TARGET_OS_IPHONE
         AudioFileID                     audioFileId_;
@@ -138,6 +151,7 @@ namespace BGE {
 
         AudioQueueRef                   queue_;
         uint32_t                        actualBuffersUsed_;
+        AudioFilePacketTableInfo        packetInfo_;
         AudioQueueBufferRef				buffers_[kAudioQueueNumBuffers];
         int32_t						    bufferSize_;
         int32_t							currPacket_;
