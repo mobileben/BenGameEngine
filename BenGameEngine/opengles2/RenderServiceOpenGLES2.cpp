@@ -1434,7 +1434,10 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         } else if (!root && !parent) {
             return maskValue;
         }
-        
+
+        // Need to update matrix
+        transformComponent->updateMatrix();
+
         // Since we have the transform, push our
         pushColorMatrix();
         pushColorTransform();
