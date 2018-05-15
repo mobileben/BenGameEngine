@@ -96,8 +96,8 @@ namespace BGE {
         void outputResourceBreakdown(uint32_t numTabs=0) const final;
         void outputMemoryBreakdown(uint32_t numTabs=0) const final;
 
-        static void outputValue(uint32_t numTabs, std::string format, va_list args);
-        template <typename... Args> static void outputValue(uint32_t numTabs, std::string format, Args... args) {
+        static void outputValue(uint32_t numTabs, const std::string& format, va_list args);
+        template <typename... Args> static void outputValue(uint32_t numTabs, const std::string& format, Args... args) {
             std::string results = format;
             
             for (auto i=0;i<numTabs;i++) {
