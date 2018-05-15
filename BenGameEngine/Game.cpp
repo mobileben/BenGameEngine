@@ -48,7 +48,7 @@ std::string BGE::Game::AnyToString::toString() const {
     return ss.str();
 }
 
-void BGE::Game::outputValue(uint32_t numTabs, std::string format, va_list args) {
+void BGE::Game::outputValue(uint32_t numTabs, const std::string& format, va_list args) {
     std::string results = format;
     
     for (auto i=0;i<numTabs;i++) {
@@ -367,7 +367,7 @@ void BGE::Game::update(double deltaTime) {
     unlock();
     
     // Update transforms
-    updateTransforms();
+    //updateTransforms();
 
     // Garbage collect
     garbageCollect();
