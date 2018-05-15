@@ -351,7 +351,7 @@ bool BGE::FontService::fontHasReferences(FontHandle fontHandle) {
     return false;
 }
 
-void BGE::FontService::createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle, std::shared_ptr<Error>)> callback) {
+std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::FontService::createFont(std::string name, uint32_t pxSize) {
     auto entry = fontTable_.find(name);
     
     if (entry != fontTable_.end()) {
@@ -359,10 +359,7 @@ void BGE::FontService::createFont(std::string name, uint32_t pxSize, std::functi
         auto font = info->fonts.find(pxSize);
         
         if (font != info->fonts.end()) {
-            // Our font exists
-            if (callback) {
-                callback(font->second, nullptr);
-            }
+            return std::make_pair(font->second, nullptr);
         } else {
             // Create a new font
             std::string path = pathForAsset(info->asset);
@@ -376,96 +373,88 @@ void BGE::FontService::createFont(std::string name, uint32_t pxSize, std::functi
                     tFont->status_ = FontStatus::Loading;
                     
                     info->fonts[pxSize] = handle;
-                    
-                    tFont->load(path, info->faceIndex, [this, name, pxSize, callback](FontHandle fontHandle, std::shared_ptr<Error> error) -> void {
-                        auto font = getFont(fontHandle);
-                        
-                        if (!font) {
-                            auto entry = fontTable_.find(name);
-                            
-                            if (entry != fontTable_.end()) {
-                                auto info = entry->second;
-                                auto f = info->fonts.find(pxSize);
-                                
-                                if (f != info->fonts.end()) {
-                                    auto tFont = getFont(f->second);
-                                    
-                                    if (tFont) {
-                                        if (tFont->status_ == FontStatus::Loading) {
-                                            tFont->destroy();
-                                            handleService_.release(f->second);
 
-                                            info->fonts.erase(pxSize);
-                                        }
+                    FontHandle fontHandle;
+                    std::shared_ptr<Error> error;
+                    std::tie(fontHandle, error) = tFont->load(path, info->faceIndex);
+                    auto font = getFont(fontHandle);
+
+                    if (!font) {
+                        auto entry = fontTable_.find(name);
+
+                        if (entry != fontTable_.end()) {
+                            auto info = entry->second;
+                            auto f = info->fonts.find(pxSize);
+
+                            if (f != info->fonts.end()) {
+                                auto tFont = getFont(f->second);
+
+                                if (tFont) {
+                                    if (tFont->status_ == FontStatus::Loading) {
+                                        tFont->destroy();
+                                        handleService_.release(f->second);
+
+                                        info->fonts.erase(pxSize);
                                     }
                                 }
                             }
                         }
-                        
-                        if (callback) {
-                            callback(fontHandle, error);
-                        }
-                    });
-                } else if (callback) {
-                    callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorOS));
+                    }
+
+                    return std::make_pair(fontHandle, error);
+                } else {
+                    return std::make_pair(FontHandle(),std::make_shared<Error>(Font::ErrorDomain, FontErrorOS));
                 }
                 
-            } else if (callback) {
-                callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorNoResourceFile));
+            } else {
+                return std::make_pair(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorNoResourceFile));
             }
         }
-    } else if (callback) {
-        callback(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorNotInTable));
+        return std::make_pair(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorNotInTable));
+    } else {
+        return std::make_pair(FontHandle(), std::make_shared<Error>(Font::ErrorDomain, FontErrorNotInTable));
     }
 }
 
-void BGE::FontService::createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback) {
-    createFont(name, pxSize, [this, scenePackageHandle, callback](FontHandle fontHandle, std::shared_ptr<Error> error) -> void {
-        if (!fontHandle.isNull()) {
-            auto &scenePackages = fontScenePackages_[fontHandle];
-            bool found = false;
-            
-            for (auto const &package : scenePackages) {
-                if (scenePackageHandle == package) {
-                    found = true;
-                    break;
-                }
+std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::FontService::createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle) {
+    FontHandle fontHandle;
+    std::shared_ptr<Error> error;
+    std::tie(fontHandle, error) = createFont(name, pxSize);
+    if (!fontHandle.isNull()) {
+        auto &scenePackages = fontScenePackages_[fontHandle];
+        bool found = false;
+
+        for (auto const &package : scenePackages) {
+            if (scenePackageHandle == package) {
+                found = true;
+                break;
             }
-            
-            if (!found) {
-                scenePackages.push_back(scenePackageHandle);
-            }
-            
         }
-        
-        if (callback) {
-            callback(fontHandle, error);
+        if (!found) {
+            scenePackages.push_back(scenePackageHandle);
         }
-    });
+    }
+    return std::make_pair(fontHandle, error);
 }
 
-void BGE::FontService::createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback) {
-    createFont(name, pxSize, [this, spaceHandle, callback](FontHandle fontHandle, std::shared_ptr<Error> error) -> void {
-        if (!fontHandle.isNull()) {
-            auto &spaces = fontSpaces_[fontHandle];
-            bool found = false;
-            
-            for (auto const &space : spaces) {
-                if (spaceHandle == space) {
-                    found = true;
-                    break;
-                }
+std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::FontService::createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle) {
+    FontHandle fontHandle;
+    std::shared_ptr<Error> error;
+    std::tie(fontHandle, error) = createFont(name, pxSize);
+    if (!fontHandle.isNull()) {
+        auto &spaces = fontSpaces_[fontHandle];
+        bool found = false;
+
+        for (auto const &space : spaces) {
+            if (spaceHandle == space) {
+                found = true;
+                break;
             }
-            
-            if (!found) {
-                spaces.push_back(spaceHandle);
-            }
-            
         }
-        
-        if (callback) {
-            callback(fontHandle, error);
+        if (!found) {
+            spaces.push_back(spaceHandle);
         }
-    });
+    }
+    return std::make_pair(fontHandle, error);
 }
 

@@ -76,8 +76,8 @@ namespace BGE {
         
         std::string pathForAsset(std::string asset);
 
-        void createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
-        void createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+        std::pair<FontHandle, std::shared_ptr<Error>> createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle);
+        std::pair<FontHandle, std::shared_ptr<Error>> createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle);
 
     private:
         friend class ScenePackage;
@@ -89,7 +89,7 @@ namespace BGE {
 
         FontHandleService handleService_;
 
-        void createFont(std::string name, uint32_t pxSize, std::function<void(FontHandle handle, std::shared_ptr<Error>)> callback);
+        std::pair<FontHandle, std::shared_ptr<Error>> createFont(std::string name, uint32_t pxSize);
         void removeFont(FontHandle handle);
 
         void buildFontInfoForAsset(std::string asset);
