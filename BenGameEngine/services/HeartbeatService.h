@@ -41,7 +41,8 @@ namespace BGE {
 
         bool isRunning() const { return running_; }
         void setRunning(bool running);
-        
+        bool runningOnQueueThread() const;
+
         // For now heartbeat is done all based on one rate, however, later it will be done by interval
         void registerListener(std::string name, std::function<void(double dt)> listener, uint32_t order);
         void unregisterListener(std::string name);

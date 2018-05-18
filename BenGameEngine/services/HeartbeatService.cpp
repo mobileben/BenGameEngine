@@ -133,6 +133,10 @@ void BGE::HeartbeatService::unregisterListener(std::string name) {
     
 }
 
+bool BGE::HeartbeatService::runningOnQueueThread() const {
+    return std::this_thread::get_id() == thread_.get_id();
+}
+
 void BGE::HeartbeatService::rebuildOrderedListeners() {
     std::vector<std::pair<std::function<void(double dt)>, uint32_t>> ordered;
     

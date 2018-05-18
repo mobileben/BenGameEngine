@@ -182,17 +182,21 @@ namespace BGE {
         
         static bool                 componentsRegistered_;
         static std::vector<void *>  componentHandleServices_;
-        
+        static std::vector<std::function<bool(HandleBackingType)>> componentHandleServiceIsHandleBackingNull_;
+
         SpaceHandle                                 spaceHandle_;
         std::vector<std::vector<ComponentHandle>>   componentHandles_;
-        
+
+
         GameObject *getComponentGameObject(Component *, GameObjectHandle gameObjHandle) const;
         
         template <typename T> static void registerComponent(uint32_t reserve, uint32_t maxLimit) {
             using HANDLE = Handle<T>;
             
             Component::registerBitmask<T>();
-            componentHandleServices_.push_back(new HandleService<T, HANDLE>(reserve, maxLimit));
+            auto service = new HandleService<T, HANDLE>(reserve, maxLimit);
+            componentHandleServices_.push_back(service);
+            componentHandleServiceIsHandleBackingNull_.push_back(std::bind(&HandleService<T, HANDLE>::isHandleBackingNull, service, std::placeholders::_1));
         }
 
         template <typename T> static void garbageCollectComponent() {
@@ -226,9 +230,11 @@ namespace BGE {
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
             auto tHandle = Handle<T>(handle.handle);
             auto component = getComponent<T>(handle.handle);
-            
-            component->destroy();
-            handleService->release(tHandle);
+
+            if (component) {
+                component->destroy();
+                handleService->release(tHandle);
+            }
         }
     };
 }

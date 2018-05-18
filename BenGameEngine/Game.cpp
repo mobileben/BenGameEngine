@@ -357,7 +357,9 @@ void BGE::Game::update(double deltaTime) {
         
         if (space) {
             space->reset_();
-            item.second();
+            if (item.second) {
+                item.second();
+            }
         }
     }
     

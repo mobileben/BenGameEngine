@@ -30,6 +30,7 @@ namespace BGE {
         ~GameObject() {}
         
         void initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, const std::string& name);
+        void markForDestroy();
         void destroy();
         
         inline GameObjectHandle getHandle() const { return handle_; }
@@ -175,6 +176,7 @@ namespace BGE {
         friend GameObjectService;
         
         bool                            active_;
+        bool                            destroy_;
         uint32_t                        componentBitmask_;
         GameObjectHandle                handle_;
         SpaceHandle                     spaceHandle_;

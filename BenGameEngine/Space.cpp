@@ -84,7 +84,6 @@ void BGE::Space::reset_() {
     
     // Turn everything off just in case this object is still accessible
     visible_ = false;
-    visible_ = false;
     updatable_ = false;
     
     // We forcibly remove any handlers. The game should play nice and do the clean up themselves.
@@ -891,10 +890,10 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, Texture *tex
 }
 
 void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
-    auto f = std::async(std::launch::async, static_cast<void(Space::*)(GameObjectHandle, ScenePackageHandle, SceneObjectCreatedDelegate *, std::function<void()>)>(&Space::createAutoDisplayObjects_), this, rootHandle, packageHandle, delegate, callback);
+    auto f = std::async(std::launch::async, static_cast<void(Space::*)(GameObjectHandle, ScenePackageHandle, SceneObjectCreatedDelegate *, std::function<void()>)>(&Space::createAutoDisplayObjectsSynchronous), this, rootHandle, packageHandle, delegate, callback);
 }
 
-void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
+void BGE::Space::createAutoDisplayObjectsSynchronous(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
     auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
     auto animationService = Game::getInstance()->getAnimationService();

@@ -29,8 +29,11 @@
 #include "PlacementComponent.h"
 #include "Game.h"
 
+#include <algorithm>
+
 bool BGE::ComponentService::componentsRegistered_ = false;
 std::vector<void *> BGE::ComponentService::componentHandleServices_;
+std::vector<std::function<bool(BGE::HandleBackingType)>> BGE::ComponentService::componentHandleServiceIsHandleBackingNull_;
 
 void BGE::ComponentService::registerComponents() {
     if (!ComponentService::componentsRegistered_) {
@@ -100,72 +103,135 @@ BGE::GameObject *BGE::ComponentService::getComponentGameObject(Component *compon
 void BGE::ComponentService::removeComponent(ComponentHandle handle) {
     auto typeId = handle.typeId;
     auto &handles = componentHandles_[typeId];
-    
-    lock();
-    for (auto h=handles.begin();h!=handles.end();++h) {
-        if (h->handle == handle.handle) {
-            if (typeId == TransformComponent::typeId_) {
-                releaseComponentHandle<TransformComponent>(handle);
-            } else if (typeId == BoundingBoxComponent::typeId_) {
-                releaseComponentHandle<BoundingBoxComponent>(handle);
-            } else if (typeId == AnimationChannelComponent::typeId_) {
-                releaseComponentHandle<AnimationChannelComponent>(handle);
-            } else if (typeId == AnimationSequenceComponent::typeId_) {
-                releaseComponentHandle<AnimationSequenceComponent>(handle);
-            } else if (typeId == AnimatorComponent::typeId_) {
-                releaseComponentHandle<AnimatorComponent>(handle);
-            } else if (typeId == ChannelFrameAnimatorComponent::typeId_) {
-                releaseComponentHandle<ChannelFrameAnimatorComponent>(handle);
-            } else if (typeId == ColorMatrixComponent::typeId_) {
-                releaseComponentHandle<ColorMatrixComponent>(handle);
-            } else if (typeId == ColorTransformComponent::typeId_) {
-                releaseComponentHandle<ColorTransformComponent>(handle);
-            } else if (typeId == FrameAnimatorComponent::typeId_) {
-                releaseComponentHandle<FrameAnimatorComponent>(handle);
-            } else if (typeId == SpriteRenderComponent::typeId_) {
-                releaseComponentHandle<SpriteRenderComponent>(handle);
-            } else if (typeId == LogicComponent::typeId_) {
-                releaseComponentHandle<LogicComponent>(handle);
-            } else if (typeId == TextComponent::typeId_) {
-                releaseComponentHandle<TextComponent>(handle);
-            } else if (typeId == PlacementComponent::typeId_) {
-                releaseComponentHandle<PlacementComponent>(handle);
-            } else if (typeId == ButtonComponent::typeId_) {
-                releaseComponentHandle<ButtonComponent>(handle);
-            } else if (typeId == InputTouchComponent::typeId_) {
-                releaseComponentHandle<InputTouchComponent>(handle);
-            } else if (typeId == PolyLineRenderComponent::typeId_) {
-                releaseComponentHandle<PolyLineRenderComponent>(handle);
-            } else if (typeId == LineRenderComponent::typeId_) {
-                releaseComponentHandle<LineRenderComponent>(handle);
-            } else if (typeId == FlatRectRenderComponent::typeId_) {
-                releaseComponentHandle<FlatRectRenderComponent>(handle);
-            } else if (typeId == MaskComponent::typeId_) {
-                releaseComponentHandle<MaskComponent>(handle);
-            } else if (typeId == TextureMaskComponent::typeId_) {
-                releaseComponentHandle<TextureMaskComponent>(handle);
-            } else {
-                assert(false);
-            }
+    auto size = handles.size();
 
-            handles.erase(h);
-            
-            unlock();
-            return;
+    if (!size) {
+        return;
+    }
+
+    lock();
+
+    auto isHandleBackingNull = componentHandleServiceIsHandleBackingNull_[typeId];
+    if (!isHandleBackingNull(handle.handle)) {
+        for (auto i=0;i<handles.size();++i) {
+            auto& h = handles[i];
+            if (h.handle == handle.handle) {
+                if (typeId == TransformComponent::typeId_) {
+                    releaseComponentHandle<TransformComponent>(handle);
+                } else if (typeId == BoundingBoxComponent::typeId_) {
+                    releaseComponentHandle<BoundingBoxComponent>(handle);
+                } else if (typeId == AnimationChannelComponent::typeId_) {
+                    releaseComponentHandle<AnimationChannelComponent>(handle);
+                } else if (typeId == AnimationSequenceComponent::typeId_) {
+                    releaseComponentHandle<AnimationSequenceComponent>(handle);
+                } else if (typeId == AnimatorComponent::typeId_) {
+                    releaseComponentHandle<AnimatorComponent>(handle);
+                } else if (typeId == ChannelFrameAnimatorComponent::typeId_) {
+                    releaseComponentHandle<ChannelFrameAnimatorComponent>(handle);
+                } else if (typeId == ColorMatrixComponent::typeId_) {
+                    releaseComponentHandle<ColorMatrixComponent>(handle);
+                } else if (typeId == ColorTransformComponent::typeId_) {
+                    releaseComponentHandle<ColorTransformComponent>(handle);
+                } else if (typeId == FrameAnimatorComponent::typeId_) {
+                    releaseComponentHandle<FrameAnimatorComponent>(handle);
+                } else if (typeId == SpriteRenderComponent::typeId_) {
+                    releaseComponentHandle<SpriteRenderComponent>(handle);
+                } else if (typeId == LogicComponent::typeId_) {
+                    releaseComponentHandle<LogicComponent>(handle);
+                } else if (typeId == TextComponent::typeId_) {
+                    releaseComponentHandle<TextComponent>(handle);
+                } else if (typeId == PlacementComponent::typeId_) {
+                    releaseComponentHandle<PlacementComponent>(handle);
+                } else if (typeId == ButtonComponent::typeId_) {
+                    releaseComponentHandle<ButtonComponent>(handle);
+                } else if (typeId == InputTouchComponent::typeId_) {
+                    releaseComponentHandle<InputTouchComponent>(handle);
+                } else if (typeId == PolyLineRenderComponent::typeId_) {
+                    releaseComponentHandle<PolyLineRenderComponent>(handle);
+                } else if (typeId == LineRenderComponent::typeId_) {
+                    releaseComponentHandle<LineRenderComponent>(handle);
+                } else if (typeId == FlatRectRenderComponent::typeId_) {
+                    releaseComponentHandle<FlatRectRenderComponent>(handle);
+                } else if (typeId == MaskComponent::typeId_) {
+                    releaseComponentHandle<MaskComponent>(handle);
+                } else if (typeId == TextureMaskComponent::typeId_) {
+                    releaseComponentHandle<TextureMaskComponent>(handle);
+                } else {
+                    assert(false);
+                }
+
+                if (size > 1) {
+#ifdef USE_ERASE
+                    handles.erase(h);
+#else
+                    std::swap(handles[i], handles.back());
+                    handles.pop_back();
+#endif
+                }
+
+                unlock();
+                return;
+            }
         }
     }
-    
     unlock();
 }
 
 void BGE::ComponentService::removeAllComponents() {
-    for (auto &handles : componentHandles_) {
+    lock();
+    for (ComponentTypeId typeId=0;typeId<componentHandles_.size();++typeId) {
+        auto& handles = componentHandles_[typeId];
+        auto isHandleBackingNull = componentHandleServiceIsHandleBackingNull_[typeId];
         for (auto const &handle : handles) {
-            removeComponent(handle);
+            if (!isHandleBackingNull(handle.handle)) {
+                if (typeId == TransformComponent::typeId_) {
+                    releaseComponentHandle<TransformComponent>(handle);
+                } else if (typeId == BoundingBoxComponent::typeId_) {
+                    releaseComponentHandle<BoundingBoxComponent>(handle);
+                } else if (typeId == AnimationChannelComponent::typeId_) {
+                    releaseComponentHandle<AnimationChannelComponent>(handle);
+                } else if (typeId == AnimationSequenceComponent::typeId_) {
+                    releaseComponentHandle<AnimationSequenceComponent>(handle);
+                } else if (typeId == AnimatorComponent::typeId_) {
+                    releaseComponentHandle<AnimatorComponent>(handle);
+                } else if (typeId == ChannelFrameAnimatorComponent::typeId_) {
+                    releaseComponentHandle<ChannelFrameAnimatorComponent>(handle);
+                } else if (typeId == ColorMatrixComponent::typeId_) {
+                    releaseComponentHandle<ColorMatrixComponent>(handle);
+                } else if (typeId == ColorTransformComponent::typeId_) {
+                    releaseComponentHandle<ColorTransformComponent>(handle);
+                } else if (typeId == FrameAnimatorComponent::typeId_) {
+                    releaseComponentHandle<FrameAnimatorComponent>(handle);
+                } else if (typeId == SpriteRenderComponent::typeId_) {
+                    releaseComponentHandle<SpriteRenderComponent>(handle);
+                } else if (typeId == LogicComponent::typeId_) {
+                    releaseComponentHandle<LogicComponent>(handle);
+                } else if (typeId == TextComponent::typeId_) {
+                    releaseComponentHandle<TextComponent>(handle);
+                } else if (typeId == PlacementComponent::typeId_) {
+                    releaseComponentHandle<PlacementComponent>(handle);
+                } else if (typeId == ButtonComponent::typeId_) {
+                    releaseComponentHandle<ButtonComponent>(handle);
+                } else if (typeId == InputTouchComponent::typeId_) {
+                    releaseComponentHandle<InputTouchComponent>(handle);
+                } else if (typeId == PolyLineRenderComponent::typeId_) {
+                    releaseComponentHandle<PolyLineRenderComponent>(handle);
+                } else if (typeId == LineRenderComponent::typeId_) {
+                    releaseComponentHandle<LineRenderComponent>(handle);
+                } else if (typeId == FlatRectRenderComponent::typeId_) {
+                    releaseComponentHandle<FlatRectRenderComponent>(handle);
+                } else if (typeId == MaskComponent::typeId_) {
+                    releaseComponentHandle<MaskComponent>(handle);
+                } else if (typeId == TextureMaskComponent::typeId_) {
+                    releaseComponentHandle<TextureMaskComponent>(handle);
+                } else {
+                    assert(false);
+                }
+            }
         }
-        
         handles.clear();
     }
+    unlock();
 }
 
 uint32_t BGE::ComponentService::totalNumComponents() const {

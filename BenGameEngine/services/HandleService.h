@@ -185,7 +185,12 @@ namespace BGE {
             
             return pointers;
         }
-        
+
+        bool isHandleBackingNull(HandleBackingType backing) {
+            HANDLE handle = HANDLE(backing);
+            return handle.isNull();
+        }
+
         uint32_t numUsedHandles() const {
             return (uint32_t) (magic_.size() - freeSlots_.size() - toBeFreeSlots_.size());
         }

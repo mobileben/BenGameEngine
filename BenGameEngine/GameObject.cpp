@@ -34,6 +34,24 @@ void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameO
     spaceHandle_ = spaceHandle;
 }
 
+void BGE::GameObject::markForDestroy() {
+    if (!handle_.isNull()) {
+        active_ = false;
+        destroy_ = true;
+
+        // Now tag all children to be destroyed
+        auto xform = getComponent<TransformComponent>();
+        if (xform) {
+            for (auto &childXform : xform->getChildren()) {
+                auto child = childXform->getGameObject();
+                if (child) {
+                    child->markForDestroy();
+                }
+            }
+        }
+    }
+}
+
 void BGE::GameObject::destroy() {
     active_ = false;
 
