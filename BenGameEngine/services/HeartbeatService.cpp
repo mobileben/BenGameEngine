@@ -18,8 +18,6 @@
 #include "Profiling.h"
 #endif /* SUPPORT_PROFILING */
 
-#define RENDER_QUEUE
-
 BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0) {
     iosHeartbeat_ = [[BGEHeartbeatIOS alloc] init];
     
@@ -34,11 +32,7 @@ BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCou
     thread_ = std::thread(&HeartbeatService::threadFunction, this);
 
     // Attach
-#ifdef RENDER_QUEUE
     iosHeartbeat_.tickHandler = std::bind(&HeartbeatService::queueTickHandler, this);
-#else
-    iosHeartbeat_.tickHandler = std::bind(&HeartbeatService::tickHandler, this);
-#endif
 }
 
 void BGE::HeartbeatService::initialize() {}
@@ -104,9 +98,7 @@ void BGE::HeartbeatService::tickHandler() {
         for (auto const& entry : orderedListeners_) {
             entry.first(elapsedTime);
         }
-#ifdef RENDER_QUEUE
         Game::getInstance()->getRenderService()->queueRender();
-#endif
     }
 #ifdef SUPPORT_PROFILING
     auto now = profiling::EpochTime::timeInMicroSec();

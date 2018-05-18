@@ -29,8 +29,6 @@
 #include "Profiling.h"
 #endif /* SUPPORT_PROFILING */
 
-#define RENDER_QUEUE
-
 const GLubyte Indices[] = {
     0, 1, 2,
     2, 3, 0
@@ -54,10 +52,6 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), current
     
     Matrix4MakeIdentify(projectionMatrix_);
 
-#ifndef RENDER_QUEUE
-    Game::getInstance()->getHeartbeatService()->registerListener("Renderer", std::bind(&RenderServiceOpenGLES2::queueRender, this, std::placeholders::_1), 1);
-#endif
-    
 #ifdef SUPPORT_PROFILING
     resetProfilingStats();
 #endif /* SUPPORT_PROFILING */

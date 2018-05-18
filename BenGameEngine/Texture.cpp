@@ -13,8 +13,6 @@
 
 #include <future>
 
-#define RENDER_QUEUE
-
 const std::string BGE::Texture::ErrorDomain = "Texture";
 
 BGE::Texture::Texture() : NamedObject(), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
@@ -113,7 +111,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::initialize(TextureHandle handle, std::
     auto height = rawTexture->getHeight();
     auto buffer = rawTexture->getBuffer();
 
-#ifdef RENDER_QUEUE
     auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
     auto fut = prom->get_future();
     Game::getInstance()->getRenderService()->queueCreateTexture(getHandle(), getFormat(), buffer, width, height, glFormat, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
@@ -142,44 +139,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::initialize(TextureHandle handle, std::
     }
 
     return error;
-#else
-    __block std::shared_ptr<Error> error;
-    auto block = ^{
-        GLuint tex;
-
-        glGenTextures(1, &tex);
-        glBindTexture(GL_TEXTURE_2D, tex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, glFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, buffer);
-        GLenum glErr = glGetError();
-
-        if (glErr == GL_NO_ERROR) {
-            valid_ = true;
-            hwId_ = tex;
-            format_ = format;
-            target_ = GL_TEXTURE_2D;
-            width_ = width;
-            height_ = height;
-
-            updateUVs();
-            updateXYs();
-
-            memoryUsage_ = computeMemoryUsage(format_, width_, height_);
-        } else {
-            valid_ = false;
-            error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorAllocation);
-        }
-    };
-    if ([[NSThread currentThread] isMainThread]) {
-        block();
-    } else {
-        dispatch_sync(dispatch_get_main_queue(), block);
-    }
-    return error;
-#endif
 }
 
 void BGE::Texture::destroy() {
@@ -196,23 +155,12 @@ void BGE::Texture::destroy() {
         }
         
         // Always delete textures on main thread (for now)
-#ifdef RENDER_QUEUE
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
         Game::getInstance()->getRenderService()->queueDestroyTexture(getHandle(), name, [prom](RenderCommandItem command, std::shared_ptr<Error> error) {
             prom->set_value(error);
         });
         fut.get();
-#else
-        auto block = ^{
-            glDeleteTextures(1, &name);
-        };
-        if ([[NSThread currentThread] isMainThread]) {
-            block();
-        } else {
-            dispatch_sync(dispatch_get_main_queue(), block);
-        }
-#endif
     }
 
     hwId_ = 0;
@@ -462,7 +410,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, 
 
 std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromAlphaBuffer(unsigned char *buffer, uint32_t width, uint32_t height) {
     if (buffer) {
-#ifdef RENDER_QUEUE
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
         Game::getInstance()->getRenderService()->queueCreateTexture(getHandle(), getFormat(), buffer, width, height, GL_ALPHA, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
@@ -474,36 +421,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromAlphaBuffer(unsigned 
             prom->set_value(error);
         });
         return fut.get();
-#else
-        __block std::shared_ptr<Error> error;
-        auto __block block = ^() {
-            GLuint tex;
-
-            glGenTextures(1, &tex);
-
-            glBindTexture(GL_TEXTURE_2D, tex);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, buffer);
-
-            GLenum glErr = glGetError();
-            if (glErr == GL_NO_ERROR) {
-                valid_ = true;
-                hwId_ = tex;
-            } else {
-                error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorAllocation);
-            }
-        };
-        if ([[NSThread currentThread] isMainThread]) {
-            block();
-        } else {
-            dispatch_sync(dispatch_get_main_queue(), block);
-        }
-
-        return error;
-#endif
     } else {
         return std::make_shared<Error>(Texture::ErrorDomain, TextureErrorNoBuffer);
     }
@@ -515,7 +432,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGB565Buffer(unsigned
 
 std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGB888Buffer(unsigned char *buffer, uint32_t width, uint32_t height) {
     if (buffer) {
-#ifdef RENDER_QUEUE
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
         Game::getInstance()->getRenderService()->queueCreateTexture(getHandle(), getFormat(), buffer, width, height, GL_RGB, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
@@ -527,39 +443,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGB888Buffer(unsigned
             prom->set_value(error);
         });
         return fut.get();
-#else
-        __block std::shared_ptr<Error> error;
-        auto block = ^() {
-            GLuint tex;
-
-            glGenTextures(1, &tex);
-            GLint alignment;
-            glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
-            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-            glBindTexture(GL_TEXTURE_2D, tex);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-            glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
-
-            GLenum glErr = glGetError();
-
-            if (glErr == GL_NO_ERROR) {
-                valid_ = true;
-                hwId_ = tex;
-            } else {
-                error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorAllocation);
-            }
-        };
-        if ([[NSThread currentThread] isMainThread]) {
-            block();
-        } else {
-            dispatch_sync(dispatch_get_main_queue(), block);
-        }
-        return error;
-#endif
     } else {
         return std::make_shared<Error>(Texture::ErrorDomain, TextureErrorNoBuffer);
     }
@@ -575,7 +458,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA4444Buffer(unsign
 
 std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height) {
     if (buffer) {
-#ifdef RENDER_QUEUE
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
         Game::getInstance()->getRenderService()->queueCreateTexture(getHandle(), getFormat(), buffer, width, height, GL_RGBA, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
@@ -587,36 +469,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA8888Buffer(unsign
             prom->set_value(error);
         });
         return fut.get();
-#else
-        __block std::shared_ptr<Error> error;
-        auto block = ^() {
-            GLuint tex;
-
-            glGenTextures(1, &tex);
-
-            glBindTexture(GL_TEXTURE_2D, tex);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-            GLenum glErr = glGetError();
-
-            if (glErr == GL_NO_ERROR) {
-                valid_ = true;
-                hwId_ = tex;
-            } else {
-                error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorAllocation);
-            }
-        };
-        if ([[NSThread currentThread] isMainThread]) {
-            block();
-        } else {
-            dispatch_sync(dispatch_get_main_queue(), block);
-        }
-        return error;
-#endif
     } else {
         return std::make_shared<Error>(Texture::ErrorDomain, TextureErrorNoBuffer);
     }
