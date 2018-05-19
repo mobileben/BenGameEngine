@@ -135,7 +135,9 @@ namespace BGE {
         TextureHandleService        textureHandleService_;
         TextureAtlasHandleService   textureAtlasHandleService_;
         
+#ifdef SUPPORT_GLKTEXTURELOADER
         GLKTextureLoader            *textureLoader_;
+#endif
         
         std::unordered_map<ScenePackageHandle, std::unordered_map<std::string, TextureHandle>> packageTextures_;
         std::unordered_map<SpaceHandle, std::unordered_map<std::string, TextureHandle>> spaceTextures_;
