@@ -1583,6 +1583,8 @@ void BGE::RenderServiceOpenGLES2::createTexture(const RenderCommandItem& item) {
     }
     GLenum glErr = glGetError();
     if (glErr == GL_NO_ERROR) {
+        // currentTextureId_ reflects the last glBindTexture bound
+        currentTextureId_ = tex;
         data->glHwId = tex;
     } else {
         error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorAllocation);
