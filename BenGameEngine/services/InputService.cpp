@@ -167,6 +167,18 @@ void BGE::InputService::spaceReset(Space *space) {
     unlock();
 }
 
+bool BGE::InputService::getBboxPoints(std::vector<Vector3>& bbox, std::vector<Vector3>& scaledBbox) {
+    auto locked = bboxMutex_.try_lock();
+
+    if (locked) {
+        bbox = bboxPoints_;
+        scaledBbox = scaledBBoxPoints_;
+        bboxMutex_.unlock();
+    }
+
+    return locked;
+}
+
 void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue) {
     auto xform = gameObj->getComponent<TransformComponent>();
     
@@ -192,9 +204,8 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                         inBounds = true;
                     }
                 }
-                
+
                 auto event = button->shouldHandleInput(input, inBounds);
-                
                 if (event != Event::None) {
                     InputEventItem eventItem;
                     
@@ -448,22 +459,18 @@ void BGE::InputService::update(double deltaTime) {
     }
 
     if (Game::getInstance()->showCollisionRects()) {
-        auto &bboxPoints = Game::getInstance()->getRenderService()->getBoundBoxPoints();
-        auto &scaledBBoxPoints = Game::getInstance()->getRenderService()->getScaledBoundBoxPoints();
-        
-        bboxPoints.clear();
-        scaledBBoxPoints.clear();
+        std::lock_guard<std::mutex> lock(bboxMutex_);
+        bboxPoints_.clear();
+        scaledBBoxPoints_.clear();
         
         for (auto const &handle : spaceHandles) {
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space && space->isActive() && space->isVisible()) {
                 std::vector<GameObject *> objects;
-                
                 space->getRootGameObjects(objects);
-                
                 for (auto const &obj : objects) {
-                    getInputPoints(obj, bboxPoints, scaledBBoxPoints);
+                    getInputPoints(obj, bboxPoints_, scaledBBoxPoints_);
                 }
             }
         }

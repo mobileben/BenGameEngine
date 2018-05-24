@@ -1385,6 +1385,7 @@ void BGE::RenderServiceOpenGLES2::render()
         
         if (Game::getInstance()->showCollisionRects()) {
             // Draw collision rects if needed
+            Game::getInstance()->getInputService()->getBboxPoints(boundingBoxPoints_, scaledBoundingBoxPoints_);
             Color color = Color{ 1, 1, 1, 1 };
             drawDebugQuads(boundingBoxPoints_, color);
             
@@ -1401,7 +1402,6 @@ void BGE::RenderServiceOpenGLES2::render()
     processingTime_ = now - startTime;
     frameRateCalculator_.nextFrame();
 #endif /* SUPPORT_PROFILING */
-
     unlock();
     handleServicesUnlock();
 }

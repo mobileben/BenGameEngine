@@ -17,6 +17,8 @@
 #include "HandleService.h"
 #include "MathTypes.h"
 
+#include <mutex>
+
 namespace BGE {
     enum class InputTouchEvent {
         Down,
@@ -80,6 +82,8 @@ namespace BGE {
         void unregisterEventHandler(EventHandlerHandle handle);
         void spaceReset(Space *space);
 
+        bool getBboxPoints(std::vector<Vector3>& bbox, std::vector<Vector3>& scaledBbox);
+
 #ifdef SUPPORT_PROFILING
         int32_t getNumProcessedObjects() const { return numProcessedObjects_; }
         int64_t getProcessingTime() const { return processingTime_; }
@@ -122,6 +126,10 @@ namespace BGE {
         InputVector                                                                         inputs_;
         std::vector<InputButtonHandler>                                                     inputButtonHandlers_;
         std::unordered_map<Event, std::vector<EventHandlerHandle>>                          inputEventHandlers_;
+
+        std::mutex                                                                          bboxMutex_;
+        std::vector<Vector3>                                                                bboxPoints_;
+        std::vector<Vector3>                                                                scaledBBoxPoints_;
 
 #ifdef SUPPORT_PROFILING
         int32_t     numProcessedObjects_;
