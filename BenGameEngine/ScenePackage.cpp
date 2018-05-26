@@ -818,7 +818,7 @@ void BGE::ScenePackage::destroy() {
     
     loadedTextureAtlases_.clear();
     
-    // Destory all textures
+    // Destroy all textures
     for (auto const &texture : loadedTextures_) {
         textureService->removeTexture(handle_, texture);
         

@@ -124,7 +124,7 @@ void BGE::Space::reset_() {
     
     textureAtlases_.clear();
     
-    // Destory all textures
+    // Destroy all textures
     for (auto const &texture : textures_) {
         textureService->removeTexture(spaceHandle_, texture);
     }

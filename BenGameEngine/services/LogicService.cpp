@@ -106,7 +106,7 @@ void BGE::LogicService::update(double deltaTime) {
     executeUnlock();
     
     for (auto &item : executeQueue) {
-        // Any of these items can be destoryed, so dereference
+        // Any of these items can be destroyed, so dereference
         auto space = spaceService->getSpace(item.first);
         
         if (space) {
