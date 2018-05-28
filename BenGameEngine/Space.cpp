@@ -70,11 +70,7 @@ void BGE::Space::reset(std::function<void()> callback) {
     if (!resetting_) {
         printf("GGGGGG Space %s resetting starting\n", getName().c_str());
         resetting_ = true;
-#if 0
-        BGE::Game::getInstance()->queueSpaceReset(this, callback);
-#else
         BGE::Game::getInstance()->getSpaceService()->queueReset(spaceHandle_);
-#endif
     }
     unlock();
 }

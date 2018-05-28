@@ -85,7 +85,6 @@ namespace BGE {
         
         void garbageCollect() override;
         
-        void queueSpaceReset(Space *space, std::function<void()> callback);
         void servicesSpaceReset(Space *space);
 
         uint32_t numGameObjects () const { return gameObjectService_->numGameObjects(); }
@@ -168,8 +167,6 @@ namespace BGE {
         bool paused_;
         WireframeMode wireframeMode_;
         bool showCollisionRects_;
-        
-        std::vector<SpaceResetQueueItem>        spaceResetQueue_;
         
         // Used to access resources metrics
         std::shared_ptr<ComponentService>       componentService_;

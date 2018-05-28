@@ -318,15 +318,6 @@ void BGE::Game::garbageCollect() {
     handleServicesUnlock();
 }
 
-void BGE::Game::queueSpaceReset(Space *space, std::function<void()> callback) {
-    lock();
-    
-    auto item = std::make_pair(space->getHandle(), callback);
-    spaceResetQueue_.push_back(item);
-    
-    unlock();
-}
-
 void BGE::Game::servicesSpaceReset(Space *space) {
     logicService_->spaceReset(space);
     animationService_->spaceReset(space);
@@ -345,28 +336,6 @@ void BGE::Game::update(double deltaTime) {
     animationService_->update(deltaTime);
 
     // Physics here
-    
-    // Clean out queued space resets
-    lock();
-    
-    auto spaceService = getSpaceService();
-    spaceService_->lock();
-    
-    for (auto &item : spaceResetQueue_) {
-        auto space = spaceService->getSpace(item.first);
-        
-        if (space) {
-            space->reset_();
-            if (item.second) {
-                item.second();
-            }
-        }
-    }
-    
-    spaceResetQueue_.clear();
-
-    spaceService_->unlock();
-    unlock();
     
     // Update transforms
     //updateTransforms();
