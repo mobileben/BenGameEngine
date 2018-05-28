@@ -21,13 +21,13 @@
 
 #include <future>
 
-BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true) {
+BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true), resetting_(false) {
 }
 
-BGE::Space::Space(ObjectId spaceId) : NamedObject(spaceId), visible_(false), order_(0), updatable_(true) {
+BGE::Space::Space(ObjectId spaceId) : NamedObject(spaceId), visible_(false), order_(0), updatable_(true), resetting_(false) {
 }
 
-BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true) {
+BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true), resetting_(false) {
 }
 
 void BGE::Space::initialize(SpaceHandle handle, std::string name, std::shared_ptr<SpaceService> service) {
@@ -39,6 +39,7 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name, std::shared_pt
     active_ = false;
     visible_ = false;
     updatable_ = false;
+    resetting_ = false;
 
     order_ = 0;
 
@@ -65,23 +66,22 @@ void BGE::Space::unlock() {
 }
 
 void BGE::Space::reset(std::function<void()> callback) {
-    // TODO: For now, on iOS, this needs to be done on the main thread
-#ifdef NOT_YET
-    dispatch_async(dispatch_get_main_queue(), ^() {
-#endif
-        lock();
-        
+    lock();
+    if (!resetting_) {
+        printf("GGGGGG Space %s resetting starting\n", getName().c_str());
+        resetting_ = true;
+#if 0
         BGE::Game::getInstance()->queueSpaceReset(this, callback);
-        
-        unlock();
-#ifdef NOT_YET
-    });
+#else
+        BGE::Game::getInstance()->getSpaceService()->queueReset(spaceHandle_);
 #endif
+    }
+    unlock();
 }
 
 void BGE::Space::reset_() {
     // Locking happens externally
-    
+    printf("GGGG Space %s ACTUAL reset_ ocurring\n", getName().c_str());
     // Turn everything off just in case this object is still accessible
     visible_ = false;
     updatable_ = false;
@@ -132,6 +132,8 @@ void BGE::Space::reset_() {
     // Remove any outstanding events
     
     textures_.clear();
+    resetting_ = false;
+    printf("GGGGGG Space %s resetting done\n", getName().c_str());
 }
 
 uint32_t BGE::Space::handlerBitmaskForSceneObjectCreatedDelegate(SceneObjectCreatedDelegate *delegate) {

@@ -15,6 +15,8 @@
 #include "Service.h"
 #include "Space.h"
 #include "HandleService.h"
+#include "Queue.h"
+
 #include <type_traits>
 
 namespace BGE {
@@ -48,9 +50,11 @@ namespace BGE {
         void outputMemoryBreakdown(uint32_t numTabs) const final;
 
         Space *createSpace(std::string name);
-        
+
         void removeSpace(SpaceHandle spaceHandle);
         void removeSpace(std::string name);
+
+        void queueReset(SpaceHandle spaceHandle);
 
         Space *getSpace(SpaceHandle spaceHandle) const;
         Space *getSpace(std::string name) const;
@@ -67,8 +71,14 @@ namespace BGE {
 
         SpaceHandleService          handleService_;
         std::vector<SpaceHandle>    spaces_;
-        
+        Queue<SpaceHandle>          resetQueue_;
+
         // TODO: Should just create sorted vector here each time space is removed or added, but also must think how to handle order change
+
+        std::thread  thread_;
+
+        void threadFunction();
+
     };
 }
 

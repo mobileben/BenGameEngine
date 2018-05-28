@@ -9,7 +9,12 @@
 #include "SpaceService.h"
 #include "Game.h"
 
+#if DEBUG
+#include <pthread.h>
+#endif
+
 BGE::SpaceService::SpaceService() : handleService_(InitialSpaceReserve, HandleServiceNoMaxLimit){
+    thread_ = std::thread(&SpaceService::threadFunction, this);
 }
 
 uint32_t BGE::SpaceService::numUsedHandles() const {
@@ -121,6 +126,10 @@ void BGE::SpaceService::removeSpace(std::string name) {
     }
 }
 
+void BGE::SpaceService::queueReset(SpaceHandle spaceHandle) {
+    resetQueue_.push(spaceHandle);
+}
+
 BGE::Space *BGE::SpaceService::getSpace(SpaceHandle spaceHandle) const {
     return handleService_.dereference(spaceHandle);
 }
@@ -182,4 +191,20 @@ std::vector<BGE::SpaceHandle> BGE::SpaceService::getReversedSpaces() const {
               });
     
     return spaces;
+}
+
+void BGE::SpaceService::threadFunction() {
+#if DEBUG
+    auto native = thread_.native_handle();
+    if (native == pthread_self()) {
+        pthread_setname_np("space");
+    }
+#endif
+    while(true) {
+        auto handle = resetQueue_.pop();
+        auto space = getSpace(handle);
+        if (space) {
+            space->reset_();
+        }
+    }
 }

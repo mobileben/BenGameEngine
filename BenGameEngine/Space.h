@@ -119,6 +119,13 @@ namespace BGE {
 
         inline bool isUpdatable() const { return updatable_; }
         inline void setUpdatable(bool updatable) { updatable_ = updatable; }
+
+        inline bool isResetting() {
+            lock();
+            bool r = resetting_;
+            unlock();
+            return r;
+        }
         
         inline uint32_t getOrder() const { return order_; }
         inline void setOrder(uint32_t order) { order_ = order; }
@@ -202,9 +209,10 @@ namespace BGE {
         bool        active_;    // Active
         bool        visible_;   // Space can be rendered
         bool        updatable_; // Objects in space can be updated
-        
+        bool        resetting_;
+
         uint32_t    order_;
-        
+
         void lock();
         void unlock();
         
