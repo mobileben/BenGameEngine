@@ -51,15 +51,10 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
 }
 
 void BGE::ButtonComponent::destroy() {
-    state = ButtonStateNormal;
-    animate = false;
     touchable_ = false;
     enabled = false;
-    showHighlighted_ = false;
-    
-    toggleable = false;
-    toggleOn = false;
-    
+
+    // Release reference
     touch = nil;
     
     auto space = getSpace();
@@ -73,17 +68,20 @@ void BGE::ButtonComponent::destroy() {
         space->removeGameObject(highlightedAnimButtonHandle);
         space->removeGameObject(currentButtonHandle);
     }
-    
-    disabledButtonHandle = GameObjectHandle();
-    disabledAnimButtonHandle = GameObjectHandle();
-    normalButtonHandle = GameObjectHandle();
-    normalAnimButtonHandle = GameObjectHandle();
-    highlightedButtonHandle = GameObjectHandle();
-    highlightedAnimButtonHandle = GameObjectHandle();
-    currentButtonHandle = GameObjectHandle();
 
     // Component::destroy last
     Component::destroy();
+}
+
+void BGE::ButtonComponent::destroyFast() {
+    touchable_ = false;
+    enabled = false;
+
+    // Release reference
+    touch = nil;
+
+    // Component::destroyFast last
+    Component::destroyFast();
 }
 
 void BGE::ButtonComponent::setButtonReference(ButtonReference *buttonRef) {

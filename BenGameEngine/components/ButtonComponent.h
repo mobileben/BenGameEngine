@@ -82,10 +82,14 @@ namespace BGE {
         GameObjectHandle getHighlightedButtonHandle() const { return highlightedButtonHandle; }
         GameObjectHandle getHighlightedAnimButtonHandle() const { return highlightedAnimButtonHandle; }
 
+    protected:
+        void destroyFast() final;
+        
     private:
         friend Space;
         friend InputService;
-        
+        friend ComponentService;
+
         uint32_t    state;
         bool        animate;
         bool        touchable_;

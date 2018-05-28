@@ -82,18 +82,22 @@ void BGE::LogicService::update(double deltaTime) {
             auto gameObj = space->getGameObject(gameObjHandle);
             
             if (gameObj) {
-                if (gameObj->isActive()) {
-                    auto logic = gameObj->getComponent<LogicComponent>();
-                    
-                    if (logic && logic->update) {
-                        remove = false;
-                        
-                        if (logic->mode == LogicComponentMode::Always || (paused && logic->mode == LogicComponentMode::Paused) || logic->mode == LogicComponentMode::Unapaused) {
-                            executeQueue.push_back(std::make_pair(spaceHandle, gameObjHandle));
+                auto logic = gameObj->getComponent<LogicComponent>();
+
+                if (logic && logic->update) {
+                    // As long as we have a valid gameObj and logic ptr and an update, then don't remove
+                    remove = false;
+                    if (gameObj->isActive()) {
+                        if (logic->update) {
+                            if (logic->mode == LogicComponentMode::Always || (paused && logic->mode == LogicComponentMode::Paused) || logic->mode == LogicComponentMode::Unapaused) {
+                                executeQueue.push_back(std::make_pair(spaceHandle, gameObjHandle));
+                            }
                         }
                     }
                 }
+                // If logic is no longer valid or no update function, this will be removed
             }
+            // No longer valid game objects get removed
         }
         
         if (remove) {

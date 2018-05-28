@@ -35,6 +35,7 @@ namespace BGE {
             localBounds_.y = 0;
             localBounds_.w = 0;
             localBounds_.h = 0;
+            materialHandles_.clear();
         }
         
         void destroy() override;
@@ -67,6 +68,7 @@ namespace BGE {
         void setGlobalBounds(Rect& bounds) { globalBounds_ = bounds; }
         
         virtual void materialsUpdated() =0;
+        void destroyFast() override;
         
     private:
         friend ComponentService;

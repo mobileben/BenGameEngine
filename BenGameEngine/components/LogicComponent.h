@@ -50,6 +50,11 @@ namespace BGE {
         LogicComponent();
         ~LogicComponent() {}
 
+    protected:
+        void destroyFast() final;
+
+    private:
+        friend ComponentService;
     };
 }
 

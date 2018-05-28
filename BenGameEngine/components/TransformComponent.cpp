@@ -59,7 +59,6 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
 
 void BGE::TransformComponent::destroy() {
     visible_ = false;
-    clipped_ = false;
 
     removeFromParent();
     removeAllChildren();
@@ -69,6 +68,16 @@ void BGE::TransformComponent::destroy() {
 
     // Component::destroy last
     Component::destroy();
+}
+
+void BGE::TransformComponent::destroyFast() {
+    visible_ = false;
+
+    parentHandle_ = TransformComponentHandle();
+    childrenHandles_.clear();
+
+    // Component::destroyFast last
+    Component::destroyFast();
 }
 
 void BGE::TransformComponent::setParentHandle(TransformComponentHandle parentHandle) {

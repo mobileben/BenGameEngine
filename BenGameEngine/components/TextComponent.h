@@ -33,18 +33,10 @@ namespace BGE {
         void initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
             RenderComponent::initialize(handle, spaceHandle);
             
-            text_ = "";
+            text_.clear();
             fontHandle_ = FontHandle();
         }
 
-        void destroy() final {
-            text_ = "";
-            fontHandle_ = FontHandle();
-
-            // RenderComponent::destroy last
-            RenderComponent::destroy();
-        }
-        
         const std::string& getText() const {
             return text_;
         }

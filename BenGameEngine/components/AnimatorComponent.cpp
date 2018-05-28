@@ -43,20 +43,6 @@ void BGE::AnimatorComponent::initialize(HandleBackingType handle, SpaceHandle sp
     forward = true;
 }
 
-void BGE::AnimatorComponent::destroy() {
-    state = AnimState::Done;
-    startFrame = 0;
-    endFrame = 0;
-    currentFrame = 0;
-    iterations = 0;
-    frameRemainderTime = 0.0F;
-    speed = 1.0F;
-    forward = true;
-
-    // Component::destroy last
-    Component::destroy();
-}
-
 void BGE::AnimatorComponent::reset() {
     setFrame(0, true);
     iterations = 1;

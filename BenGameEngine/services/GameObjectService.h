@@ -106,6 +106,7 @@ namespace BGE {
         
         void getAllChildGameObjects(GameObject *root, std::vector<GameObject *> &objects);
         void releaseObject(GameObjectHandle handle);
+        void releaseObjectDontReleaseComponents(GameObjectHandle handle);
     };
 }
 

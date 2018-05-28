@@ -33,13 +33,6 @@ namespace BGE {
             
             channel = nullptr;
         }
-        
-        inline void destroy() final {
-            channel = nullptr;
-            
-            // Component::destroy last
-            Component::destroy();
-        }
 
     protected:
         friend ComponentService;

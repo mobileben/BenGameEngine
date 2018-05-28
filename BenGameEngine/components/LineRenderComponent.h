@@ -28,14 +28,7 @@ namespace BGE {
             
             thickness_ = 1;
             closedLoop_ = false;
-        }
-        
-        void destroy() final {
-            thickness_ = 1;
             points_.clear();
-            
-            // RenderComponent::destroy last
-            RenderComponent::destroy();
         }
 
         const std::vector<Vector2>& getPoints() const;

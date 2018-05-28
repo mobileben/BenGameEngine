@@ -41,7 +41,7 @@ namespace BGE {
         
         virtual void initialize(HandleBackingType handle, SpaceHandle spaceHandle);
         virtual void destroy();
-        
+
         inline std::type_index getTypeIndex() const { return type_index_; }
         inline ComponentTypeId getTypeId() const { return typeId_; }
         inline uint32_t getBitmask() const { return bitmask_; }
@@ -103,7 +103,8 @@ namespace BGE {
         inline void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
 
         virtual void created() {}
-        
+        virtual void destroyFast();     // destroyFast is called internally when we are doing removeAllComponents
+
     private:
         friend ComponentService;
         friend GameObject;

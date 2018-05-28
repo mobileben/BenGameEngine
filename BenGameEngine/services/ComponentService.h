@@ -236,6 +236,18 @@ namespace BGE {
                 handleService->release(tHandle);
             }
         }
+
+        // Used with removeAllComponents
+        template <typename T> void releaseFastComponentHandle(ComponentHandle handle) {
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[T::typeId_]);
+            auto tHandle = Handle<T>(handle.handle);
+            auto component = getComponent<T>(handle.handle);
+
+            if (component) {
+                component->destroyFast();
+                handleService->release(tHandle);
+            }
+        }
     };
 }
 

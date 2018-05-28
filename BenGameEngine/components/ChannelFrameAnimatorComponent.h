@@ -31,13 +31,6 @@ namespace BGE {
             
             currKeyframe = 0;
         }
-        
-        void destroy() final {
-            currKeyframe = 0;
-            
-            // Component::destroy last
-            Component::destroy();
-        }
 
         // TODO: Move to controller
         int32_t     currKeyframe;

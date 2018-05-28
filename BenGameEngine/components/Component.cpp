@@ -28,6 +28,12 @@ void BGE::Component::destroy() {
     spaceHandle_ = SpaceHandle();
 }
 
+void BGE::Component::destroyFast() {
+    handle_ = 0;
+    gameObjectHandle_ = GameObjectHandle();
+    spaceHandle_ = SpaceHandle();
+}
+
 BGE::Space *BGE::Component::getSpace() const {
     return Game::getInstance()->getSpaceService()->getSpace(spaceHandle_);
 }

@@ -185,45 +185,45 @@ void BGE::ComponentService::removeAllComponents() {
         for (auto const &handle : handles) {
             if (!isHandleBackingNull(handle.handle)) {
                 if (typeId == TransformComponent::typeId_) {
-                    releaseComponentHandle<TransformComponent>(handle);
+                    releaseFastComponentHandle<TransformComponent>(handle);
                 } else if (typeId == BoundingBoxComponent::typeId_) {
-                    releaseComponentHandle<BoundingBoxComponent>(handle);
+                    releaseFastComponentHandle<BoundingBoxComponent>(handle);
                 } else if (typeId == AnimationChannelComponent::typeId_) {
-                    releaseComponentHandle<AnimationChannelComponent>(handle);
+                    releaseFastComponentHandle<AnimationChannelComponent>(handle);
                 } else if (typeId == AnimationSequenceComponent::typeId_) {
-                    releaseComponentHandle<AnimationSequenceComponent>(handle);
+                    releaseFastComponentHandle<AnimationSequenceComponent>(handle);
                 } else if (typeId == AnimatorComponent::typeId_) {
-                    releaseComponentHandle<AnimatorComponent>(handle);
+                    releaseFastComponentHandle<AnimatorComponent>(handle);
                 } else if (typeId == ChannelFrameAnimatorComponent::typeId_) {
-                    releaseComponentHandle<ChannelFrameAnimatorComponent>(handle);
+                    releaseFastComponentHandle<ChannelFrameAnimatorComponent>(handle);
                 } else if (typeId == ColorMatrixComponent::typeId_) {
-                    releaseComponentHandle<ColorMatrixComponent>(handle);
+                    releaseFastComponentHandle<ColorMatrixComponent>(handle);
                 } else if (typeId == ColorTransformComponent::typeId_) {
-                    releaseComponentHandle<ColorTransformComponent>(handle);
+                    releaseFastComponentHandle<ColorTransformComponent>(handle);
                 } else if (typeId == FrameAnimatorComponent::typeId_) {
-                    releaseComponentHandle<FrameAnimatorComponent>(handle);
+                    releaseFastComponentHandle<FrameAnimatorComponent>(handle);
                 } else if (typeId == SpriteRenderComponent::typeId_) {
-                    releaseComponentHandle<SpriteRenderComponent>(handle);
+                    releaseFastComponentHandle<SpriteRenderComponent>(handle);
                 } else if (typeId == LogicComponent::typeId_) {
-                    releaseComponentHandle<LogicComponent>(handle);
+                    releaseFastComponentHandle<LogicComponent>(handle);
                 } else if (typeId == TextComponent::typeId_) {
-                    releaseComponentHandle<TextComponent>(handle);
+                    releaseFastComponentHandle<TextComponent>(handle);
                 } else if (typeId == PlacementComponent::typeId_) {
-                    releaseComponentHandle<PlacementComponent>(handle);
+                    releaseFastComponentHandle<PlacementComponent>(handle);
                 } else if (typeId == ButtonComponent::typeId_) {
-                    releaseComponentHandle<ButtonComponent>(handle);
+                    releaseFastComponentHandle<ButtonComponent>(handle);
                 } else if (typeId == InputTouchComponent::typeId_) {
-                    releaseComponentHandle<InputTouchComponent>(handle);
+                    releaseFastComponentHandle<InputTouchComponent>(handle);
                 } else if (typeId == PolyLineRenderComponent::typeId_) {
-                    releaseComponentHandle<PolyLineRenderComponent>(handle);
+                    releaseFastComponentHandle<PolyLineRenderComponent>(handle);
                 } else if (typeId == LineRenderComponent::typeId_) {
-                    releaseComponentHandle<LineRenderComponent>(handle);
+                    releaseFastComponentHandle<LineRenderComponent>(handle);
                 } else if (typeId == FlatRectRenderComponent::typeId_) {
-                    releaseComponentHandle<FlatRectRenderComponent>(handle);
+                    releaseFastComponentHandle<FlatRectRenderComponent>(handle);
                 } else if (typeId == MaskComponent::typeId_) {
-                    releaseComponentHandle<MaskComponent>(handle);
+                    releaseFastComponentHandle<MaskComponent>(handle);
                 } else if (typeId == TextureMaskComponent::typeId_) {
-                    releaseComponentHandle<TextureMaskComponent>(handle);
+                    releaseFastComponentHandle<TextureMaskComponent>(handle);
                 } else {
                     assert(false);
                 }

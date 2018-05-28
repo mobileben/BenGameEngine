@@ -29,21 +29,6 @@ void BGE::BoundingBoxComponent::initialize(HandleBackingType handle, SpaceHandle
     aabbMaxY = 0.0F;
 }
 
-void BGE::BoundingBoxComponent::destroy() {
-    x = 0.0F;
-    y = 0.0F;
-    width = 0.0F;
-    height = 0.0F;
-    
-    aabbMinX = 0.0F;
-    aabbMinY = 0.0F;
-    aabbMaxX = 0.0F;
-    aabbMaxY = 0.0F;
-
-    // Component::destroy last
-    Component::destroy();
-}
-
 void BGE::BoundingBoxComponent::computeAABB(Matrix4 &transform) {
     computeAABB(transform, width, height);
 }

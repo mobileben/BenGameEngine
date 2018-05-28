@@ -61,6 +61,16 @@ void BGE::GameObject::destroy() {
     spaceHandle_ = SpaceHandle();
 }
 
+void BGE::GameObject::destroyDontReleaseComponents() {
+    active_ = false;
+    
+    componentBitmask_ = 0;
+    components_.clear();
+
+    handle_ = GameObjectHandle();
+    spaceHandle_ = SpaceHandle();
+}
+
 void BGE::GameObject::listComponents() const {
     printf("GameObj %s has components", getName().c_str());
     for (auto it = components_.begin();it != components_.end();++it) {

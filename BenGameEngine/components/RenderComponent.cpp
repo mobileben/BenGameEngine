@@ -20,11 +20,20 @@ void BGE::RenderComponent::destroy() {
     for (auto const &material : materialHandles_) {
         materialService->removeMaterial(material);
     }
-    
-    materialHandles_.clear();
-    
+
     // Component::destroy last
     Component::destroy();
+}
+
+void BGE::RenderComponent::destroyFast() {
+    enabled_ = false;
+    auto materialService = Game::getInstance()->getMaterialService();
+    for (auto const &material : materialHandles_) {
+        materialService->removeMaterial(material);
+    }
+
+    // Component::destroyFast last
+    Component::destroyFast();
 }
 
 void BGE::RenderComponent::getGlobalBounds(Rect& bounds) {

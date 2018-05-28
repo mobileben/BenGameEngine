@@ -22,6 +22,9 @@ BGE::AnimationSequenceComponent::AnimationSequenceComponent() : Component(), fra
 void BGE::AnimationSequenceComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
     Component::initialize(handle, spaceHandle);
     
+    channels.clear();
+    bounds = nullptr;
+
     frameRate = 0;
     totalFrames = 0;
     numChannels = 0;
@@ -30,21 +33,10 @@ void BGE::AnimationSequenceComponent::initialize(HandleBackingType handle, Space
 
 void BGE::AnimationSequenceComponent::destroy() {
     auto space = getSpace();
-
     for (auto const &channel : channels) {
         space->removeGameObject(channel);
     }
 
-    channels.clear();
-
-    bounds = nullptr;
-
-    frameRate = 0;
-    totalFrames = 0;
-    numChannels = 0;
-    numBounds = 0;
-
     // Component::destroy last
     Component::destroy();
 }
-

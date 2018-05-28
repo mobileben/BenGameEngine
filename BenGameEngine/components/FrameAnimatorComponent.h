@@ -25,15 +25,7 @@ namespace BGE {
         
         void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final {
             Component::initialize(handle, spaceHandle);
-            
             currentFrame = 0;
-        }
-        
-        void destroy() final {
-            currentFrame = 0;
-        
-            // Component::destroy last
-            Component::destroy();
         }
 
         // TODO: Move to controller

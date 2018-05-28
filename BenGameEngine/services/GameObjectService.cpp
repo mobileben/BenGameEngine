@@ -155,7 +155,7 @@ void BGE::GameObjectService::removeGameObject(GameObjectHandle handle) {
 
 void BGE::GameObjectService::removeAllGameObjects() {
     for (auto const &handle : gameObjects_) {
-        releaseObject(handle);
+        releaseObjectDontReleaseComponents(handle);
     }
     
     gameObjects_.clear();
@@ -167,6 +167,15 @@ void BGE::GameObjectService::releaseObject(GameObjectHandle handle) {
 
     if (obj) {
         obj->destroy();
+        handleService_.release(handle);
+    }
+}
+
+void BGE::GameObjectService::releaseObjectDontReleaseComponents(GameObjectHandle handle){
+    auto obj = getGameObject(handle);
+
+    if (obj) {
+        obj->destroyDontReleaseComponents();
         handleService_.release(handle);
     }
 }

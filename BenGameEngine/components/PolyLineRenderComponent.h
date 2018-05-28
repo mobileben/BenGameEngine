@@ -37,17 +37,10 @@ namespace BGE {
             noFeatherAtCore_ = false;
             
             thickness_ = 1;
-        }
-        
-        void destroy() final {
-            thickness_ = 1;
             points_.clear();
             colors_.clear();
-            
-            // RenderComponent::destroy last
-            RenderComponent::destroy();
         }
-        
+
         const std::vector<Vector2>& getPoints() const;
         void setPoints(const std::vector<Vector2>& points, bool lineLoop=false);
         const std::vector<Color>& getColors() const;

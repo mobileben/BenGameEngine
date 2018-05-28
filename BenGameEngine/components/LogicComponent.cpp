@@ -22,6 +22,7 @@ void BGE::LogicComponent::initialize(HandleBackingType handle, SpaceHandle space
     
     mode = LogicComponentMode::Always;
     priority = 0;
+    this->update = nullptr;
 }
 
 void BGE::LogicComponent::destroy() {
@@ -35,4 +36,14 @@ void BGE::LogicComponent::destroy() {
     
     // Component::destroy last
     Component::destroy();
+}
+
+void BGE::LogicComponent::destroyFast() {
+    auto gameObject = getGameObject();
+    if (gameObject) {
+        Game::getInstance()->getLogicService()->removeGameObject(gameObject);
+    }
+    this->update = nullptr;
+    // Component::destroyFast last
+    Component::destroyFast();
 }
