@@ -54,7 +54,7 @@ namespace BGE {
         // Although components should not ideally have any methods, we are doing them here to control the animation
         // TODO: Look at possibly having an animation controller to wrap around this.
         void reset();
-        void setFrame(int32_t frame, bool force=false);
+        void setFrame(int32_t frame);
         void setToLastFrame();
         void play(int32_t iterations=1, bool forward=true, float speed=1.0);
         void playToFrame(int32_t endFrame, float speed=1.0);

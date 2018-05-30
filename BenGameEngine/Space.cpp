@@ -421,7 +421,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
         obj = getGameObject(objHandle);
         animator = obj->getComponent<AnimatorComponent>();
         
-        animator->setFrame(0, true);
+        animator->setFrame(0);
         
         addCreatedGameObjectsForAnimSequence(obj, pushBitmask, objects);
         

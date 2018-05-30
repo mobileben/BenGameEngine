@@ -255,7 +255,7 @@ void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceCompo
             }
             
             if (origFrame != frame) {
-                animator->setFrame(frame, true);
+                animator->setFrame(frame);
             }
             
             // Only trigger when done

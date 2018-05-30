@@ -351,7 +351,7 @@ void BGE::GameObject::upgradeToAnimationSequence() {
                 addComponent(bbox);
             }
             
-            animator->setFrame(0, true);
+            animator->setFrame(0);
         }
     }
 }

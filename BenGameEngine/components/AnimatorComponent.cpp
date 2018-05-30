@@ -44,7 +44,7 @@ void BGE::AnimatorComponent::initialize(HandleBackingType handle, SpaceHandle sp
 }
 
 void BGE::AnimatorComponent::reset() {
-    setFrame(0, true);
+    setFrame(0);
     iterations = 1;
     state = AnimState::Done;
     
@@ -61,7 +61,7 @@ void BGE::AnimatorComponent::reset() {
     frameRemainderTime = secPerFrame;
 }
 
-void BGE::AnimatorComponent::setFrame(int32_t frame, bool force) {
+void BGE::AnimatorComponent::setFrame(int32_t frame) {
     auto space = getSpace();
     auto gameObjHandle = getGameObjectHandle();
     auto gameObj = space->getGameObject(gameObjHandle);
@@ -113,7 +113,7 @@ void BGE::AnimatorComponent::setToLastFrame() {
     if (gameObj) {
         auto seq = gameObj->getComponent<AnimationSequenceComponent>();
 
-        setFrame(seq->totalFrames - 1, true);
+        setFrame(seq->totalFrames - 1);
     }
 }
 
@@ -165,138 +165,136 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
     } else {
         xform->setVisibility(true);
         
-        if (true || origFrame != channelFrame) {
-            Material *material = nullptr;
-            
-            if (gameObj->getComponent<LineRenderComponent>()) {
-                auto render = gameObj->getComponent<LineRenderComponent>();
-                material = render->getMaterial();
-            } else if (gameObj->getComponent<FlatRectRenderComponent>()) {
-                auto render = gameObj->getComponent<FlatRectRenderComponent>();
-                material = render->getMaterial();
-            } else if (gameObj->getComponent<SpriteRenderComponent>()) {
-                auto render = gameObj->getComponent<SpriteRenderComponent>();
-                material = render->getMaterial();
-            } else if (gameObj->getComponent<TextComponent>()) {
-                auto render = gameObj->getComponent<TextComponent>();
-                material = render->getMaterial();
-            } else if (gameObj->getComponent<PolyLineRenderComponent>()) {
-                auto render = gameObj->getComponent<PolyLineRenderComponent>();
-                material = render->getMaterial();
-            }
-            
-            animator->currKeyframe = channelFrame;
-            
-            // Update our transform
-            if (keyframe->position) {
-                xform->setPosition(*keyframe->position);
-            } else {
-                xform->setX(0);
-                xform->setY(0);
-            }
-            
-            xform->setZ(keyframe->order);
-            
-            if (keyframe->scale) {
-                xform->setScale(*keyframe->scale);
-            } else {
-                xform->setScaleX(1);
-                xform->setScaleY(1);
-            }
-            if (keyframe->skew) {
-                xform->setSkew(*keyframe->skew);
-            } else {
-                xform->setSkew(Vector2{0, 0});
-            }
-            if (keyframe->collisionRectScale) {
-                xform->setCollisionRectScale(*keyframe->collisionRectScale);
-            } else {
-                xform->setCollisionRectScale(Vector2{1,1});
-            }
-            auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();
-            auto colorTransform = gameObj->getComponent<ColorTransformComponent>();
-            auto space = gameObj->getSpace();
-            
-            if (keyframe->colorMatrix) {
-                if (colorMatrix) {
-                    colorMatrix->matrix = *keyframe->colorMatrix;
-                } else {
-                    colorMatrix = space->createComponent<ColorMatrixComponent>();
-                    gameObj->addComponent(colorMatrix);
-                }
-                
+        Material *material = nullptr;
+
+        if (gameObj->getComponent<LineRenderComponent>()) {
+            auto render = gameObj->getComponent<LineRenderComponent>();
+            material = render->getMaterial();
+        } else if (gameObj->getComponent<FlatRectRenderComponent>()) {
+            auto render = gameObj->getComponent<FlatRectRenderComponent>();
+            material = render->getMaterial();
+        } else if (gameObj->getComponent<SpriteRenderComponent>()) {
+            auto render = gameObj->getComponent<SpriteRenderComponent>();
+            material = render->getMaterial();
+        } else if (gameObj->getComponent<TextComponent>()) {
+            auto render = gameObj->getComponent<TextComponent>();
+            material = render->getMaterial();
+        } else if (gameObj->getComponent<PolyLineRenderComponent>()) {
+            auto render = gameObj->getComponent<PolyLineRenderComponent>();
+            material = render->getMaterial();
+        }
+
+        animator->currKeyframe = channelFrame;
+
+        // Update our transform
+        if (keyframe->position) {
+            xform->setPosition(*keyframe->position);
+        } else {
+            xform->setX(0);
+            xform->setY(0);
+        }
+
+        xform->setZ(keyframe->order);
+
+        if (keyframe->scale) {
+            xform->setScale(*keyframe->scale);
+        } else {
+            xform->setScaleX(1);
+            xform->setScaleY(1);
+        }
+        if (keyframe->skew) {
+            xform->setSkew(*keyframe->skew);
+        } else {
+            xform->setSkew(Vector2{0, 0});
+        }
+        if (keyframe->collisionRectScale) {
+            xform->setCollisionRectScale(*keyframe->collisionRectScale);
+        } else {
+            xform->setCollisionRectScale(Vector2{1,1});
+        }
+        auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();
+        auto colorTransform = gameObj->getComponent<ColorTransformComponent>();
+        auto space = gameObj->getSpace();
+
+        if (keyframe->colorMatrix) {
+            if (colorMatrix) {
                 colorMatrix->matrix = *keyframe->colorMatrix;
-                
-                if (material) {
-                    material->setColorMatrix(*keyframe->colorMatrix);
-                }
             } else {
-                if (colorMatrix) {
-                    gameObj->removeComponent<ColorMatrixComponent>();
-                }
+                colorMatrix = space->createComponent<ColorMatrixComponent>();
+                gameObj->addComponent(colorMatrix);
             }
-            
-            if (keyframe->colorTransform) {
-                if (colorTransform) {
-                    colorTransform->transform = *keyframe->colorTransform;
-                } else {
-                    colorTransform = space->createComponent<ColorTransformComponent>();
-                    gameObj->addComponent(colorTransform);
-                }
-                
+
+            colorMatrix->matrix = *keyframe->colorMatrix;
+
+            if (material) {
+                material->setColorMatrix(*keyframe->colorMatrix);
+            }
+        } else {
+            if (colorMatrix) {
+                gameObj->removeComponent<ColorMatrixComponent>();
+            }
+        }
+
+        if (keyframe->colorTransform) {
+            if (colorTransform) {
                 colorTransform->transform = *keyframe->colorTransform;
             } else {
-                if (colorTransform) {
-                    gameObj->removeComponent<ColorTransformComponent>();
-                }
+                colorTransform = space->createComponent<ColorTransformComponent>();
+                gameObj->addComponent(colorTransform);
             }
-            
-            xform->setRotationInDegrees(keyframe->rotation);
-            xform->forceDirty();
-            
-            // If this is a Keyframe reference, update
-            if (channel->channel->referenceType == GfxReferenceTypeKeyframe) {
-                // Find the appropriate child
-                for (auto i=0;i<xform->getNumChildren();i++) {
-                    auto childXform = xform->childAtIndex(i);
-                    if (childXform->hasGameObject()) {
-                        auto childObjHandle = childXform->getGameObjectHandle();
-                        auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
-                        
-                        childXform->forceDirty();
-                        // TODO: Have some better means of identifying the right child. For now brute force it
-                        if (childObj) {
-                            auto childAnimator = childObj->getComponent<FrameAnimatorComponent>();
-                            
-                            if (childAnimator) {
-                                auto childSeq = childObj->getComponent<AnimationSequenceComponent>();
-                                animateSequenceByFrame(space, childSeq, childAnimator, keyframe->frame);
-                                
-                                
-                                // Update the bounds
-                                for (auto bi=0;i<childSeq->numBounds;bi++) {
-                                    auto bounds = childSeq->bounds[bi];
-                                    
-                                    if (bounds.startFrame >= bi && bi < (bounds.startFrame + bounds.totalFrames)) {
-                                        auto bbox = childObj->getComponent<BoundingBoxComponent>();
-                                        
-                                        if (!bbox) {
-                                            auto space = childObj->getSpace();
-                                            
-                                            bbox = space->createComponent<BGE::BoundingBoxComponent>();
-                                            
-                                            childObj->addComponent(bbox);
-                                        }
-                                        
-                                        bbox->x = bounds.bounds->x;
-                                        bbox->y = bounds.bounds->y;
-                                        bbox->width = bounds.bounds->w;
-                                        bbox->height = bounds.bounds->h;
-                                        break;
+
+            colorTransform->transform = *keyframe->colorTransform;
+        } else {
+            if (colorTransform) {
+                gameObj->removeComponent<ColorTransformComponent>();
+            }
+        }
+
+        xform->setRotationInDegrees(keyframe->rotation);
+        xform->forceDirty();
+
+        // If this is a Keyframe reference, update
+        if (channel->channel->referenceType == GfxReferenceTypeKeyframe) {
+            // Find the appropriate child
+            for (auto i=0;i<xform->getNumChildren();i++) {
+                auto childXform = xform->childAtIndex(i);
+                if (childXform->hasGameObject()) {
+                    auto childObjHandle = childXform->getGameObjectHandle();
+                    auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
+
+                    childXform->forceDirty();
+                    // TODO: Have some better means of identifying the right child. For now brute force it
+                    if (childObj) {
+                        auto childAnimator = childObj->getComponent<FrameAnimatorComponent>();
+
+                        if (childAnimator) {
+                            auto childSeq = childObj->getComponent<AnimationSequenceComponent>();
+                            animateSequenceByFrame(space, childSeq, childAnimator, keyframe->frame);
+
+
+                            // Update the bounds
+                            for (auto bi=0;i<childSeq->numBounds;bi++) {
+                                auto bounds = childSeq->bounds[bi];
+
+                                if (bounds.startFrame >= bi && bi < (bounds.startFrame + bounds.totalFrames)) {
+                                    auto bbox = childObj->getComponent<BoundingBoxComponent>();
+
+                                    if (!bbox) {
+                                        auto space = childObj->getSpace();
+
+                                        bbox = space->createComponent<BGE::BoundingBoxComponent>();
+
+                                        childObj->addComponent(bbox);
                                     }
+
+                                    bbox->x = bounds.bounds->x;
+                                    bbox->y = bounds.bounds->y;
+                                    bbox->width = bounds.bounds->w;
+                                    bbox->height = bounds.bounds->h;
+                                    break;
                                 }
-                                break;
                             }
+                            break;
                         }
                     }
                 }
@@ -306,14 +304,11 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
 }
 
 void BGE::AnimatorComponent::animateSequenceByFrame(Space *space, AnimationSequenceComponent *seq, FrameAnimatorComponent *animator, int32_t frame) {
-    // TODO: UPDATE THIS
-    if (true || frame != animator->currentFrame) {
-        animator->currentFrame = frame;
-        
-        for (auto const &childHandle : seq->channels) {
-            auto child = space->getGameObject(childHandle);
-            animateChannel(child, frame);
-        }
+    animator->currentFrame = frame;
+
+    for (auto const &childHandle : seq->channels) {
+        auto child = space->getGameObject(childHandle);
+        animateChannel(child, frame);
     }
 }
 
