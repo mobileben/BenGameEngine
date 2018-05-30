@@ -18,6 +18,8 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include <mutex>
+
 #include "Service.h"
 #include "Texture.h"
 #include "TextureAtlas.h"
@@ -43,9 +45,9 @@ namespace BGE {
         void update(double deltaTime) {}
         void garbageCollect() final;
         
-        uint32_t numTextures() const;   // Texture count includes subtextures
-        uint32_t numSubTextures() const;
-        uint32_t numTextureAtlases() const;
+        uint32_t numTextures();   // Texture count includes subtextures
+        uint32_t numSubTextures();
+        uint32_t numTextureAtlases();
         
         uint32_t numUsedTextureHandles() const;
         uint32_t maxTextureHandles() const;
@@ -61,29 +63,29 @@ namespace BGE {
         size_t unusedHandleMemory() const final;
         size_t totalHandleMemory() const final;
 
-        size_t totalTextureMemory() const;
+        size_t totalTextureMemory();
         
-        void outputMemoryBreakdown(uint32_t numTabs) const final;
+        void outputMemoryBreakdown(uint32_t numTabs);
         
-        TextureHandle getTextureHandle(ScenePackageHandle scenePackageHandle, std::string name) const;
-        TextureHandle getTextureHandle(SpaceHandle spaceHandle, std::string name) const;
-        TextureHandle getTextureHandle(TextureAtlasHandle atlasHandle, std::string name)const ;
+        TextureHandle getTextureHandle(ScenePackageHandle scenePackageHandle, std::string name);
+        TextureHandle getTextureHandle(SpaceHandle spaceHandle, std::string name);
+        TextureHandle getTextureHandle(TextureAtlasHandle atlasHandle, std::string name);
         
-        TextureAtlasHandle getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, std::string name) const;
-        TextureAtlasHandle getTextureAtlasHandle(SpaceHandle spaceHandle, std::string name) const;
-        TextureAtlasHandle getTextureAtlasHandle(FontHandle fontHandle, std::string name) const;
+        TextureAtlasHandle getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, std::string name);
+        TextureAtlasHandle getTextureAtlasHandle(SpaceHandle spaceHandle, std::string name);
+        TextureAtlasHandle getTextureAtlasHandle(FontHandle fontHandle, std::string name);
 
-        Texture *getTexture(ScenePackageHandle scenePackageHandle, std::string name) const;
-        Texture *getTexture(SpaceHandle spaceHandle, std::string name) const;
-        Texture *getTexture(TextureAtlasHandle atlasHandle, std::string name) const;
-        inline Texture *getTexture(TextureHandle handle) const {
+        Texture *getTexture(ScenePackageHandle scenePackageHandle, std::string name);
+        Texture *getTexture(SpaceHandle spaceHandle, std::string name);
+        Texture *getTexture(TextureAtlasHandle atlasHandle, std::string name);
+        inline Texture *getTexture(TextureHandle handle) {
             return textureHandleService_.dereference(handle);
         }
 
-        TextureAtlas *getTextureAtlas(ScenePackageHandle scenePackageHandle, std::string name) const;
-        TextureAtlas *getTextureAtlas(SpaceHandle spaceHandle, std::string name) const;
-        TextureAtlas *getTextureAtlas(FontHandle fontHandle, std::string name) const;
-        inline TextureAtlas *getTextureAtlas(TextureAtlasHandle handle) const {
+        TextureAtlas *getTextureAtlas(ScenePackageHandle scenePackageHandle, std::string name);
+        TextureAtlas *getTextureAtlas(SpaceHandle spaceHandle, std::string name);
+        TextureAtlas *getTextureAtlas(FontHandle fontHandle, std::string name);
+        inline TextureAtlas *getTextureAtlas(TextureAtlasHandle handle) {
             return textureAtlasHandleService_.dereference(handle);
         }
 
@@ -146,6 +148,14 @@ namespace BGE {
         std::unordered_map<ScenePackageHandle, std::unordered_map<std::string, TextureAtlasHandle>> packageTextureAtlases_;
         std::unordered_map<SpaceHandle, std::unordered_map<std::string, TextureAtlasHandle>> spaceTextureAtlases_;
         std::unordered_map<FontHandle, std::unordered_map<std::string, TextureAtlasHandle>> fontTextureAtlases_;
+
+        // Mutex for each map above
+        std::mutex  packageTexturesMutex_;
+        std::mutex  spaceTexturesMutex_;
+        std::mutex  atlasTexturesMutex_;
+        std::mutex  packageTextureAtlasesMutex_;
+        std::mutex  spaceTextureAtlasesMutex_;
+        std::mutex  fontTextureAtlasesMutex_;
 
         std::pair<Texture *, std::shared_ptr<Error>> createTextureFromFile(std::string name, std::string filename, TextureFormat format);
         std::pair<Texture *, std::shared_ptr<Error>> createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height);
