@@ -112,7 +112,7 @@ void BGE::MaterialService::removeMaterial(MaterialHandle handle) {
         if (it != materials_.end()) {
             material->destroy();
             handleService_.release(handle);
-            materials_.erase(material->getInstanceId());
+            materials_.erase(it);
         }
     }
 }
@@ -125,7 +125,7 @@ void BGE::MaterialService::removeMaterial(ObjectId matId) {
         
         material->destroy();
         handleService_.release(it->second);
-        materials_.erase(matId);
+        materials_.erase(it);
     }
 }
 
