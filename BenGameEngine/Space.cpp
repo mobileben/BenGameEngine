@@ -85,7 +85,6 @@ void BGE::Space::unlock() {
 void BGE::Space::reset(std::function<void()> callback) {
     lock();
     if (!resetting_) {
-        printf("GGGGGG Space %s resetting starting\n", getName().c_str());
         resetting_ = true;
         BGE::Game::getInstance()->getSpaceService()->queueReset(spaceHandle_);
     }
@@ -97,7 +96,6 @@ void BGE::Space::reset_() {
     auto startTime = profiling::EpochTime::timeInMicroSec();
 #endif /* SUPPORT_PROFILING */
     // Locking happens externally
-    printf("GGGG Space %s ACTUAL reset_ ocurring\n", getName().c_str());
     // Turn everything off just in case this object is still accessible
     visible_ = false;
     updatable_ = false;
@@ -152,8 +150,6 @@ void BGE::Space::reset_() {
 #ifdef SUPPORT_PROFILING
     resetTime_ = profiling::EpochTime::timeInMicroSec() - startTime;
 #endif /* SUPPORT_PROFILING */
-
-    printf("GGGGGG Space %s resetting done\n", getName().c_str());
 }
 
 uint32_t BGE::Space::handlerBitmaskForSceneObjectCreatedDelegate(SceneObjectCreatedDelegate *delegate) {
