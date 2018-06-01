@@ -151,8 +151,9 @@ namespace BGE {
         GameObject *createSprite(std::string instanceName, TextureHandle texHandle);
         GameObject *createSprite(std::string instanceName, Texture *texture);
         
-        void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback);
-        void createAutoDisplayObjectsSynchronous(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback);
+        void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, std::function<void()> callback);
+        void createAutoDisplayObjectsSynchronous(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate);
+        void createAutoDisplayObjectsSynchronous(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, std::vector<GameObjectHandle>& topLevelObjects);
 
 
         // Font management
@@ -253,6 +254,9 @@ namespace BGE {
         
         void setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, AnimationSequenceReference *animSeqRef);
         void setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, const AnimationSequenceReference& animSeqRef);
+
+        void createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, std::function<void()> callback);
+        void createAutoDisplayObjectsSynchronous_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, CreatedGameObjectVector& createdObjects, std::vector<GameObjectHandle>& topLevelObjects);
 
         void dispatchCreatedHandlers(CreatedGameObjectVector *objects, SceneObjectCreatedDelegate *delegate);
     };

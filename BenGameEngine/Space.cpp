@@ -911,123 +911,142 @@ BGE::GameObject *BGE::Space::createSprite(std::string instanceName, Texture *tex
     return obj;
 }
 
-void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
-    auto f = std::async(std::launch::async, static_cast<void(Space::*)(GameObjectHandle, ScenePackageHandle, SceneObjectCreatedDelegate *, std::function<void()>)>(&Space::createAutoDisplayObjectsSynchronous), this, rootHandle, packageHandle, delegate, callback);
+void BGE::Space::createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
+    auto f = std::async(std::launch::async, static_cast<void(Space::*)(GameObjectHandle, ScenePackageHandle, bool, SceneObjectCreatedDelegate *, std::function<void()>)>(&Space::createAutoDisplayObjects_), this, rootHandle, packageHandle, initiallyActive, delegate, callback);
 }
 
-void BGE::Space::createAutoDisplayObjectsSynchronous(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
+void BGE::Space::createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, std::function<void()> callback) {
+    createAutoDisplayObjectsSynchronous(rootHandle, packageHandle, initiallyActive, delegate);
+    if (callback) {
+        callback();
+    }
+}
+
+void BGE::Space::createAutoDisplayObjectsSynchronous(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate) {
+    std::vector<GameObjectHandle> rootObjHandles;
+    createAutoDisplayObjectsSynchronous(rootHandle, packageHandle, initiallyActive, delegate, rootObjHandles);
+}
+
+void BGE::Space::createAutoDisplayObjectsSynchronous(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, std::vector<GameObjectHandle>& topLevelObjects) {
+    CreatedGameObjectVector createdObjects;
+    auto animationService = Game::getInstance()->getAnimationService();
+
+    animationService->lock();
+    lock();
+
+    createAutoDisplayObjectsSynchronous_(rootHandle, packageHandle, initiallyActive, delegate, createdObjects, topLevelObjects);
+
+    // Now notifiy all create handlers
+    dispatchCreatedHandlers(&createdObjects, delegate);
+    unlock();
+    animationService->unlock();
+}
+
+void BGE::Space::createAutoDisplayObjectsSynchronous_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, CreatedGameObjectVector& createdObjects, std::vector<GameObjectHandle>& topLevelObjects) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(packageHandle);
     auto bitmask = Space::handlerBitmaskForSceneObjectCreatedDelegate(delegate);
     auto animationService = Game::getInstance()->getAnimationService();
-    
+
     if (package) {
         animationService->lock();
         lock();
-        
+
         auto autoDisplayList = package->getAutoDisplayList();
         auto num = package->getAutoDisplayListSize();
-        CreatedGameObjectVector createdObjects;
-        std::vector<GameObjectHandle> rootObjHandles;
-        
+
         for (auto i=0;i<num;i++) {
             auto elem = &autoDisplayList[i];
             GameObject *obj;
-            
+
             switch (elem->referenceType) {
                 case GfxReferenceTypeAnimationSequence:
                     obj = createAnimSequence(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
-                    
+
                 case GfxReferenceTypeButton:
                     obj = createButton(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
-                
+
                 case GfxReferenceTypeExternalReference:
                     obj = createExternalReference(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
-                    
+
                 case GfxReferenceTypeMask:
                     obj = createMask(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
-                    
+
                 case GfxReferenceTypePlacement:
                     obj = createPlacement(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
-                    
+
                 case GfxReferenceTypeSprite:
                     obj = createSprite(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
-                    
+
                 case GfxReferenceTypeText:
                     obj = createText(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
-                    
+
                 case GfxReferenceTypeTextureMask:
                     obj = createTextureMask(elem->reference, elem->name, packageHandle, bitmask, &createdObjects);
                     break;
-                    
+
                 default:
                     assert(false);
                     break;
             }
-            
+
             if (obj) {
                 auto xform = obj->getComponent<TransformComponent>();
-                
+
                 if (elem->position) {
                     xform->setPosition(*elem->position);
                 }
-                
+
                 if (elem->scale) {
                     xform->setScale(*elem->scale);
                 }
-                
+
                 xform->setRotationInDegrees(elem->rotation);
-                
+
                 if (elem->colorMatrix) {
-                    
+
                 }
-                
+
                 if (elem->colorTransform) {
-                    
+
                 }
-                
+
                 if (elem->hidden) {
                     xform->setVisibility(false);
                 }
-                
-                rootObjHandles.push_back(obj->getHandle());
+
+                topLevelObjects.push_back(obj->getHandle());
             }
         }
-        
+
         TransformComponent *rootXform = nullptr;
-        
+
         // Update root in case allocations moved handles
         auto root = getGameObject(rootHandle);
-        
+
         if (root) {
             rootXform = root->getComponent<TransformComponent>();
         }
-        
-        for (auto const &objHandle : rootObjHandles) {
+
+        for (auto const &objHandle : topLevelObjects) {
             auto obj = getGameObject(objHandle);
-            
+
             if (rootXform) {
                 auto xform = obj->getComponent<TransformComponent>();
                 rootXform->addChild(xform);
             }
-            
-            obj->setActive(true);
+
+            obj->setActive(initiallyActive);
         }
 
-        // Now notifiy all create handlers
-        dispatchCreatedHandlers(&createdObjects, delegate);
         unlock();
         animationService->unlock();
-    }
-    
-    if (callback) {
-        callback();
     }
 }
 
