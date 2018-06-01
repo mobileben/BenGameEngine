@@ -19,15 +19,28 @@
 #include "PlacementComponent.h"
 #include "FlatRectRenderComponent.h"
 
+#ifdef SUPPORT_PROFILING
+#include "Profiling.h"
+#endif /* SUPPORT_PROFILING */
+
 #include <future>
 
 BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true), resetting_(false) {
+#ifdef SUPPORT_PROFILING
+    resetTime_ = 0;
+#endif /* SUPPORT_PROFILING */
 }
 
 BGE::Space::Space(ObjectId spaceId) : NamedObject(spaceId), visible_(false), order_(0), updatable_(true), resetting_(false) {
+#ifdef SUPPORT_PROFILING
+    resetTime_ = 0;
+#endif /* SUPPORT_PROFILING */
 }
 
 BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true), resetting_(false) {
+#ifdef SUPPORT_PROFILING
+    resetTime_ = 0;
+#endif /* SUPPORT_PROFILING */
 }
 
 void BGE::Space::initialize(SpaceHandle handle, std::string name, std::shared_ptr<SpaceService> service) {
@@ -42,6 +55,10 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name, std::shared_pt
     resetting_ = false;
 
     order_ = 0;
+
+#ifdef SUPPORT_PROFILING
+    resetTime_ = 0;
+#endif /* SUPPORT_PROFILING */
 
     gameObjectService_ = std::make_shared<GameObjectService>();
     gameObjectService_->setSpaceHandle(spaceHandle_);
@@ -76,6 +93,9 @@ void BGE::Space::reset(std::function<void()> callback) {
 }
 
 void BGE::Space::reset_() {
+#ifdef SUPPORT_PROFILING
+    auto startTime = profiling::EpochTime::timeInMicroSec();
+#endif /* SUPPORT_PROFILING */
     // Locking happens externally
     printf("GGGG Space %s ACTUAL reset_ ocurring\n", getName().c_str());
     // Turn everything off just in case this object is still accessible
@@ -129,6 +149,10 @@ void BGE::Space::reset_() {
     
     textures_.clear();
     resetting_ = false;
+#ifdef SUPPORT_PROFILING
+    resetTime_ = profiling::EpochTime::timeInMicroSec() - startTime;
+#endif /* SUPPORT_PROFILING */
+
     printf("GGGGGG Space %s resetting done\n", getName().c_str());
 }
 

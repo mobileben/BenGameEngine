@@ -132,7 +132,11 @@ namespace BGE {
 
         void loadAllTextures(std::function<void()> callback);
         void linkAll();
-        
+
+#ifdef SUPPORT_PROFILING
+        int64_t timeForLastReset() const { return resetTime_; }
+#endif /* SUPPORT_PROFILING */
+
         // Component management
         GameObject *createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
         GameObject *createButton(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
@@ -212,6 +216,10 @@ namespace BGE {
         bool        resetting_;
 
         uint32_t    order_;
+
+#ifdef SUPPORT_PROFILING
+        int64_t     resetTime_;
+#endif /* SUPPORT_PROFILING */
 
         void lock();
         void unlock();
