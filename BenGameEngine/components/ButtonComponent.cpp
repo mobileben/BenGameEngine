@@ -395,8 +395,6 @@ void BGE::ButtonComponent::setToggleOn(bool on) {
     toggleOn = on;
     
     if (toggleable) {
-        auto gameObj = getGameObject();
-        
         if (toggleOn) {
             useHighlightedButton();
         } else {

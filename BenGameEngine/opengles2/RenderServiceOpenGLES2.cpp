@@ -262,10 +262,6 @@ std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgr
         std::shared_ptr<ShaderProgramOpenGLES2> glProgram = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(shaderProgramStack_.back());
         
         glUseProgram(glProgram->getProgram());
-        
-        for (auto const &kv: glProgram->getAttributes()) {
-            
-        }
     }
     
     return shaderProgramStack_.back();

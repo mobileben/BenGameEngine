@@ -326,8 +326,6 @@ void BGE::Game::servicesSpaceReset(Space *space) {
 }
 
 void BGE::Game::update(double deltaTime) {
-//    BGE::Game::getInstance()->getRenderService()->lock();
-
     // Input
     inputService_->update(deltaTime);
 
@@ -342,8 +340,6 @@ void BGE::Game::update(double deltaTime) {
 
     // Garbage collect
     garbageCollect();
-
-//    BGE::Game::getInstance()->getRenderService()->unlock();
 }
 
 void BGE::Game::updateTransforms() {
