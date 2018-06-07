@@ -127,6 +127,10 @@ void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, Scen
             }
             
             if (!found) {
+                auto space = Game::getInstance()->getSpaceService()->getSpace(loadable.spaceHandle);
+                if (space) {
+                    space->scenePackageAdded(packageRef.handle);
+                }
                 packageRef.references.push_back(loadable.spaceHandle);
             }
             
@@ -376,7 +380,7 @@ void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, ScenePacka
         if (it->handle == handle) {
             auto package = getScenePackage(handle);
             auto &refs = it->references;
-            
+
             for (auto hIt=refs.begin(); hIt!=refs.end();++hIt) {
                 if (*hIt == spaceHandle) {
                     auto space = Game::getInstance()->getSpaceService()->getSpace(spaceHandle);
@@ -384,7 +388,6 @@ void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, ScenePacka
                     if (space) {
                         space->scenePackageRemoved(package->getHandle());
                     }
-                    
                     refs.erase(hIt);
                     break;
                 }
@@ -411,7 +414,6 @@ void BGE::ScenePackageService::resetPackage(ScenePackageHandle handle) {
 void BGE::ScenePackageService::releasePackage(ScenePackage *package) {
     if (package) {
         auto handle = package->getHandle();
-        
         package->destroy();
         handleService_.release(handle);
     }
