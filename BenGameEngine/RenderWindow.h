@@ -9,12 +9,20 @@
 #ifndef BGERenderWindow_h
 #define BGERenderWindow_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
 #include <stdio.h>
 #include <memory>
 #include <map>
 #include <string>
 #include "RenderContext.h"
+
+#if TARGET_OS_IPHONE
 #include "BGEView.h"
+#endif /* TARGET_OS_IPHONE */
 
 namespace BGE {
     class RenderView;
@@ -26,9 +34,10 @@ namespace BGE {
         
         RenderWindow() : x_(0), y_(0), width_(0), height_(0), contentScaleFactor_(1) {}
         ~RenderWindow() {}
-        
+
+#if TARGET_OS_IPHONE
         BGEView *getView() { return view_; }
-        void setView(BGEView *view);
+#endif /* TARGET_OS_IPHONE */
         
         std::shared_ptr<RenderContext> getRenderContext() { return renderContext_; }
         void setRenderContext(std::shared_ptr<RenderContext> renderContext);
@@ -53,7 +62,9 @@ namespace BGE {
         float contentScaleFactor_;
         
     private:
+#if TARGET_OS_IPHONE
         BGEView *view_;
+#endif /* TARGET_OS_IPHONE */
         std::shared_ptr<RenderContext> renderContext_;
         std::map<std::string, std::shared_ptr<RenderView>> renderViews_;
     };

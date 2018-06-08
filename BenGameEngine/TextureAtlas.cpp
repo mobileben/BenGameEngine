@@ -11,13 +11,25 @@
 
 const std::string BGE::TextureAtlas::ErrorDomain = "TextureAtlas";
 
-BGE::TextureAtlas::TextureAtlas() : NamedObject(), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0), hwId_(0), target_(GL_TEXTURE_2D) {
+BGE::TextureAtlas::TextureAtlas() : NamedObject(), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0) {
+#ifdef SUPPORT_OPENGL
+    hwId_ = 0;
+    target_= GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
 }
 
-BGE::TextureAtlas::TextureAtlas(ObjectId texId) : NamedObject(texId), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0), hwId_(0), target_(GL_TEXTURE_2D) {
+BGE::TextureAtlas::TextureAtlas(ObjectId texId) : NamedObject(texId), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0) {
+#ifdef SUPPORT_OPENGL
+    hwId_ = 0;
+    target_= GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
 }
 
-BGE::TextureAtlas::TextureAtlas(ObjectId texId, std::string name) : NamedObject(texId, name), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0), hwId_(0), target_(GL_TEXTURE_2D) {
+BGE::TextureAtlas::TextureAtlas(ObjectId texId, std::string name) : NamedObject(texId, name), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0) {
+#ifdef SUPPORT_OPENGL
+    hwId_ = 0;
+    target_= GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
 }
 
 void BGE::TextureAtlas::reset() {
@@ -29,8 +41,10 @@ void BGE::TextureAtlas::reset() {
     alphaState_ = TextureAlphaState::None;
     width_ = 0;
     height_ = 0;
+#ifdef SUPPORT_OPENGL
     hwId_ = 0;
     target_ = GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
     
     subTextures_.clear();
 }
@@ -106,8 +120,10 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
             this->alphaState_ = texture->getAlphaState();
             this->width_ = texture->getWidth();
             this->height_ = texture->getHeight();
+#ifdef SUPPORT_OPENGL
             this->hwId_ = texture->getHWTextureId();
             this->target_ = texture->getTarget();
+#endif /* SUPPORT_OPENGL */
 
             if (subTextures.size() > 0) {
                 for (auto const &st : subTextures) {
@@ -124,8 +140,10 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
                 alphaState_ = TextureAlphaState::None;
                 width_ = 0;
                 height_ = 0;
+#ifdef SUPPORT_OPENGL
                 hwId_ = 0;
                 target_ = GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
 
                 atlas = nullptr;
                 error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorInvalidSubTexture);
@@ -155,8 +173,10 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
             this->alphaState_ = texture->getAlphaState();
             this->width_ = texture->getWidth();
             this->height_ = texture->getHeight();
+#ifdef SUPPORT_OPENGL
             this->hwId_ = texture->getHWTextureId();
             this->target_ = texture->getTarget();
+#endif /* SUPPORT_OPENGL */
 
             if (subTextures.size() > 0) {
                 for (auto const &st : subTextures) {
@@ -173,8 +193,10 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
                 alphaState_ = TextureAlphaState::None;
                 width_ = 0;
                 height_ = 0;
+#ifdef SUPPORT_OPENGL
                 hwId_ = 0;
                 target_ = GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
 
                 atlas = nullptr;
                 error = std::make_shared<Error>(TextureAtlas::ErrorDomain, TextureErrorInvalidSubTexture);

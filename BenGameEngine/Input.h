@@ -9,8 +9,15 @@
 #ifndef Input_h
 #define Input_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
+#if TARGET_OS_IPHONE
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#endif /* TARGET_OS_IPHONE */
 #include <stdio.h>
 #include "Object.h"
 #include "Handle.h"
@@ -33,10 +40,13 @@ namespace BGE {
     class Input : public Object {
     public:
         TouchType       type;
+
+        double          timestamp;
         
-        NSTimeInterval  timestamp;
-        
+#if TARGET_OS_IPHONE
         UITouch         *touch;
+#endif /* TARGET_OS_IPHONE */
+        
         float           x;
         float           y;
         uint32_t        tapCount;

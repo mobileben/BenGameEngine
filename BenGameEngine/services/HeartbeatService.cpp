@@ -19,8 +19,10 @@
 #endif /* SUPPORT_PROFILING */
 
 BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0) {
+#if TARGET_OS_IPHONE
     iosHeartbeat_ = [[BGEHeartbeatIOS alloc] init];
-    
+#endif /* TARGET_OS_IPHONE */
+
     timebaseInfo_.numer = 0; timebaseInfo_.denom = 0;
     mach_timebase_info(&timebaseInfo_);
     
@@ -31,22 +33,28 @@ BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCou
 
     thread_ = std::thread(&HeartbeatService::threadFunction, this);
 
+#if TARGET_OS_IPHONE
     // Attach
     iosHeartbeat_.tickHandler = std::bind(&HeartbeatService::queueTickHandler, this);
+#endif /* TARGET_OS_IPHONE */
 }
 
 void BGE::HeartbeatService::initialize() {}
 void BGE::HeartbeatService::reset() {}
 void BGE::HeartbeatService::platformSuspending() {
     Service::platformSuspending();
-    
+
+#if TARGET_OS_IPHONE
     [iosHeartbeat_ platformSuspending];
+#endif /* TARGET_OS_IPHONE */
 }
 
 void BGE::HeartbeatService::platformResuming() {
     Service::platformResuming();
-    
+
+#if TARGET_OS_IPHONE
     [iosHeartbeat_ platformResuming];
+#endif /* TARGET_OS_IPHONE */
     
     // Get our lastCounter to a good time so we don't get a huge jump in time
     lastCounter_ = mach_absolute_time();

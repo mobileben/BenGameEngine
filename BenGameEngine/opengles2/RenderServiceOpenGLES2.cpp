@@ -6,6 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
+#ifdef SUPPORT_OPENGLES2
+
 #include "RenderServiceOpenGLES2.h"
 #include "RenderView.h"
 #include "ShaderServiceOpenGLES2.h"
@@ -95,10 +97,11 @@ void BGE::RenderServiceOpenGLES2::resume() {
 void BGE::RenderServiceOpenGLES2::destroy() {}
 
 size_t BGE::RenderServiceOpenGLES2::totalMemory() const {
-    auto view = this->getRenderWindow()->getView();
     size_t memory = 0;
+
+#if TARGET_OS_IPHONE
+    auto view = this->getRenderWindow()->getView();
     auto area = view.drawableWidth * view.drawableHeight;
-    
     switch (view.drawableColorFormat) {
         case GLKViewDrawableColorFormatRGBA8888:
         case GLKViewDrawableColorFormatSRGBA8888:
@@ -134,7 +137,9 @@ size_t BGE::RenderServiceOpenGLES2::totalMemory() const {
         default:
             break;
     }
-    
+#else
+    // For now assume 32-bit color buffer only
+#endif /* TARGET_OS_IPHONE */
     return memory;
     
 }
@@ -163,6 +168,7 @@ void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(Render2DCoordinateSystem
 
 void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)
 {
+#if TARGET_OS_IPHONE
     auto glContext = std::dynamic_pointer_cast<RenderContextOpenGLES2>(context);
 
     [EAGLContext setCurrentContext:glContext->getContext()];
@@ -181,6 +187,7 @@ void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<RenderContext
 //    Matrix4Scale(projectionMatrix_, 1, -1, 1);
 //    CAEAGLLayer *eaglLayer = (CAEAGLLayer *)window->getView().layer;
 //    eaglLayer.contentsScale = window->getView().contentScaleFactor;
+#endif /* TARGET_OS_IPHONE */
 
 #if 1
     setCoordinateSystem2D(Render2DCoordinateSystem::OpenGLCentered);
@@ -1605,4 +1612,6 @@ void BGE::RenderServiceOpenGLES2::resetProfilingStats() {
 }
 
 #endif /* SUPPORT_PROFILING */
+
+#endif /* SUPPORT_OPENGLES2 */
 

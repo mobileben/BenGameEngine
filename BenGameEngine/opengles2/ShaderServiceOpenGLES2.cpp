@@ -6,6 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
+#ifdef SUPPORT_OPENGLES2
+
 #include "ShaderServiceOpenGLES2.h"
 
 NSBundle *BGE::ShaderServiceOpenGLES2::shaderBundle_ = nil;
@@ -66,3 +68,6 @@ std::shared_ptr<BGE::ShaderProgram> BGE::ShaderServiceOpenGLES2::createShaderPro
     
     return program;
 }
+
+#endif /* SUPPORT_OPENGLES2 */
+

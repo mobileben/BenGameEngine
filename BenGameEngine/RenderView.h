@@ -17,8 +17,8 @@ namespace BGE {
     class RenderView
     {
     public:
-        RenderView(std::shared_ptr<RenderWindow> window, float x, float y, float width, float height);
-        ~RenderView() {}
+        RenderView(float x, float y, float width, float height);
+        virtual ~RenderView() {}
         
         float getX();
         float getY();
@@ -28,6 +28,8 @@ namespace BGE {
         std::weak_ptr<RenderWindow> getWindow();
         
     private:
+        friend class RenderWindow;
+        
         float x_;
         float y_;
         float width_;

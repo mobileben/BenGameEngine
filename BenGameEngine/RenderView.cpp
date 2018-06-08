@@ -8,9 +8,8 @@
 
 #include "RenderView.h"
 
-BGE::RenderView::RenderView(std::shared_ptr<RenderWindow> window, float x, float y, float width, float height) : window_(window), x_(x), y_(y), width_(width), height_(height)
+BGE::RenderView::RenderView(float x, float y, float width, float height) : x_(x), y_(y), width_(width), height_(height)
 {
-    
 }
 
 float BGE::RenderView::getX()

@@ -109,14 +109,20 @@ void BGE::RenderService::queueSetIsReady() {
     renderQueue_.push(command);
 }
 
-void BGE::RenderService::queueCreateTexture(TextureHandle texHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
-    auto data = std::make_shared<RenderTextureCommandData>(texHandle, format, buffer, width, height, glFormat);
+void BGE::RenderService::queueCreateTexture(const RenderTextureCommandData& texData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto data = std::make_shared<RenderTextureCommandData>(texData.textureHandle, texData.textureFormat, texData.textureBuffer, texData.textureWidth, texData.textureHeight);
+#ifdef SUPPORT_OPENGL
+    data->glFormat = texData.glFormat;
+#endif /* SUPPORT_OPENGL */
     auto command = RenderCommandItem(RenderCommand::TextureCreate, data, callback);
     renderQueue_.push(command);
 }
 
-void BGE::RenderService::queueDestroyTexture(TextureHandle texHandle, GLuint hwId, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
-    auto data = std::make_shared<RenderTextureCommandData>(texHandle, hwId);
+void BGE::RenderService::queueDestroyTexture(const RenderTextureCommandData& texData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto data = std::make_shared<RenderTextureCommandData>(texData.textureHandle);
+#ifdef SUPPORT_OPENGL
+    data->glHwId = texData.glHwId;
+#endif /* SUPPORT_OPENGL */
     auto command = RenderCommandItem(RenderCommand::TextureDestroy, data, callback);
     renderQueue_.push(command);
 }

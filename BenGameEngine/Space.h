@@ -9,6 +9,11 @@
 #ifndef BGESpace_h
 #define BGESpace_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
 #endif /* TARGET_OS_IPHONE */

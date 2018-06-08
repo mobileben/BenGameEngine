@@ -9,6 +9,11 @@
 #ifndef BGETextureService_h
 #define BGETextureService_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
 #endif /* TARGET_OS_IPHONE */
@@ -26,13 +31,19 @@
 #include "Error.h"
 #include "Handle.h"
 #include "HandleService.h"
+#if TARGET_OS_IPHONE
 #include <GLKit/GLKit.h>
+#endif /* TARGET_OS_IPHONE */
 
 namespace BGE {
     class TextureService : public Service
     {
     public:
+#if TARGET_OS_IPHONE
         TextureService(EAGLContext *context);
+#else
+        TextureService();
+#endif /* TARGET_OS_IPHONE */
         ~TextureService() {}
         
         void initialize() final {}

@@ -22,7 +22,11 @@ uint32_t BGE::ButtonComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent);
 
-BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), touchable_(true), enabled(true), showHighlighted_(true), toggleable(false), toggleOn(false), touch(nil) {
+BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), touchable_(true), enabled(true), showHighlighted_(true), toggleable(false), toggleOn(false)
+#if TARGET_OS_IPHONE
+, touch(nil)
+#endif /* TARGET_OS_IPHONE */
+{
 }
 
 void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
@@ -37,7 +41,9 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
     toggleable = false;
     toggleOn = false;
     
+#if TARGET_OS_IPHONE
     touch = nil;
+#endif /* TARGET_OS_IPHONE */
     
     disabledButtonHandle = GameObjectHandle();
     disabledAnimButtonHandle = GameObjectHandle();
@@ -54,8 +60,10 @@ void BGE::ButtonComponent::destroy() {
     touchable_ = false;
     enabled = false;
 
+#if TARGET_OS_IPHONE
     // Release reference
     touch = nil;
+#endif /* TARGET_OS_IPHONE */
     
     auto space = getSpace();
     
@@ -77,8 +85,10 @@ void BGE::ButtonComponent::destroyFast() {
     touchable_ = false;
     enabled = false;
 
+#if TARGET_OS_IPHONE
     // Release reference
     touch = nil;
+#endif /* TARGET_OS_IPHONE */
 
     // Component::destroyFast last
     Component::destroyFast();
@@ -615,24 +625,30 @@ BGE:: Event BGE::ButtonComponent::shouldHandleInput(Input *input, bool inBounds)
             event = shouldHandleTouchDownEvent(inBounds);
             
             if (event == Event::TouchDownInside) {
+#if TARGET_OS_IPHONE
                 touch = input->touch;
+#endif /* TARGET_OS_IPHONE */
             }
             break;
             
         case TouchType::Up:
             // Thouch up always handled as something that needs to be done
+#if TARGET_OS_IPHONE
             if (touch == input->touch) {
                 event = shouldHandleTouchUpEvent(inBounds);
                 touch = nil;
             }
+#endif /* TARGET_OS_IPHONE */
             break;
             
         case TouchType::Cancel:
+#if TARGET_OS_IPHONE
             // Cancel always treated as somethingthat needs to be done
             if (touch == input->touch) {
                 event = shouldHandleTouchCancelEvent();
                 touch = nil;
             }
+#endif /* TARGET_OS_IPHONE */
             break;
             
         default:

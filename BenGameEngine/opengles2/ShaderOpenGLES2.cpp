@@ -6,6 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
+#ifdef SUPPORT_OPENGLES2
+
 #include <Foundation/Foundation.h>
 #include "ShaderOpenGLES2.h"
 #include "ShaderServiceOpenGLES2.h"
@@ -66,3 +68,5 @@ BGE::ShaderOpenGLES2::ShaderOpenGLES2(ShaderType shaderType, std::string name) :
         state_ = ShaderState::FileError;
     }
 }
+
+#endif /* SUPPORT_OPENGLES2 */

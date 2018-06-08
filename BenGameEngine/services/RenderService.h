@@ -87,14 +87,41 @@ namespace BGE {
         uint8_t                     *textureBuffer;
         uint32_t                    textureWidth;
         uint32_t                    textureHeight;
+#ifdef SUPPORT_OPENGL
         GLint                       glFormat;
         GLuint                      glHwId;
+#endif /* SUPPORT_OPENGL */
 
-        RenderTextureCommandData() : textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0), glFormat(0), glHwId(0) {}
-        RenderTextureCommandData(TextureHandle textureHandle) : textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0), glFormat(0), glHwId(0) {}
-        RenderTextureCommandData(TextureHandle textureHandle, GLuint hwId) : textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0), glFormat(0), glHwId(hwId) {}
-        RenderTextureCommandData(TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height) : textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height), glFormat(0), glHwId(0) {}
-        RenderTextureCommandData(TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat) : textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height), glFormat(glFormat), glHwId(0) {}
+        RenderTextureCommandData() : textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0) {
+#ifdef SUPPORT_OPENGL
+            glFormat = 0;
+            glHwId = 0;
+#endif /* SUPPORT_OPENGL */
+        }
+        RenderTextureCommandData(TextureHandle textureHandle) : textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0) {
+#ifdef SUPPORT_OPENGL
+            glFormat = 0;
+            glHwId = 0;
+#endif /* SUPPORT_OPENGL */
+        }
+#ifdef SUPPORT_OPENGL
+        RenderTextureCommandData(TextureHandle textureHandle, GLuint hwId) : textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0) {
+            glFormat = 0;
+            glHwId = hwId;
+        }
+#endif /* SUPPORT_OPENGL */
+        RenderTextureCommandData(TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height) : textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height) {
+#ifdef SUPPORT_OPENGL
+            glFormat = 0;
+            glHwId = 0;
+#endif /* SUPPORT_OPENGL */
+        }
+#ifdef SUPPORT_OPENGL
+        RenderTextureCommandData(TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat) : textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height) {
+            glFormat = glFormat;
+            glHwId = 0;
+        }
+#endif /* SUPPORT_OPENGL */
     };
 
     struct RenderCommandItem {
@@ -181,8 +208,8 @@ namespace BGE {
         void queueBindRenderWindow(const std::shared_ptr<RenderContext>& context, const std::shared_ptr<RenderWindow>& window);
         void queueCreateBuiltinShaders();
         void queueSetIsReady();
-        void queueCreateTexture(TextureHandle texHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
-        void queueDestroyTexture(TextureHandle texHandle, GLuint hwId, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueCreateTexture(const RenderTextureCommandData& texData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueDestroyTexture(const RenderTextureCommandData& texData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
         void queueRender();
 
     protected:

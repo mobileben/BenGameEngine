@@ -37,6 +37,8 @@ BGE::Input *BGE::InputService::createInput() {
     return input;
 }
 
+#if TARGET_OS_IPHONE
+
 void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view) {
     lock();
     
@@ -102,6 +104,9 @@ void BGE::InputService::touchEventMove(NSSet* touches, UIView* view) {
 void BGE::InputService::touchEventCancel(NSSet* touches, UIView* view) {
     touchEvent(TouchType::Cancel, touches, view);
 }
+
+#endif /* TARGET_OS_IPHONE */
+
 
 BGE::EventHandlerHandle BGE::InputService::registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function) {
     lock();
@@ -250,11 +255,14 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                                 eventItem.inBounds = true;
 
                                 queue.push_back(eventItem);
+#if TARGET_OS_IPHONE
                                 inputTouch->touch = input->touch;
+#endif /* TARGET_OS_IPHONE */
                             }
                         }
                     }
-                    
+
+#if TARGET_OS_IPHONE
                     if (inputTouch->touch == input->touch) {
                         if (input->type == TouchType::Up && inputTouch->touch == input->touch) {
                             auto event = Event::TouchUpOutside;
@@ -280,6 +288,7 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                             inputTouch->touch = nil;
                         }
                     }
+#endif /* TARGET_OS_IPHONE */
                 }
             }
         }
@@ -351,16 +360,20 @@ void BGE::InputService::update(double deltaTime) {
                     auto button = space->getComponent(item.buttonComponentHandle);
                     
                     if (button) {
+#if TARGET_OS_IPHONE
                         if (button->getTouch() == input->touch) {
                             button->setTouch(nil);
                         }
+#endif /* TARGET_OS_IPHONE */
                     } else {
                         auto inputTouch = space->getComponent(item.inputTouchComponentHandle);
                         
                         if (inputTouch) {
+#if TARGET_OS_IPHONE
                             if (inputTouch->touch == input->touch) {
                                 inputTouch->touch = nil;
                             }
+#endif /* TARGET_OS_IPHONE */
                         }
                     }
                 }

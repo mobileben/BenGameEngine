@@ -42,7 +42,8 @@ namespace BGE {
 
         inline TextureAtlasHandle getHandle() const { return handle_; }
         inline TextureHandle getTextureHandle() const { return textureHandle_; };
-        
+
+#ifdef SUPPORT_OPENGL
         inline uint32_t getHWTextureId() const {
             return hwId_;
         }
@@ -50,7 +51,7 @@ namespace BGE {
         inline GLenum getTarget() const {
             return target_;
         }
-        
+#endif /* SUPPORT_OPENGL */
         inline TextureAlphaState getAlphaState() const { return alphaState_; }
         inline TextureFormat getFormat() const { return format_; }
 
@@ -80,10 +81,11 @@ namespace BGE {
         
         uint32_t                width_;
         uint32_t                height_;
-        
+
+#ifdef SUPPORT_OPENGL
         GLuint                  hwId_;
         GLenum                  target_;
-        
+#endif /* SUPPORT_OPENGL */
         TextureFormat           format_;
         TextureAlphaState       alphaState_;
         

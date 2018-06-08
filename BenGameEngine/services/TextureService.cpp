@@ -10,12 +10,21 @@
 #include "Game.h"
 #include "RawTexture.h"
 
+#if TARGET_OS_IPHONE
 BGE::TextureService::TextureService(EAGLContext *context) : Service(), textureHandleService_(InitialTextureReserve, HandleServiceNoMaxLimit), textureAtlasHandleService_(InitialTextureAtlasReserve, HandleServiceNoMaxLimit) {
 #ifdef SUPPORT_GLKTEXTURELOADER
 #error NEED TO QUEUE THIS ON THE RENDER THREAD
     textureLoader_ = [[GLKTextureLoader alloc] initWithSharegroup:context.sharegroup];
 #endif
 }
+#else
+BGE::TextureService::TextureService() : Service(), textureHandleService_(InitialTextureReserve, HandleServiceNoMaxLimit), textureAtlasHandleService_(InitialTextureAtlasReserve, HandleServiceNoMaxLimit) {
+#ifdef SUPPORT_GLKTEXTURELOADER
+#error NEED TO QUEUE THIS ON THE RENDER THREAD
+    textureLoader_ = [[GLKTextureLoader alloc] initWithSharegroup:context.sharegroup];
+#endif
+}
+#endif /* TARGET_OS_IPHONE */
 
 void BGE::TextureService::garbageCollect() {
     textureHandleService_.garbageCollect();

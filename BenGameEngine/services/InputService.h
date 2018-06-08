@@ -9,6 +9,11 @@
 #ifndef InputService_h
 #define InputService_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
 #include <stdio.h>
 #include <functional>
 #include "Service.h"
@@ -72,11 +77,13 @@ namespace BGE {
         void destroy() final {}
         void update(double deltaTime) final;
         void garbageCollect() final;
-        
+
+#if TARGET_OS_IPHONE
         void touchEventDown(NSSet* touches, UIView* view);
         void touchEventUp(NSSet* touches, UIView* view);
         void touchEventMove(NSSet* touches, UIView* view);
         void touchEventCancel(NSSet* touches, UIView* view);
+#endif /* TARGET_OS_IPHONE */
         
         EventHandlerHandle registerEventHandler(GameObject *gameObj, Event event, EventHandlerFunction function);
         void unregisterEventHandler(EventHandlerHandle handle);
@@ -137,7 +144,9 @@ namespace BGE {
 #endif /* SUPPORT_PROFILING  */
         
         Input *createInput();
+#if TARGET_OS_IPHONE
         void touchEvent(TouchType type, NSSet* touches, UIView* view);
+#endif /* TARGET_OS_IPHONE */
         void checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue);
         void getInputPoints(GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints);
     };

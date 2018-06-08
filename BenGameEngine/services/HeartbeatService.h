@@ -9,14 +9,21 @@
 #ifndef HeartbeatService_h
 #define HeartbeatService_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
 #include <stdio.h>
 #include <string>
 #include <map>
 #include <functional>
 #include <utility>
 #include <vector>
+#if TARGET_OS_IPHONE
 #include <QuartzCore/QuartzCore.h>
 #include "BGEHeartbeatIOS.h"
+#endif /* TARGET_OS_IPHONE */
 #include "Queue.h"
 #include <mach/mach.h>
 #include <mach/mach_time.h>
@@ -54,8 +61,10 @@ namespace BGE {
     protected:
         std::map<std::string, std::pair<std::function<void(double dt)>, uint32_t>> listeners_;
         std::vector<std::pair<std::function<void(double dt)>, uint32_t>> orderedListeners_;
-        
+
+#if TARGET_OS_IPHONE
         BGEHeartbeatIOS *iosHeartbeat_;
+#endif /* TARGET_OS_IPHONE */
         
         bool                        running_;
         uint64_t                    counter_;

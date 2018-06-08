@@ -6,7 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
-#include <Foundation/Foundation.h>
+#ifdef SUPPORT_OPENGLES2
+
 #include "ShaderProgramOpenGLES2.h"
 
 BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders) : ShaderProgram(name, shaders) {
@@ -82,4 +83,6 @@ void BGE::ShaderProgramOpenGLES2::createAttributesAndUniforms(std::vector<std::s
         uniforms_[key] = location;
     }
 }
+
+#endif /* SUPPORT_OPENGLES2 */
 

@@ -15,29 +15,53 @@
 
 const std::string BGE::Texture::ErrorDomain = "Texture";
 
-BGE::Texture::Texture() : NamedObject(), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
+BGE::Texture::Texture() : NamedObject(), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false) {
+#ifdef SUPPORT_OPENGL
+    hwId_ = 0;
+    target_ = GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
+#ifdef SUPPORT_GLKTEXTURELOADER
+    textureInfo_ = nil;
+#endif /* SUPPORT_GLKTEXTURELOADER */
     updateUVs();
     updateXYs();
 }
 
 #ifdef NOT_YET
-BGE::Texture::Texture(uint32_t texId) : NamedObject(texId), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
+BGE::Texture::Texture(uint32_t texId) : NamedObject(texId), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false) {
+#ifdef SUPPORT_OPENGL
+    hwId_ = 0;
+    target_ = GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
+#ifdef SUPPORT_GLKTEXTURELOADER
+    textureInfo_ = nil;
+#endif /* SUPPORT_GLKTEXTURELOADER */
     updateUVs();
     updateXYs();
 }
 
-BGE::Texture::Texture(uint32_t texId, std::string name) : NamedObject(texId, name), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(nil) {
+BGE::Texture::Texture(uint32_t texId, std::string name) : NamedObject(texId, name), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false) {
+#ifdef SUPPORT_OPENGL
+    hwId_ = 0;
+    target_ = GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
+#ifdef SUPPORT_GLKTEXTURELOADER
+    textureInfo_ = nil;
+#endif /* SUPPORT_GLKTEXTURELOADER */
     updateUVs();
     updateXYs();
 }
 
+#ifdef SUPPORT_GLKTEXTURELOADER
 BGE::Texture::Texture(uint32_t texId, std::string name, GLKTextureInfo *textureInfo) : NamedObject(texId, name), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), x_(0), y_(0), width_(0), height_(0), isSubTexture_(false), hwId_(0), target_(GL_TEXTURE_2D), textureInfo_(textureInfo) {
     format_ = TextureFormat::RGBA8888;
     
     if (textureInfo) {
         valid_ = true;
+#ifdef SUPPORT_OPENGL
         hwId_ = textureInfo.name;
         target_ = textureInfo.target;
+#endif /* SUPPORT_OPENGL */
         width_ = textureInfo.width;
         height_ = textureInfo.height;
         
@@ -45,7 +69,8 @@ BGE::Texture::Texture(uint32_t texId, std::string name, GLKTextureInfo *textureI
         updateXYs();
     }
 }
-#endif
+#endif /* SUPPORT_GLKTEXTURELOADER */
+#endif /* NOT_YET */
 
 void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFormat format) {
     handle_ = handle;
@@ -58,8 +83,10 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFor
     y_ = 0;
     width_ = 0;
     height_ = 0;
+#ifdef SUPPORT_OPENGL
     hwId_ = 0;
     target_ = GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
 
     atlasHandle_ = TextureAtlasHandle();
     isSubTexture_ = false;
@@ -67,13 +94,16 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFor
     memoryUsage_ = computeMemoryUsage(format_, width_, height_);
 }
 
+#ifdef SUPPORT_GLKTEXTURELOADER
 void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFormat format, GLKTextureInfo *texInfo) {
     initialize(handle, name, format);
     
     if (texInfo) {
         valid_ = true;
+#ifdef SUPPORT_OPENGL
         hwId_ = texInfo.name;
         target_ = texInfo.target;
+#endif /* SUPPORT_OPENGL */
         width_ = texInfo.width;
         height_ = texInfo.height;
         
@@ -83,20 +113,27 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFor
         memoryUsage_ = computeMemoryUsage(format_, width_, height_);
     }
 }
+#endif /* SUPPORT_GLKTEXTURELOADER */
 
 std::shared_ptr<BGE::Error> BGE::Texture::initialize(TextureHandle handle, std::string name, RawTexture *rawTexture) {
     TextureFormat format = TextureFormat::Undefined;
+#ifdef SUPPORT_OPENGL
     GLint glFormat = 0;
+#endif /* SUPPORT_OPENGL */
     
     switch (rawTexture->getFormat()) {
         case RawTexture::Format::RGB8_A8:
             format = TextureFormat::RGBA8888;
+#ifdef SUPPORT_OPENGL
             glFormat = GL_RGBA;
+#endif /* SUPPORT_OPENGL */
             break;
             
         case RawTexture::Format::RGB8:
             format = TextureFormat::RGB888;
+#ifdef SUPPORT_OPENGL
             glFormat = GL_RGB;
+#endif /* SUPPORT_OPENGL */
             break;
             
         default:
@@ -110,15 +147,21 @@ std::shared_ptr<BGE::Error> BGE::Texture::initialize(TextureHandle handle, std::
     auto width = rawTexture->getWidth();
     auto height = rawTexture->getHeight();
     auto buffer = rawTexture->getBuffer();
-
+    RenderTextureCommandData data(getHandle(), getFormat(), buffer, width, height);
     auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
     auto fut = prom->get_future();
-    Game::getInstance()->getRenderService()->queueCreateTexture(getHandle(), getFormat(), buffer, width, height, glFormat, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
+
+#ifdef SUPPORT_OPENGL
+    data.glFormat = glFormat;
+#endif /* SUPPORT_OPENGL */
+    Game::getInstance()->getRenderService()->queueCreateTexture(data, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
         // Do the least amount of work inside
         if (!error) {
             auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(command.data);
             valid_ = true;
+#ifdef SUPPORT_OPENGL
             hwId_ = data->glHwId;
+#endif /* SUPPORT_OPENGL */
         } else {
             valid_ = false;
         }
@@ -128,7 +171,9 @@ std::shared_ptr<BGE::Error> BGE::Texture::initialize(TextureHandle handle, std::
 
     if (!error) {
         format_ = format;
+#ifdef SUPPORT_OPENGL
         target_ = GL_TEXTURE_2D;
+#endif /* SUPPORT_OPENGL */
         width_ = width;
         height_ = height;
 
@@ -146,25 +191,37 @@ void BGE::Texture::destroy() {
     
     if (!isSubTexture_) {
         // Only non-subtextures can be freed, since the atlas is freed separately
+        RenderTextureCommandData data(getHandle());
+#ifdef SUPPORT_OPENGL
         GLuint name;
 
+#ifdef SUPPORT_GLKTEXTURELOADER
         if (textureInfo_) {
             name = textureInfo_.name;
         } else {
             name = hwId_;
         }
-        
+#else
+        name = hwId_;
+#endif /* SUPPORT_GLKTEXTURELOADER */
+        data.glHwId = name;
+#endif /* SUPPORT_OPENGL */
+
         // Always delete textures on main thread (for now)
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
-        Game::getInstance()->getRenderService()->queueDestroyTexture(getHandle(), name, [prom](RenderCommandItem command, std::shared_ptr<Error> error) {
+        Game::getInstance()->getRenderService()->queueDestroyTexture(data, [prom](RenderCommandItem command, std::shared_ptr<Error> error) {
             prom->set_value(error);
         });
         fut.get();
     }
 
+#ifdef SUPPORT_OPENGL
     hwId_ = 0;
+#endif /* SUPPORT_OPENGL */
+#ifdef SUPPORT_GLKTEXTURELOADER
     textureInfo_ = nil;
+#endif /* SUPPORT_GLKTEXTURELOADER */
     handle_ = TextureHandle();
     atlasHandle_ = TextureAtlasHandle();
 }
@@ -391,10 +448,12 @@ std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, 
                 width_ = width;
                 height_ = height;
             }
-            
+
+#ifdef SUPPORT_OPENGL
             hwId_ = atlas->getHWTextureId();
             target_ = atlas->getTarget();
-            
+#endif /* SUPPORT_OPENGL */
+
             updateUVs(rotated);
             updateXYs();
             
@@ -410,13 +469,19 @@ std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, 
 
 std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromAlphaBuffer(unsigned char *buffer, uint32_t width, uint32_t height) {
     if (buffer) {
+        RenderTextureCommandData data(getHandle(), getFormat(), buffer, width, height);
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
-        Game::getInstance()->getRenderService()->queueCreateTexture(getHandle(), getFormat(), buffer, width, height, GL_ALPHA, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
+#ifdef SUPPORT_OPENGL
+        data.glFormat = GL_ALPHA;
+#endif /* SUPPORT_OPENGL */
+        Game::getInstance()->getRenderService()->queueCreateTexture(data, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
             if (!error) {
                 auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(command.data);
                 valid_ = true;
+#ifdef SUPPORT_OPENGL
                 hwId_ = data->glHwId;
+#endif /* SUPPORT_OPENGL */
             }
             prom->set_value(error);
         });
@@ -432,13 +497,19 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGB565Buffer(unsigned
 
 std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGB888Buffer(unsigned char *buffer, uint32_t width, uint32_t height) {
     if (buffer) {
+        RenderTextureCommandData data(getHandle(), getFormat(), buffer, width, height);
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
-        Game::getInstance()->getRenderService()->queueCreateTexture(getHandle(), getFormat(), buffer, width, height, GL_RGB, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
+#ifdef SUPPORT_OPENGL
+        data.glFormat = GL_RGB;
+#endif /* SUPPORT_OPENGL */
+        Game::getInstance()->getRenderService()->queueCreateTexture(data, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
             if (!error) {
                 auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(command.data);
                 valid_ = true;
+#ifdef SUPPORT_OPENGL
                 hwId_ = data->glHwId;
+#endif /* SUPPORT_OPENGL */
             }
             prom->set_value(error);
         });
@@ -458,13 +529,19 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA4444Buffer(unsign
 
 std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height) {
     if (buffer) {
+        RenderTextureCommandData data(getHandle(), getFormat(), buffer, width, height);
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
-        Game::getInstance()->getRenderService()->queueCreateTexture(getHandle(), getFormat(), buffer, width, height, GL_RGBA, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
+#ifdef SUPPORT_OPENGL
+        data.glFormat = GL_RGBA;
+#endif /* SUPPORT_OPENGL */
+        Game::getInstance()->getRenderService()->queueCreateTexture(data, [this, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
             if (!error) {
                 auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(command.data);
                 valid_ = true;
+#ifdef SUPPORT_OPENGL
                 hwId_ = data->glHwId;
+#endif /* SUPPORT_OPENGL */
             }
             prom->set_value(error);
         });

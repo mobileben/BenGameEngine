@@ -6,8 +6,15 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
+#ifdef SUPPORT_OPENGLES2
+
 #ifndef RenderServiceOpenGLES2_h
 #define RenderServiceOpenGLES2_h
+
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
 
 #include <stdio.h>
 #include "RenderService.h"
@@ -18,8 +25,9 @@
 #include "GameObject.h"
 #include "Font.h"
 
-// TODO: REmove
+#if TARGET_OS_IPHONE
 #include <GLKit/GLKit.h>
+#endif /* TARGET_OS_IPHONE */
 
 namespace BGE {
     class TransformComponent;
@@ -79,8 +87,10 @@ namespace BGE {
         void disableMask(uint8_t maskBits);
         
         void render();
-        
+
+#if TARGET_OS_IPHONE
         void setGLKTextureInfo(GLKTextureInfo *info) { textureInfo_ = info; }
+#endif /* TARGET_OS_IPHONE */
 
 #ifdef SUPPORT_PROFILING
         virtual void resetProfilingStats();
@@ -125,3 +135,5 @@ namespace BGE {
 }
 
 #endif /* RenderServiceOpenGLES2_h */
+
+#endif /* SUPPORT_OPENGLES2 */

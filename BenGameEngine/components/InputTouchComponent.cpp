@@ -14,7 +14,9 @@ std::type_index BGE::InputTouchComponent::type_index_ = typeid(BGE::InputTouchCo
 
 void BGE::InputTouchComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
     Component::initialize(handle, spaceHandle);
-    
+
+#if TARGET_OS_IPHONE
     touch = nil;
+#endif /* TARGET_OS_IPHONE */
 }
 

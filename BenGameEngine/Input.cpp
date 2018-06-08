@@ -16,7 +16,9 @@ void BGE::Input::initialize(InputHandle handle) {
     
     type = TouchType::None;
     timestamp = 0;
+#if TARGET_OS_IPHONE
     touch = nil;
+#endif /* TARGET_OS_IPHONE */
     x = 0;
     y = 0;
     tapCount = 0;
@@ -24,7 +26,9 @@ void BGE::Input::initialize(InputHandle handle) {
 
 void BGE::Input::destroy() {
     type = TouchType::None;
+#if TARGET_OS_IPHONE
     touch = nil;
+#endif /* TARGET_OS_IPHONE */
     
     handle_ = InputHandle();
 }

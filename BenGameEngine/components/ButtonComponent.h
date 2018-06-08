@@ -9,7 +9,14 @@
 #ifndef ButtonComponent_h
 #define ButtonComponent_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
+#if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
+#endif /* TARGET_OS_IPHONE */
 #include <stdio.h>
 #include <memory>
 #include <chrono>
@@ -71,9 +78,11 @@ namespace BGE {
         double pressedTime() const;
         
         Event shouldHandleInput(Input *input, bool inBounds);
-        
+
+#if TARGET_OS_IPHONE
         UITouch *getTouch() const { return touch; }
         void setTouch(UITouch *t) { touch = t; }
+#endif /* TARGET_OS_IPHONE */
         
         GameObjectHandle getDisabledButtonHandle() const { return disabledButtonHandle; }
         GameObjectHandle getDisabledAnimButtonHandle() const { return disabledAnimButtonHandle; }
@@ -103,7 +112,9 @@ namespace BGE {
         std::chrono::high_resolution_clock::time_point pressedTimeStart;
         float       pressedTime_;
         
+#if TARGET_OS_IPHONE
         UITouch     *touch; // We need this to properly track events
+#endif /* TARGET_OS_IPHONE */
         
         GameObjectHandle disabledButtonHandle;
         GameObjectHandle disabledAnimButtonHandle;

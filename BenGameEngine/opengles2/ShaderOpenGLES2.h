@@ -6,6 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
+#ifdef SUPPORT_OPENGLES2
+
 #ifndef BGEShaderOpenGLES2_h
 #define BGEShaderOpenGLES2_h
 
@@ -31,3 +33,5 @@ namespace BGE {
 }
 
 #endif /* BGEShaderOpenGLES2_h */
+
+#endif /* SUPPORT_OPENGLES2 */

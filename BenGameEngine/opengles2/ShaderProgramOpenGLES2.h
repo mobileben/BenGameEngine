@@ -6,6 +6,8 @@
 //  Copyright © 2016 2n Productions. All rights reserved.
 //
 
+#ifdef SUPPORT_OPENGLES2
+
 #ifndef BGEShaderProgramOpenGLES2_h
 #define BGEShaderProgramOpenGLES2_h
 
@@ -18,7 +20,6 @@
 #include "ShaderOpenGLES2.h"
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
-#include <Foundation/Foundation.h>
 
 namespace BGE {
     class ShaderProgramOpenGLES2 : public ShaderProgram
@@ -48,3 +49,5 @@ namespace BGE {
 }
 
 #endif /* BGEShaderProgramOpenGLES2_h */
+
+#endif /* SUPPORT_OPENGLES2 */

@@ -9,13 +9,17 @@
 #ifndef AudioService_h
 #define AudioService_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
 #include <stdio.h>
 #include <unordered_map>
 #include <vector>
 
+#if TARGET_OS_IPHONE
 #import <Foundation/Foundation.h>
-
-#ifdef TARGET_OS_IPHONE
 #import "AudioServiceHelper.h"
 #endif
 

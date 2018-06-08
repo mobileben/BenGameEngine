@@ -18,9 +18,16 @@
 #include "MathTypes.h"
 #include "Handle.h"
 #include "RawTexture.h"
+#ifdef SUPPORT_GLKTEXTURELOADER
 #include <GLKit/GLKit.h>
+#endif /* SUPPORT_GLKTEXTURELOADER */
+
+#ifdef SUPPORT_OPENGL
+#ifdef SUPPORT_OPENGLES2
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
+#endif /* SUPPORT_OPENGLES2 */
+#endif /* SUPPORT_OPENGL */
 
 namespace BGE {
     typedef enum {
@@ -69,13 +76,17 @@ namespace BGE {
 #ifdef NOT_YET
         Texture(ObjectId texId);
         Texture(ObjectId texId, std::string name);
+#ifdef SUPPORT_GLKTEXTURELOADER
         Texture(uint32_t texId, std::string name, GLKTextureInfo *textureInfo);
+#endif /* SUPPORT_GLKTEXTURELOADER */
 #endif
         ~Texture() {}
         
         void initialize(TextureHandle handle, std::string name, TextureFormat format);
         std::shared_ptr<Error> initialize(TextureHandle handle, std::string name, RawTexture *rawTexture);
+#ifdef SUPPORT_GLKTEXTURELOADER
         void initialize(TextureHandle handle, std::string name, TextureFormat format, GLKTextureInfo *texInfo);
+#endif /* SUPPORT_GLKTEXTURELOADER */
         void destroy();
         
         inline TextureAlphaState getAlphaState() const { return alphaState_; }
@@ -92,10 +103,13 @@ namespace BGE {
         
         inline bool isSubTexture() const { return isSubTexture_; }
         
+#ifdef SUPPORT_GLKTEXTURELOADER
         inline GLKTextureInfo *getTextureInfo() const { return textureInfo_; }
+#endif /* SUPPORT_GLKTEXTURELOADER */
+#ifdef SUPPORT_OPENGL
         inline uint32_t getHWTextureId() const { return hwId_; }
         inline GLenum getTarget() const { return target_; }
-
+#endif /* SUPPORT_OPENGL */
         inline size_t getMemoryUsage() const { return memoryUsage_; }
         
         std::shared_ptr<Error> createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height);
@@ -131,8 +145,10 @@ namespace BGE {
         // TODO: valid_ needs to become state or status
         bool                valid_;
         TextureHandle       handle_;
+#ifdef SUPPORT_OPENGL
         GLuint              hwId_;
         GLenum              target_;
+#endif /* SUPPORT_OPENGL */
         Vector2             xys_[4];
         Vector2             uvs_[4];
 
@@ -148,7 +164,9 @@ namespace BGE {
         
         TextureFormat       format_;
         TextureAlphaState   alphaState_;
+#ifdef SUPPORT_GLKTEXTURELOADER
         GLKTextureInfo      *textureInfo_;
+#endif /* SUPPORT_GLKTEXTURELOADER */
 
         void setValid(bool valid) { valid_ = valid; }
         void setFormat(TextureFormat format) { format_ = format; }

@@ -9,14 +9,19 @@
 #ifndef AudioBuffer_h
 #define AudioBuffer_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
 #include <stdio.h>
-#import <Foundation/Foundation.h>
 #include <functional>
 #include "Error.h"
 #include "Handle.h"
 #include "NamedObject.h"
 
 #if TARGET_OS_IPHONE
+#import <Foundation/Foundation.h>
 #include "AudioToolbox/AudioFile.h"
 #include "AudioToolbox/AudioQueue.h"
 #endif /* TARGET_OS_IPHONE */
