@@ -128,6 +128,7 @@ void BGE::AudioBuffer::createFromFile(std::string filename, bool streaming, std:
             callback(this, error);
         }
     });
+#elif TARGET_OS_MAC
 #else
 #error Unsupported target
 #endif /* TARGET_OS_IPHONE */

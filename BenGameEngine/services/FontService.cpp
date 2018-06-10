@@ -11,8 +11,10 @@
 #include FT_FREETYPE_H
 #include <cassert>
 
+#if TARGET_OS_IPHONE
 NSBundle *BGE::FontService::builtinBundle_ = nil;
 NSBundle *BGE::FontService::mainBundle_ = nil;
+#endif /* TARGET_OS_IPHONE */
 
 bool fontInfoIsEqual(std::shared_ptr<BGE::FontInfo> i, std::shared_ptr<BGE::FontInfo> j) {
     return i->family == j->family && i->style == j->style && i->asset == j->asset;
@@ -22,17 +24,19 @@ std::string BGE::FontService::fontAsKey(std::string name, uint32_t pixelSize) {
     return name + std::to_string(pixelSize);
 }
 
+#if TARGET_OS_IPHONE
 void BGE::FontService::mapBundles(std::string bundleName)
 {
     // TODO: Create FileService for things like this bundle crap
-    
     if (!FontService::builtinBundle_) {
         FontService::builtinBundle_ = [NSBundle bundleWithURL:[[NSBundle mainBundle] URLForResource:[[NSString alloc] initWithCString:bundleName.c_str() encoding:NSUTF8StringEncoding] withExtension:@"bundle"]];
         FontService::mainBundle_ = [NSBundle mainBundle];
     }
 }
+#endif /* TARGET_OS_IPHONE */
 
 BGE::FontService::FontService(std::map<std::string, std::string> resources) : handleService_(InitialFontReserve, HandleServiceNoMaxLimit) {
+#if TARGET_OS_IPHONE
     FontService::mapBundles("BenGameEngineBundle");
 
     std::vector<std::string> assets;
@@ -109,6 +113,7 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
         
         assert(found);
     }
+#endif /* TARGET_OS_IPHONE */
 }
 
 uint32_t BGE::FontService::numFonts() const {
@@ -155,6 +160,7 @@ size_t BGE::FontService::totalHandleMemory() const {
 
 // TODO: Move to file service
 std::string BGE::FontService::pathForAsset(std::string asset) {
+#if TARGET_OS_IPHONE
     // Find our fullpath
     NSString *str = [[NSString alloc] initWithCString:asset.c_str() encoding:NSUTF8StringEncoding];
     
@@ -175,7 +181,8 @@ std::string BGE::FontService::pathForAsset(std::string asset) {
             return cpath;
         }
     }
-    
+#endif /* TARGET_OS_IPHONE */
+
     return "";
 }
 

@@ -2445,12 +2445,18 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
             });
 #endif
 #else
+#if TARGET_OS_IPHONE
             // TODO: This will be done later perhaps?
             loadAllTextures([this, callback]() {
                 if (callback) {
                     callback(this);
                 }
             });
+#else
+            if (callback) {
+                callback(this);
+            }
+#endif /* TARGET_OS_IPHONE */
 #endif
         } catch (std::exception& ex) {
             printf("Exception: could not unmarshal ScenePackage. %s\n", ex.what());
@@ -2550,6 +2556,11 @@ void BGE::ScenePackage::create(const ScenePackageFormat& format, std::function<v
     } else if (callback) {
         callback(this);
     }
+}
+
+void BGE::ScenePackage::saveAsSpkg(const std::string& filename) {
+    ScenePackageFormat format{*this};
+    format.save(filename);
 }
 
 void BGE::ScenePackage::loadAllTextures(std::function<void()> callback) {

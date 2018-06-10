@@ -21,7 +21,7 @@ void BGE::TextureMaskComponent::setTextureMaskReference(TextureMaskReference *te
     if (texMaskRef) {
         setTextureMaskReference(*texMaskRef);
     } else {
-        NSLog(@"WHAAA");
+        printf("WHAAA\n");
     }
 }
 

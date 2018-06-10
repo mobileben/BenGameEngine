@@ -299,11 +299,13 @@ namespace BGE {
         // This is for debugging
         void saveAsBinary(const std::string& filename);
 
+        void create(const std::shared_ptr<rapidjson::Document> jsonDict, std::function<void(ScenePackage *)> callback);
+        void saveAsSpkg(const std::string& filename);
+
     protected:
         void setStatus(ScenePackageStatus status) { status_ = status; }
         void create(const ScenePackageFormat& format, std::function<void(ScenePackage *)> callback);
         void create(const uint64_t *buffer, size_t bufferSize, bool managed, std::function<void(ScenePackage *)> callback);
-        void create(const std::shared_ptr<rapidjson::Document> jsonDict, std::function<void(ScenePackage *)> callback);
         void loadAllTextures(std::function<void()> callback);
 
     private:

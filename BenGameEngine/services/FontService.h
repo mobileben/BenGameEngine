@@ -9,6 +9,11 @@
 #ifndef BGEFontService_h
 #define BGEFontService_h
 
+#ifdef __APPLE__
+// Force include of TargetConditionals to pick up TARGET_OS macros
+#include <TargetConditionals.h>
+#endif /* __APPLE__ */
+
 #include <stdio.h>
 #include <unordered_map>
 #include <string>
@@ -20,14 +25,18 @@
 #include "Error.h"
 #include "Handle.h"
 #include "HandleService.h"
+#if TARGET_OS_IPHONE
 #include <Foundation/Foundation.h>
+#endif /* TARGET_OS_IPHONE */
 
 namespace BGE {
     class FontService : public Service
     {
     public:
         static std::string fontAsKey(std::string name, uint32_t pixelSize);
+#if TARGET_OS_IPHONE
         static void mapBundles(std::string bundleName);
+#endif /* TARGET_OS_IPHONE */
         
         FontService(std::map<std::string, std::string> resources = std::map<std::string, std::string>());
         ~FontService() {}
@@ -62,9 +71,10 @@ namespace BGE {
         Font *getFont(FontHandle handle) const;
  
     protected:
-        // TODO: For now this is Mac/iOS specific
+#if TARGET_OS_IPHONE
         static NSBundle *builtinBundle_;
         static NSBundle *mainBundle_;
+#endif /* TARGET_OS_IPHONE */
         
         using FontTableMap = std::unordered_map<std::string, std::shared_ptr<FontInfo>>;
         

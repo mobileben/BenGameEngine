@@ -75,6 +75,8 @@
 		B547F17D1D125BD00031AF58 /* FrameAnimatorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B547F17B1D125BD00031AF58 /* FrameAnimatorComponent.cpp */; };
 		B54821F61CD87A8A0073AFCC /* AnimationSequenceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B54821F41CD87A8A0073AFCC /* AnimationSequenceComponent.cpp */; };
 		B54821F91CD9AD970073AFCC /* AnimationChannelComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B54821F71CD9AD970073AFCC /* AnimationChannelComponent.cpp */; };
+		B549E67D20CB8C7800A69799 /* Audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAD31DE15E9C0035AA74 /* Audio.cpp */; };
+		B549E67E20CB8C7C00A69799 /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5BBFAD61DE15EAB0035AA74 /* AudioBuffer.cpp */; };
 		B5503D471D4EBC3500FC77B6 /* EventService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5503D451D4EBC3500FC77B6 /* EventService.cpp */; };
 		B5503D701D51A6A700FC77B6 /* CommonLobby-iPh6.json in Resources */ = {isa = PBXBuildFile; fileRef = B5503D551D51A6A700FC77B6 /* CommonLobby-iPh6.json */; };
 		B5503D841D51A6B700FC77B6 /* CommonHUD-iPh6.json in Resources */ = {isa = PBXBuildFile; fileRef = B5503D801D51A6B700FC77B6 /* CommonHUD-iPh6.json */; };
@@ -1337,6 +1339,7 @@
 				B5B9C0D220C9F72E00306FC9 /* TransformComponent.cpp in Sources */,
 				B5B9C0D320C9F72E00306FC9 /* Game.cpp in Sources */,
 				B5B9C0D520C9F72E00306FC9 /* FlatRectRenderComponent.cpp in Sources */,
+				B549E67E20CB8C7C00A69799 /* AudioBuffer.cpp in Sources */,
 				B5B9C0D620C9F72E00306FC9 /* ColorTransformComponent.cpp in Sources */,
 				B5B9C0D720C9F72E00306FC9 /* ScenePackageService.cpp in Sources */,
 				B5B9C0D820C9F72E00306FC9 /* Component.cpp in Sources */,
@@ -1351,6 +1354,7 @@
 				B5B9C0E120C9F72E00306FC9 /* ShaderProgramOpenGLES2.cpp in Sources */,
 				B5B9C0E220C9F72E00306FC9 /* Service.cpp in Sources */,
 				B5B9C0E320C9F72E00306FC9 /* RenderView.cpp in Sources */,
+				B549E67D20CB8C7800A69799 /* Audio.cpp in Sources */,
 				B5B9C0E720C9F72E00306FC9 /* ShaderServiceOpenGLES2.cpp in Sources */,
 				B5B9C0E820C9F72E00306FC9 /* MaterialService.cpp in Sources */,
 				B5B9C0E920C9F72E00306FC9 /* LogicComponent.cpp in Sources */,
