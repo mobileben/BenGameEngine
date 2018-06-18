@@ -47,7 +47,7 @@ void BGE::AnimatorComponent::reset() {
     setFrame(0);
     iterations = 1;
     state = AnimState::Done;
-    
+
     auto gameObjHandle = getGameObjectHandle();
     auto gameObj = getSpace()->getGameObject(gameObjHandle);
     auto seq = gameObj->getComponent<AnimationSequenceComponent>();
@@ -316,13 +316,20 @@ void BGE::AnimatorComponent::play(int32_t iterations, bool forward, float speed)
     auto gameObj = getGameObject();
     auto seq = gameObj->getComponent<AnimationSequenceComponent>();
 
+    if (seq->frameRate != 0) {
+        secPerFrame = 1.0 / (float) seq->frameRate;
+    } else {
+        secPerFrame = 1.0 / 30.0;   // Default to 30 fps
+    }
+
     this->state = AnimState::Playing;
     this->iterations = iterations;
     this->forward = forward;
     this->speed = speed;
     this->startFrame = 0;
     this->endFrame = seq->totalFrames - 1;
-    
+    this->frameRemainderTime = 0;
+
     if (forward) {
         this->setFrame(0);
     } else {
@@ -331,13 +338,27 @@ void BGE::AnimatorComponent::play(int32_t iterations, bool forward, float speed)
 }
 
 void BGE::AnimatorComponent::playToFrame(int32_t endFrame, float speed) {
+    auto gameObj = getGameObject();
+    auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+
+    if (seq->frameRate != 0) {
+        secPerFrame = 1.0 / (float) seq->frameRate;
+    } else {
+        secPerFrame = 1.0 / 30.0;   // Default to 30 fps
+    }
+
+    if (endFrame >= seq->totalFrames) {
+        endFrame = seq->totalFrames - 1;
+    }
+    
     this->state = AnimState::Playing;
     this->iterations = 1;
     this->forward = true;
     this->speed = speed;
     this->startFrame = 0;
     this->endFrame = endFrame;
-    
+    this->frameRemainderTime = 0;
+
     this->setFrame(0);
 }
 
