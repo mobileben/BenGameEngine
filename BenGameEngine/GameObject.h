@@ -142,7 +142,7 @@ namespace BGE {
         void moveToParent(GameObjectHandle handle);
         void moveToParent(GameObject *parent);
         
-        void removeAllChildren();
+        void removeAllChildren(bool destroy=false);
         void removeFromParent();
 
         inline uint32_t getComponentBitmask() const { return componentBitmask_; }

@@ -304,11 +304,26 @@ void BGE::GameObject::moveToParent(GameObject *parent) {
     }
 }
 
-void BGE::GameObject::removeAllChildren() {
+void BGE::GameObject::removeAllChildren(bool destroy) {
     auto xform = getComponent<TransformComponent>();
-    
     if (xform) {
-        xform->removeAllChildren();
+        if (destroy) {
+            std::vector<TransformComponentHandle> cHandles = xform->getChildrenHandles();
+            xform->removeAllChildren();
+            if (cHandles.size()) {
+                auto space = getSpace();
+                if (space) {
+                    for (auto h : cHandles) {
+                        auto cXform = space->getComponent<TransformComponent>(h);
+                        if (cXform) {
+                            space->removeGameObject(cXform->gameObjectHandle_);
+                        }
+                    }
+                }
+            }
+        } else {
+            xform->removeAllChildren();
+        }
     }
 }
 
