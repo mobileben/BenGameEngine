@@ -18,6 +18,8 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
+#include <mutex>
+
 #include <functional>
 #include "Service.h"
 #include "FontInfo.h"
@@ -51,7 +53,7 @@ namespace BGE {
         void update(double deltaTime) final {}
         void garbageCollect() final { handleService_.garbageCollect(); }
         
-        uint32_t numFonts() const;
+        uint32_t numFonts();
         
         uint32_t numUsedHandles() const final;
         uint32_t maxHandles() const final;
@@ -65,10 +67,10 @@ namespace BGE {
         void removeFont(ScenePackageHandle scenePackageHandle, FontHandle handle);
         void removeFont(SpaceHandle spaceHandle, FontHandle handle);
 
-        FontHandle getFontHandle(std::string name, uint32_t pixelSize) const;
+        FontHandle getFontHandle(std::string name, uint32_t pixelSize);
         
-        Font *getFont(std::string name, uint32_t pixelSize) const;
-        Font *getFont(FontHandle handle) const;
+        Font *getFont(std::string name, uint32_t pixelSize);
+        Font *getFont(FontHandle handle);
  
     protected:
 #if TARGET_OS_IPHONE
@@ -98,6 +100,12 @@ namespace BGE {
         using FontHandleService = HandleService<Font, FontHandle>;
 
         FontHandleService handleService_;
+
+        // Mutexes to protect create and destroy in multi-threaded environment
+        std::mutex  fontTableMutex_;
+        std::recursive_mutex  fontScenePackageMutex_;
+        std::recursive_mutex  fontSpacesMutex_;
+        std::mutex  fontInfoMutex_;
 
         std::pair<FontHandle, std::shared_ptr<Error>> createFont(std::string name, uint32_t pxSize);
         void removeFont(FontHandle handle);

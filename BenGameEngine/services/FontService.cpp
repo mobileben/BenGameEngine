@@ -116,9 +116,10 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
 #endif /* TARGET_OS_IPHONE */
 }
 
-uint32_t BGE::FontService::numFonts() const {
+uint32_t BGE::FontService::numFonts() {
     uint32_t num = 0;
-    
+    std::lock_guard<std::mutex> lock(fontInfoMutex_);
+
     for (auto const &fontInfo : fontInfo_) {
         for (auto const &it : fontInfo->fonts) {
             if (handleService_.dereference(it.second)) {
@@ -203,7 +204,9 @@ void BGE::FontService::buildFontInfoForAsset(std::string asset) {
                 FT_Long numFaces = face->num_faces;
                 
                 FT_Done_Face(face);
-                
+
+                std::lock_guard<std::mutex> lock(fontInfoMutex_);
+
                 for (auto fi=0;fi<numFaces;fi++) {
                     error = FT_New_Face(library, path.c_str(), fi, &face);
                     
@@ -245,7 +248,8 @@ void BGE::FontService::buildFontInfoForAsset(std::string asset) {
     }
 }
 
-BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) const {
+BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixelSize) {
+    std::lock_guard<std::mutex> lock(fontTableMutex_);
     auto f = fontTable_.find(name);
     
     if (f != fontTable_.end()) {
@@ -260,7 +264,8 @@ BGE::FontHandle BGE::FontService::getFontHandle(std::string name, uint32_t pixel
     return FontHandle();
 }
 
-BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) const {
+BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) {
+    std::lock_guard<std::mutex> lock(fontTableMutex_);
     auto f = fontTable_.find(name);
     
     if (f != fontTable_.end()) {
@@ -275,11 +280,12 @@ BGE::Font *BGE::FontService::getFont(std::string name, uint32_t pixelSize) const
     return nullptr;
 }
 
-BGE::Font *BGE::FontService::getFont(FontHandle handle) const {
+BGE::Font *BGE::FontService::getFont(FontHandle handle) {
     return handleService_.dereference(handle);
 }
 
 void BGE::FontService::removeFont(ScenePackageHandle scenePackageHandle, FontHandle handle) {
+    std::lock_guard<std::recursive_mutex> lock(fontScenePackageMutex_);
     auto sceneIt = fontScenePackages_.find(handle);
     
     if (sceneIt != fontScenePackages_.end()) {
@@ -300,6 +306,7 @@ void BGE::FontService::removeFont(ScenePackageHandle scenePackageHandle, FontHan
 }
 
 void BGE::FontService::removeFont(SpaceHandle spaceHandle, FontHandle handle) {
+    std::lock_guard<std::recursive_mutex> lock(fontSpacesMutex_);
     auto spaceIt = fontSpaces_.find(handle);
     
     if (spaceIt != fontSpaces_.end()) {
@@ -320,7 +327,7 @@ void BGE::FontService::removeFont(SpaceHandle spaceHandle, FontHandle handle) {
 }
 
 void BGE::FontService::removeFont(FontHandle handle) {
-    
+    std::lock_guard<std::mutex> lock(fontInfoMutex_);
     for (auto const &fontInfo : fontInfo_) {
         for (auto const &it : fontInfo->fonts) {
             if (it.second == handle) {
@@ -339,6 +346,7 @@ void BGE::FontService::removeFont(FontHandle handle) {
 }
 
 bool BGE::FontService::fontHasReferences(FontHandle fontHandle) {
+    std::lock_guard<std::recursive_mutex> lock(fontScenePackageMutex_);
     auto sceneIt = fontScenePackages_.find(fontHandle);
     
     if (sceneIt != fontScenePackages_.end()) {
@@ -347,6 +355,7 @@ bool BGE::FontService::fontHasReferences(FontHandle fontHandle) {
         }
     }
 
+    std::lock_guard<std::recursive_mutex> sLock(fontSpacesMutex_);
     auto spaceIt = fontSpaces_.find(fontHandle);
 
     if (spaceIt != fontSpaces_.end()) {
@@ -359,6 +368,8 @@ bool BGE::FontService::fontHasReferences(FontHandle fontHandle) {
 }
 
 std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::FontService::createFont(std::string name, uint32_t pxSize) {
+    std::lock_guard<std::mutex> lock(fontTableMutex_);
+    std::lock_guard<std::mutex> iLock(fontInfoMutex_);
     auto entry = fontTable_.find(name);
     
     if (entry != fontTable_.end()) {
@@ -426,6 +437,7 @@ std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::FontService::create
 std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::FontService::createFont(std::string name, uint32_t pxSize, ScenePackageHandle scenePackageHandle) {
     FontHandle fontHandle;
     std::shared_ptr<Error> error;
+    std::lock_guard<std::recursive_mutex> lock(fontScenePackageMutex_);
     std::tie(fontHandle, error) = createFont(name, pxSize);
     if (!fontHandle.isNull()) {
         auto &scenePackages = fontScenePackages_[fontHandle];
@@ -447,6 +459,7 @@ std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::FontService::create
 std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::FontService::createFont(std::string name, uint32_t pxSize, SpaceHandle spaceHandle) {
     FontHandle fontHandle;
     std::shared_ptr<Error> error;
+    std::lock_guard<std::recursive_mutex> lock(fontSpacesMutex_);
     std::tie(fontHandle, error) = createFont(name, pxSize);
     if (!fontHandle.isNull()) {
         auto &spaces = fontSpaces_[fontHandle];
