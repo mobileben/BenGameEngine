@@ -47,8 +47,7 @@ BGE::FontService::FontService(std::map<std::string, std::string> resources) : ha
     fontResources_["Avenir Next Condensed"] = "Avenir Next Condensed.ttc";
     fontResources_["Arial Narrow"] = "Arial Narrow.ttf";
     fontResources_["Arial Narrow Bold"] = "Arial Narrow Bold.ttf";
-    fontResources_["Gill Sans"] = "GillSans.ttc";
-    fontResources_["PeachyKeenJF"] = "peachy.otf";
+    fontResources_["Roboto Medium"] = "Roboto-Medium.ttf";
     fontResources_.insert(resources.begin(), resources.end());
     
     // Build FontInfo for all font resources

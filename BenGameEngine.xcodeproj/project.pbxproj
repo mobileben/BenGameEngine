@@ -27,7 +27,6 @@
 		B51A568A1D56AC34005AA9AB /* CommonHUD-iPh6_atlas_0@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B51A56891D56AC34005AA9AB /* CommonHUD-iPh6_atlas_0@2x.png */; };
 		B51A568C1D57F590005AA9AB /* CommonLobby-iPh6_atlas_0@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B51A568B1D57F590005AA9AB /* CommonLobby-iPh6_atlas_0@2x.png */; };
 		B51A568E1D57F5F3005AA9AB /* Common-iPh6_atlas_0@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B51A568D1D57F5F3005AA9AB /* Common-iPh6_atlas_0@2x.png */; };
-		B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */; };
 		B525E36F1C8957A700C691C0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E36E1C8957A700C691C0 /* main.m */; };
 		B525E3721C8957A700C691C0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E3711C8957A700C691C0 /* AppDelegate.m */; };
 		B525E3751C8957A700C691C0 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B525E3741C8957A700C691C0 /* ViewController.m */; };
@@ -68,6 +67,7 @@
 		B52B76111CBA2C7F00758249 /* RenderComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B760F1CBA2C7F00758249 /* RenderComponent.cpp */; };
 		B52B76141CBADF5E00758249 /* MaterialService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52B76121CBADF5E00758249 /* MaterialService.cpp */; };
 		B52BFB081D000C650040A839 /* StringArrayBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B52BFB061D000C650040A839 /* StringArrayBuilder.cpp */; };
+		B52EB3E9212C056700A3E210 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B52EB3E8212C056200A3E210 /* Roboto-Medium.ttf */; };
 		B545A6041DC01D81000ADD6C /* RawTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B545A6021DC01D81000ADD6C /* RawTexture.cpp */; };
 		B545A6071DC0210F000ADD6C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B545A6061DC0210F000ADD6C /* libpng.a */; };
 		B545A6091DC0217F000ADD6C /* libz.1.2.8.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = B545A6081DC0217F000ADD6C /* libz.1.2.8.tbd */; };
@@ -109,7 +109,6 @@
 		B57FC8D91FBA6ED700F445E0 /* Arial Narrow.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8D81FBA6ED700F445E0 /* Arial Narrow.ttf */; };
 		B57FC8DC1FBAA3D400F445E0 /* Arial Narrow Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8DA1FBAA3D400F445E0 /* Arial Narrow Bold.ttf */; };
 		B57FC8DD1FBAA3D400F445E0 /* Avenir Next Condensed.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B57FC8DB1FBAA3D400F445E0 /* Avenir Next Condensed.ttc */; };
-		B58237C21FECB9E500B99E2A /* GillSans.ttc in Resources */ = {isa = PBXBuildFile; fileRef = B58237C11FECB9E400B99E2A /* GillSans.ttc */; };
 		B59BE7891D8622430055800E /* PlacementComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B59BE7871D8622430055800E /* PlacementComponent.cpp */; };
 		B5ACE88F1CBB08D5004B6871 /* TransformComponentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE88D1CBB08D2004B6871 /* TransformComponentTests.m */; };
 		B5ACE8921CBB56CE004B6871 /* ComponentService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5ACE8901CBB56CE004B6871 /* ComponentService.cpp */; };
@@ -192,7 +191,6 @@
 		B5C388DF1D24D90500137CEC /* ColorMatrixComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388DD1D24D90500137CEC /* ColorMatrixComponent.cpp */; };
 		B5C388E21D24D91B00137CEC /* ColorTransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C388E01D24D91B00137CEC /* ColorTransformComponent.cpp */; };
 		B5C8024420019882005ED480 /* Profiling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5C8024220019882005ED480 /* Profiling.cpp */; };
-		B5D9DCB01F63266D00661651 /* peachy.otf in Resources */ = {isa = PBXBuildFile; fileRef = B5D9DCAF1F63266D00661651 /* peachy.otf */; };
 		B5DCDA231CE2F9F100CBF0A6 /* HandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA221CE2F9F100CBF0A6 /* HandleTests.m */; };
 		B5DCDA261CE59F7400CBF0A6 /* ScenePackageService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5DCDA241CE59F7400CBF0A6 /* ScenePackageService.cpp */; };
 		B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = B5E7B9B51CC35B5000978F1A /* LineVertex.glsl */; };
@@ -388,6 +386,7 @@
 		B52BFB0A1D00AA750040A839 /* ArrayBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArrayBuilder.h; sourceTree = "<group>"; };
 		B52BFB0D1D0138790040A839 /* UniqueArrayBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UniqueArrayBuilder.h; sourceTree = "<group>"; };
 		B52BFB0F1D0155720040A839 /* FixedArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FixedArray.h; sourceTree = "<group>"; };
+		B52EB3E8212C056200A3E210 /* Roboto-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Medium.ttf"; sourceTree = "<group>"; };
 		B545A6021DC01D81000ADD6C /* RawTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RawTexture.cpp; path = dataformats/RawTexture.cpp; sourceTree = "<group>"; };
 		B545A6031DC01D81000ADD6C /* RawTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RawTexture.h; path = dataformats/RawTexture.h; sourceTree = "<group>"; };
 		B545A6061DC0210F000ADD6C /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = BenGameEngine/external/libpng/lib/libpng.a; sourceTree = "<group>"; };
@@ -805,6 +804,7 @@
 		B525E3D71C8959D200C691C0 /* BenGameEngineBundle */ = {
 			isa = PBXGroup;
 			children = (
+				B52EB3E8212C056200A3E210 /* Roboto-Medium.ttf */,
 				B51F32CA1C9EE94E00B9F658 /* AppleGothic.ttf */,
 				B57FC8D61FBA6D6A00F445E0 /* Arial Black.ttf */,
 				B57FC8DA1FBAA3D400F445E0 /* Arial Narrow Bold.ttf */,
@@ -1152,9 +1152,6 @@
 				B57331A91EE3762E00335959 /* PolyLineFragment.glsl in Resources */,
 				B525E3DE1C895A1900C691C0 /* TextureFragment.glsl in Resources */,
 				B525E3DF1C895A1900C691C0 /* TextureVertex.glsl in Resources */,
-				B58237C21FECB9E500B99E2A /* GillSans.ttc in Resources */,
-				B5D9DCB01F63266D00661651 /* peachy.otf in Resources */,
-				B51F32CB1C9EE94E00B9F658 /* AppleGothic.ttf in Resources */,
 				B5E7B9B61CC35B5900978F1A /* LineVertex.glsl in Resources */,
 				B571F1951C9E1B94007F5A90 /* FontVertex.glsl in Resources */,
 				B571F1731C915AAD007F5A90 /* ColorMatrixTextureVertex.glsl in Resources */,
@@ -1162,6 +1159,7 @@
 				B571F1791C95256A007F5A90 /* MaskColorMatrixTextureVertex.glsl in Resources */,
 				B5E7B9B71CC35B5D00978F1A /* LineFragment.glsl in Resources */,
 				B5661E0F1E6A2B5F0083717F /* FullColorFontFragment.glsl in Resources */,
+				B52EB3E9212C056700A3E210 /* Roboto-Medium.ttf in Resources */,
 				B508CD901CA901B700127B97 /* Avenir.ttc in Resources */,
 				B571F18B1C992B3D007F5A90 /* lazy.ttf in Resources */,
 				B57331AA1EE3762E00335959 /* PolyLineVertex.glsl in Resources */,
