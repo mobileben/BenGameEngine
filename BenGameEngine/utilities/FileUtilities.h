@@ -20,10 +20,10 @@ namespace BGE {
     public:
         enum class PathType {
             builtin,
-            download
+            runtime
         };
         
-        static std::string getDownloadPath();
+        static std::string getRuntimePath();
         static std::string getBuiltinPath();
         
         static std::string getPath(const BaseDirectory &base);
@@ -31,11 +31,11 @@ namespace BGE {
         
         inline static std::string getSeparator() { return separator_; }
         
-        static void initialize(std::string builtinPath, std::string downloadPath, std::string separator="/");
+        static void initialize(std::string builtinPath, std::string runtimePath, std::string separator="/");
         
     private:
         static bool initialized_;
-        static std::string downloadPath_;
+        static std::string runtimePath_;
         static std::string builtinPath_;
         static std::string separator_;
     };

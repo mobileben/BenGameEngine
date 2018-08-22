@@ -10,14 +10,14 @@
 #include <cassert>
 
 bool BGE::FileUtilities::initialized_;
-std::string BGE::FileUtilities::downloadPath_;
+std::string BGE::FileUtilities::runtimePath_;
 std::string BGE::FileUtilities::builtinPath_;
 std::string BGE::FileUtilities::separator_;
 
-std::string BGE::FileUtilities::getDownloadPath() {
+std::string BGE::FileUtilities::getRuntimePath() {
     assert(initialized_);
     
-    return downloadPath_;
+    return runtimePath_;
 }
 
 std::string BGE::FileUtilities::getBuiltinPath() {
@@ -38,8 +38,8 @@ std::string BGE::FileUtilities::getPath(const FilePath &filePath) {
     return filePath.filename();
 }
 
-void BGE::FileUtilities::initialize(std::string builtinPath, std::string downloadPath, std::string separator) {
-    downloadPath_ = downloadPath;
+void BGE::FileUtilities::initialize(std::string builtinPath, std::string runtimePath, std::string separator) {
+    runtimePath_ = runtimePath;
     builtinPath_ = builtinPath;
     separator_ = separator;
     
@@ -65,12 +65,12 @@ BGE::BaseDirectory::BaseDirectory(std::string path) {
         
         subpath = subpath.substr(0, index);
     } else {
-        // This must be downloadPath
-        refPath = FileUtilities::getDownloadPath();
+        // This must be runtimePath
+        refPath = FileUtilities::getRuntimePath();
         index = path.find(refPath);
         
         if (index != std::string::npos) {
-            type = FileUtilities::PathType::download;
+            type = FileUtilities::PathType::runtime;
             
             auto len = index + refPath.length();
             
@@ -97,7 +97,7 @@ std::string BGE::BaseDirectory::filename() const {
     if (type == FileUtilities::PathType::builtin) {
         path += FileUtilities::getBuiltinPath();
     } else {
-        path += FileUtilities::getDownloadPath();
+        path += FileUtilities::getRuntimePath();
     }
     
     if (!subpath.empty()) {
@@ -117,7 +117,7 @@ std::string BGE::FilePath::filename() const {
     if (type == FileUtilities::PathType::builtin) {
         path += FileUtilities::getBuiltinPath();
     } else {
-        path += FileUtilities::getDownloadPath();
+        path += FileUtilities::getRuntimePath();
     }
     
     if (!subpath.empty()) {
