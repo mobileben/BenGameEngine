@@ -78,27 +78,34 @@ namespace BGE {
         
         void outputMemoryBreakdown(uint32_t numTabs);
         
-        TextureHandle getTextureHandle(ScenePackageHandle scenePackageHandle, std::string name);
-        TextureHandle getTextureHandle(SpaceHandle spaceHandle, std::string name);
-        TextureHandle getTextureHandle(TextureAtlasHandle atlasHandle, std::string name);
+        TextureHandle getTextureHandle(ScenePackageHandle scenePackageHandle, const std::string& name);
+        TextureHandle getTextureHandle(SpaceHandle spaceHandle, const std::string& name);
+        TextureHandle getTextureHandle(TextureAtlasHandle atlasHandle, const std::string& name);
         
-        TextureAtlasHandle getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, std::string name);
-        TextureAtlasHandle getTextureAtlasHandle(SpaceHandle spaceHandle, std::string name);
-        TextureAtlasHandle getTextureAtlasHandle(FontHandle fontHandle, std::string name);
+        TextureAtlasHandle getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, const std::string& name);
+        TextureAtlasHandle getTextureAtlasHandle(SpaceHandle spaceHandle, const std::string& name);
+        TextureAtlasHandle getTextureAtlasHandle(FontHandle fontHandle, const std::string& name);
 
-        Texture *getTexture(ScenePackageHandle scenePackageHandle, std::string name);
-        Texture *getTexture(SpaceHandle spaceHandle, std::string name);
-        Texture *getTexture(TextureAtlasHandle atlasHandle, std::string name);
+        Texture *getTexture(ScenePackageHandle scenePackageHandle, const std::string& name);
+        Texture *getTexture(SpaceHandle spaceHandle, const std::string& name);
+        Texture *getTexture(TextureAtlasHandle atlasHandle, const std::string& name);
         inline Texture *getTexture(TextureHandle handle) {
             return textureHandleService_.dereference(handle);
         }
 
-        TextureAtlas *getTextureAtlas(ScenePackageHandle scenePackageHandle, std::string name);
-        TextureAtlas *getTextureAtlas(SpaceHandle spaceHandle, std::string name);
-        TextureAtlas *getTextureAtlas(FontHandle fontHandle, std::string name);
+        TextureAtlas *getTextureAtlas(ScenePackageHandle scenePackageHandle, const std::string& name);
+        TextureAtlas *getTextureAtlas(SpaceHandle spaceHandle, const std::string& name);
+        TextureAtlas *getTextureAtlas(FontHandle fontHandle, const std::string& name);
         inline TextureAtlas *getTextureAtlas(TextureAtlasHandle handle) {
             return textureAtlasHandleService_.dereference(handle);
         }
+
+        // Rename texture right now only allowed through SpaceHandle
+        // Note subtextures are not allowed to be renamed
+        // Returns true if successful, false if not.
+        // TextureHandle is not changed
+        bool renameTexture(SpaceHandle spaceHandle, TextureHandle handle, const std::string& name);
+        bool renameTexture(SpaceHandle spaceHandle, const std::string& existingName, const std::string& newName);
 
         void removeTexture(ScenePackageHandle scenePackageHandle, TextureHandle handle);
         void removeTexture(SpaceHandle spaceHandle, TextureHandle handle);

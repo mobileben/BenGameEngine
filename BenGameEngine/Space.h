@@ -178,6 +178,9 @@ namespace BGE {
         Texture *getTexture(std::string name) const;
         TextureAtlas *getTextureAtlas(std::string name) const;
 
+        bool renameTexture(TextureHandle handle, const std::string& name);
+        bool renameTexture(const std::string& existingName, const std::string& newName);
+
         void removeTexture(TextureHandle handle);
         void removeTextureAtlas(TextureAtlasHandle handle);
 

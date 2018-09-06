@@ -1450,6 +1450,14 @@ BGE::TextureAtlas *BGE::Space::getTextureAtlas(std::string name) const {
     return Game::getInstance()->getTextureService()->getTextureAtlas(spaceHandle_, name);
 }
 
+bool BGE::Space::renameTexture(TextureHandle handle, const std::string& name) {
+    return Game::getInstance()->getTextureService()->renameTexture(spaceHandle_, handle, name);
+}
+
+bool BGE::Space::renameTexture(const std::string& existingName, const std::string& newName) {
+    return Game::getInstance()->getTextureService()->renameTexture(spaceHandle_, existingName, newName);
+}
+
 void BGE::Space::removeTexture(TextureHandle handle) {
     Game::getInstance()->getTextureService()->removeTexture(spaceHandle_, handle);
 }
