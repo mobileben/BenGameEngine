@@ -30,7 +30,7 @@ namespace BGE {
     using ScenePackageLoadCompletionHandler = std::function<void(ScenePackageHandle, std::shared_ptr<Error>)>;
 
     struct ScenePackageLoadItem {
-        enum class LoadType { Package, Textures, Completion };
+        enum class LoadType { Package, Textures, Function };
         LoadType            type;
         SpaceHandle         spaceHandle;
         ScenePackageHandle  packageHandle;
@@ -40,7 +40,8 @@ namespace BGE {
 
         ScenePackageLoadItem(SpaceHandle spaceHandle, const std::string& name, const FilePath& filePath, ScenePackageLoadCompletionHandler callback) : type(LoadType::Package), spaceHandle(spaceHandle), name(name), filePath(filePath), completionHandler(callback) {}
         ScenePackageLoadItem(ScenePackageHandle packageHandle, ScenePackageLoadCompletionHandler callback) : type(LoadType::Textures), packageHandle(packageHandle), completionHandler(callback) {}
-        ScenePackageLoadItem(ScenePackageLoadCompletionHandler callback) : type(LoadType::Completion), completionHandler(callback) {}
+        // Can be used to execute a function on the scene package thread.
+        ScenePackageLoadItem(ScenePackageLoadCompletionHandler callback) : type(LoadType::Function), completionHandler(callback) {}
     };
     
     class ScenePackageService : public Service {
@@ -73,11 +74,13 @@ namespace BGE {
         bool isAligned8Memory(size_t size) const;
         size_t aligned8MemorySize(size_t size) const;
 
+        void dispatchAsync(ScenePackageLoadCompletionHandler func);
+
         void createPackage(SpaceHandle spaceHandle, std::string name, const FilePath &filePath, ScenePackageLoadCompletionHandler callback);
         void createPackageFromSPKGBinary(SpaceHandle spaceHandle, std::string name, const uint64_t *buffer, size_t bufferSize, bool managed, const BaseDirectory& baseDirectory, ScenePackageLoadCompletionHandler callback);
         void createPackageFromJSONBinary(SpaceHandle spaceHandle, std::string name, const uint8_t *buffer, size_t bufferSize, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback);
         void createPackageFromJSONDict(SpaceHandle spaceHandle, std::string name, const std::shared_ptr<rapidjson::Document> jsonDict, const BaseDirectory &baseDirectory, ScenePackageLoadCompletionHandler callback);
-
+        
         void addSpaceHandleReference(SpaceHandle spaceHandle, ScenePackageHandle packageHandle);
 
         ScenePackageHandle getScenePackageHandle(std::string name) const;

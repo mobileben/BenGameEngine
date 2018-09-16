@@ -105,10 +105,14 @@ void BGE::ScenePackageService::loadPackageTextures(ScenePackageLoadItem loadable
     }
 }
 
+
+void BGE::ScenePackageService::dispatchAsync(ScenePackageLoadCompletionHandler func) {
+    ScenePackageLoadItem loadable(func);
+    queuedLoadItems_.push(loadable);
+}
+
 void BGE::ScenePackageService::createPackage(SpaceHandle spaceHandle, std::string name, const FilePath &filePath, ScenePackageLoadCompletionHandler callback) {
     ScenePackageLoadItem loadable{spaceHandle, name, filePath, callback};
-    
-    queuedLoadItems_.push(loadable);
 }
 
 void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
@@ -598,7 +602,7 @@ void BGE::ScenePackageService::loadThreadFunction() {
                     loadable.completionHandler(packageHandle, error);
                 }
             });
-        } else if (loadable.type == ScenePackageLoadItem::LoadType::Completion) {
+        } else if (loadable.type == ScenePackageLoadItem::LoadType::Function) {
             auto f = std::async(std::launch::async, static_cast<void(ScenePackageService::*)(ScenePackageLoadItem, ScenePackageLoadCompletionHandler)>(&ScenePackageService::completionPackage), this, loadable, [loadable](ScenePackageHandle packageHandle, std::shared_ptr<Error> error) {
                 if (loadable.completionHandler) {
                     loadable.completionHandler(packageHandle, error);
