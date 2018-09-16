@@ -18,7 +18,7 @@
 #include "Profiling.h"
 #endif /* SUPPORT_PROFILING */
 
-BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0) {
+BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0), currentDispatchQueue_(0) {
 #if TARGET_OS_IPHONE
     iosHeartbeat_ = [[BGEHeartbeatIOS alloc] init];
 #endif /* TARGET_OS_IPHONE */
@@ -91,6 +91,23 @@ void BGE::HeartbeatService::queueTickHandler() {
     queuedItems_.pushIfEmpty(this);
 }
 
+void BGE::HeartbeatService::dispatchHandler() {
+    std::lock_guard<std::mutex> lock(dispatchQueueMutex_);
+    // To process queue
+    auto& queue = dispatchQueues_[currentDispatchQueue_];
+    
+    // Flip current buffer
+    currentDispatchQueue_ ^= 1;
+    
+    // Now go through each one. Since we flipped the buffer, any changes to the queue will happen
+    auto count = queue.size();
+    for (auto i=0;i<count;++i) {
+        auto func =  std::move(queue.front());
+        queue.pop();
+        func();
+    }
+}
+
 void BGE::HeartbeatService::tickHandler() {
 #ifdef SUPPORT_PROFILING
     auto startTime = profiling::EpochTime::timeInMicroSec();
@@ -102,6 +119,9 @@ void BGE::HeartbeatService::tickHandler() {
         double elapsedTime = delta * timebaseMultiplier_;
 
         lastCounter_ = counter_;
+        
+        // Dispatch handlers are done prior to any of the listeners
+        dispatchHandler();
         
         for (auto const& entry : orderedListeners_) {
             entry.first(elapsedTime);
@@ -136,6 +156,13 @@ void BGE::HeartbeatService::unregisterListener(std::string name) {
 bool BGE::HeartbeatService::runningOnQueueThread() const {
     return std::this_thread::get_id() == thread_.get_id();
 }
+
+void BGE::HeartbeatService::dispatchAsync(HeartbeatDispatchFunction func) {
+    std::lock_guard<std::mutex> lock(dispatchQueueMutex_);
+    auto& queue = dispatchQueues_[currentDispatchQueue_];
+    queue.push(func);
+}
+
 
 void BGE::HeartbeatService::rebuildOrderedListeners() {
     std::vector<std::pair<std::function<void(double dt)>, uint32_t>> ordered;

@@ -28,10 +28,13 @@
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <thread>
+#include <functional>
 
 #include "Service.h"
 
 namespace BGE {
+    using HeartbeatDispatchFunction = std::function<void()>;
+    
     class HeartbeatService : public Service {
     public:
         HeartbeatService();
@@ -50,6 +53,8 @@ namespace BGE {
         void setRunning(bool running);
         bool runningOnQueueThread() const;
 
+        void dispatchAsync(HeartbeatDispatchFunction func);
+        
         // For now heartbeat is done all based on one rate, however, later it will be done by interval
         void registerListener(std::string name, std::function<void(double dt)> listener, uint32_t order);
         void unregisterListener(std::string name);
@@ -74,6 +79,10 @@ namespace BGE {
         std::thread                 thread_;
         Queue<HeartbeatService *>   queuedItems_;
         
+        std::mutex                              dispatchQueueMutex_;
+        uint32_t                                currentDispatchQueue_;
+        std::queue<HeartbeatDispatchFunction>   dispatchQueues_[2];
+        
 #ifdef SUPPORT_PROFILING
         int64_t     processingTime_;
 #endif /* SUPPORT_PROFILING */
@@ -81,6 +90,7 @@ namespace BGE {
         void rebuildOrderedListeners();
         void queueTickHandler();
         void tickHandler();
+        void dispatchHandler();
         void threadFunction();
     };
 }
