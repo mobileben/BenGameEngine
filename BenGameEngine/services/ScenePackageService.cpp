@@ -113,6 +113,7 @@ void BGE::ScenePackageService::dispatchAsync(ScenePackageLoadCompletionHandler f
 
 void BGE::ScenePackageService::createPackage(SpaceHandle spaceHandle, std::string name, const FilePath &filePath, ScenePackageLoadCompletionHandler callback) {
     ScenePackageLoadItem loadable{spaceHandle, name, filePath, callback};
+    queuedLoadItems_.push(loadable);
 }
 
 void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
