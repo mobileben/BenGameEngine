@@ -43,14 +43,18 @@ void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view)
     lock();
     
     auto scale = [[UIScreen mainScreen] nativeScale];
-
+    auto window = BGE::Game::getInstance()->getRenderService()->getRenderWindow();
+    auto mapX = scale * window->getFromMappedXScale();
+    auto mapY = scale * window->getFromMappedYScale();
+    auto w_2 = window->getMappedWidth() / 2.0;
+    auto h = window->getMappedHeight();
+    auto h_2 = h / 2.0;
+    
     for (UITouch *touch in touches) {
         Input *input = createInput();
-        
         auto p = [touch locationInView:view];
-        
-        p.x *= scale;
-        p.y *= scale;
+        p.x *= mapX;
+        p.y *= mapY;
         
         input->timestamp = [touch timestamp];
         input->touch = touch;
@@ -58,24 +62,22 @@ void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view)
         input->tapCount = (uint32_t) [touch tapCount];
         
         // Convert to proper coordinates if needed
-        std::shared_ptr<RenderWindow> window = Game::getInstance()->getRenderService()->getRenderWindow();
-
         switch (Game::getInstance()->getRenderService()->getCoordinateSystem2D()) {
             case Render2DCoordinateSystem::Traditional:
                 input->x = p.x;
                 input->y = p.y;
                 break;
             case Render2DCoordinateSystem::TraditionalCentered:
-                input->x = p.x - (window->getWidth() * window->getContentScaleFactor() / 2.0);
-                input->y = p.y - (window->getHeight() * window->getContentScaleFactor() / 2.0);
+                input->x = p.x - w_2;
+                input->y = p.y - h_2;
                 break;
             case Render2DCoordinateSystem::OpenGL:
                 input->x = p.x;
-                input->y = (window->getHeight() * window->getContentScaleFactor()) - p.y;
+                input->y = h - p.y;
                 break;
             case Render2DCoordinateSystem::OpenGLCentered:
-                input->x = p.x - (window->getWidth() * window->getContentScaleFactor() / 2.0);
-                input->y = (window->getHeight() * window->getContentScaleFactor() / 2.0) - p.y;
+                input->x = p.x - w_2;
+                input->y = h_2 - p.y;
                 break;
         }
         

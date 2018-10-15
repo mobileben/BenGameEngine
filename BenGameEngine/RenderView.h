@@ -25,6 +25,11 @@ namespace BGE {
         float getWidth();
         float getHeight();
         
+        void setMappedWidth(float width);
+        void setMappedHeight(float height);
+        float getMappedWidth() const { return mappedWidth_; }
+        float getMappedHeight() const { return mappedHeight_; }
+
         std::weak_ptr<RenderWindow> getWindow();
         
     private:
@@ -34,8 +39,10 @@ namespace BGE {
         float y_;
         float width_;
         float height_;
+        float mappedWidth_;
+        float mappedHeight_;
+
         std::weak_ptr<RenderWindow> window_;
-        
     };
 }
 

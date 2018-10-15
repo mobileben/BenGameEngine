@@ -63,6 +63,7 @@ namespace BGE {
         std::shared_ptr<ShaderProgram> popShaderProgram();
         
         const Matrix4 *getProjectionMatrix() { return &projectionMatrix_; }
+        const Matrix4 *getMappedProjectionMatrix() { return &mappedProjectionMatrix_; }
         
         void drawRect(Vector2 &position, Vector2 &size, Vector4 &color);
         void drawShadedRect(Vector2 &position, Vector2 &size, Vector4 color[4]);
@@ -109,6 +110,7 @@ namespace BGE {
         uint32_t currentTexture_[MaxTextureUnits];
         
         Matrix4 projectionMatrix_;
+        Matrix4 mappedProjectionMatrix_;
         GLKTextureInfo *textureInfo_;
         uint8_t activeMasks_;
 

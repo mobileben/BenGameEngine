@@ -52,8 +52,8 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), current
     shaderService_ = std::make_shared<ShaderServiceOpenGLES2>();
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
     
-    Matrix4MakeIdentify(projectionMatrix_);
-
+    Matrix4MakeIdentity(projectionMatrix_);
+    Matrix4MakeIdentity(mappedProjectionMatrix_);
 #ifdef SUPPORT_PROFILING
     resetProfilingStats();
 #endif /* SUPPORT_PROFILING */
@@ -164,6 +164,7 @@ void BGE::RenderServiceOpenGLES2::setCoordinateSystem2D(Render2DCoordinateSystem
             Matrix4MakeOrthographic(projectionMatrix_, -window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getWidth() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, window->getHeight() * this->getRenderWindow()->getContentScaleFactor() / 2.0, -1, 1);
             break;
     }
+    mappedProjectionMatrix_ = projectionMatrix_;
 }
 
 void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)
@@ -543,14 +544,14 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             
             GLint textureUniform = glShader->locationForUniform("Texture");
             GLint projectionLocation = glShader->locationForUniform("Projection");
-            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
             
             // This is a hack for now
 
             GLint modelLocation = glShader->locationForUniform("ModelView");
             Matrix4 mat;
             
-            Matrix4MakeIdentify(mat);
+            Matrix4MakeIdentity(mat);
             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
             // END HACK
         
@@ -605,7 +606,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
                 glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 
                 material->getColor(color);
-                glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+                glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
 
                 if (transformComponent) {
@@ -614,7 +615,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
                     // TODO: This is a hack for now
                     Matrix4 mat;
                     
-                    Matrix4MakeIdentify(mat);
+                    Matrix4MakeIdentity(mat);
                     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
                 }
 
@@ -655,7 +656,7 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
                     // This is a hack for now
                     Matrix4 mat;
                     
-                    Matrix4MakeIdentify(mat);
+                    Matrix4MakeIdentity(mat);
                     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
                 }
 
@@ -665,7 +666,7 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
                 Color color;
 
                 material->getColor(color);
-                glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+                glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
                 glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
                                GL_UNSIGNED_BYTE, &Indices[0]);
@@ -703,7 +704,7 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
                         
                         GLint textureUniform = glShader->locationForUniform("Texture");
                         GLint projectionLocation = glShader->locationForUniform("Projection");
-                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                         auto transformComponent = gameObject->getComponent<TransformComponent>();
                         GLint modelLocation = glShader->locationForUniform("ModelView");
                         
@@ -713,7 +714,7 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
                             // TODO: This is a hack for now
                             Matrix4 mat;
                             
-                            Matrix4MakeIdentify(mat);
+                            Matrix4MakeIdentity(mat);
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
                         }
                         
@@ -759,11 +760,11 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
     GLint colorLocation = glShader->locationForUniform("Color");
     
     glEnableVertexAttribArray(positionLocation);
-    glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+    glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
 
     Matrix4 mat;
     
-    Matrix4MakeIdentify(mat);
+    Matrix4MakeIdentity(mat);
     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
     
     glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
@@ -813,7 +814,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
             Color color;
             
             material->getColor(color);
-            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
 
             if (xform) {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) xform->worldMatrix_.m);
@@ -821,7 +822,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
                 // TODO: This is a hack for now
                 Matrix4 mat;
                 
-                Matrix4MakeIdentify(mat);
+                Matrix4MakeIdentity(mat);
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
             }
             
@@ -866,7 +867,7 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(GameObject *gameObject) {
             
             glEnableVertexAttribArray(positionLocation);
             
-            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
             
             if (xform) {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) xform->worldMatrix_.m);
@@ -874,7 +875,7 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(GameObject *gameObject) {
                 // TODO: This is a hack for now
                 Matrix4 mat;
                 
-                Matrix4MakeIdentify(mat);
+                Matrix4MakeIdentity(mat);
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
             }
             
@@ -998,7 +999,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                         
                         GLint textureUniform = glShader->locationForUniform("Texture");
                         GLint projectionLocation = glShader->locationForUniform("Projection");
-                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) projectionMatrix_.m);
+                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                         auto transformComponent = gameObject->getComponent<TransformComponent>();
                         GLint modelLocation = glShader->locationForUniform("ModelView");
                         GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
@@ -1012,7 +1013,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                             // TODO: This is a hack for now
                             Matrix4 mat;
                             
-                            Matrix4MakeIdentify(mat);
+                            Matrix4MakeIdentity(mat);
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
                         }
                         
@@ -1123,7 +1124,7 @@ void BGE::RenderServiceOpenGLES2::drawString(std::string str, Font *font, const 
         auto colorMultiplierLocation = glShader->locationForUniform("ColorMultiplier");
         auto colorOffsetLocation = glShader->locationForUniform("ColorOffset");
 
-        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) renderer->getProjectionMatrix()->m);
+        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) renderer->getMappedProjectionMatrix()->m);
         glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
 
         glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
@@ -1353,7 +1354,7 @@ void BGE::RenderServiceOpenGLES2::render()
         assert(colorMatrixStack_.size() == 0);
         assert(colorTransformStack_.size() == 0);
         
-        ColorMatrixMakeIdentify(currentColorMatrix_);
+        ColorMatrixMakeIdentity(currentColorMatrix_);
         colorMatrixStack_.clear();  // TODO: remove?
         
         ColorTransformMakeIdentity(currentColorTransform_);
@@ -1366,7 +1367,12 @@ void BGE::RenderServiceOpenGLES2::render()
         
         // TODO: Content scale factor
 //        glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight());
-        glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth() * this->getRenderWindow()->getContentScaleFactor(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight() * this->getRenderWindow()->getContentScaleFactor());
+        auto window = this->getRenderWindow();
+        auto view = window->getRenderView(RenderWindow::DefaultRenderViewName);
+        glViewport(0, 0, view->getWidth() * this->getRenderWindow()->getContentScaleFactor(), view->getHeight() * window->getContentScaleFactor());
+        
+        mappedProjectionMatrix_ = projectionMatrix_;
+        Matrix4Scale(mappedProjectionMatrix_, window->getToMappedXScale(), window->getToMappedYScale(), 1.0);
         
         std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
         

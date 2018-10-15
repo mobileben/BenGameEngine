@@ -46,6 +46,24 @@ float BGE::RenderWindow::getContentScaleFactor() const {
     return contentScaleFactor_;
 }
 
+void BGE::RenderWindow::setMappedWidth(float width) {
+    auto nativeWidth = width_ * contentScaleFactor_;
+    mappedWidth_ = width;
+    toMappedXScale_ = nativeWidth / mappedWidth_;
+    fromMappedXScale_ = mappedWidth_ / nativeWidth;
+    Matrix4MakeScale(toMappedMatrix_, toMappedXScale_, toMappedYScale_, 1.0);
+    Matrix4MakeScale(fromMappedMatrix_, fromMappedXScale_, fromMappedYScale_, 1.0);
+}
+
+void BGE::RenderWindow::setMappedHeight(float height) {
+    auto nativeHeight = height_ * contentScaleFactor_;
+    mappedHeight_ = height;
+    toMappedYScale_ = nativeHeight / mappedHeight_;
+    fromMappedYScale_ = mappedHeight_ / nativeHeight;
+    Matrix4MakeScale(toMappedMatrix_, toMappedXScale_, toMappedYScale_, 1.0);
+    Matrix4MakeScale(fromMappedMatrix_, fromMappedXScale_, fromMappedYScale_, 1.0);
+}
+
 void BGE::RenderWindow::addRenderView(std::string name, std::shared_ptr<RenderView> renderView) {
     if (renderViews_.empty()) {
 #if TARGET_OS_IPHONE
@@ -65,6 +83,8 @@ void BGE::RenderWindow::addRenderView(std::string name, std::shared_ptr<RenderVi
                 this->height_ = 0;
                 this->contentScaleFactor_ = 1;
             }
+            setMappedWidth(this->width_ * this->contentScaleFactor_);
+            setMappedHeight(this->height_ * this->contentScaleFactor_);
             view_ = view;
         }
 #endif /* TARGET_OS_IPHONE */
