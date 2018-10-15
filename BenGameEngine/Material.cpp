@@ -9,7 +9,7 @@
 #include "Material.h"
 
 BGE::Material::Material(ObjectId matId) : Object(matId), colorDirty_(false)  {
-    Matrix4MakeIdentify(colorMatrix_.matrix);
+    Matrix4MakeIdentity(colorMatrix_.matrix);
     colorMatrix_.offset.r = 0;
     colorMatrix_.offset.g = 0;
     colorMatrix_.offset.b = 0;
@@ -17,7 +17,7 @@ BGE::Material::Material(ObjectId matId) : Object(matId), colorDirty_(false)  {
 }
 
 BGE::Material::Material() : Object(), colorDirty_(false)  {
-    Matrix4MakeIdentify(colorMatrix_.matrix);
+    Matrix4MakeIdentity(colorMatrix_.matrix);
     colorMatrix_.offset.r = 0;
     colorMatrix_.offset.g = 0;
     colorMatrix_.offset.b = 0;
@@ -25,7 +25,7 @@ BGE::Material::Material() : Object(), colorDirty_(false)  {
 }
 
 void BGE::Material::initialize(MaterialHandle handle) {
-    Matrix4MakeIdentify(colorMatrix_.matrix);
+    Matrix4MakeIdentity(colorMatrix_.matrix);
     colorMatrix_.offset.r = 0;
     colorMatrix_.offset.g = 0;
     colorMatrix_.offset.b = 0;

@@ -13,5 +13,5 @@ BGE::ComponentTypeId BGE::ColorMatrixComponent::typeId_ = Component::InvalidType
 std::type_index BGE::ColorMatrixComponent::type_index_ = typeid(BGE::ColorMatrixComponent);
 
 BGE::ColorMatrixComponent::ColorMatrixComponent() : Component() {
-    ColorMatrixMakeIdentify(matrix);
+    ColorMatrixMakeIdentity(matrix);
 }

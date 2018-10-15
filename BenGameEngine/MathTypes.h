@@ -128,7 +128,7 @@ namespace BGE {
     bool operator==(const ColorMatrix& lhs, const ColorMatrix& rhs);
     bool operator!=(const ColorMatrix& lhs, const ColorMatrix& rhs);
 
-    extern void ColorMatrixMakeIdentify(ColorMatrix &matrix);
+    extern void ColorMatrixMakeIdentity(ColorMatrix &matrix);
     extern void ColorMatrixMultiply(ColorMatrix& matrix, ColorMatrix& left, ColorMatrix& right);
     ColorMatrix operator*(ColorMatrix& lhs, ColorMatrix& rhs);
 
@@ -166,7 +166,7 @@ namespace BGE {
     
     extern void Matrix4Make(Matrix4& matrix, float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31, float m32, float m33);
     
-    extern void Matrix4MakeIdentify(Matrix4& matrix);
+    extern void Matrix4MakeIdentity(Matrix4& matrix);
     
     extern void Matrix4MakeWithArray(Matrix4& matrix, float values[16]);
     

@@ -19,8 +19,8 @@ std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComp
 
 BGE::TransformComponent::TransformComponent() : Component(), visible_(true), clipped_(false),
 bounds_({ 0, 0, 0, 0}), useCollisionRectScale_(false), collisionRectScale_({1, 1}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), useSkew_(false), rotation_(0), localDirty_(false), worldDirty_(false), speed_(1), paused_(false) {
-    Matrix4MakeIdentify(localMatrix_);
-    Matrix4MakeIdentify(worldMatrix_);
+    Matrix4MakeIdentity(localMatrix_);
+    Matrix4MakeIdentity(worldMatrix_);
 }
 
 void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
@@ -53,8 +53,8 @@ void BGE::TransformComponent::initialize(HandleBackingType handle, SpaceHandle s
     speed_ = 1;
     paused_ = false;
     
-    Matrix4MakeIdentify(localMatrix_);
-    Matrix4MakeIdentify(worldMatrix_);
+    Matrix4MakeIdentity(localMatrix_);
+    Matrix4MakeIdentity(worldMatrix_);
 }
 
 void BGE::TransformComponent::destroy() {

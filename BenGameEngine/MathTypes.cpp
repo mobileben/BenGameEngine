@@ -209,8 +209,8 @@ namespace BGE {
         return false;
     }
     
-    void ColorMatrixMakeIdentify(ColorMatrix &matrix) {
-        Matrix4MakeIdentify(matrix.matrix);
+    void ColorMatrixMakeIdentity(ColorMatrix &matrix) {
+        Matrix4MakeIdentity(matrix.matrix);
         matrix.offset.r = matrix.offset.g = matrix.offset.b = matrix.offset.a = 0;
     }
     
@@ -404,7 +404,7 @@ namespace BGE {
         
     }
     
-    void Matrix4MakeIdentify(Matrix4& matrix)
+    void Matrix4MakeIdentity(Matrix4& matrix)
     {
         matrix.m00 = 1;
         matrix.m01 = 0;
@@ -550,7 +550,7 @@ namespace BGE {
     
     void Matrix4MakeScale(Matrix4& matrix, float sx, float sy, float sz)
     {
-        Matrix4MakeIdentify(matrix);
+        Matrix4MakeIdentity(matrix);
         
         matrix.m[0] = sx;
         matrix.m[5] = sy;
@@ -586,7 +586,7 @@ namespace BGE {
 
     void Matrix4MakeTranslation(Matrix4& matrix, float tx, float ty, float tz)
     {
-        Matrix4MakeIdentify(matrix);
+        Matrix4MakeIdentity(matrix);
         
         matrix.m[12] = tx;
         matrix.m[13] = ty;
