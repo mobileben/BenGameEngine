@@ -8,6 +8,7 @@
 
 #include "ButtonComponent.h"
 #include "Game.h"
+#include "MathTypes.h"
 #include "TransformComponent.h"
 #include "BoundingBoxComponent.h"
 
@@ -18,11 +19,14 @@ static const char *ButtonStateNormalAnimString = "normal-anim";
 static const char *ButtonStateHighlightedString = "highlighted";
 static const char *ButtonStateHighlightedAnimString = "highlighted-anim";
 
+static const float kDefaultTouchUpCollisionScale = 3;
+static const float kDefaultDebounceTime = 0.200;
+
 uint32_t BGE::ButtonComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::ButtonComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::ButtonComponent::type_index_ = typeid(BGE::ButtonComponent);
 
-BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), touchable_(true), enabled(true), showHighlighted_(true), toggleable(false), toggleOn(false)
+BGE::ButtonComponent::ButtonComponent() : Component(), state(ButtonStateNormal), animate(false), touchable_(true), enabled(true), showHighlighted_(true), toggleable(false), toggleOn(false), event_(Event::None), debouncing_(false), debounceDuration_(kDefaultDebounceTime), debounceTimer_(0), pressedTime_(0), pressedDuration_(0), pressedByDurationTriggered_(false), touchUpCollisionScale_(kDefaultTouchUpCollisionScale)
 #if TARGET_OS_IPHONE
 , touch(nil)
 #endif /* TARGET_OS_IPHONE */
@@ -41,6 +45,14 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
     toggleable = false;
     toggleOn = false;
     
+    event_ = Event::None;
+    debouncing_ = false;
+    debounceDuration_ = kDefaultDebounceTime;
+    pressedTime_ = 0;
+    pressedDuration_ = 0;
+    pressedByDurationTriggered_ = false;
+    touchUpCollisionScale_ = kDefaultTouchUpCollisionScale;
+    
 #if TARGET_OS_IPHONE
     touch = nil;
 #endif /* TARGET_OS_IPHONE */
@@ -52,6 +64,8 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
     highlightedButtonHandle = GameObjectHandle();
     highlightedAnimButtonHandle = GameObjectHandle();
     currentButtonHandle = GameObjectHandle();
+    
+    highlightedAnimHandlerHandle = EventHandlerHandle();
     
     pressedTime_ = 0;
 }
@@ -75,6 +89,9 @@ void BGE::ButtonComponent::destroy() {
         space->removeGameObject(highlightedButtonHandle);
         space->removeGameObject(highlightedAnimButtonHandle);
         space->removeGameObject(currentButtonHandle);
+        
+        Game::getInstance()->getAnimationService()->unregisterEventHandler(highlightedAnimHandlerHandle);
+        highlightedAnimHandlerHandle.nullify();
     }
 
     // Component::destroy last
@@ -224,7 +241,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     }
                     
                     highlightedAnimButtonHandle = highlightedAnimButton->getHandle();
-                    
+                    highlightedAnimHandlerHandle = Game::getInstance()->getAnimationService()->registerEventHandler(highlightedAnimButton, BGE::Event::AnimationReachedEnd, std::bind(&ButtonComponent::handleHighlightedAnimEndHandler, this, std::placeholders::_1, std::placeholders::_2));
+
                     gameObj = space->getGameObject(getGameObjectHandle());
                     xform = gameObj->getComponent<TransformComponent>();
                     xform->addChild(highlightedAnimButton->getComponent<TransformComponent>());
@@ -306,18 +324,22 @@ void BGE::ButtonComponent::setEnabled(bool enabled) {
     if (enabled) {
         state &= ~ButtonStateDisabled;
         
-        if (toggleable) {
-            if (toggleOn) {
-                useHighlightedButton();
+        if (!isDebouncing()) {
+            if (toggleable) {
+                if (toggleOn) {
+                    useHighlightedButton();
+                } else {
+                    useNormalButton();
+                }
             } else {
                 useNormalButton();
             }
-        } else {
-            useNormalButton();
         }
     } else {
         state |= ButtonStateDisabled;
-        useDisabledButton();
+        if (!isDebouncing()) {
+            useDisabledButton();
+        }
     }
 }
 
@@ -421,8 +443,20 @@ void BGE::ButtonComponent::setToggleable(bool on) {
     toggleable = on;
 }
 
-double BGE::ButtonComponent::pressedTime() const {
+float BGE::ButtonComponent::pressedTime() const {
     return pressedTime_;
+}
+
+float BGE::ButtonComponent::pressedDuration() const {
+    return pressedDuration_;
+}
+
+bool BGE::ButtonComponent::pressedByDurationTriggered() const {
+    return pressedByDurationTriggered_;
+}
+
+void BGE::ButtonComponent::setPressedDuration(float duration) {
+    pressedDuration_ = duration;
 }
 
 void BGE::ButtonComponent::useHighlightedButton() {
@@ -439,45 +473,20 @@ void BGE::ButtonComponent::useHighlightedButton() {
             animator->stop();
         }
         
-        currentButton = nullptr;
+        currentButtonHandle = highlightedButtonHandle;
+        currentButton = getSpace()->getGameObject(currentButtonHandle);
         
-        if (animate) {
+        if (!currentButton) {
             GameObject *button;
             
-            if ((button = space->getGameObject(highlightedAnimButtonHandle)) != nullptr && button->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
-                currentButtonHandle = button->getHandle();
-                playAnim = true;
-            } else if ((button = space->getGameObject(highlightedButtonHandle)) != nullptr) {
-                currentButtonHandle = button->getHandle();
-            } else if ((button = space->getGameObject(normalAnimButtonHandle)) != nullptr && button->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
+            // Fallback as we don't have this
+            if ((button = space->getGameObject(normalAnimButtonHandle)) != nullptr && button->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
                 currentButtonHandle = button->getHandle();
                 playAnim = true;
             } else if ((button = space->getGameObject(normalButtonHandle)) != nullptr) {
                 currentButtonHandle = button->getHandle();
             } else {
                 assert(false);
-            }
-
-        } else {
-            currentButtonHandle = highlightedButtonHandle;
-            
-            currentButton = getSpace()->getGameObject(currentButtonHandle);
-            
-            if (!currentButton) {
-                GameObject *button;
-
-                // Fallback as we don't have this
-                if ((button = space->getGameObject(highlightedAnimButtonHandle)) != nullptr && button->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
-                    currentButtonHandle = button->getHandle();
-                    playAnim = true;
-                } else if ((button = space->getGameObject(normalAnimButtonHandle)) != nullptr && button->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
-                    currentButtonHandle = button->getHandle();
-                    playAnim = true;
-                } else if ((button = space->getGameObject(normalButtonHandle)) != nullptr) {
-                    currentButtonHandle = button->getHandle();
-                } else {
-                    assert(false);
-                }
             }
         }
 
@@ -617,11 +626,61 @@ void BGE::ButtonComponent::useNormalButton() {
     }
 }
 
+void BGE::ButtonComponent::animateHighlightedButton() {
+    auto space = getSpace();
+    auto currentButton = space->getGameObject(currentButtonHandle);
+    
+    if (showHighlighted_) {
+        bool playAnim = false;
+        int32_t count = 1;
+        currentButton->setActive(false);
+        
+        if (currentButton->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
+            auto animator = currentButton->getComponent<AnimatorComponent>();
+            animator->stop();
+        }
+        
+        currentButton = nullptr;
+        GameObject *button;
+        
+        if ((button = space->getGameObject(highlightedAnimButtonHandle)) != nullptr && button->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
+            currentButtonHandle = button->getHandle();
+            playAnim = true;
+        } else if ((button = space->getGameObject(highlightedButtonHandle)) != nullptr) {
+            currentButtonHandle = button->getHandle();
+        } else if ((button = space->getGameObject(normalAnimButtonHandle)) != nullptr && button->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
+            currentButtonHandle = button->getHandle();
+            playAnim = true;
+            count = AnimPlayForever;
+        } else if ((button = space->getGameObject(normalButtonHandle)) != nullptr) {
+            currentButtonHandle = button->getHandle();
+        } else {
+            assert(false);
+        }
+        
+        currentButton = getSpace()->getGameObject(currentButtonHandle);
+        
+        if (currentButton) {
+            currentButton->setActive(true);
+            
+            if (playAnim) {
+                auto animator = currentButton->getComponent<AnimatorComponent>();
+                
+                if (animator->state == AnimState::Done) {
+                    animator->play(count);
+                }
+            }
+        }
+    }
+}
+
 BGE:: Event BGE::ButtonComponent::shouldHandleInput(Input *input, bool inBounds) {
     Event event = Event::None;
     
     switch (input->type) {
         case TouchType::Down:
+            // For safety anytime we have a touch down, clear our pressedByDurationTriggered_
+            pressedByDurationTriggered_ = false;
             event = shouldHandleTouchDownEvent(inBounds);
             
             if (event == Event::TouchDownInside) {
@@ -637,6 +696,17 @@ BGE:: Event BGE::ButtonComponent::shouldHandleInput(Input *input, bool inBounds)
             if (touch == input->touch) {
                 event = shouldHandleTouchUpEvent(inBounds);
                 touch = nil;
+            }
+#endif /* TARGET_OS_IPHONE */
+            break;
+            
+        case TouchType::Move:
+#if TARGET_OS_IPHONE
+            if (touch == input->touch) {
+                event = shouldHandleTouchMoveEvent(inBounds);
+                if (event == Event::TouchInsideForDuration) {
+                    touch = nil;
+                }
             }
 #endif /* TARGET_OS_IPHONE */
             break;
@@ -658,10 +728,49 @@ BGE:: Event BGE::ButtonComponent::shouldHandleInput(Input *input, bool inBounds)
     return event;
 }
 
+
+float BGE::ButtonComponent::getCollisionScale(Input *input) const {
+    if ((input->type == TouchType::Move || input->type == TouchType::Up) && touch == input->touch) {
+        return touchUpCollisionScale_;
+    } else {
+        return 1.0;
+    }
+}
+
+void BGE::ButtonComponent::update(double deltaTime) {
+    // Update only used when we're debouncing
+    if (debouncing_) {
+        if (highlightedAnimButtonHandle.isNull()) {
+            debounceTimer_ += deltaTime;
+            if (debounceTimer_ >= debounceDuration_) {
+                debouncing_ = false;
+                pressedByDurationTriggered_ = false;
+                event_ = Event::None;
+                
+                if (isEnabled()) {
+                    if (toggleable) {
+                        if (toggleOn) {
+                            useHighlightedButton();
+                        } else {
+                            useNormalButton();
+                        }
+                    } else {
+                        setHighlighted(false);
+                    }
+                } else {
+                    useDisabledButton();
+                }
+            }
+        }
+    } else if (event_ == Event::TouchDownInside) {
+        pressedTime_ += deltaTime;
+    }
+}
+
 BGE::Event BGE::ButtonComponent::shouldHandleTouchDownEvent(bool inBounds) {
     Event event = Event::None;
     
-    if (inBounds) {
+    if (isTouchable() && isEnabled() && !isDebouncing() && inBounds) {
         event = Event::TouchDownInside;
     }
     
@@ -669,88 +778,148 @@ BGE::Event BGE::ButtonComponent::shouldHandleTouchDownEvent(bool inBounds) {
 }
 
 BGE::Event BGE::ButtonComponent::shouldHandleTouchCancelEvent() {
+    // Always cancel
     Event event = Event::TouchCancel;
+    return event;
+}
+
+BGE::Event BGE::ButtonComponent::shouldHandleTouchMoveEvent(bool inBounds) {
+    Event event = Event::None;
+    if (isTouchable() && isEnabled() && !isDebouncing()) {
+        if (inBounds) {
+            if (!pressedByDurationTriggered_ && pressedDuration_ > 0.0) {
+                // If we have a pressed duration, then test our pressedTime_
+                if (nearlyGreaterThanOrEqual(pressedTime_, pressedDuration_)) {
+                    event = Event::TouchInsideForDuration;
+                }
+            }
+        } else {
+            // If we are out of bounds, then reset our pressedTime_
+            event = event_;
+        }
+    }
+    
     return event;
 }
 
 BGE::Event BGE::ButtonComponent::shouldHandleTouchUpEvent(bool inBounds) {
     Event event = Event::None;
     
-    if (inBounds) {
-        event = Event::TouchUpInside;
-    } else {
-        event = Event::TouchUpOutside;
+    if (isTouchable() && isEnabled() && !isDebouncing()) {
+        if (inBounds) {
+            event = Event::TouchUpInside;
+        } else {
+            event = Event::TouchUpOutside;
+        }
     }
     
     return event;
 }
 
 BGE::Event BGE::ButtonComponent::handleTouchDownEvent(bool inBounds) {
-    Event event = Event::None;
+    event_ = Event::None;
     
     pressedTime_ = 0;
 
-    if (inBounds) {
-        if (isTouchable() && isEnabled()) {
+    if (isTouchable() && isEnabled() && !isDebouncing()) {
+        if (inBounds) {
             setHighlighted(true);
-            pressedTimeStart = std::chrono::high_resolution_clock::now();
+            event_ = Event::TouchDownInside;
         }
-        event = Event::TouchDownInside;
     }
-    
-    return event;
+    return event_;
 }
 
 BGE::Event BGE::ButtonComponent::handleTouchCancelEvent() {
-    Event event = Event::TouchCancel;
-    
-    if (isTouchable() && isEnabled()) {
-        useNormalButton();
-    }
-    
+    event_ = Event::TouchCancel;
+
     pressedTime_ = 0;
 
-    return event;
+    if (isTouchable() && isEnabled() && !isDebouncing()) {
+        useNormalButton();
+    }
+
+    return event_;
 }
 
-BGE::Event BGE::ButtonComponent::handleTouchUpEvent(bool inBounds) {
-    Event event = Event::None;
-    
-    if (isTouchable() && isEnabled()) {
-        if (inBounds) {
-            if (toggleable) {
-                if (toggleOn) {
-                    setToggleOn(false);
-                } else {
-                    setToggleOn(true);
-                }
-                
-                if (toggleOn) {
-                    useHighlightedButton();
-                } else {
-                    useNormalButton();
-                }
+BGE::Event BGE::ButtonComponent::handleTouchInsideForDurationEvent(bool inBounds) {
+    if (isTouchable() && isEnabled() && !isDebouncing()) {
+        if (inBounds && !pressedByDurationTriggered_) {
+            if (toggleOn) {
+                setToggleOn(false);
             } else {
-                setHighlighted(false);
+                setToggleOn(true);
+            }
+            
+            debouncing_ = true;
+            debounceTimer_ = 0;
+            if (!highlightedAnimButtonHandle.isNull()) {
+                animateHighlightedButton();
             }
         } else {
-            setHighlighted(false);
+            pressedTime_ = 0;
         }
-        
-        auto now = std::chrono::high_resolution_clock::now();
-        auto difference = std::chrono::duration_cast<std::chrono::milliseconds>(now - pressedTimeStart).count();
-        
-        pressedTime_ = difference / 1000.0;
     } else {
         pressedTime_ = 0;
     }
     
-    if (inBounds) {
-        event = Event::TouchUpInside;
+    if (inBounds && !pressedByDurationTriggered_) {
+        event_ = Event::TouchInsideForDuration;
+        pressedByDurationTriggered_ = true;
     } else {
-        event = Event::TouchUpOutside;
+        // Do nothing (we should not be called)
+    }
+    
+    return event_;
+}
+
+BGE::Event BGE::ButtonComponent::handleTouchUpEvent(bool inBounds) {
+    event_ = Event::None;
+    
+    if (isTouchable() && isEnabled() && !isDebouncing()) {
+        if (inBounds) {
+            if (toggleOn) {
+                setToggleOn(false);
+            } else {
+                setToggleOn(true);
+            }
+            
+            debouncing_ = true;
+            debounceTimer_ = 0;
+            if (!highlightedAnimButtonHandle.isNull()) {
+                animateHighlightedButton();
+            }
+        } else {
+            setHighlighted(false);
+        }
+    }
+    
+    if (inBounds) {
+        event_ = Event::TouchUpInside;
+    } else {
+        event_ = Event::TouchUpOutside;
+        pressedTime_ = 0;
     }
 
-    return event;
+    return event_;
+}
+
+void BGE::ButtonComponent::handleHighlightedAnimEndHandler(GameObject *gameObj, Event event) {
+    debouncing_ = false;
+    event_ = Event::None;
+    
+    if (isEnabled()) {
+        if (toggleable) {
+            if (toggleOn) {
+                useHighlightedButton();
+            } else {
+                useNormalButton();
+            }
+        } else {
+            setHighlighted(false);
+        }
+    } else {
+        useDisabledButton();
+    }
 }
 

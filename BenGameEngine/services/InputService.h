@@ -148,6 +148,7 @@ namespace BGE {
         void touchEvent(TouchType type, NSSet* touches, UIView* view);
 #endif /* TARGET_OS_IPHONE */
         void checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue);
+        void updateInputObject(GameObject *gameObj, double deltaTime);
         void getInputPoints(GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints);
     };
 }

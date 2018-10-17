@@ -28,6 +28,7 @@ namespace BGE {
         TouchDownInside,
         TouchRepeatInside,
         TouchUpInside,
+        TouchInsideForDuration,
         TouchUpOutside,
         TouchCancel,
         

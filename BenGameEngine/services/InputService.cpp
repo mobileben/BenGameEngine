@@ -186,6 +186,32 @@ bool BGE::InputService::getBboxPoints(std::vector<Vector3>& bbox, std::vector<Ve
     return locked;
 }
 
+void BGE::InputService::updateInputObject(GameObject *gameObj, double deltaTime) {
+    auto xform = gameObj->getComponent<TransformComponent>();
+    
+    if (xform) {
+        auto button = gameObj->getComponent<ButtonComponent>();
+        
+        if (button) {
+            button->update(deltaTime);
+        }
+        
+        // Determine if we have children, if we do process them.
+        for (auto i=0;i<xform->getNumChildren();i++) {
+            auto childXform = xform->childAtIndex(i);
+            if (childXform->hasGameObject()) {
+                auto childObjHandle = childXform->getGameObjectHandle();
+                auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
+                
+                // TODO: Have some better means of identifying the right child. For now brute force it
+                if (childObj && childObj->isActive() && childObj->canInteract()) {
+                    updateInputObject(childObj, deltaTime);
+                }
+            }
+        }
+    }
+}
+
 void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue) {
     auto xform = gameObj->getComponent<TransformComponent>();
     
@@ -204,7 +230,13 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                 bool inBounds = false;
                 
                 xform->getWorldMatrix(matrix);
-                bbox->computeAABB(matrix, xform->getCollisionRectScale());
+                // collision rect based on artwork override bounds, button collision scale based on buttons that allow for allowing for an increased
+                // area on touch up
+                Vector2 rectScale = xform->getCollisionRectScale();
+                auto buttonScale = button->getCollisionScale(input);
+                rectScale.x *= buttonScale;
+                rectScale.y *= buttonScale;
+                bbox->computeAABB(matrix, rectScale);
                 
                 if (BGE::nearlyGreaterThanOrEqual(input->x, bbox->aabbMinX) && input->x < bbox->aabbMaxX) {
                     if (BGE::nearlyGreaterThanOrEqual(input->y, bbox->aabbMinY) && input->y < bbox->aabbMaxY) {
@@ -322,12 +354,32 @@ void BGE::InputService::update(double deltaTime) {
     auto startTime = profiling::EpochTime::timeInMicroSec();
     numProcessedObjects_ = 0;
 #endif /* SUPPORT_PROFILING */
+    // First pass updates any buttons we may have
+    // This is needed bacause we debounce buttons by either
+    // time or awaiting highlighted anims completing
+    std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
+
+    for (auto const &handle : spaceHandles) {
+        auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
+        
+        if (space && space->isActive() && space->isVisible()) {
+            std::vector<GameObject *> objects;
+            
+            space->getRootGameObjects(objects);
+            
+            for (auto const &obj : objects) {
+                if (obj && obj->isActive()) {
+                    updateInputObject(obj, deltaTime);
+                }
+            }
+        }
+    }
+
     // Sort inputs
     std::sort(inputs_.begin(), inputs_.end(), compareInputPointers);
     
     std::vector<InputTouchEvent> inputTouchQueue;
     std::vector<InputEventItem> inputEventQueue;
-    std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
 
     for (auto input : inputs_) {
         std::vector<InputEventItem> inputQueue;
@@ -418,6 +470,10 @@ void BGE::InputService::update(double deltaTime) {
                         
                     case Event::TouchCancel:
                         event = button->handleTouchCancelEvent();
+                        break;
+                        
+                    case Event::TouchInsideForDuration:
+                        event = button->handleTouchInsideForDurationEvent(item.inBounds);
                         break;
                         
                     case Event::TouchUpOutside:

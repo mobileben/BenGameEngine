@@ -75,9 +75,24 @@ namespace BGE {
         void setToggleOn(bool on);
         bool isToggleable() const;
         void setToggleable(bool on);
-        double pressedTime() const;
+        bool isDebouncing() const { return debouncing_; }
+        float pressedTime() const;
+        float pressedDuration() const;
+        bool pressedByDurationTriggered() const;
+        
+        void setPressedDuration(float duration);
+        
+        float getTouchUpCollisionScale() const { return touchUpCollisionScale_; }
+        void setTouchUpCollisionScale(float scale) { touchUpCollisionScale_ = scale; }
+        
+        float getDebounceDuration() const { return debounceDuration_; }
+        void setDebounceDuration(float duration) { debounceDuration_ = duration; }
         
         Event shouldHandleInput(Input *input, bool inBounds);
+        
+        float getCollisionScale(Input *input) const;
+        
+        void update(double deltaTime);
 
 #if TARGET_OS_IPHONE
         UITouch *getTouch() const { return touch; }
@@ -104,13 +119,20 @@ namespace BGE {
         bool        touchable_;
         bool        enabled;
         bool        showHighlighted_;
-        
+
         // For when we want to treat this like a toggle
         bool        toggleable;
         bool        toggleOn;
         
-        std::chrono::high_resolution_clock::time_point pressedTimeStart;
+        Event       event_;
+        bool        debouncing_;
+        float       debounceDuration_;
+        float       debounceTimer_;
+        
         float       pressedTime_;
+        float       pressedDuration_;
+        bool        pressedByDurationTriggered_;
+        float       touchUpCollisionScale_;
         
 #if TARGET_OS_IPHONE
         UITouch     *touch; // We need this to properly track events
@@ -123,19 +145,27 @@ namespace BGE {
         GameObjectHandle highlightedButtonHandle;
         GameObjectHandle highlightedAnimButtonHandle;
         GameObjectHandle currentButtonHandle;
+        
+        EventHandlerHandle highlightedAnimHandlerHandle;
   
-        void useHighlightedButton();
+        void useHighlightedButton();        // This never animates
         void useDisabledButton();
         void useNormalButton();
 
+        void animateHighlightedButton();    // This animates
+        
         // TODO: If multi-touch then we will need to match touches, if necessary
         Event shouldHandleTouchDownEvent(bool inBounds);
         Event shouldHandleTouchCancelEvent();
+        Event shouldHandleTouchMoveEvent(bool inBounds);
         Event shouldHandleTouchUpEvent(bool inBounds);
         
         Event handleTouchDownEvent(bool inBounds);
         Event handleTouchCancelEvent();
+        Event handleTouchInsideForDurationEvent(bool inBounds);
         Event handleTouchUpEvent(bool inBounds);
+        
+        void handleHighlightedAnimEndHandler(GameObject *gameObj, Event event);
     };
 }
 
