@@ -174,6 +174,7 @@ namespace BGE {
         void setBackgroundColor(Color color) { backgroundColor_ = color; }
         
         Vector2 getWindowWidthHeight() const;
+        Vector2 getWindowMappedWidthHeight() const;
 
         Vector2 deviceCoordinatesFromRenderCoordinates(Vector2 pos);
         

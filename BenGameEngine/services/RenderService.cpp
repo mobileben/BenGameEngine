@@ -61,6 +61,16 @@ BGE::Vector2 BGE::RenderService::getWindowWidthHeight() const {
     return wh;
 }
 
+BGE::Vector2 BGE::RenderService::getWindowMappedWidthHeight() const {
+    Vector2 wh;
+    auto window = getRenderWindow();
+    
+    wh.w = window->getMappedWidth();
+    wh.h = window->getMappedHeight();
+    
+    return wh;
+}
+
 BGE::Vector2 BGE::RenderService::deviceCoordinatesFromRenderCoordinates(Vector2 pos) {
     // This is the MacOS/iOS implementation
     Vector2 convertedPos;
