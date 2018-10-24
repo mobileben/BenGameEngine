@@ -26,7 +26,7 @@ namespace VASEr {
                 for( int i=0; i<length; i++)
                 {
                     length_along += L[i];
-                    double p;
+                    double p = 0.0;
                     if( grad.unit==GD_ratio)
                         p = length_along/path_length;
                     else if ( grad.unit==GD_length)
