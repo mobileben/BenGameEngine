@@ -92,12 +92,15 @@ void BGE::HeartbeatService::queueTickHandler() {
 }
 
 void BGE::HeartbeatService::dispatchHandler() {
-    std::lock_guard<std::mutex> lock(dispatchQueueMutex_);
+    std::unique_lock<std::mutex> lock(dispatchQueueMutex_);
     // To process queue
     auto& queue = dispatchQueues_[currentDispatchQueue_];
     
     // Flip current buffer
     currentDispatchQueue_ ^= 1;
+    
+    // Unlock to allow any running handler to redispatch
+    lock.unlock();
     
     // Now go through each one. Since we flipped the buffer, any changes to the queue will happen
     auto count = queue.size();
