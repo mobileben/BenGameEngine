@@ -20,14 +20,23 @@ BGE::TextureMaskComponent::TextureMaskComponent() : RenderComponent() {
 void BGE::TextureMaskComponent::setTextureMaskReference(TextureMaskReference *texMaskRef) {
     if (texMaskRef) {
         setTextureMaskReference(*texMaskRef);
-    } else {
-        printf("WHAAA\n");
     }
 }
 
 void BGE::TextureMaskComponent::setTextureMaskReference(const TextureMaskReference &texMaskRef) {
-    auto material = Game::getInstance()->getMaterialService()->createMaterial(texMaskRef.texture->textureHandle);
-    this->setMaterials({material});
+    BGE::MaterialHandle materialHandle;
+    
+    if (hasMaterials()) {
+        auto material = getMaterial();
+        if (material) {
+            material->setTextureHandle(texMaskRef.texture->textureHandle);
+            materialHandle = material->getHandle();
+        }
+    } else {
+        materialHandle = Game::getInstance()->getMaterialService()->createMaterial(texMaskRef.texture->textureHandle);
+    }
+    
+    this->setMaterial(materialHandle);
 
     auto texture = Game::getInstance()->getTextureService()->getTexture(texMaskRef.texture->textureHandle);
     Vector2 wh;

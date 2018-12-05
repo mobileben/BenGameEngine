@@ -16,8 +16,19 @@ std::type_index BGE::MaskComponent::type_index_ = typeid(BGE::MaskComponent);
 
 BGE::MaskComponent::MaskComponent() : RenderComponent() {
     Color color = { 1, 0, 1, 1 };
-    auto handle = Game::getInstance()->getMaterialService()->createMaterial(color);
-    setMaterials({handle});
+    BGE::MaterialHandle materialHandle;
+    
+    if (hasMaterials()) {
+        auto material = getMaterial();
+        if (material) {
+            material->setColor(color);
+            materialHandle = material->getHandle();
+        }
+    } else {
+        materialHandle = Game::getInstance()->getMaterialService()->createMaterial(color);
+    }
+    
+    this->setMaterial(materialHandle);
 }
 
 void BGE::MaskComponent::setMaskReference(MaskReference *maskRef) {
@@ -34,8 +45,19 @@ void BGE::MaskComponent::setMaskReference(const MaskReference &maskRef) {
 
     // Update the material
     Color color = { 1, 0, 1, 1 };
-    auto handle = Game::getInstance()->getMaterialService()->createMaterial(color);
-    setMaterials({handle});
+    BGE::MaterialHandle materialHandle;
+    
+    if (hasMaterials()) {
+        auto material = getMaterial();
+        if (material) {
+            material->setColor(color);
+            materialHandle = material->getHandle();
+        }
+    } else {
+        materialHandle = Game::getInstance()->getMaterialService()->createMaterial(color);
+    }
+    
+    this->setMaterial(materialHandle);
 }
 
 void BGE::MaskComponent::setWidth(float width) {

@@ -76,6 +76,15 @@ std::vector<BGE::Material *> BGE::RenderComponent::getMaterials() const {
     return materials;
 }
 
+void BGE::RenderComponent::setMaterial(MaterialHandle material) {
+    if (materialHandles_.empty()) {
+        materialHandles_.push_back(material);
+    } else {
+        materialHandles_[0] = material;
+    }
+    materialsUpdated();
+}
+
 void BGE::RenderComponent::setMaterials(std::vector<MaterialHandle> materials) {
     for (auto const &handle : materialHandles_) {
         if (std::find(materials.begin(), materials.end(), handle) == materials.end()) {

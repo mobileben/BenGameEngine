@@ -24,21 +24,53 @@ void BGE::SpriteRenderComponent::setTextureReference(TextureReference *texRef) {
 }
 
 void BGE::SpriteRenderComponent::setTextureReference(const TextureReference &texRef) {
-    auto material = Game::getInstance()->getMaterialService()->createMaterial(texRef.textureHandle);
+    BGE::MaterialHandle materialHandle;
     
-    this->setMaterials({material});
+    if (hasMaterials()) {
+        auto material = getMaterial();
+        if (material) {
+            material->setTextureHandle(texRef.textureHandle);
+            materialHandle = material->getHandle();
+        }
+    } else {
+        materialHandle = Game::getInstance()->getMaterialService()->createMaterial(texRef.textureHandle);
+    }
+    
+    if (!materialHandle.isNull()) {
+        this->setMaterial(materialHandle);
+    }
 }
 
 void BGE::SpriteRenderComponent::setTextureHandle(TextureHandle texHandle) {
-    auto material = Game::getInstance()->getMaterialService()->createMaterial(texHandle);
+    BGE::MaterialHandle materialHandle;
     
-    this->setMaterials({material});
+    if (hasMaterials()) {
+        auto material = getMaterial();
+        if (material) {
+            material->setTextureHandle(texHandle);
+            materialHandle = material->getHandle();
+        }
+    } else {
+        materialHandle = Game::getInstance()->getMaterialService()->createMaterial(texHandle);
+    }
+    
+    this->setMaterial(materialHandle);
 }
 
 void BGE::SpriteRenderComponent::setTexture(Texture *tex) {
-    auto material = Game::getInstance()->getMaterialService()->createMaterial(tex->getHandle());
+    BGE::MaterialHandle materialHandle;
     
-    this->setMaterials({material});
+    if (hasMaterials()) {
+        auto material = getMaterial();
+        if (material) {
+            material->setTextureHandle(tex->getHandle());
+            materialHandle = material->getHandle();
+        }
+    } else {
+        materialHandle = Game::getInstance()->getMaterialService()->createMaterial(tex->getHandle());
+    }
+    
+    this->setMaterial(materialHandle);
 }
 
 BGE::TextureHandle BGE::SpriteRenderComponent::getTextureHandle() {

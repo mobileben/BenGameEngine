@@ -51,11 +51,13 @@ namespace BGE {
         void setEnabled(bool enabled) { enabled_ = enabled; }
         RenderComponentAnchor getAnchor() const { return anchor_; }
         
+        inline bool hasMaterials() const { return materialHandles_.size(); }
         MaterialHandle getMaterialHandle(uint32_t index=0) const;
         Material *getMaterial(uint32_t index=0) const;
         std::vector<MaterialHandle> getMaterialHandles() const;
         std::vector<Material *> getMaterials() const;
         
+        void setMaterial(MaterialHandle material);
         void setMaterials(std::vector<MaterialHandle> materials);
         
     protected:
@@ -69,7 +71,7 @@ namespace BGE {
         
         virtual void materialsUpdated() =0;
         void destroyFast() override;
-        
+
     private:
         friend ComponentService;
         
