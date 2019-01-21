@@ -315,6 +315,8 @@ const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
 
 void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
     auto handles = getGameObjects();
+    objects.clear();
+    objects.reserve(handles.size());
     
     for (auto const &handle : handles) {
         auto obj = getGameObject(handle);
@@ -333,7 +335,9 @@ void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
 
 void BGE::Space::getReverseRootGameObjects(std::vector<GameObject *> &objects) {
     auto handles = getGameObjects();
-    
+    objects.clear();
+    objects.reserve(handles.size());
+
     for (int32_t i=static_cast<int32_t>(handles.size())-1;i>=0;--i) {
         auto obj = getGameObject(handles[i]);
         // Only active root game objects can be returned
