@@ -787,12 +787,14 @@ BGE::Event BGE::ButtonComponent::shouldHandleTouchMoveEvent(bool inBounds) {
     Event event = Event::None;
     if (isTouchable() && isEnabled() && !isDebouncing()) {
         if (inBounds) {
+#ifdef BGE_HANDLE_TOUCH_INSIDE_FOR_DURATION
             if (!pressedByDurationTriggered_ && pressedDuration_ > 0.0) {
                 // If we have a pressed duration, then test our pressedTime_
                 if (nearlyGreaterThanOrEqual(pressedTime_, pressedDuration_)) {
                     event = Event::TouchInsideForDuration;
                 }
             }
+#endif /* BGE_HANDLE_TOUCH_INSIDE_FOR_DURATION */
         } else {
             // If we are out of bounds, then reset our pressedTime_
             event = event_;

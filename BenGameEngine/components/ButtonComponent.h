@@ -80,6 +80,8 @@ namespace BGE {
         float pressedDuration() const;
         bool pressedByDurationTriggered() const;
         
+        Event getEvent() const { return event_; }
+        
         void setPressedDuration(float duration);
         
         float getTouchUpCollisionScale() const { return touchUpCollisionScale_; }
@@ -105,6 +107,8 @@ namespace BGE {
         GameObjectHandle getNormalAnimButtonHandle() const { return normalAnimButtonHandle; }
         GameObjectHandle getHighlightedButtonHandle() const { return highlightedButtonHandle; }
         GameObjectHandle getHighlightedAnimButtonHandle() const { return highlightedAnimButtonHandle; }
+        
+        Event handleTouchInsideForDurationEvent(bool inBounds);
 
     protected:
         void destroyFast() final;
@@ -162,7 +166,6 @@ namespace BGE {
         
         Event handleTouchDownEvent(bool inBounds);
         Event handleTouchCancelEvent();
-        Event handleTouchInsideForDurationEvent(bool inBounds);
         Event handleTouchUpEvent(bool inBounds);
         
         void handleHighlightedAnimEndHandler(GameObject *gameObj, Event event);

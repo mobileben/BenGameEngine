@@ -472,9 +472,11 @@ void BGE::InputService::update(double deltaTime) {
                         event = button->handleTouchCancelEvent();
                         break;
                         
+#ifdef BGE_HANDLE_TOUCH_INSIDE_FOR_DURATION
                     case Event::TouchInsideForDuration:
                         event = button->handleTouchInsideForDurationEvent(item.inBounds);
                         break;
+#endif /* BGE_HANDLE_TOUCH_INSIDE_FOR_DURATION */
                         
                     case Event::TouchUpOutside:
                     case Event::TouchUpInside:
