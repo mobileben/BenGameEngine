@@ -199,7 +199,7 @@ void BGE::InputService::updateInputObject(GameObject *gameObj, double deltaTime)
         // Determine if we have children, if we do process them.
         for (auto i=0;i<xform->getNumChildren();i++) {
             auto childXform = xform->childAtIndex(i);
-            if (childXform->hasGameObject()) {
+            if (childXform && childXform->hasGameObject()) {
                 auto childObjHandle = childXform->getGameObjectHandle();
                 auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
                 
