@@ -1375,13 +1375,12 @@ void BGE::RenderServiceOpenGLES2::render()
         Matrix4Scale(mappedProjectionMatrix_, window->getToMappedXScale(), window->getToMappedYScale(), 1.0);
         
         std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
-        
+        std::vector<GameObject *> objects;
+
         for (auto const &handle : spaceHandles) {
             auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
             
             if (space && space->isActive() && space->isVisible()) {
-                std::vector<GameObject *> objects;
-                
                 space->getRootGameObjects(objects);
                 
                 for (auto const &obj : objects) {
