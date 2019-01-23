@@ -740,14 +740,8 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
 #endif /* SUPPORT_PROFILING */
                     }
                 }
-            } else {
-                NSLog(@"INDEED");
             }
-        } else {
-            NSLog(@"HWY");
         }
-    } else {
-        NSLog(@"HWY");
     }
 }
 
@@ -1045,14 +1039,8 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
 #endif /* SUPPORT_PROFILING */
                     }
                 }
-            } else {
-                NSLog(@"INDEED SPRITE");
             }
-        } else {
-            NSLog(@"HWY");
         }
-    } else {
-        NSLog(@"HWY");
     }
 }
 
