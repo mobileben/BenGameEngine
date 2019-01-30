@@ -51,7 +51,7 @@ std::string BGE::Game::AnyToString::toString() const {
 void BGE::Game::outputValue(uint32_t numTabs, const std::string& format, va_list args) {
     std::string results = format;
     
-    for (auto i=0;i<numTabs;i++) {
+    for (auto i=0u;i<numTabs;i++) {
         printf("\t");
     }
     
@@ -60,7 +60,7 @@ void BGE::Game::outputValue(uint32_t numTabs, const std::string& format, va_list
     const char *str = format.c_str();
     bool inFormatSpecifier = false;
     char formatSpecifier[3]; // Indicates current format specifier
-    auto formatSpecifierIndex = 0;
+    auto formatSpecifierIndex = 0u;
     
     formatSpecifier[0] = '\0';
     formatSpecifier[1] = '\0';
@@ -404,7 +404,7 @@ void BGE::Game::outputResourceUsage() const {
 }
 
 void BGE::Game::setPaused(bool paused) {
-    paused_ = true;
+    paused_ = paused;
 }
 
 void BGE::Game::outputResourceBreakdown(uint32_t numTabs) const {

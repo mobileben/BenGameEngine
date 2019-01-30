@@ -118,7 +118,7 @@ namespace BGE {
         }
 #ifdef SUPPORT_OPENGL
         RenderTextureCommandData(TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat) : textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height) {
-            glFormat = glFormat;
+            this->glFormat = glFormat;
             glHwId = 0;
         }
 #endif /* SUPPORT_OPENGL */

@@ -145,7 +145,7 @@ BGE::RawTexture *BGE::RawTexture::createFromPng(const std::string& filename) {
                 rowPtrs = (png_byte **) malloc(height * sizeof(png_byte *));
                 
                 if (rowPtrs) {
-                    for (auto i=0;i<height;++i) {
+                    for (png_uint_32 i=0;i<height;++i) {
                         rowPtrs[i] = &image[i * bytesInRow];
                     }
                     

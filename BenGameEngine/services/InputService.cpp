@@ -197,7 +197,7 @@ void BGE::InputService::updateInputObject(GameObject *gameObj, double deltaTime)
         }
         
         // Determine if we have children, if we do process them.
-        for (auto i=0;i<xform->getNumChildren();i++) {
+        for (uint32_t i=0;i<xform->getNumChildren();i++) {
             auto childXform = xform->childAtIndex(i);
             if (childXform && childXform->hasGameObject()) {
                 auto childObjHandle = childXform->getGameObjectHandle();
@@ -328,7 +328,7 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
         }
         
         // Determine if we have children, if we do process them.
-        for (auto i=0;i<xform->getNumChildren();i++) {
+        for (uint32_t i=0;i<xform->getNumChildren();i++) {
             auto childXform = xform->childAtIndex(i);
             if (childXform->hasGameObject()) {
                 auto childObjHandle = childXform->getGameObjectHandle();
@@ -585,23 +585,23 @@ void BGE::InputService::getInputPoints(GameObject *gameObj, std::vector<Vector3>
             xform->getWorldMatrix(matrix);
             bbox->computeAABB(matrix);
             // Add points
-            bboxPoints.push_back(Vector3{ bbox->aabbMinX, bbox->aabbMinY, 0});
-            bboxPoints.push_back(Vector3{ bbox->aabbMaxX, bbox->aabbMinY, 0});
-            bboxPoints.push_back(Vector3{ bbox->aabbMaxX, bbox->aabbMaxY, 0});
-            bboxPoints.push_back(Vector3{ bbox->aabbMinX, bbox->aabbMaxY, 0});
+            bboxPoints.push_back(Vector3{ {bbox->aabbMinX, bbox->aabbMinY, 0}});
+            bboxPoints.push_back(Vector3{ {bbox->aabbMaxX, bbox->aabbMinY, 0}});
+            bboxPoints.push_back(Vector3{ {bbox->aabbMaxX, bbox->aabbMaxY, 0}});
+            bboxPoints.push_back(Vector3{ {bbox->aabbMinX, bbox->aabbMaxY, 0}});
             
             if (xform->useCollisionRectScale()) {
                 bbox->computeAABB(matrix, xform->getCollisionRectScale());
                 
                 // Add points
-                scaledBBoxPoints.push_back(Vector3{ bbox->aabbMinX, bbox->aabbMinY, 0});
-                scaledBBoxPoints.push_back(Vector3{ bbox->aabbMaxX, bbox->aabbMinY, 0});
-                scaledBBoxPoints.push_back(Vector3{ bbox->aabbMaxX, bbox->aabbMaxY, 0});
-                scaledBBoxPoints.push_back(Vector3{ bbox->aabbMinX, bbox->aabbMaxY, 0});
+                scaledBBoxPoints.push_back(Vector3{ {bbox->aabbMinX, bbox->aabbMinY, 0}});
+                scaledBBoxPoints.push_back(Vector3{ {bbox->aabbMaxX, bbox->aabbMinY, 0}});
+                scaledBBoxPoints.push_back(Vector3{ {bbox->aabbMaxX, bbox->aabbMaxY, 0}});
+                scaledBBoxPoints.push_back(Vector3{ {bbox->aabbMinX, bbox->aabbMaxY, 0}});
             }
         }
         
-        for (auto i=0;i<xform->getNumChildren();i++) {
+        for (uint32_t i=0;i<xform->getNumChildren();i++) {
             auto childXform = xform->childAtIndex(i);
             if (childXform->hasGameObject()) {
                 auto childObjHandle = childXform->getGameObjectHandle();

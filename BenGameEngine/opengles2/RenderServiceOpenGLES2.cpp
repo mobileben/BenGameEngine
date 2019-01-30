@@ -684,7 +684,7 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
         auto mask = gameObject->getComponent<TextureMaskComponent>();
         
         if (mask) {
-            VertexTex *const vertices = mask->getVertices();
+            VertexTex * vertices = mask->getVertices();
             auto material = mask->getMaterial();
             if (material) {
                 auto textureHandle = material->getTextureHandle();
@@ -765,7 +765,7 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
 
     glLineWidth(2);
 
-    for (auto index=0;index<points.size();index += 4) {
+    for (size_t index=0;index<points.size();index += 4) {
         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                               sizeof(Vertex), &points[index]);
         glDrawArrays(GL_LINE_LOOP, 0, (GLsizei) 4);
@@ -882,7 +882,7 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(GameObject *gameObject) {
             
             assert(points.size() == numColors || numColors == 1);
             
-            for (auto i=0;i<points.size();++i) {
+            for (size_t i=0;i<points.size();++i) {
                 auto colorIndex = i;
                 vPoints[i].x = points[i].x;
                 vPoints[i].y = points[i].y;
@@ -965,7 +965,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
         auto sprite = gameObject->getComponent<SpriteRenderComponent>();
         
         if (sprite) {
-            VertexTex *const vertices = sprite->getVertices();
+            VertexTex * vertices = sprite->getVertices();
             auto material = sprite->getMaterial();
             if (material) {
                 auto textureHandle = material->getTextureHandle();
@@ -1174,7 +1174,7 @@ void BGE::RenderServiceOpenGLES2::drawString(std::string str, Font *font, const 
         glUniform1i(textureUniform, 0);
         glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
 
-        for (int i=0;i<length;i++) {
+        for (size_t i=0;i<length;i++) {
             code = chars[i];
 
             auto glyph = font->glyphs_.find(code);
@@ -1301,7 +1301,7 @@ void BGE::RenderServiceOpenGLES2::disableMask(uint8_t maskBits)
     }
 }
 
-void BGE::RenderServiceOpenGLES2::queueRender(double time) {
+void BGE::RenderServiceOpenGLES2::queueRender(__attribute__ ((unused)) double time) {
     lock();
 
     if (!isBackgrounded()) {
@@ -1382,11 +1382,11 @@ void BGE::RenderServiceOpenGLES2::render()
         if (Game::getInstance()->showCollisionRects()) {
             // Draw collision rects if needed
             Game::getInstance()->getInputService()->getBboxPoints(boundingBoxPoints_, scaledBoundingBoxPoints_);
-            Color color = Color{ 1, 1, 1, 1 };
+            Color color = Color{{ 1, 1, 1, 1 }};
             drawDebugQuads(boundingBoxPoints_, color);
             
             // First draw normal bounds
-            color = Color{ 1, 1, 0, 1 };
+            color = Color{{ 1, 1, 0, 1 }};
             drawDebugQuads(scaledBoundingBoxPoints_, color);
         }
         
@@ -1497,7 +1497,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         
         // Determine if we have children, if we do process them.
         auto childrenHandles = transformComponent->getOrderedChildrenHandles();
-        for (auto i=0;i<childrenHandles.size();++i) {
+        for (size_t i=0;i<childrenHandles.size();++i) {
             auto childXformHandle = childrenHandles[i];
             auto childXform = componentService_->getComponent<TransformComponent>(childXformHandle.getHandle());
             

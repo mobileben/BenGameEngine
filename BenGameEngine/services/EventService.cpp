@@ -38,6 +38,6 @@ void BGE::EventService::removeEventHandler(EventHandlerHandle handle) {
     handleService_.release(handle);
 }
 
-void BGE::EventService::spaceReset(Space *space) {
+void BGE::EventService::spaceReset(__attribute__ ((unused)) Space *space) {
     
 }

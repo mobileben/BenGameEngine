@@ -1490,6 +1490,11 @@
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				THIRD_PARTY_PREBUILTS_DIR = "/Users/ben/Development/third-party-prebuilts-ios";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-Wformat=2",
+				);
 			};
 			name = Debug;
 		};
@@ -1545,6 +1550,11 @@
 				SDKROOT = iphoneos;
 				THIRD_PARTY_PREBUILTS_DIR = "/Users/ben/Development/third-party-prebuilts-ios";
 				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-Wformat=2",
+				);
 			};
 			name = Release;
 		};
@@ -1717,6 +1727,11 @@
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				THIRD_PARTY_PREBUILTS_DIR = "/Users/ben/Development/third-party-prebuilts-ios";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-Wformat=2",
+				);
 			};
 			name = DevDebug;
 		};
@@ -1845,6 +1860,11 @@
 				SDKROOT = iphoneos;
 				THIRD_PARTY_PREBUILTS_DIR = "/Users/ben/Development/third-party-prebuilts-ios";
 				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-Wformat=2",
+				);
 			};
 			name = DevRelease;
 		};
@@ -1966,6 +1986,11 @@
 				SDKROOT = iphoneos;
 				THIRD_PARTY_PREBUILTS_DIR = "/Users/ben/Development/third-party-prebuilts-ios";
 				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+					"-Wformat=2",
+				);
 			};
 			name = AppStore;
 		};

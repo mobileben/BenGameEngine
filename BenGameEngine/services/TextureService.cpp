@@ -11,7 +11,7 @@
 #include "RawTexture.h"
 
 #if TARGET_OS_IPHONE
-BGE::TextureService::TextureService(EAGLContext *context) : Service(), textureHandleService_(InitialTextureReserve, HandleServiceNoMaxLimit), textureAtlasHandleService_(InitialTextureAtlasReserve, HandleServiceNoMaxLimit) {
+BGE::TextureService::TextureService(__attribute__ ((unused)) EAGLContext *context) : Service(), textureHandleService_(InitialTextureReserve, HandleServiceNoMaxLimit), textureAtlasHandleService_(InitialTextureAtlasReserve, HandleServiceNoMaxLimit) {
 #ifdef SUPPORT_GLKTEXTURELOADER
 #error NEED TO QUEUE THIS ON THE RENDER THREAD
     textureLoader_ = [[GLKTextureLoader alloc] initWithSharegroup:context.sharegroup];
@@ -836,7 +836,7 @@ std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::crea
     }
 }
 
-std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromFile(std::string name, std::string filename, TextureFormat format)
+std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureFromFile(std::string name, std::string filename, __attribute__ ((unused)) TextureFormat format)
 {
 #ifdef SUPPORT_GLKTEXTURELOADER
     dispatch_group_t group = dispatch_group_create();

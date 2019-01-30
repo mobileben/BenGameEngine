@@ -103,7 +103,7 @@ namespace BGE {
 
             int64_t                     lastTimestamp;
             std::vector<int64_t>        samples;
-            int32_t                     index;
+            uint32_t                    index;
             int64_t                     sum;
         };
     }

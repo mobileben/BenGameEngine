@@ -38,7 +38,7 @@ namespace BGE {
         void pause() final { Service::pause(); }
         void resume() final { Service::resume(); }
         void destroy() final {}
-        void update(double deltaTime) final {}
+        void update(__attribute__ ((unused)) double deltaTime) final {}
         void garbageCollect() final;
 
         template <typename T> uint32_t numComponents() const {
@@ -106,7 +106,7 @@ namespace BGE {
             return componentHandles_[T::typeId_];
         }
         
-        template <typename T, typename... Args> T *createComponent(Args&& ...args) {
+        template <typename T, typename... Args> T *createComponent() {
             using HANDLE = Handle<T>;
             using HANDLESERVICE = HandleService<T, HANDLE>;
             HANDLESERVICE *handleService = static_cast<HANDLESERVICE *>(componentHandleServices_[T::typeId_]);

@@ -95,7 +95,7 @@ namespace VASEr {
                               void (*add_point)(void*,double,double),
                               void* obj )
         {
-            const double curve_distance_epsilon                  = 1e-30;
+            __attribute__ ((unused)) const double curve_distance_epsilon                  = 1e-30;
             const double curve_collinearity_epsilon              = 1e-30;
             const double curve_angle_tolerance_epsilon           = 0.01;
             const int curve_recursion_limit = 32;
@@ -320,7 +320,7 @@ namespace VASEr {
         {
             double m_distance_tolerance_square = 0.5 / m_approximation_scale;
             m_distance_tolerance_square *= m_distance_tolerance_square;
-            int m_count = 0;
+            __attribute__ ((unused)) int m_count = 0;
             add_point(obj, x1, y1);
             recursive_bezier(x1, y1, x2, y2, x3, y3, x4, y4, 0,
                              m_angle_tolerance, m_cusp_limit, m_distance_tolerance_square,

@@ -65,8 +65,8 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
             int32_t extraIndex = 0;
             int32_t extraXferSize = 0;
             int32_t nextIndex = index;
-            int32_t	xferSize = packetDesc->mBytesPerPacket * numPackets;
-            int32_t	totalSize = audio->getAudioMemoryImageSize();
+            UInt32	xferSize = packetDesc->mBytesPerPacket * numPackets;
+            UInt32	totalSize = audio->getAudioMemoryImageSize();
             uint8_t *audioData = audio->getAudioMemoryImage();
             uint8_t *dst = (uint8_t *) inBuffer->mAudioData;
             bool go = true;
@@ -135,7 +135,7 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
     }
 }
 
-static void AudioQueueIsRunningOutputBuffer(void* data, AudioQueueRef inAQ, AudioQueuePropertyID inID) {
+static void AudioQueueIsRunningOutputBuffer(void* data, __attribute__ ((unused)) AudioQueueRef inAQ, __attribute__ ((unused)) AudioQueuePropertyID inID) {
     BGE::AudioHandle handle = BGE::AudioHandle(static_cast<BGE::HandleBackingType>(reinterpret_cast<intptr_t>(data)));
     BGE::Audio *audio = BGE::Game::getInstance()->getAudioService()->getAudio(handle);
 
@@ -495,7 +495,7 @@ void BGE::Audio::prime(void) {
     currPacket_ = 0;
     memoryImageIndex_ = 0;
     
-    for (auto i=0;i<actualBuffersUsed_;i++) {
+    for (auto i=0u;i<actualBuffersUsed_;i++) {
         AudioQueueHandleOutputBuffer(reinterpret_cast<void *>(static_cast<intptr_t>(getHandle().getHandle())), queue_, buffers_[i]);
     }
 }

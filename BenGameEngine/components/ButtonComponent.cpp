@@ -138,7 +138,7 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
         if (xform) {
             char catstr[128];
             
-            for (auto i=0;i<buttonRef.numStates;i++) {
+            for (auto i=0u;i<buttonRef.numStates;i++) {
                 auto state = &buttonRef.states[i];
                 if (!strcmp(ButtonStateDisabledString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
@@ -906,7 +906,7 @@ BGE::Event BGE::ButtonComponent::handleTouchUpEvent(bool inBounds) {
     return event_;
 }
 
-void BGE::ButtonComponent::handleHighlightedAnimEndHandler(GameObject *gameObj, Event event) {
+void BGE::ButtonComponent::handleHighlightedAnimEndHandler(__attribute__ ((unused)) GameObject *gameObj, __attribute__ ((unused)) Event event) {
     debouncing_ = false;
     event_ = Event::None;
     

@@ -88,7 +88,7 @@ size_t BGE::ScenePackageService::aligned8MemorySize(size_t size) const {
     return fixed;
 }
 
-void BGE::ScenePackageService::loadPackageTextures(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
+void BGE::ScenePackageService::loadPackageTextures(ScenePackageLoadItem loadable, __attribute__ ((unused)) ScenePackageLoadCompletionHandler callback) {
     if (loadable.type == ScenePackageLoadItem::LoadType::Textures) {
         auto package = getScenePackage(loadable.packageHandle);
         if (package) {
@@ -183,7 +183,7 @@ void BGE::ScenePackageService::createPackageFromSPKGBinary(SpaceHandle spaceHand
             scenePackages_.push_back(ref);
 
             // The loading system relies on having the package initalized with handle
-            package->create(packageBuffer, bufferSize, managed, [this, spaceHandle, managed, packageBuffer, callback, handle](ScenePackage * package) {
+            package->create(packageBuffer, bufferSize, managed, [this, spaceHandle, callback, handle](ScenePackage * package) {
                 auto tHandle = handle;
                 std::shared_ptr<Error> error = nullptr;
 
@@ -317,9 +317,9 @@ void BGE::ScenePackageService::createPackageFromSPKG(ScenePackageLoadItem loadab
     }
 }
 
-void BGE::ScenePackageService::completionPackage(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
-    if (loadable.completionHandler) {
-        loadable.completionHandler(ScenePackageHandle(), nullptr);
+void BGE::ScenePackageService::completionPackage(__attribute__ ((unused)) ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
+    if (callback) {
+        callback(ScenePackageHandle(), nullptr);
     }
 }
 
@@ -409,10 +409,10 @@ void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, ScenePacka
     }
 }
 
-void BGE::ScenePackageService::resetPackage(std::string name) {
+void BGE::ScenePackageService::resetPackage(__attribute__ ((unused)) std::string name) {
 }
 
-void BGE::ScenePackageService::resetPackage(ScenePackageHandle handle) {
+void BGE::ScenePackageService::resetPackage(__attribute__ ((unused)) ScenePackageHandle handle) {
     
 }
 

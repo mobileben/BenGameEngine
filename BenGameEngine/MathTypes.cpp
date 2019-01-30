@@ -52,7 +52,7 @@ namespace BGE {
     }
 
     bool operator==(const Matrix4& lhs, const Matrix4& rhs) {
-        for (auto i=0;i<sizeof(lhs.m)/sizeof(float);++i) {
+        for (auto i=0u;i<sizeof(lhs.m)/sizeof(float);++i) {
             if (lhs.m[i] != rhs.m[i]) {
                 return false;
             }
@@ -61,7 +61,7 @@ namespace BGE {
     }
 
     bool operator!=(const Matrix4& lhs, const Matrix4& rhs) {
-        for (auto i=0;i<sizeof(lhs.m)/sizeof(float);++i) {
+        for (auto i=0u;i<sizeof(lhs.m)/sizeof(float);++i) {
             if (lhs.m[i] != rhs.m[i]) {
                 return true;
             }
@@ -70,7 +70,7 @@ namespace BGE {
     }
 
     bool operator==(const Matrix3& lhs, const Matrix3& rhs) {
-        for (auto i=0;i<sizeof(lhs.m)/sizeof(float);++i) {
+        for (auto i=0u;i<sizeof(lhs.m)/sizeof(float);++i) {
             if (lhs.m[i] != rhs.m[i]) {
                 return false;
             }
@@ -79,7 +79,7 @@ namespace BGE {
     }
 
     bool operator!=(const Matrix3& lhs, const Matrix3& rhs) {
-        for (auto i=0;i<sizeof(lhs.m)/sizeof(float);++i) {
+        for (auto i=0u;i<sizeof(lhs.m)/sizeof(float);++i) {
             if (lhs.m[i] != rhs.m[i]) {
                 return true;
             }
@@ -88,7 +88,7 @@ namespace BGE {
     }
 
     bool operator==(const Matrix2& lhs, const Matrix2& rhs) {
-        for (auto i=0;i<sizeof(lhs.m)/sizeof(float);++i) {
+        for (auto i=0u;i<sizeof(lhs.m)/sizeof(float);++i) {
             if (lhs.m[i] != rhs.m[i]) {
                 return false;
             }
@@ -97,7 +97,7 @@ namespace BGE {
     }
 
     bool operator!=(const Matrix2& lhs, const Matrix2& rhs) {
-        for (auto i=0;i<sizeof(lhs.m)/sizeof(float);++i) {
+        for (auto i=0u;i<sizeof(lhs.m)/sizeof(float);++i) {
             if (lhs.m[i] != rhs.m[i]) {
                 return true;
             }

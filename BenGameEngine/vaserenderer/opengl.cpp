@@ -32,7 +32,7 @@ namespace VASEr {
             }
         }
         
-        void backend::polyline( const Vec2* P, Color C, double W, int length, const polyline_opt*) //constant color and weight
+        void backend::polyline(__attribute__ ((unused)) const Vec2* P, __attribute__ ((unused)) Color C, __attribute__ ((unused)) double W, __attribute__ ((unused)) int length, const polyline_opt*) //constant color and weight
         {
 #ifdef NOT_YET
             int type=0;
@@ -114,7 +114,7 @@ namespace VASEr {
     }
     Image renderer::get_image()
     {
-        Image im={0};
+        Image im={nullptr, 0, 0};
 #ifdef NOT_YET
         int res[4];
         glGetIntegerv(GL_VIEWPORT,res);

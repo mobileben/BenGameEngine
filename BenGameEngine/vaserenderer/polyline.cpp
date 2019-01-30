@@ -435,7 +435,7 @@ namespace VASEr {
 #define push_quad(A0,A1,A2,A3,A4,A5,A6,A7,A8) push_quad_(__LINE__,A0,A1,A2,A3,A4,A5,A6,A7,A8)
 #define push_quadf(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12) push_quadf_(__LINE__,A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12)
         
-        void push_quad_( short line, vertex_array_holder& core,
+        void push_quad_( __attribute__ ((unused)) short line, vertex_array_holder& core,
                         const Point& P0, const Point& P1, const Point& P2, const Point& P3,
                         const Color& c0, const Color& c1, const Color& c2, const Color& c3)
         {
@@ -449,7 +449,7 @@ namespace VASEr {
             core.push3( P1, P2, P3,
                        c1, c2, c3);
         }
-        void push_quadf_( short line, vertex_array_holder& core,
+        void push_quadf_( __attribute__ ((unused)) short line, vertex_array_holder& core,
                          const Point& P0, const Point& P1, const Point& P2, const Point& P3,
                          const Color& c0, const Color& c1, const Color& c2, const Color& c3,
                          bool trans0, bool trans1, bool trans2, bool trans3)
@@ -701,14 +701,16 @@ namespace VASEr {
                     for ( int p=0; p<cur_count; p++) //each triangle to be cut
                     {
                         //perform cut
-                        if ( ST[p].T1c > 0)
-                            if ( kn_colored)
+                        if ( ST[p].T1c > 0) {
+                            if ( kn_colored) {
                                 triangle_knife_cut( kn0[k], kn1[k], kn2[k],
                                                    &kC0[k],&kC1[k],
                                                    ST[p]);
-                            else
+                            } else {
                                 triangle_knife_cut( kn0[k],kn1[k],kn2[k],
                                                    0,0,ST[p]);
+                            }
+                        }
                         
                         //push retaining part
                         if ( ST[p].T1c > 0) {
@@ -758,7 +760,7 @@ namespace VASEr {
         void anchor_late( const Vec2* P, const Color* C, st_polyline* SL,
                          vertex_array_holder& tris,
                          Point cap1, Point cap2)
-        {	const int size_of_P = 3;
+        {	__attribute__ ((unused)) const int size_of_P = 3;
             
             tris.set_gl_draw_mode(GL_TRIANGLES);
             
@@ -1093,7 +1095,7 @@ C[1],C[2],C[2])
                     else //if ( SL[i].djoint == PLC_butt | SL[i].cap == PLC_square | SL[i].cap == PLC_rect)
                     {	//rectangle caps
                         Point P_cur = P[i];
-                        bool degen_nxt=0, degen_las=0;
+                        __attribute__ ((unused)) bool degen_nxt=0, __attribute__ ((unused)) degen_las=0;
                         if ( k == 0)
                             if ( SL[0].djoint==PLC_butt || SL[0].djoint==PLC_square)
                                 P_cur -= cap1;
@@ -1285,7 +1287,7 @@ C[1],C[2],C[2])
             Point P[2]; P[0]=SA.P[0]; P[1]=SA.P[1];
             Color C[2]; C[0]=SA.C[0]; C[1]=SA.C[1];
             
-            polyline_opt opt={0};
+            polyline_opt opt={};
             if ( options)
                 opt = (*options);
             
@@ -1364,7 +1366,7 @@ C[1],C[2],C[2])
         
         int anchor( st_anchor& SA, const polyline_opt* options, bool cap_first, bool cap_last)
         {
-            polyline_opt opt={0};
+            polyline_opt opt={};
             if ( options)
                 opt = (*options);
             
@@ -1523,7 +1525,7 @@ C[1],C[2],C[2])
                     double cos_tho=-V.x-V.y;
                     bool zero_degree = Point::negligible(cos_tho-1);
                     bool d180_degree = cos_tho < -1+0.0001;
-                    bool smaller_than_30_degree = cos_tho > 0.8660254;
+                    __attribute__ ((unused)) bool smaller_than_30_degree = cos_tho > 0.8660254;
                     char result3 = 1;
                     
                     if ( (cos_tho < 0 && opt.joint==PLJ_bevel) ||
@@ -1816,7 +1818,7 @@ C[1],C[2],C[2])
             const Point* P=(Point*)points;
             bool cap_first= inopt? !inopt->no_cap_first :true;
             bool cap_last=  inopt? !inopt->no_cap_last  :true;
-            double* seg_len=inopt? inopt->segment_length: 0;
+            __attribute__ ((unused)) double* seg_len=inopt? inopt->segment_length: 0;
             
             st_anchor SA1,SA2;
             vertex_array_holder vcore;  //curve core
@@ -2004,7 +2006,7 @@ C[1],C[2],C[2])
                             int from, int to,
                             bool approx)
         {
-            polyline_inopt inopt={0};
+            polyline_inopt inopt={};
             if( in_options) inopt=*in_options;
             if( from>0) from-=1;
             inopt.join_first = from!=0;
@@ -2026,8 +2028,8 @@ C[1],C[2],C[2])
                       const polyline_opt* options, //options
                       const polyline_inopt* in_options) //internal options
         {
-            polyline_opt   opt={0};
-            polyline_inopt inopt={0};
+            polyline_opt   opt={};
+            polyline_inopt inopt={};
             if( options)    opt=*options;
             if( in_options) inopt=*in_options;
             
@@ -2121,20 +2123,20 @@ C[1],C[2],C[2])
     }
     void polyline( const Vec2* P, Color C, double W, int length, const polyline_opt* opt) //constant color and weight
     {
-        VASErin::polyline_inopt inopt={0};
+        VASErin::polyline_inopt inopt={};
         inopt.const_color=true;
         inopt.const_weight=true;
         VASErin::polyline(P,&C,&W,length,opt,&inopt);
     }
     void polyline( const Vec2* P, const Color* C, double W, int length, const polyline_opt* opt) //constant weight
     {
-        VASErin::polyline_inopt inopt={0};
+        VASErin::polyline_inopt inopt={};
         inopt.const_weight=true;
         VASErin::polyline(P,C,&W,length,opt,&inopt);
     }
     void polyline( const Vec2* P, Color C, const double* W, int length, const polyline_opt* opt) //constant color
     {
-        VASErin::polyline_inopt inopt={0};
+        VASErin::polyline_inopt inopt={};
         inopt.const_color=true;
         VASErin::polyline(P,&C,W,length,opt,&inopt);
     }

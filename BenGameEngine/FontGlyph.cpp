@@ -14,7 +14,7 @@
 BGE::FontGlyph::FontGlyph() : offsetX_(0), offsetY_(0), offsetYInverted_(0), advance_(0) {
 }
 
-BGE::FontGlyph::FontGlyph(Font *font, TextureHandle textureHandle, int32_t offsetX, int32_t offsetY, int32_t advance) : textureHandle_(textureHandle), offsetX_(offsetX), offsetY_(0), offsetYInverted_(offsetY), advance_(advance) {
+BGE::FontGlyph::FontGlyph(Font *font, TextureHandle textureHandle, int32_t offsetX, int32_t offsetY, int32_t advance) : offsetX_(offsetX), offsetY_(0), offsetYInverted_(offsetY), advance_(advance), textureHandle_(textureHandle) {
     auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
     
     if (texture) {

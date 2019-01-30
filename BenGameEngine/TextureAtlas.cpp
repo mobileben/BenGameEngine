@@ -11,21 +11,21 @@
 
 const std::string BGE::TextureAtlas::ErrorDomain = "TextureAtlas";
 
-BGE::TextureAtlas::TextureAtlas() : NamedObject(), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0) {
+BGE::TextureAtlas::TextureAtlas() : NamedObject(), valid_(false), width_(0), height_(0), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None) {
 #ifdef SUPPORT_OPENGL
     hwId_ = 0;
     target_= GL_TEXTURE_2D;
 #endif /* SUPPORT_OPENGL */
 }
 
-BGE::TextureAtlas::TextureAtlas(ObjectId texId) : NamedObject(texId), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0) {
+BGE::TextureAtlas::TextureAtlas(ObjectId texId) : NamedObject(texId), valid_(false), width_(0), height_(0), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None) {
 #ifdef SUPPORT_OPENGL
     hwId_ = 0;
     target_= GL_TEXTURE_2D;
 #endif /* SUPPORT_OPENGL */
 }
 
-BGE::TextureAtlas::TextureAtlas(ObjectId texId, std::string name) : NamedObject(texId, name), valid_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), width_(0), height_(0) {
+BGE::TextureAtlas::TextureAtlas(ObjectId texId, std::string name) : NamedObject(texId, name), valid_(false), width_(0), height_(0), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None) {
 #ifdef SUPPORT_OPENGL
     hwId_ = 0;
     target_= GL_TEXTURE_2D;

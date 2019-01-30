@@ -15,7 +15,7 @@ BGE::ComponentTypeId BGE::MaskComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::MaskComponent::type_index_ = typeid(BGE::MaskComponent);
 
 BGE::MaskComponent::MaskComponent() : RenderComponent() {
-    Color color = { 1, 0, 1, 1 };
+    Color color = { {1, 0, 1, 1} };
     BGE::MaterialHandle materialHandle;
     
     if (hasMaterials()) {
@@ -44,7 +44,7 @@ void BGE::MaskComponent::setMaskReference(const MaskReference &maskRef) {
     setWidthHeight(wh);
 
     // Update the material
-    Color color = { 1, 0, 1, 1 };
+    Color color = { {1, 0, 1, 1} };
     BGE::MaterialHandle materialHandle;
     
     if (hasMaterials()) {
@@ -95,7 +95,7 @@ void BGE::MaskComponent::resetPosition() {
     auto gameObj = getGameObject();
     auto xform = gameObj->getComponent<TransformComponent>();
     
-    xform->setPosition(Vector2{0, 0});
+    xform->setPosition(Vector2{{0, 0}});
 }
 
 void BGE::MaskComponent::resize(Vector2 size) {

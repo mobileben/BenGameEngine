@@ -79,7 +79,7 @@ namespace BGE {
         }
         
         U *safeAddressOf(int32_t index) const {
-            if (index == NullPtrIndex || index >= items_.size()) {
+            if (index == NullPtrIndex || index >= static_cast<int32_t>(items_.size())) {
                 return nullptr;
             } else {
                 return addressOf(index);

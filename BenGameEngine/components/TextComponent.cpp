@@ -14,7 +14,7 @@ BGE::ComponentTypeId BGE::TextComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::TextComponent::type_index_ = typeid(BGE::TextComponent);
 
 BGE::TextComponent::TextComponent() : RenderComponent(), multiline_(false), dropShadow_(false) {
-    dropShadowColor_ = Color{0, 0, 0, 0};
+    dropShadowColor_ = Color{{0, 0, 0, 0}};
     dropShadowOffset_ = Vector2{};
 }
 
@@ -52,7 +52,7 @@ void BGE::TextComponent::setFont(FontHandle fontHandle) {
     updateBoundingBox();
 }
 
-float BGE::TextComponent::getWidth(bool minimum) {
+float BGE::TextComponent::getWidth(__attribute__ ((unused)) bool minimum) {
     auto font = Game::getInstance()->getFontService()->getFont(fontHandle_);
     float width = 0;
     
@@ -108,11 +108,11 @@ void BGE::TextComponent::buildLines() {
     if (multiline_) {
         auto font = Game::getInstance()->getFontService()->getFont(fontHandle_);
 
-        uint32_t length;
-        uint32_t currLineLength;
+        int32_t length;
+        int32_t currLineLength;
         BOOL inWord = false;
-        uint32_t currWordStart = 0;
-        uint32_t lastWordEnd = -1;
+        int32_t currWordStart = 0;
+        int32_t lastWordEnd = -1;
         std::string line;
         float maxTextWidth = boundsWidth_;
         bool needNewline = false;
@@ -130,7 +130,7 @@ void BGE::TextComponent::buildLines() {
         // A leading value of 1 represents 110% fo the lineHeight for the distance.
         lineHeight *= 1.0 + leading_ * 0.1f;
 
-        for (uint32_t i=0;i<length;i++) {
+        for (int32_t i=0;i<length;i++) {
             if (i < nextPosition) {
                 continue;
             }
@@ -177,7 +177,7 @@ void BGE::TextComponent::buildLines() {
                     if (inWord) {
                         int32_t end = length;
                         
-                        for (int32_t j=i+1;j<length;j++) {
+                        for (auto j=i+1;j<length;j++) {
                             char futureCh = text_.at(j);
                             
                             if (futureCh == ' ' || futureCh == '\n' || futureCh == '\r') {
@@ -253,7 +253,7 @@ void BGE::TextComponent::buildLines() {
         float height = lineHeight + (multiText_.size() - 1) * lineHeight;
         float y = height / 2 - lineHeight / 2;
 
-        for (auto i=0;i<multiText_.size();++i) {
+        for (size_t i=0;i<multiText_.size();++i) {
             textY_.push_back(y);
             y -= lineHeight;
         }

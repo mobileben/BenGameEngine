@@ -15,7 +15,7 @@
 
 const std::string BGE::RenderService::ErrorDomain = "RenderService";
 
-BGE::RenderService::RenderService() : ready_(false), backgroundColor_({0, 0, 0, 1}) {
+BGE::RenderService::RenderService() : ready_(false), backgroundColor_({{0, 0, 0, 1}}) {
     thread_ = std::thread(&RenderService::threadFunction, this);
 }
 

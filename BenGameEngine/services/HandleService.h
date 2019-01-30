@@ -55,7 +55,7 @@ namespace BGE {
         void pause() final { Service::pause(); }
         void resume() final { Service::resume(); }
         void destroy() final {}
-        void update(double deltaTime) final {}
+        void update(__attribute__ ((unused)) double deltaTime) final {}
 
         DATA* allocate(HANDLE& handle) {
             HandleBackingType index;
@@ -173,7 +173,7 @@ namespace BGE {
             std::vector<DATA *> pointers;
             handleServicesLock();
             
-            for (auto i=0;i<data_.size();i++) {
+            for (auto i=0u;i<data_.size();i++) {
                 if (magic_[i] != 0) {
                     DATA *ptr = const_cast<DATA *>(&data_[i]);
                     

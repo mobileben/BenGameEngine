@@ -25,7 +25,7 @@ void BGE::profiling::FrameRateCalculator::reset() {
     sum = 0;
 
     lastTimestamp = EpochTime::timeInMilliSec();
-    for (auto i=0;i<samples.size();++i) {
+    for (auto i=0u;i<samples.size();++i) {
         samples[i] = 0;
     }
 }

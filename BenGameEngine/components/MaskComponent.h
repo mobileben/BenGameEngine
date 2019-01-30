@@ -40,7 +40,7 @@ namespace BGE {
         void resetSize();
         
     protected:
-        Vertex* const getVertices() { return vertices_; }
+        Vertex* getVertices() { return vertices_; }
         
         void materialsUpdated();
 

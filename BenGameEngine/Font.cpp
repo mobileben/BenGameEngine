@@ -22,13 +22,13 @@ static const int NumSupportedCharacters = 256 - InitialSupportedCharacterOffset;
 
 const std::string BGE::Font::ErrorDomain = "Font";
 
-BGE::Font::Font() : NamedObject(), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
+BGE::Font::Font() : NamedObject(), pixelSize_(0), handle_(FontHandle()), status_(FontStatus::Invalid), hasKerning_(false), textureAtlasHandle_(TextureAtlasHandle()) {
 }
 
-BGE::Font::Font(ObjectId fontId) : NamedObject(fontId), handle_(FontHandle()), pixelSize_(0), status_(FontStatus::Invalid), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
+BGE::Font::Font(ObjectId fontId) : NamedObject(fontId), pixelSize_(0), handle_(FontHandle()), status_(FontStatus::Invalid), hasKerning_(false), textureAtlasHandle_(TextureAtlasHandle()) {
 }
 
-BGE::Font::Font(const std::string& name, uint32_t pixelSize) : NamedObject(0, name), handle_(FontHandle()), pixelSize_(pixelSize), status_(FontStatus::Invalid), textureAtlasHandle_(TextureAtlasHandle()), hasKerning_(false) {
+BGE::Font::Font(const std::string& name, uint32_t pixelSize) : NamedObject(0, name), pixelSize_(pixelSize), handle_(FontHandle()), status_(FontStatus::Invalid), hasKerning_(false), textureAtlasHandle_(TextureAtlasHandle()) {
 }
 
 void BGE::Font::initialize(FontHandle handle, const std::string& name, uint32_t pixelSize) {
@@ -82,7 +82,7 @@ int32_t BGE::Font::kerningForPair(uint16_t prev, uint16_t curr) {
     return kerning;
 }
 
-uint32_t BGE::Font::getStringWidth(std::string str, bool minimum) {
+uint32_t BGE::Font::getStringWidth(std::string str, __attribute__ ((unused)) bool minimum) {
     int32_t width = 0;
     
     if (status_ == FontStatus::Valid) {
@@ -91,7 +91,7 @@ uint32_t BGE::Font::getStringWidth(std::string str, bool minimum) {
         size_t length = str.length();
         uint16_t prev = 0;
 
-        for (int i=0;i<length;i++) {
+        for (auto i=0u;i<length;i++) {
             code = chars[i];
 
             auto glyph = glyphs_.find(code);
@@ -243,7 +243,7 @@ std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::Font::load(std::str
                                 
                                 dest = &atlasBuffer[y * atlasSpan + x];
                                 
-                                for (int line=0;line<currBitmap->rows;line++) {
+                                for (auto line=0u;line<currBitmap->rows;line++) {
                                     memcpy(&dest[line * atlasSpan], &currBuffer[line * currBitmap->pitch], currBitmap->width);
                                 }
                             } else {

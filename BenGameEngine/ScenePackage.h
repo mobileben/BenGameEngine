@@ -310,7 +310,7 @@ namespace BGE {
 
     private:
         friend class ScenePackageService;
-        friend class ScenePackageFormat;
+        friend struct ScenePackageFormat;
         
         struct TextureQueueItem {
             std::string     name;

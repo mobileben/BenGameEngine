@@ -10,10 +10,11 @@
 
 const std::string BGE::AudioBuffer::ErrorDomain = "AudioBuffer";
 
-BGE::AudioBuffer::AudioBuffer() : valid_(false), streaming_(false), duration_(0), memUsage_(0)
+BGE::AudioBuffer::AudioBuffer() : valid_(false), streaming_(false), duration_(0)
 #if TARGET_OS_IPHONE
     , audioFileId_(nullptr), maxPacketSize_(0), audioBuffer_(nullptr), audioBufferSize_(0)
 #endif /* TARGET_OS_IPHONE */
+    , memUsage_(0)
 {
 #if TARGET_OS_IPHONE
     memset(&streamBasicDesc_, 0, sizeof(streamBasicDesc_));

@@ -33,7 +33,7 @@ namespace BGE {
         void setWidthHeight(Vector2 &&wh);
         
     protected:
-        Vertex* const getVertices() { return vertices_; }
+        Vertex* getVertices() { return vertices_; }
         
         void materialsUpdated();
         

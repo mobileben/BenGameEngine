@@ -53,7 +53,7 @@ namespace BGE {
         void pause() final { Service::pause(); }
         void resume() final { Service::resume(); }
         void destroy() final {}
-        void update(double deltaTime) {}
+        void update(__attribute__ ((unused)) double deltaTime) {}
         void garbageCollect() final;
         
         uint32_t numTextures();   // Texture count includes subtextures
@@ -75,6 +75,8 @@ namespace BGE {
         size_t totalHandleMemory() const final;
 
         size_t totalTextureMemory();
+        
+        using Service::outputMemoryBreakdown;
         
         void outputMemoryBreakdown(uint32_t numTabs);
         

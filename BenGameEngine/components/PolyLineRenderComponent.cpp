@@ -19,7 +19,7 @@ const std::vector<BGE::Vector2>& BGE::PolyLineRenderComponent::getPoints() const
     return points_;
 }
 
-void BGE::PolyLineRenderComponent::setPoints(const std::vector<Vector2>& points, bool lineLoop) {
+void BGE::PolyLineRenderComponent::setPoints(const std::vector<Vector2>& points, __attribute__ ((unused)) bool lineLoop) {
     points_ = points;
     
     // Calculate bounds

@@ -190,7 +190,7 @@ namespace BGE {
         std::vector<int32_t>    keyframes;
     };
 
-    class AnimationSequenceReference;
+    struct AnimationSequenceReference;
     
     struct AnimationChannelReference {
         const char *name;

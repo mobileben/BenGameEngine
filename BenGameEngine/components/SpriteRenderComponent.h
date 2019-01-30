@@ -40,7 +40,7 @@ namespace BGE {
     protected:
         void materialsUpdated();
         
-        VertexTex* const getVertices() { return vertices_; }
+        VertexTex* getVertices() { return vertices_; }
         
     private:
         friend ComponentService;

@@ -46,7 +46,7 @@ namespace BGE {
         virtual void pause() final;
         virtual void resume() final;
         virtual void destroy() final;
-        void update(double deltaTime) final {}
+        void update(__attribute__ ((unused)) double deltaTime) final {}
 
         static int8_t MaxActiveMasks;
         

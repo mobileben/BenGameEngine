@@ -18,7 +18,7 @@ namespace BGE {
     using HandleBackingType = uint32_t;
     
     class GameObject;
-    class EventHandler;
+    struct EventHandler;
     
     class AnimationChannelComponent;
     class AnimationSequenceComponent;

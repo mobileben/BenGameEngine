@@ -33,7 +33,7 @@ BGE::AudioService::AudioService(std::shared_ptr<EventService> eventService) : ev
 #endif /* TARGET_OS_IPHONE */
 }
 
-void BGE::AudioService::update(double deltaTime) {
+void BGE::AudioService::update(__attribute__ ((unused)) double deltaTime) {
     
 }
 

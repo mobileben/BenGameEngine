@@ -24,7 +24,7 @@ namespace VASEr {
             }
             void point(double x, double y)
             {
-                Vec2 V={x,y};
+                Vec2 V={x,y, 0};
                 addvertex(V);
             }
             void point(Vec2 V)
@@ -34,7 +34,7 @@ namespace VASEr {
             static void point_cb(void* obj, double x, double y)
             {
                 polyline_buffer* This = (polyline_buffer*)obj;
-                Vec2 V={x,y};
+                Vec2 V={x,y, 0};
                 This->addvertex(V);
             }
             void vertex(Vec2 V, Color cc)
@@ -66,7 +66,7 @@ namespace VASEr {
             void draw(const polyline_opt* options)
             {
                 if( !N) return;
-                polyline_inopt in_options={0};
+                polyline_inopt in_options={};
                 in_options.segment_length = &L[0];
                 polyline( &P[0],&C[0],&W[0],N,options,&in_options);
             }
@@ -120,9 +120,9 @@ namespace VASEr {
         
         void polybezier( const Vec2* P, const gradient* grad, int length, const polybezier_opt* options, const polybezier_inopt* in_options)
         {
-            polybezier_opt opt={0};
-            polybezier_inopt inopt={0};
-            polyline_opt poly={0};
+            polybezier_opt opt={};
+            polybezier_inopt inopt={};
+            polyline_opt poly={};
             poly.joint = PLJ_bevel;
             if( options) opt = *options;
             if( in_options) inopt = *in_options;
@@ -167,8 +167,8 @@ namespace VASEr {
     
     void polybezier( const Vec2* P, Color cc, double ww, int length, const polybezier_opt* options)
     {
-        gradient grad = {0};
-        gradient_stop stop[2] = {0};
+        gradient grad = {};
+        gradient_stop stop[2] = {};
         grad.stops = stop;
         grad.length = 2;
         stop[0].type = GS_rgba; stop[0].color = cc;

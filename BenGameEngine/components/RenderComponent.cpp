@@ -9,7 +9,7 @@
 #include "RenderComponent.h"
 #include "Game.h"
 
-BGE::RenderComponent::RenderComponent() : Component(), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), enabled_(true), globalBoundsDirty_(true), anchor_(RenderComponentAnchor::Center) {
+BGE::RenderComponent::RenderComponent() : Component(), enabled_(true), globalBoundsDirty_(true), localBounds_({0, 0, 0, 0}), globalBounds_({0, 0, 0, 0}), anchor_(RenderComponentAnchor::Center) {
 }
 
 void BGE::RenderComponent::destroy() {
@@ -36,9 +36,11 @@ void BGE::RenderComponent::destroyFast() {
     Component::destroyFast();
 }
 
+#ifdef NOT_YET
 void BGE::RenderComponent::getGlobalBounds(Rect& bounds) {
     
 }
+#endif
 
 BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) const {
     if (index < materialHandles_.size()) {

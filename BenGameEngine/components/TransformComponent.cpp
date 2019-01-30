@@ -18,7 +18,7 @@ BGE::ComponentTypeId BGE::TransformComponent::typeId_ = Component::InvalidTypeId
 std::type_index BGE::TransformComponent::type_index_ = typeid(BGE::TransformComponent);
 
 BGE::TransformComponent::TransformComponent() : Component(), visible_(true), clipped_(false),
-bounds_({ 0, 0, 0, 0}), useCollisionRectScale_(false), collisionRectScale_({1, 1}), position_({ 0, 0 }), z_(0), scale_( { 1, 1 }), skew_({ 0, 0 }), useSkew_(false), rotation_(0), localDirty_(false), worldDirty_(false), speed_(1), paused_(false) {
+bounds_({ 0, 0, 0, 0}), useCollisionRectScale_(false), collisionRectScale_({{1, 1}}), useSkew_(false), position_({ {0, 0} }), z_(0), scale_( { { 1, 1 } }), skew_({ { 0, 0 } }), rotation_(0), localDirty_(false), worldDirty_(false), speed_(1), paused_(false) {
     Matrix4MakeIdentity(localMatrix_);
     Matrix4MakeIdentity(worldMatrix_);
 }
@@ -447,7 +447,7 @@ BGE::Vector2 BGE::TransformComponent::getGlobalPosition() {
     
     getWorldMatrix(mtx);
     
-    Matrix4MultiplyVector2(results, mtx, Vector2{0, 0});
+    Matrix4MultiplyVector2(results, mtx, Vector2{{0, 0}});
                            
     return results;
 }
@@ -549,7 +549,7 @@ std::vector<BGE::TransformComponent *> BGE::TransformComponent::getOrderedChildr
     
     TransformComponent **xforms = &children[0];
     
-    int32_t i, j;
+    size_t i, j;
     
     for (i=1;i<children.size();++i) {
         j = i;
@@ -583,7 +583,7 @@ std::vector<BGE::TransformComponent *> BGE::TransformComponent::getReverseOrdere
     
     TransformComponent **xforms = &children[0];
     
-    int32_t i, j;
+    size_t i, j;
     
     for (i=1;i<children.size();++i) {
         j = i;

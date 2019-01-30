@@ -320,7 +320,7 @@ void BGE::ScenePackageFormat::save(const std::string& filename) {
         std::vector<size_t>         offsets;
 
         // Fill in parts of the header
-        for (auto i=0;i<sizeof(kScenePackageFormatMagic);++i) {
+        for (size_t i=0;i<sizeof(kScenePackageFormatMagic);++i) {
             header.magic[i] = kScenePackageFormatMagic[i];
         }
 
@@ -686,12 +686,12 @@ void BGE::ScenePackageFormat::save(const std::string& filename) {
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-BGE::ScenePackage::ScenePackage() : NamedObject(), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), emptyStringIndex_(NullPtrIndex), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), sourceIndex_(NullPtrIndex) {
-    position_ = Vector2{0, 0};
+BGE::ScenePackage::ScenePackage() : NamedObject(), status_(ScenePackageStatus::Invalid), frameRate_(0), pixelsPerPoint_(0), width_(0), height_(0), emptyStringIndex_(NullPtrIndex), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), sourceIndex_(NullPtrIndex), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), memoryUsage_(0) {
+    position_ = Vector2{{0, 0}};
 }
 
-BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), width_(0), height_(0), memoryUsage_(0), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), emptyStringIndex_(NullPtrIndex), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), sourceIndex_(NullPtrIndex) {
-    position_ = Vector2{0, 0};
+BGE::ScenePackage::ScenePackage(ObjectId sceneId) : NamedObject(sceneId), status_(ScenePackageStatus::Invalid), frameRate_(0), pixelsPerPoint_(0), width_(0), height_(0), emptyStringIndex_(NullPtrIndex), defaultPositionIndex_(NullPtrIndex), defaultScaleIndex_(NullPtrIndex), defaultSkewIndex_(NullPtrIndex), defaultCollisionRectScaleIndex_(NullPtrIndex), sourceIndex_(NullPtrIndex), fontsLoaded_(false), texturesLoaded_(false), hasExternal_(false), memoryUsage_(0) {
+    position_ = Vector2{{0, 0}};
 }
 
 void BGE::ScenePackage::initialize(ScenePackageHandle handle, std::string name) {
@@ -1208,7 +1208,7 @@ void BGE::ScenePackage::link() {
         animChannelRef->numKeyframes = (int32_t) animChannelIntRef->numKeyframes;
         animChannelRef->keyframes = animChannelKeyframes_.addressOf(keyframeIndex);
 
-        for (auto ki=0;ki<animChannelRef->numKeyframes;ki++) {
+        for (uint32_t ki=0;ki<animChannelRef->numKeyframes;ki++) {
             animChannelRef->keyframes[ki] = animKeyframeRefs_.addressOf(keyframes[ki]);
         }
 
@@ -1609,10 +1609,10 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
             }
 
             emptyStringIndex_ = stringBuilder.add("");
-            defaultPositionIndex_ = vector2Builder.add(Vector2{0, 0});
-            defaultScaleIndex_ = vector2Builder.add(Vector2{1, 1});
-            defaultSkewIndex_ = vector2Builder.add(Vector2{0, 0});
-            defaultCollisionRectScaleIndex_ = vector2Builder.add(Vector2{1, 1});
+            defaultPositionIndex_ = vector2Builder.add(Vector2{{0, 0}});
+            defaultScaleIndex_ = vector2Builder.add(Vector2{{1, 1}});
+            defaultSkewIndex_ = vector2Builder.add(Vector2{{0, 0}});
+            defaultCollisionRectScaleIndex_ = vector2Builder.add(Vector2{{1, 1}});
 
             sourceIndex_ = stringBuilder.add(source_);
 
@@ -1622,7 +1622,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
             // Do subtextures first, since we will use this info to know if our textures are atlases
 
             // Subtextures
-            for (auto index=0;index<subtextures.Size();index++) {
+            for (rapidjson::SizeType index=0;index<subtextures.Size();index++) {
                 Value subTexDict = subtextures[index].GetObject();
                 TextureReferenceIntermediate *texRef = texIntBuilder.addressOf(index);
                 SubTextureDef subTexDef{};
@@ -1674,7 +1674,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                 texAtlasSubTexDefBuilder.add(atlasSubTexDefInt);
             }
 
-            for (int32_t index=0;index<textures.Size();index++) {
+            for (rapidjson::SizeType index=0;index<textures.Size();index++) {
                 Value texDict = textures[index].GetObject();
                 TextureReferenceIntermediate *texRef = texIntBuilder.addressOf((int) (subtextures.Size() + index));
 
@@ -1707,7 +1707,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
                 textIntBuilder.resize((int32_t) text.Size());
 
-                for (int32_t index=0;index<text.Size();index++) {
+                for (rapidjson::SizeType index=0;index<text.Size();index++) {
                     Value textDict = text[index].GetObject();
                     TextReferenceIntermediate *textRef = textIntBuilder.addressOf(index);
 
@@ -1768,7 +1768,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
                 animSeqIntBuilder.resize((int32_t) symbols.Size());
 
-                for (auto index=0;index<symbols.Size();index++) {
+                for (rapidjson::SizeType index=0;index<symbols.Size();index++) {
                     auto symbolDict = symbols[index].GetObject();
                     AnimationSequenceReferenceIntermediate *animSeq = animSeqIntBuilder.addressOf(index);
 
@@ -1793,7 +1793,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
                         animSeq->totalFrames = (uint32_t) frames.Size();
 
-                        for (auto fi=0;fi<frames.Size();fi++) {
+                        for (rapidjson::SizeType fi=0;fi<frames.Size();fi++) {
                             auto frameDict = frames[fi].GetObject();
 
                             if (fi == 0) {
@@ -1820,7 +1820,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                             if (frameDict.HasMember(kScenePackageKeyChildren)) {
                                 auto children = frameDict[kScenePackageKeyChildren].GetArray();
 
-                                for (auto ci=0;ci<children.Size();ci++) {
+                                for (rapidjson::SizeType ci=0;ci<children.Size();ci++) {
                                     auto childDict = children[ci].GetObject();
                                     const char *childName = childDict[kScenePackageKeyName].GetString();
 
@@ -1834,7 +1834,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                                         if (channelIndexIt != channelIndex.end()) {
                                             channel = channelRefIntBuilder.addressOf(channelIndexIt->second);
                                             channelKeyframes = &channelRefIntKeyframes[channelIndexIt->second];
-                                            if (ci > channel->order) {
+                                            if (static_cast<int32_t>(ci) > channel->order) {
                                                 channel->order = static_cast<int32_t>(ci);
                                             }
                                         } else {
@@ -2134,7 +2134,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
             // Build keyframe indices
             for (auto i=0;i<channelRefIntBuilder.size();++i) {
                 AnimationChannelReferenceIntermediate *channel = channelRefIntBuilder.addressOf(i);
-                for (auto fi=0;fi<channelRefIntKeyframes.size();++fi) {
+                for (size_t fi=0;fi<channelRefIntKeyframes.size();++fi) {
                     auto& chanKeyframe = channelRefIntKeyframes[fi];
                     if (channel->chanId == chanKeyframe.chanId) {
                         channel->numKeyframes = static_cast<decltype(channel->numKeyframes)>(chanKeyframe.keyframes.size());
@@ -2153,7 +2153,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
                 placementIntBuilder.resize((int32_t) placements.Size());
 
-                for (auto index=0;index<placements.Size();index++) {
+                for (rapidjson::SizeType index=0;index<placements.Size();index++) {
                     auto dict = placements[index].GetObject();
                     PlacementIntermediate *placement = placementIntBuilder.addressOf(index);
                     const char *name = dict[kScenePackageKeyName].GetString();
@@ -2173,7 +2173,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                 auto buttons = (*jsonDict)[kScenePackageKeyButtons].GetArray();
                 int32_t numStates = 0;
 
-                for (auto index=0;index<buttons.Size();index++) {
+                for (rapidjson::SizeType index=0;index<buttons.Size();index++) {
                     auto buttonDict = buttons[index].GetObject();
                     auto states = buttonDict[kScenePackageKeyStates].GetArray();
 
@@ -2185,7 +2185,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
                 int32_t stateIndex = 0;
 
-                for (int32_t index=0;index<buttons.Size();index++) {
+                for (rapidjson::SizeType index=0;index<buttons.Size();index++) {
                     auto buttonDict = buttons[index].GetObject();
                     ButtonIntermediate *button = buttonIntBuilder.addressOf(index);
                     const char *buttonName = buttonDict[kScenePackageKeyName].GetString();
@@ -2230,7 +2230,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
                 maskIntBuilder.resize((int32_t) masks.Size());
 
-                for (auto index=0;index<masks.Size();index++) {
+                for (rapidjson::SizeType index=0;index<masks.Size();index++) {
                     auto dict = masks[index].GetObject();
                     MaskIntermediate *mask = maskIntBuilder.addressOf(index);
                     const char *name = dict[kScenePackageKeyName].GetString();
@@ -2251,7 +2251,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
                 textureMaskIntBuilder.resize((int32_t) textureMasks.Size());
 
-                for (int32_t index=0;index<textureMasks.Size();index++) {
+                for (rapidjson::SizeType index=0;index<textureMasks.Size();index++) {
                     auto dict = textureMasks[index].GetObject();
                     TextureMaskIntermediate *mask = textureMaskIntBuilder.addressOf(index);
                     const char *name = dict[kScenePackageKeyName].GetString();
@@ -2270,7 +2270,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
                 extPackageIntBuilder.resize((int32_t) externals.Size());
 
-                for (auto index=0;index<externals.Size();index++) {
+                for (rapidjson::SizeType index=0;index<externals.Size();index++) {
                     auto dict = externals[index].GetObject();
                     ExternalPackageIntermediate *external = extPackageIntBuilder.addressOf(index);
                     const char *name = dict[kScenePackageKeyName].GetString();
@@ -2290,7 +2290,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
                 autoDisplayElemIntBuilder.resize((int32_t) autoDisplayElems.Size());
 
-                for (auto index=0;index<autoDisplayElems.Size();index++) {
+                for (rapidjson::SizeType index=0;index<autoDisplayElems.Size();index++) {
                     auto dict = autoDisplayElems[index].GetObject();
                     AutoDisplayElementIntermediate *elem = autoDisplayElemIntBuilder.addressOf(index);
                     const char *name = dict[kScenePackageKeyName].GetString();
@@ -2566,7 +2566,7 @@ void BGE::ScenePackage::saveAsSpkg(const std::string& filename) {
 void BGE::ScenePackage::loadAllTextures(std::function<void()> callback) {
     // Now get the file information
     loadTextures([this, callback]() {
-        loadFonts([this, callback]() {
+        loadFonts([callback]() {
             if (callback) {
                 callback();
             }
@@ -2651,7 +2651,7 @@ void BGE::ScenePackage::loadFonts(std::function<void()> callback) {
             fontName = strings_.addressOf(textRefInt->fontName);
 
             for (auto const &f : fontQueue_) {
-                if (f.first == fontName && f.second == size) {
+                if (f.first == fontName && static_cast<int32_t>(f.second) == size) {
                     found = true;
                     break;
                 }

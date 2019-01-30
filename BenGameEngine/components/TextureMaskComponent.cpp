@@ -85,7 +85,7 @@ void BGE::TextureMaskComponent::resetPosition() {
     auto gameObj = getGameObject();
     auto xform = gameObj->getComponent<TransformComponent>();
 
-    xform->setPosition(Vector2{0, 0});
+    xform->setPosition(Vector2{{0, 0}});
 }
 
 void BGE::TextureMaskComponent::resize(Vector2 size) {

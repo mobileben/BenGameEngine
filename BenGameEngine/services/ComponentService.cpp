@@ -113,7 +113,7 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
 
     auto isHandleBackingNull = componentHandleServiceIsHandleBackingNull_[typeId];
     if (!isHandleBackingNull(handle.handle)) {
-        for (auto i=0;i<handles.size();++i) {
+        for (size_t i=0;i<handles.size();++i) {
             auto& h = handles[i];
             if (h.handle == handle.handle) {
                 if (typeId == TransformComponent::typeId_) {
@@ -322,7 +322,7 @@ uint32_t BGE::ComponentService::totalMaxHandlesAllocated() const {
 uint32_t BGE::ComponentService::numMaterials() const {
     uint32_t num = 0;
     
-    for (auto i=0;i<componentHandleServices_.size();i++) {
+    for (auto i=0u;i<componentHandleServices_.size();i++) {
         if (i == SpriteRenderComponent::typeId_) {
             auto const &handles = componentHandles_[i];
             for (auto const &handle : handles) {
@@ -395,7 +395,7 @@ uint32_t BGE::ComponentService::numMaterials() const {
 size_t BGE::ComponentService::usedHandleMemory() const {
     size_t mem = 0;
     
-    for (auto i=0;i<componentHandleServices_.size();i++) {
+    for (auto i=0u;i<componentHandleServices_.size();i++) {
         if (i == TransformComponent::typeId_) {
             auto handleService = static_cast<HandleService<TransformComponent, TransformComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->usedMemory();
@@ -467,7 +467,7 @@ size_t BGE::ComponentService::usedHandleMemory() const {
 size_t BGE::ComponentService::unusedHandleMemory() const {
     size_t mem = 0;
     
-    for (auto i=0;i<componentHandleServices_.size();i++) {
+    for (auto i=0u;i<componentHandleServices_.size();i++) {
         if (i == TransformComponent::typeId_) {
             auto handleService = static_cast<HandleService<TransformComponent, TransformComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->unusedMemory();
@@ -539,7 +539,7 @@ size_t BGE::ComponentService::unusedHandleMemory() const {
 size_t BGE::ComponentService::totalHandleMemory() const {
     size_t mem = 0;
     
-    for (auto i=0;i<componentHandleServices_.size();i++) {
+    for (auto i=0u;i<componentHandleServices_.size();i++) {
         if (i == TransformComponent::typeId_) {
             auto handleService = static_cast<HandleService<TransformComponent, TransformComponentHandle> *>(componentHandleServices_[i]);
             mem += handleService->totalMemory();
@@ -609,7 +609,7 @@ size_t BGE::ComponentService::totalHandleMemory() const {
 }
 
 void BGE::ComponentService::outputResourceBreakdown(uint32_t numTabs) const {
-    for (auto i=0;i<componentHandleServices_.size();i++) {
+    for (auto i=0u;i<componentHandleServices_.size();i++) {
         if (i == TransformComponent::typeId_) {
             outputComponentResourceBreakdown<TransformComponent>(numTabs);
         } else if (i == BoundingBoxComponent::typeId_) {
@@ -657,7 +657,7 @@ void BGE::ComponentService::outputResourceBreakdown(uint32_t numTabs) const {
 }
 
 void BGE::ComponentService::outputMemoryBreakdown(uint32_t numTabs) const {
-    for (auto i=0;i<componentHandleServices_.size();i++) {
+    for (auto i=0u;i<componentHandleServices_.size();i++) {
         if (i == TransformComponent::typeId_) {
             outputComponentMemoryBreakdown<TransformComponent>(numTabs);
         } else if (i == BoundingBoxComponent::typeId_) {

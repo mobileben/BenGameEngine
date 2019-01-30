@@ -71,9 +71,9 @@ void BGE::AnimatorComponent::setFrame(int32_t frame) {
 
     if (gameObj) {
         auto seq = gameObj->getComponent<AnimationSequenceComponent>();
-        auto numChannels = seq->channels.size();
+        size_t numChannels = seq->channels.size();
         
-        for (auto i=0;i<numChannels;i++) {
+        for (size_t i=0;i<numChannels;i++) {
             gameObj = space->getGameObject(gameObjHandle);
             seq = gameObj->getComponent<AnimationSequenceComponent>();
             
@@ -87,7 +87,7 @@ void BGE::AnimatorComponent::setFrame(int32_t frame) {
         seq = gameObj->getComponent<AnimationSequenceComponent>();
         
         // Update the bounds
-        for (auto i=0;i<seq->numBounds;i++) {
+        for (uint32_t i=0;i<seq->numBounds;i++) {
             auto bounds = seq->bounds[i];
             
             if (bounds.startFrame >= i && i < (bounds.startFrame + bounds.totalFrames)) {
@@ -126,12 +126,12 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
     AnimationKeyframeReference *keyframe = channel->channel->keyframes[channelFrame];
     bool hide = false;
     
-    if (frame < keyframe->startFrame) {
+    if (frame < static_cast<int32_t>(keyframe->startFrame)) {
         // We need to start stepping back keyframes
         while (--channelFrame >= 0) {
             keyframe = channel->channel->keyframes[channelFrame];
             
-            if (frame >= keyframe->startFrame) {
+            if (frame >= static_cast<int32_t>(keyframe->startFrame)) {
                 break;
             }
         }
@@ -141,18 +141,18 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
             keyframe = channel->channel->keyframes[channelFrame];
             hide = true;
         }
-    } else if (frame > (keyframe->startFrame + keyframe->totalFrames - 1) ) {
+    } else if (frame > static_cast<int32_t>(keyframe->startFrame + keyframe->totalFrames) - 1) {
         // We need to start stepping forward keyframes
-        while (++channelFrame < channel->channel->numKeyframes) {
+        while (++channelFrame < static_cast<int32_t>(channel->channel->numKeyframes)) {
             keyframe = channel->channel->keyframes[channelFrame];
             
-            if (frame < (keyframe->startFrame + keyframe->totalFrames)) {
+            if (frame < static_cast<int32_t>(keyframe->startFrame + keyframe->totalFrames)) {
                 break;
             }
         }
         
-        if (channelFrame >= channel->channel->numKeyframes) {
-            channelFrame = channel->channel->numKeyframes - 1;
+        if (channelFrame >= static_cast<int32_t>(channel->channel->numKeyframes)) {
+            channelFrame = static_cast<int32_t>(channel->channel->numKeyframes) - 1;
             keyframe = channel->channel->keyframes[channelFrame];
             hide = true;
         }
@@ -205,12 +205,12 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
         if (keyframe->skew) {
             xform->setSkew(*keyframe->skew);
         } else {
-            xform->setSkew(Vector2{0, 0});
+            xform->setSkew(Vector2{{0, 0}});
         }
         if (keyframe->collisionRectScale) {
             xform->setCollisionRectScale(*keyframe->collisionRectScale);
         } else {
-            xform->setCollisionRectScale(Vector2{1,1});
+            xform->setCollisionRectScale(Vector2{{1,1}});
         }
         auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();
         auto colorTransform = gameObj->getComponent<ColorTransformComponent>();
@@ -256,7 +256,7 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
         // If this is a Keyframe reference, update
         if (channel->channel->referenceType == GfxReferenceTypeKeyframe) {
             // Find the appropriate child
-            for (auto i=0;i<xform->getNumChildren();i++) {
+            for (uint32_t i=0;i<xform->getNumChildren();i++) {
                 auto childXform = xform->childAtIndex(i);
                 if (childXform->hasGameObject()) {
                     auto childObjHandle = childXform->getGameObjectHandle();
@@ -273,7 +273,7 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
 
 
                             // Update the bounds
-                            for (auto bi=0;i<childSeq->numBounds;bi++) {
+                            for (uint32_t bi=0;i<childSeq->numBounds;bi++) {
                                 auto bounds = childSeq->bounds[bi];
 
                                 if (bounds.startFrame >= bi && bi < (bounds.startFrame + bounds.totalFrames)) {
@@ -347,7 +347,7 @@ void BGE::AnimatorComponent::playToFrame(int32_t endFrame, float speed) {
         secPerFrame = 1.0 / 30.0;   // Default to 30 fps
     }
 
-    if (endFrame >= seq->totalFrames) {
+    if (endFrame >= static_cast<int32_t>(seq->totalFrames)) {
         endFrame = seq->totalFrames - 1;
     }
     

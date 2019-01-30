@@ -13,26 +13,26 @@
 
 #pragma mark - Touch Events
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesBegan:(NSSet *)touches withEvent:(__attribute__ ((unused)) UIEvent *)event
 {
     BGE::Game::getInstance()->getInputService()->touchEventDown(touches, self);
 }
 
 
 // Handles the continuation of a touch.
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesMoved:(NSSet *)touches withEvent:(__attribute__ ((unused)) UIEvent *)event
 {
     BGE::Game::getInstance()->getInputService()->touchEventMove(touches, self);
 }
 
 // Handles the end of a touch event when the touch is a tap.
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesEnded:(NSSet *)touches withEvent:(__attribute__ ((unused)) UIEvent *)event
 {
     BGE::Game::getInstance()->getInputService()->touchEventUp(touches, self);
 }
 
 // Handles the end of a touch event.
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesCancelled:(NSSet *)touches withEvent:(__attribute__ ((unused)) UIEvent *)event
 {
     BGE::Game::getInstance()->getInputService()->touchEventCancel(touches, self);
 }

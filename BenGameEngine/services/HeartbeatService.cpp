@@ -104,7 +104,7 @@ void BGE::HeartbeatService::dispatchHandler() {
     
     // Now go through each one. Since we flipped the buffer, any changes to the queue will happen
     auto count = queue.size();
-    for (auto i=0;i<count;++i) {
+    for (auto i=0u;i<count;++i) {
         auto func =  std::move(queue.front());
         queue.pop();
         func();
@@ -152,7 +152,7 @@ void BGE::HeartbeatService::registerListener(std::string name, std::function<voi
     rebuildOrderedListeners();
 }
 
-void BGE::HeartbeatService::unregisterListener(std::string name) {
+void BGE::HeartbeatService::unregisterListener(__attribute__ ((unused)) std::string name) {
     
 }
 

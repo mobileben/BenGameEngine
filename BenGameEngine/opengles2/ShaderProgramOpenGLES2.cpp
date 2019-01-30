@@ -10,11 +10,11 @@
 
 #include "ShaderProgramOpenGLES2.h"
 
-BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders) : ShaderProgram(name, shaders) {
+BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders) : ShaderProgram(name, shaders), error_(GL_NO_ERROR) {
     state_ = createShaderProgram(name, shaders);
 }
 
-BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms) : ShaderProgram(name, shaders)
+BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms) : ShaderProgram(name, shaders), error_(GL_NO_ERROR)
 {
     state_ = createShaderProgram(name, shaders);
     
@@ -26,7 +26,7 @@ BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vecto
     }
 }
 
-BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(std::string name, std::vector<std::shared_ptr<Shader>> shaders)
+BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(__attribute__ ((unused)) std::string name, std::vector<std::shared_ptr<Shader>> shaders)
 {
     program_ = glCreateProgram();
     
@@ -57,6 +57,7 @@ BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(std::st
                 message[0] = '\0';
                 glGetProgramInfoLog(program_, sizeof(message), 0, &message[0]);
                 
+                error_ = glGetError();
                 errorString_ = std::string(message);
                 state_ = ShaderProgramState::LinkError;
             }

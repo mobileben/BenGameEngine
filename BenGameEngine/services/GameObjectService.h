@@ -35,7 +35,7 @@ namespace BGE {
         void pause() final { Service::pause(); }
         void resume() final { Service::resume(); }
         void destroy() final {}
-        void update(double deltaTime) final {}
+        void update(__attribute__ ((unused)) double deltaTime) final {}
         void garbageCollect() final { handleService_.garbageCollect(); }
         
         uint32_t numGameObjects () const;

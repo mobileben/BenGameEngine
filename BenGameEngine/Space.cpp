@@ -25,19 +25,19 @@
 
 #include <future>
 
-BGE::Space::Space() : NamedObject(), visible_(false), order_(0), updatable_(true), resetting_(false) {
+BGE::Space::Space() : NamedObject(), visible_(false), updatable_(true), resetting_(false), order_(0) {
 #ifdef SUPPORT_PROFILING
     resetTime_ = 0;
 #endif /* SUPPORT_PROFILING */
 }
 
-BGE::Space::Space(ObjectId spaceId) : NamedObject(spaceId), visible_(false), order_(0), updatable_(true), resetting_(false) {
+BGE::Space::Space(ObjectId spaceId) : NamedObject(spaceId), visible_(false), updatable_(true), resetting_(false), order_(0) {
 #ifdef SUPPORT_PROFILING
     resetTime_ = 0;
 #endif /* SUPPORT_PROFILING */
 }
 
-BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), order_(0), updatable_(true), resetting_(false) {
+BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, name), visible_(false), updatable_(true), resetting_(false), order_(0) {
 #ifdef SUPPORT_PROFILING
     resetTime_ = 0;
 #endif /* SUPPORT_PROFILING */
@@ -89,6 +89,10 @@ void BGE::Space::reset(std::function<void()> callback) {
         BGE::Game::getInstance()->getSpaceService()->queueReset(spaceHandle_);
     }
     unlock();
+    
+    if (callback) {
+        callback();
+    }
 }
 
 void BGE::Space::reset_() {
@@ -382,6 +386,10 @@ void BGE::Space::loadAllTextures(std::function<void()> callback) {
             package->link();
         }
     }
+    
+    if (callback) {
+        callback();
+    }
 }
 
 // TODO: Add in support for dependency validation as well as linking in order of dependencies
@@ -456,7 +464,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string instanceName, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate) {
+BGE::GameObject *BGE::Space::createAnimChannel(__attribute__ ((unused)) std::string name, std::string instanceName, const AnimationChannelReference *channelRef, __attribute__ ((unused)) SceneObjectCreatedDelegate *delegate) {
     if (channelRef) {
         lock();
         
@@ -485,7 +493,7 @@ BGE::GameObject *BGE::Space::createAnimChannel(std::string name, std::string ins
     return nullptr;
 }
 
-BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
+BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, __attribute__ ((unused)) SceneObjectCreatedDelegate *delegate) {
     auto package = Game::getInstance()->getScenePackageService()->getScenePackage(handle);
     AnimationSequenceReference *animSeqRef;
     
@@ -1127,7 +1135,7 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
         auto pushText = pushBitmask & TextComponent::bitmask_;
         auto pushMasks = pushBitmask & MaskComponent::bitmask_;
         auto pushPlacements = pushBitmask & PlacementComponent::bitmask_;
-        auto pushTextureMasks = pushBitmask & TextureMaskComponent::bitmask_;
+        __attribute__((unused)) auto pushTextureMasks = pushBitmask & TextureMaskComponent::bitmask_;
         
         if (animSeqComponent) {
             for (auto &channel : animSeqComponent->channels) {
@@ -1497,7 +1505,7 @@ void BGE::Space::setAnimationSequenceReference(AnimationSequenceComponentHandle 
     AnimationChannelReference *channels = animSeqRef.channels;
     auto numChannels = animSeq->numChannels;
     
-    for (auto i=0;i<numChannels;i++) {
+    for (auto i=0u;i<numChannels;i++) {
         auto channelRef = &channels[i];
         auto obj = this->createAnimChannel(channelRef->reference, channelRef->name, channelRef, nullptr);
         auto xform = obj->getComponent<TransformComponent>();
@@ -1660,7 +1668,7 @@ void BGE::Space::setAnimationChannelReference(AnimationChannelComponentHandle ch
         }
     }
 }
-void BGE::Space::setGameObjectHandle(ComponentHandle compHandle, GameObjectHandle gameObjHandle) {
+void BGE::Space::setGameObjectHandle(ComponentHandle compHandle, __attribute__ ((unused)) GameObjectHandle gameObjHandle) {
     if (compHandle.typeId == AnimationChannelComponent::typeId_) {
         auto handle = AnimationChannelComponentHandle(compHandle.handle);
         auto comp = getComponent(handle);

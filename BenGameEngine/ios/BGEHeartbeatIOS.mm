@@ -21,7 +21,7 @@
     return self;
 }
 
-- (void)tick:(CADisplayLink *)displayLink
+- (void)tick:(__attribute__ ((unused)) CADisplayLink *)displayLink
 {
     if (self.tickHandler) {
         self.tickHandler();

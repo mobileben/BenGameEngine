@@ -65,8 +65,8 @@ namespace BGE {
             return 0;
         }
         
-        virtual void outputResourceBreakdown(uint32_t numTabs) const {};
-        virtual void outputMemoryBreakdown(uint32_t numTabs) const {};
+        virtual void outputResourceBreakdown(uint32_t numTabs) const;
+        virtual void outputMemoryBreakdown(uint32_t numTabs) const;
         
         bool isBackgrounded() const { return backgrounded_; }
         bool isPaused() const { return paused_; }

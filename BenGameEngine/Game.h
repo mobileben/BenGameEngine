@@ -99,7 +99,7 @@ namespace BGE {
         template <typename... Args> static void outputValue(uint32_t numTabs, const std::string& format, Args... args) {
             std::string results = format;
             
-            for (auto i=0;i<numTabs;i++) {
+            for (size_t i=0;i<numTabs;i++) {
                 printf("\t");
             }
             

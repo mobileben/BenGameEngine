@@ -67,7 +67,9 @@ namespace BGE {
         void setGlobalBoundsDirty(bool dirty) { globalBoundsDirty_ = dirty; }
         
         void setLocalBounds(Rect& bounds) { localBounds_ = bounds; }
+#ifdef NOT_YET
         void setGlobalBounds(Rect& bounds) { globalBounds_ = bounds; }
+#endif
         
         virtual void materialsUpdated() =0;
         void destroyFast() override;
