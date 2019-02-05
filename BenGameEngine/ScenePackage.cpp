@@ -1731,7 +1731,9 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                         }
 
                         if (textRef->multiline) {
+#if DEBUG
                             printf("Multi-line text for %s\n", name);
+#endif
                         }
                         std::string alignment = formatDict[kScenePackageKeyAlignment].GetString();
 
@@ -2459,7 +2461,9 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 #endif /* TARGET_OS_IPHONE */
 #endif
         } catch (std::exception& ex) {
+#if DEBUG
             printf("Exception: could not unmarshal ScenePackage. %s\n", ex.what());
+#endif
         }
     } else if (callback) {
         callback(this);
