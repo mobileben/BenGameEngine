@@ -80,6 +80,9 @@ namespace BGE {
         float pressedDuration() const;
         bool pressedByDurationTriggered() const;
         
+        void activeUpdated(bool active);
+        void visibilityUpdated(bool visible);
+        
         Event getEvent() const { return event_; }
         
         void setPressedDuration(float duration);
@@ -157,6 +160,8 @@ namespace BGE {
         void useNormalButton();
 
         void animateHighlightedButton();    // This animates
+        
+        bool serviceDebounce(double deltaTime, bool forceClear=false);
         
         // TODO: If multi-touch then we will need to match touches, if necessary
         Event shouldHandleTouchDownEvent(bool inBounds);

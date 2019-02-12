@@ -37,7 +37,7 @@ namespace BGE {
         inline GameObjectHandle getHandle() const { return handle_; }
         
         inline bool isActive() const { return active_; }
-        inline void setActive(bool active) { active_ = active; }
+        void setActive(bool active);
 
         Space *getSpace() const;
         inline SpaceHandle getSpaceHandle() const { return spaceHandle_; }

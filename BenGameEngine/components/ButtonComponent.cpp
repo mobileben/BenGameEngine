@@ -363,7 +363,7 @@ void BGE::ButtonComponent::setHighlighted(bool highlighted) {
             state |= ButtonStateHighlighted;
             useHighlightedButton();
         } else {
-            state &= ButtonStateHighlighted;
+            state &= ~ButtonStateHighlighted;
             
             // For now, selected acts like highlighted
             if (!(state & ButtonStateSelected)) {
@@ -453,6 +453,18 @@ float BGE::ButtonComponent::pressedDuration() const {
 
 bool BGE::ButtonComponent::pressedByDurationTriggered() const {
     return pressedByDurationTriggered_;
+}
+
+void BGE::ButtonComponent::activeUpdated(bool active) {
+    if (!active) {
+        serviceDebounce(0.0, true);
+    }
+}
+
+void BGE::ButtonComponent::visibilityUpdated(bool visible) {
+    if (!visible) {
+        serviceDebounce(0.0, true);
+    }
 }
 
 void BGE::ButtonComponent::setPressedDuration(float duration) {
@@ -674,6 +686,33 @@ void BGE::ButtonComponent::animateHighlightedButton() {
     }
 }
 
+bool BGE::ButtonComponent::serviceDebounce(double deltaTime, bool forceClear) {
+    if (debouncing_) {
+        debounceTimer_ += deltaTime;
+        if (forceClear || debounceTimer_ >= debounceDuration_) {
+            debouncing_ = false;
+            pressedByDurationTriggered_ = false;
+            event_ = Event::None;
+            
+            if (isEnabled()) {
+                if (toggleable) {
+                    if (toggleOn) {
+                        useHighlightedButton();
+                    } else {
+                        useNormalButton();
+                    }
+                } else {
+                    setHighlighted(false);
+                }
+            } else {
+                useDisabledButton();
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 BGE:: Event BGE::ButtonComponent::shouldHandleInput(Input *input, bool inBounds) {
     Event event = Event::None;
     
@@ -739,31 +778,10 @@ float BGE::ButtonComponent::getCollisionScale(Input *input) const {
 
 void BGE::ButtonComponent::update(double deltaTime) {
     // Update only used when we're debouncing
-    if (debouncing_) {
-        if (highlightedAnimButtonHandle.isNull()) {
-            debounceTimer_ += deltaTime;
-            if (debounceTimer_ >= debounceDuration_) {
-                debouncing_ = false;
-                pressedByDurationTriggered_ = false;
-                event_ = Event::None;
-                
-                if (isEnabled()) {
-                    if (toggleable) {
-                        if (toggleOn) {
-                            useHighlightedButton();
-                        } else {
-                            useNormalButton();
-                        }
-                    } else {
-                        setHighlighted(false);
-                    }
-                } else {
-                    useDisabledButton();
-                }
-            }
+    if (!serviceDebounce(deltaTime)) {
+        if (event_ == Event::TouchDownInside) {
+            pressedTime_ += deltaTime;
         }
-    } else if (event_ == Event::TouchDownInside) {
-        pressedTime_ += deltaTime;
     }
 }
 

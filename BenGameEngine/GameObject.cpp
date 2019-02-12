@@ -12,6 +12,7 @@
 #include "ComponentBitmask.h"
 #include "AnimationSequenceComponent.h"
 #include "BoundingBoxComponent.h"
+#include "ButtonComponent.h"
 #include "AnimatorComponent.h"
 #include "FrameAnimatorComponent.h"
 #include "TransformComponent.h"
@@ -92,6 +93,16 @@ void BGE::GameObject::removeAllComponents() {
     components_.clear();
 }
 
+void BGE::GameObject::setActive(bool active) {
+    active_ = active;
+    
+    auto button = getComponent<ButtonComponent>();
+    if (button) {
+        button->activeUpdated(active);
+    }
+}
+
+
 BGE::Space *BGE::GameObject::getSpace() const {
     return Game::getInstance()->getSpaceService()->getSpace(spaceHandle_);
 }
@@ -164,9 +175,13 @@ bool BGE::GameObject::isVisible(void) {
 
 void BGE::GameObject::setVisibility(bool visible) {
     auto xform = getComponent<TransformComponent>();
-    
     if (xform) {
-        return xform->setVisibility(visible);
+        xform->setVisibility(visible);
+    }
+    
+    auto button = getComponent<ButtonComponent>();
+    if (button) {
+        button->visibilityUpdated(visible);
     }
 }
 
@@ -184,7 +199,7 @@ void BGE::GameObject::setClipped(bool clipped) {
     auto xform = getComponent<TransformComponent>();
     
     if (xform) {
-        return xform->setClipped(clipped);
+        xform->setClipped(clipped);
     }
 }
 
