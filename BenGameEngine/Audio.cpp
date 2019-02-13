@@ -188,7 +188,7 @@ static void DeriveBufferSize (AudioStreamBasicDescription &ASBDesc,
 
 #endif /* TARGET_OS_IPHONE */
 
-BGE::Audio::Audio() : doneCallback(nullptr), valid_(false), state_(AudioPlayState::Off), type_(AudioType::SFX), streaming_(false), looping_(0), pauseSource_(AudioPauseSource::None), playbackRate_(1.0)
+BGE::Audio::Audio() : doneCallback(nullptr), valid_(false), state_(AudioPlayState::Off), type_(AudioType::SFX), streaming_(false), looping_(0), pauseSource_(static_cast<uint32_t>(AudioPauseSource::None)), playbackRate_(1.0)
 #if TARGET_OS_IPHONE
 , audioFileId_(nullptr), audioBuffer_(nullptr), audioBufferSize_(0), queue_(nullptr), actualBuffersUsed_(0), bufferSize_(0), currPacket_(0), numPacketsToRead_(0), packetDesc_(nullptr), memoryImageIndex_(0)
 #endif /* TARGET_OS_IPHONE */
@@ -316,7 +316,7 @@ void BGE::Audio::initialize(AudioHandle handle, const std::string& name, AudioBu
     } else {
         type_ = AudioType::SFX;
     }
-    pauseSource_ = AudioPauseSource::None;
+    pauseSource_ = static_cast<uint32_t>(AudioPauseSource::None);
 }
 
 void BGE::Audio::destroy() {
@@ -345,7 +345,7 @@ void BGE::Audio::destroy() {
     
     state_ = AudioPlayState::Off;
     audioBufferHandle_.nullify();
-    pauseSource_ = AudioPauseSource::None;
+    pauseSource_ = static_cast<uint32_t>(AudioPauseSource::None);
 }
 
 void BGE::Audio::setDoneCallback(std::function<void(Audio *)> callback) {
@@ -368,13 +368,19 @@ bool BGE::Audio::isPlaying() const {
     return (state_ != AudioPlayState::Off && state_ != AudioPlayState::Stopping);
 }
 
-bool BGE::Audio::isPaused(AudioPauseSource source) const {
-    if (source != AudioPauseSource::None && source != pauseSource_) {
+bool BGE::Audio::isPaused() const {
+    return (state_ == AudioPlayState::Paused);
+}
+
+bool BGE::Audio::isPausedForSource(AudioPauseSource source) const {
+    uint32_t src = static_cast<uint32_t>(source);
+    if (!(pauseSource_ & src)) {
         return false;
     }
     
     return (state_ == AudioPlayState::Paused);
 }
+
 bool BGE::Audio::isLooping() const {
     return looping_ > 1;
 }
@@ -389,7 +395,7 @@ void BGE::Audio::play(uint32_t loop) {
     }
 
     looping_ = loop;
-    pauseSource_ = AudioPauseSource::None;
+    pauseSource_ = static_cast<uint32_t>(AudioPauseSource::None);
 
 #if TARGET_OS_IPHONE
     state_= AudioPlayState::Queued;
@@ -402,36 +408,42 @@ void BGE::Audio::play(uint32_t loop) {
 #endif /* TARGET_OS_IPHONE */
 }
 
-void BGE::Audio::pause(AudioPauseSource source) {
+void BGE::Audio::pauseForSource(AudioPauseSource source) {
     if (!valid_) {
         return;
     }
 
     if (isPlaying()) {
-        state_ = AudioPlayState::Paused;
-        pauseSource_ = source;
+        if (!isPaused()) {
 #if TARGET_OS_IPHONE
-        AudioQueuePause(queue_);
+            AudioQueuePause(queue_);
 #endif /* TARGET_OS_IPHONE */
+        }
+        state_ = AudioPlayState::Paused;
+        pauseSource_ |= static_cast<uint32_t>(source);
     }
 }
 
-void BGE::Audio::resume(AudioPauseSource source) {
+void BGE::Audio::resumeForSource(AudioPauseSource source) {
     if (!valid_) {
         return;
     }
 
-    if (pauseSource_ == AudioPauseSource::None || source != pauseSource_) {
+    uint32_t src = static_cast<uint32_t>(source);
+    if (!(pauseSource_ & src)) {
         return;
     }
 
-    state_ = AudioPlayState::Playing;
-    pauseSource_ = AudioPauseSource::None;
+    pauseSource_ &= ~src;
+    
+    if (pauseSource_ == static_cast<uint32_t>(AudioPauseSource::None)) {
+        state_ = AudioPlayState::Playing;
 
 #if TARGET_OS_IPHONE
-    OSStatus	status;
-    status = AudioQueueStart(queue_, NULL);
+        OSStatus    status;
+        status = AudioQueueStart(queue_, NULL);
 #endif /* TARGET_OS_IPHONE */
+    }
 }
 
 void BGE::Audio::stop() {
@@ -441,7 +453,8 @@ void BGE::Audio::stop() {
 
     if (isPlaying()) {
         state_ = AudioPlayState::Stopping;
-        pauseSource_ = AudioPauseSource::None;
+        pauseSource_ = static_cast<uint32_t>(AudioPauseSource::None);
+        
 #if TARGET_OS_IPHONE
         AudioQueueStop(queue_, YES);
         AudioQueueReset(queue_);

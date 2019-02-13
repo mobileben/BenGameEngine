@@ -48,10 +48,12 @@ namespace BGE {
     };
     
     enum class AudioPauseSource : uint32_t {
-        None = 0,
-        AudioService,
-        User1,
-        User2
+        None            = 0,
+        AudioService    = 1 << 0,
+        User1           = 1 << 1,
+        User2           = 1 << 2,
+        User3           = 1 << 3,
+        User4           = 1 << 4
     };
 
     const uint32_t AudioPlayForever = static_cast<uint32_t>(-1);
@@ -110,14 +112,15 @@ namespace BGE {
         double getDuration() const;
         
         bool isPlaying() const;
-        bool isPaused(AudioPauseSource source=AudioPauseSource::None) const;
+        bool isPaused() const;
+        bool isPausedForSource(AudioPauseSource source=AudioPauseSource::None) const;
         bool isLooping() const;
         inline uint32_t	getLoopingCount(void) const { return looping_; }
         inline void setLoopingCount(uint32_t looping) { looping_ = looping; }
 
         void play(uint32_t loop = AudioPlayOnce);
-        void pause(AudioPauseSource source=AudioPauseSource::None);
-        void resume(AudioPauseSource source=AudioPauseSource::None);
+        void pauseForSource(AudioPauseSource source);
+        void resumeForSource(AudioPauseSource source);
         void stop();
 
         bool getEnablePlaybackRate() const { return enablePlaybackRate_; }
@@ -143,7 +146,7 @@ namespace BGE {
         bool                            streaming_;
         
         uint32_t                        looping_;
-        AudioPauseSource                pauseSource_;
+        uint32_t                        pauseSource_;
         bool                            enablePlaybackRate_;
         float                           playbackRate_;
 
