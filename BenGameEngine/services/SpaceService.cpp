@@ -194,12 +194,10 @@ std::vector<BGE::SpaceHandle> BGE::SpaceService::getReversedSpaces() const {
 }
 
 void BGE::SpaceService::threadFunction() {
-#if DEBUG
     auto native = thread_.native_handle();
     if (native == pthread_self()) {
         pthread_setname_np("space");
     }
-#endif
     while(true) {
         auto handle = resetQueue_.pop();
         auto space = getSpace(handle);

@@ -155,12 +155,10 @@ void BGE::RenderService::destroyTexture(const RenderCommandItem& item) {
 }
 
 void BGE::RenderService::threadFunction() {
-#if DEBUG
     auto native = thread_.native_handle();
     if (native == pthread_self()) {
         pthread_setname_np("render");
     }
-#endif
     while(true) {
         auto command = renderQueue_.pop();
         switch (command.command) {

@@ -75,12 +75,10 @@ void BGE::HeartbeatService::setRunning(bool running) {
 }
 
 void BGE::HeartbeatService::threadFunction() {
-#if DEBUG
     auto native = thread_.native_handle();
     if (native == pthread_self()) {
         pthread_setname_np("heartbeat");
     }
-#endif
     while (true) {
         queuedItems_.pop();
         tickHandler();
