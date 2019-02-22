@@ -144,6 +144,7 @@ namespace BGE {
         static const std::string ErrorDomain;
 
         RenderService();
+        virtual ~RenderService();
 
         virtual void bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window);
         virtual void resizeRenderWindow();
@@ -257,7 +258,8 @@ namespace BGE {
         
         Color backgroundColor_;
 
-        std::thread  thread_;
+        bool            threadRunning_;
+        std::thread     thread_;
 
         virtual void threadFunction();
     };

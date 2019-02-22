@@ -100,42 +100,47 @@ size_t BGE::RenderServiceOpenGLES2::totalMemory() const {
     size_t memory = 0;
 
 #if TARGET_OS_IPHONE
-    auto view = this->getRenderWindow()->getView();
-    auto area = view.drawableWidth * view.drawableHeight;
-    switch (view.drawableColorFormat) {
-        case GLKViewDrawableColorFormatRGBA8888:
-        case GLKViewDrawableColorFormatSRGBA8888:
-            memory += area * 4;
-            break;
+    auto window = this->getRenderWindow();
+    if (window) {
+        auto view = this->getRenderWindow()->getView();
+        if (view) {
+            auto area = view.drawableWidth * view.drawableHeight;
+            switch (view.drawableColorFormat) {
+                case GLKViewDrawableColorFormatRGBA8888:
+                case GLKViewDrawableColorFormatSRGBA8888:
+                    memory += area * 4;
+                    break;
+                    
+                case GLKViewDrawableColorFormatRGB565:
+                    memory += area * 2;
+                    break;
+                    
+                default:
+                    break;
+            }
             
-        case GLKViewDrawableColorFormatRGB565:
-            memory += area * 2;
-            break;
+            switch (view.drawableStencilFormat) {
+                case GLKViewDrawableStencilFormat8:
+                    memory += area;
+                    break;
+                    
+                default:
+                    break;
+            }
             
-        default:
-            break;
-    }
-    
-    switch (view.drawableStencilFormat) {
-        case GLKViewDrawableStencilFormat8:
-            memory += area;
-            break;
-            
-        default:
-            break;
-    }
-    
-    switch (view.drawableDepthFormat) {
-        case GLKViewDrawableDepthFormat24:
-            memory += area * 3;
-            break;
-            
-        case GLKViewDrawableDepthFormat16:
-            memory += area * 2;
-            break;
-            
-        default:
-            break;
+            switch (view.drawableDepthFormat) {
+                case GLKViewDrawableDepthFormat24:
+                    memory += area * 3;
+                    break;
+                    
+                case GLKViewDrawableDepthFormat16:
+                    memory += area * 2;
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
     }
 #else
     // For now assume 32-bit color buffer only

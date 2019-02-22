@@ -434,7 +434,7 @@ void BGE::ScenePackageFormat::save(const std::string& filename) {
         auto offset = offsets[sizeIndex];
 
         uint8_t *bytePtr = reinterpret_cast<uint8_t *>(buffer_);
-        uint8_t *bufferPtr = reinterpret_cast<uint8_t *>(buffer_);
+        uint8_t *bufferPtr;
 
         // Strings
         uint8_t *src = reinterpret_cast<uint8_t *>(strings_.safeBaseAddress());
@@ -1863,7 +1863,9 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                                             auto idx = channelRefIntBuilder.size();
                                             channelIndex[childName] = idx;
                                             channelRefIntBuilder.add(newChannel);
+#ifdef OBSOLETE
                                             channel = channelRefIntBuilder.addressOf(idx);
+#endif
                                             channelRefIntKeyframes.push_back(newChannelKeyframes);
                                             channelKeyframes = &channelRefIntKeyframes[idx];
 
@@ -1876,7 +1878,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                                         ColorTransform colorTransformBacking{};
                                         ColorTransform *colorTransform = &colorTransformBacking;
                                         ColorMatrix colorMatrixBacking{};
-                                        ColorMatrix *colorMatrix = &colorMatrixBacking;
+                                        ColorMatrix *colorMatrix;
                                         Vector2 scaleBacking{};
                                         Vector2 *scale = &scaleBacking;
                                         Vector2 skewBacking{};

@@ -91,20 +91,24 @@ BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(std::string na
 }
 
 void BGE::GameObjectService::getAllChildGameObjects(GameObject *root, std::vector<GameObject *> &objects) {
-    auto xform = root->getComponent<TransformComponent>();
-    
-    if (xform) {
-        auto children = xform->getChildren();
+    if (root) {
+        auto xform = root->getComponent<TransformComponent>();
         
-        for (auto &child : children) {
-            auto object = child->getGameObject();
+        if (xform) {
+            auto children = xform->getChildren();
             
-            if (object) {
-                objects.push_back(object);
+            for (auto &child : children) {
+                auto object = child->getGameObject();
+                
+                if (object) {
+                    objects.push_back(object);
+                }
+                
+                getAllChildGameObjects(object, objects);
             }
-            
-            getAllChildGameObjects(object, objects);
         }
+    } else {
+        objects.clear();
     }
 }
 

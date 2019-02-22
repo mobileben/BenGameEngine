@@ -38,6 +38,7 @@ namespace BGE {
         static const uint32_t MaxTextureUnits = 4;
         
         RenderServiceOpenGLES2();
+        ~RenderServiceOpenGLES2() {}
         
         virtual void initialize() final;
         virtual void reset() final;

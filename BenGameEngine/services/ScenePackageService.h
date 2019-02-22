@@ -38,6 +38,7 @@ namespace BGE {
         FilePath            filePath;
         ScenePackageLoadCompletionHandler completionHandler;
 
+        ScenePackageLoadItem() : type(LoadType::Package), completionHandler(nullptr) {}
         ScenePackageLoadItem(SpaceHandle spaceHandle, const std::string& name, const FilePath& filePath, ScenePackageLoadCompletionHandler callback) : type(LoadType::Package), spaceHandle(spaceHandle), name(name), filePath(filePath), completionHandler(callback) {}
         ScenePackageLoadItem(ScenePackageHandle packageHandle, ScenePackageLoadCompletionHandler callback) : type(LoadType::Textures), packageHandle(packageHandle), completionHandler(callback) {}
         // Can be used to execute a function on the scene package thread.

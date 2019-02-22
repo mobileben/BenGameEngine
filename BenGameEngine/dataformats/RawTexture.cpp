@@ -99,7 +99,9 @@ BGE::RawTexture *BGE::RawTexture::createFromPng(const std::string& filename) {
                 break;
                 
             case PNG_COLOR_TYPE_GRAY_ALPHA:
+#ifdef NOT_YET
                 format = RawTexture::Format::A8;
+#endif
                 assert(false); // We don't know if this will work yet
                 break;
 
@@ -113,7 +115,9 @@ BGE::RawTexture *BGE::RawTexture::createFromPng(const std::string& filename) {
             case PNG_COLOR_TYPE_PALETTE:
                 png_set_palette_to_rgb(png_ptr);
                 png_set_filler(png_ptr, 0xFF, PNG_FILLER_AFTER);
+#ifdef NOT_YET
                 format = RawTexture::Format::RGB8;
+#endif
                 assert(false); // We don't know if this will work yet
                 break;
         }

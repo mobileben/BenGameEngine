@@ -192,13 +192,11 @@ std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::Font::load(std::str
                 int maxRow = NumSupportedCharacters / maxCol;
                 int atlasW = glyphW * maxCol;
                 int atlasH = glyphH * maxRow;
-                int atlasSpan = glyphW * maxCol;
-                
+                int atlasSpan = atlasW;
+
                 glyphW_ = glyphW;
                 glyphH_ = glyphH;
                 baseline_ = (int) maxBearing;
-                
-                atlasSpan = atlasW;
                 
                 unsigned char *atlasBuffer = (unsigned char *)malloc(atlasW * atlasH);
                 
@@ -337,6 +335,11 @@ std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::Font::load(std::str
                     status_ = FontStatus::Valid;
                     fontHandle = handle_;
                 } else {
+                    for (int i=0;i<NumSupportedCharacters;i++) {
+                        if (bitmaps[i].buffer) {
+                            free(bitmaps[i].buffer);
+                        }
+                    }
                     bgeError = std::make_shared<Error>(Font::ErrorDomain, FontErrorAllocation);
                 }
             } else {

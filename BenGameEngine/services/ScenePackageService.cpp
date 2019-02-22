@@ -210,6 +210,10 @@ void BGE::ScenePackageService::createPackageFromSPKGBinary(SpaceHandle spaceHand
                 }
             });
         } else {
+            if (!managed) {
+                delete [] packageBuffer;
+            }
+
             if (callback) {
                 callback(handle, std::make_shared<Error>(ScenePackage::ErrorDomain, static_cast<int32_t>(ScenePackageError::NoAvailableHandles)));
             }

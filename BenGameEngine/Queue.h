@@ -24,22 +24,30 @@ class Queue
 public:
     T pop() {
         std::unique_lock<std::mutex> mlock(mutex_);
-        while (queue_.empty()) {
+        while (running_ && queue_.empty()) {
             cond_.wait(mlock);
         }
         
-        auto item = queue_.front();
-        queue_.pop();
-        return item;
+        if (running_ && queue_.size()) {
+            auto item = queue_.front();
+            queue_.pop();
+            return item;
+        } else {
+            return T();
+        }
     }
     
     void pop(T& item) {
         std::unique_lock<std::mutex> mlock(mutex_);
-        while (queue_.empty()) {
+        while (running_ && queue_.empty()) {
             cond_.wait(mlock);
         }
-        item = queue_.front();
-        queue_.pop();
+        if (running_ && queue_.size()) {
+            item = queue_.front();
+            queue_.pop();
+        } else {
+            item = T();
+        }
     }
     
     void push(const T& item) {
@@ -98,11 +106,19 @@ public:
         return count;
     }
 
-    Queue() = default;
+    void quit() {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        running_ = false;
+        mlock.unlock();
+        cond_.notify_one();
+    }
+    
+    Queue() : running_(true) {}
     Queue(const Queue &) = delete;
     Queue &operator=(const Queue &) = delete;
     
 private:
+    bool                    running_;
     std::queue<T>           queue_;
     std::mutex              mutex_;
     std::condition_variable cond_;

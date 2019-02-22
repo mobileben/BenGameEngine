@@ -1374,7 +1374,7 @@ C[1],C[2],C[2])
             Color* C = SA.C;
             double* weight = SA.W;
             
-            {	st_polyline emptySL;
+            {	st_polyline emptySL{};
                 SA.SL[0]=emptySL; SA.SL[1]=emptySL; SA.SL[2]=emptySL;
             }
             st_polyline* SL = SA.SL;
@@ -1836,7 +1836,8 @@ C[1],C[2],C[2])
             
             for( int i=1; i<length-1; i++)
             {
-                double t,r;
+                double t = 0.05;
+                double r = 1.0;
                 determine_t_r(weight(i),t,r);
                 if ( opt && opt->feather && !opt->no_feather_at_core)
                     r*=opt->feathering;
@@ -1857,7 +1858,8 @@ C[1],C[2],C[2])
             double W_las,W_fir;
             poly_point_inter( P,C,W,inopt, P_las,C_las,W_las, length-2, 0.5);
             {
-                double t,r;
+                double t = 0.05;
+                double r = 1.0;
                 determine_t_r(W_las,t,r);
                 if ( opt && opt->feather && !opt->no_feather_at_core)
                     r*=opt->feathering;

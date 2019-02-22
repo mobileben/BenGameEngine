@@ -37,7 +37,7 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
                     inBuffer->mAudioDataByteSize = numBytesReadFromFile;
                     inBuffer->mPacketDescriptionCount = numPackets;
                     
-                    status = AudioQueueEnqueueBuffer(audio->getAudioQueueRef(), inBuffer, (audio->getAudioStreamPacketDescription() ? numPackets : 0), audio->getAudioStreamPacketDescription());
+                    AudioQueueEnqueueBuffer(audio->getAudioQueueRef(), inBuffer, (audio->getAudioStreamPacketDescription() ? numPackets : 0), audio->getAudioStreamPacketDescription());
                     
                     audio->setCurrentPacket(audio->getCurrentPacket() + numPackets);
                 } else {
@@ -62,7 +62,6 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
             bool needsStop = false;
             auto packetDesc = audio->getAudioStreamBasicDescription();
             int32_t	index = audio->getCurrentMemoryImageIndex();
-            int32_t extraIndex = 0;
             int32_t extraXferSize = 0;
             int32_t nextIndex = index;
             UInt32	xferSize = packetDesc->mBytesPerPacket * numPackets;
@@ -87,7 +86,6 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
                     }
 
                     if (xferSize > diff) {
-                        extraIndex = 0;
                         extraXferSize = xferSize - diff;
                         nextIndex = extraXferSize;
                         xferSize = diff;
@@ -119,7 +117,7 @@ static void AudioQueueHandleOutputBuffer(void* data, AudioQueueRef inAQ, AudioQu
                 inBuffer->mAudioDataByteSize = xferSize + extraXferSize;
                 inBuffer->mPacketDescriptionCount = 0;
 
-                status = AudioQueueEnqueueBuffer(audio->getAudioQueueRef(), inBuffer, (audio->getAudioStreamPacketDescription() ? numPackets : 0), audio->getAudioStreamPacketDescription());
+                AudioQueueEnqueueBuffer(audio->getAudioQueueRef(), inBuffer, (audio->getAudioStreamPacketDescription() ? numPackets : 0), audio->getAudioStreamPacketDescription());
                 audio->setCurrentMemoryImageIndex(nextIndex);
             }
 
@@ -250,7 +248,7 @@ void BGE::Audio::initialize(AudioHandle handle, const std::string& name, AudioBu
                     
                     AudioQueueSetProperty(queue_, kAudioQueueProperty_MagicCookie, magicCookie, cookieSize);
                     
-                    delete magicCookie;
+                    delete [] magicCookie;
                 } else {
                     invalid = true;
                 }
@@ -285,7 +283,7 @@ void BGE::Audio::initialize(AudioHandle handle, const std::string& name, AudioBu
                 }
             }
             
-            status = AudioQueueAddPropertyListener(queue_, kAudioQueueProperty_IsRunning, AudioQueueIsRunningOutputBuffer, reinterpret_cast<void *>(static_cast<intptr_t>(getHandle().getHandle())));
+            AudioQueueAddPropertyListener(queue_, kAudioQueueProperty_IsRunning, AudioQueueIsRunningOutputBuffer, reinterpret_cast<void *>(static_cast<intptr_t>(getHandle().getHandle())));
             
             if (!invalid) {
                 valid_ = true;
@@ -399,10 +397,9 @@ void BGE::Audio::play(uint32_t loop) {
 
 #if TARGET_OS_IPHONE
     state_= AudioPlayState::Queued;
-    OSStatus status;
     prime();
-    status = AudioQueuePrime(queue_, 0, NULL);
-    status = AudioQueueStart(queue_, NULL);
+    AudioQueuePrime(queue_, 0, NULL);
+    AudioQueueStart(queue_, NULL);
 #else
     state_= AudioPlayState::Playing;
 #endif /* TARGET_OS_IPHONE */
@@ -440,8 +437,7 @@ void BGE::Audio::resumeForSource(AudioPauseSource source) {
         state_ = AudioPlayState::Playing;
 
 #if TARGET_OS_IPHONE
-        OSStatus    status;
-        status = AudioQueueStart(queue_, NULL);
+        AudioQueueStart(queue_, NULL);
 #endif /* TARGET_OS_IPHONE */
     }
 }

@@ -16,7 +16,19 @@
 const std::string BGE::RenderService::ErrorDomain = "RenderService";
 
 BGE::RenderService::RenderService() : ready_(false), backgroundColor_({{0, 0, 0, 1}}) {
+    threadRunning_ = true;
     thread_ = std::thread(&RenderService::threadFunction, this);
+}
+
+BGE::RenderService::~RenderService() {
+    // TODO: Make threadRunning_ protected by a mutex
+    threadRunning_ = false;
+    renderQueue_.quit();
+    try {
+        thread_.join();
+    } catch(std::exception& e) {
+        printf("Exception trying to join thread %s\n", e.what());
+    }
 }
 
 void BGE::RenderService::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)
@@ -159,7 +171,9 @@ void BGE::RenderService::threadFunction() {
     if (native == pthread_self()) {
         pthread_setname_np("render");
     }
-    while(true) {
+    
+    // TODO: Make threadRunning_ protected by a mutex
+    while(threadRunning_) {
         auto command = renderQueue_.pop();
         switch (command.command) {
             case RenderCommand::BindWindow: {
