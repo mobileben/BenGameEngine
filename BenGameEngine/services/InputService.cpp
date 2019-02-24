@@ -357,7 +357,7 @@ bool compareInputPointers(BGE::Input *lhs, BGE::Input *rhs) {
 }
 
 void BGE::InputService::update(double deltaTime) {
-//    lock();
+    lock();
 
 #ifdef SUPPORT_PROFILING
     auto startTime = profiling::EpochTime::timeInMicroSec();
@@ -580,7 +580,7 @@ void BGE::InputService::update(double deltaTime) {
     processingTime_ = now - startTime;
 #endif /* SUPPORT_PROFILING */
 
-//    unlock();
+    unlock();
 }
 
 void BGE::InputService::getInputPoints(Space *space, GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints) {
