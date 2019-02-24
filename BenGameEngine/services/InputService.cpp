@@ -186,40 +186,40 @@ bool BGE::InputService::getBboxPoints(std::vector<Vector3>& bbox, std::vector<Ve
     return locked;
 }
 
-void BGE::InputService::updateInputObject(GameObject *gameObj, double deltaTime) {
-    auto xform = gameObj->getComponent<TransformComponent>();
+void BGE::InputService::updateInputObject(Space *space, GameObject *gameObj, double deltaTime) {
+    auto xform = gameObj->getComponentLockless<TransformComponent>(space);
     
     if (xform) {
-        auto button = gameObj->getComponent<ButtonComponent>();
+        auto button = gameObj->getComponentLockless<ButtonComponent>(space);
         
         if (button) {
             button->update(deltaTime);
         }
         
         // Determine if we have children, if we do process them.
-        for (uint32_t i=0;i<xform->getNumChildren();i++) {
-            auto childXform = xform->childAtIndex(i);
+        uint32_t numChildren = xform->getNumChildren();
+        for (uint32_t i=0;i<numChildren;i++) {
+            auto childXform = xform->childAtIndexLockless(space, i);
             if (childXform && childXform->hasGameObject()) {
-                auto childObjHandle = childXform->getGameObjectHandle();
-                auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
+                auto childObj = childXform->getGameObjectLockless(space);
                 
                 // TODO: Have some better means of identifying the right child. For now brute force it
-                if (childObj && childObj->isActive() && childObj->canInteract()) {
-                    updateInputObject(childObj, deltaTime);
+                if (childObj && childObj->isActive() && childObj->canInteractLockless(space)) {
+                    updateInputObject(space, childObj, deltaTime);
                 }
             }
         }
     }
 }
 
-void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue) {
-    auto xform = gameObj->getComponent<TransformComponent>();
+void BGE::InputService::checkInput(Input *input, Space *space, GameObject *gameObj, std::vector<InputEventItem> &queue) {
+    auto xform = gameObj->getComponent<TransformComponent>(space);
     
     if (xform && xform->canInteract()) {
 #ifdef SUPPORT_PROFILING
         ++numProcessedObjects_;
 #endif /* SUPPORT_PROFILING */
-        auto button = gameObj->getComponent<ButtonComponent>();
+        auto button = gameObj->getComponentLockless<ButtonComponent>(space);
         
         if (button) {
             // Compute collision if exists
@@ -248,7 +248,10 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                 if (event != Event::None) {
                     InputEventItem eventItem;
                     
-                    eventItem.spaceHandle = gameObj->getSpace()->getHandle();
+                    eventItem.space = space;
+#ifdef OBSOLETE
+                    eventItem.spaceHandle = space->getHandle();
+#endif
                     eventItem.gameObjHandle = gameObj->getHandle();
                     eventItem.buttonComponentHandle = button->getHandle<ButtonComponent>();
                     eventItem.inputTouchComponentHandle = InputTouchComponentHandle();
@@ -260,10 +263,10 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                 }
             }
         } else {
-            auto inputTouch = gameObj->getComponent<InputTouchComponent>();
+            auto inputTouch = gameObj->getComponentLockless<InputTouchComponent>(space);
             
             if (inputTouch) {
-                auto bbox = gameObj->getComponent<BoundingBoxComponent>();
+                auto bbox = gameObj->getComponentLockless<BoundingBoxComponent>(space);
                 
                 if (bbox) {
                     Matrix4 matrix;
@@ -279,7 +282,10 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                             if (input->type == TouchType::Down) {
                                 InputEventItem eventItem;
 
-                                eventItem.spaceHandle = gameObj->getSpace()->getHandle();
+                                eventItem.space = space;
+#ifdef OBSOLETE
+                                eventItem.spaceHandle = space->getHandle();
+#endif
                                 eventItem.gameObjHandle = gameObj->getHandle();
                                 eventItem.buttonComponentHandle = ButtonComponentHandle();
                                 eventItem.inputTouchComponentHandle = InputTouchComponentHandle();
@@ -307,7 +313,10 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
                             
                             InputEventItem eventItem;
                             
-                            eventItem.spaceHandle = gameObj->getSpace()->getHandle();
+                            eventItem.space = space;
+#ifdef OBSOLETE
+                            eventItem.spaceHandle = space->getHandle();
+#endif
                             eventItem.gameObjHandle = gameObj->getHandle();
                             eventItem.buttonComponentHandle = ButtonComponentHandle();
                             eventItem.inputTouchComponentHandle = inputTouch->getHandle<InputTouchComponent>();
@@ -328,15 +337,15 @@ void BGE::InputService::checkInput(Input *input, GameObject *gameObj, std::vecto
         }
         
         // Determine if we have children, if we do process them.
-        for (uint32_t i=0;i<xform->getNumChildren();i++) {
-            auto childXform = xform->childAtIndex(i);
+        uint32_t numChildren = xform->getNumChildren();
+        for (uint32_t i=0;i<numChildren;i++) {
+            auto childXform = xform->childAtIndex(space, i);
             if (childXform->hasGameObject()) {
-                auto childObjHandle = childXform->getGameObjectHandle();
-                auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
+                auto childObj = childXform->getGameObjectLockless(space);
                 
                 // TODO: Have some better means of identifying the right child. For now brute force it
-                if (childObj && childObj->isActive() && childObj->canInteract()) {
-                    checkInput(input, childObj, queue);
+                if (childObj && childObj->isActive() && childObj->canInteractLockless(space)) {
+                    checkInput(input, space, childObj, queue);
                 }
             }
         }
@@ -348,7 +357,7 @@ bool compareInputPointers(BGE::Input *lhs, BGE::Input *rhs) {
 }
 
 void BGE::InputService::update(double deltaTime) {
-    lock();
+//    lock();
 
 #ifdef SUPPORT_PROFILING
     auto startTime = profiling::EpochTime::timeInMicroSec();
@@ -357,61 +366,73 @@ void BGE::InputService::update(double deltaTime) {
     // First pass updates any buttons we may have
     // This is needed bacause we debounce buttons by either
     // time or awaiting highlighted anims completing
-    std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
+    auto spaceService = Game::getInstance()->getSpaceService();
+    
+    spaceService->getSpaces(spaceHandles_);
 
-    for (auto const &handle : spaceHandles) {
-        auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
+    handleServicesLock();
+    
+    auto length = spaceHandles_.size();
+    spaces_.clear();
+    spaces_.reserve(length);
+    rootGameObjects_.reserve(length);
+    
+    while (rootGameObjects_.size() <= length) {
+        rootGameObjects_.push_back(std::vector<GameObject *>());
+    }
+    
+    for (size_t i=0;i<length;++i) {
+        auto const& handle = spaceHandles_[i];
+        auto space = spaceService->getSpaceLockless(handle);
+        spaces_.push_back(space);
         
         if (space && space->isActive() && space->isVisible()) {
-            std::vector<GameObject *> objects;
-            
-            space->getRootGameObjects(objects);
-            
-            for (auto const &obj : objects) {
-                if (obj && obj->isActive()) {
-                    updateInputObject(obj, deltaTime);
-                }
+            auto& rootGameObjs = rootGameObjects_[i];
+            space->getRootGameObjects(rootGameObjs);
+            for (auto const &obj : rootGameObjs) {
+                updateInputObject(space, obj, deltaTime);
             }
         }
     }
 
+    handleServicesUnlock();
+    
     // Sort inputs
     std::sort(inputs_.begin(), inputs_.end(), compareInputPointers);
-    
-    std::vector<InputTouchEvent> inputTouchQueue;
-    std::vector<InputEventItem> inputEventQueue;
 
+    inputEventQueue_.clear();
+    
+    handleServicesLock();
     for (auto input : inputs_) {
-        std::vector<InputEventItem> inputQueue;
-        
-        for (auto const &handle : spaceHandles) {
-            auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
-            
+        inputEventWorkQueue_.clear();
+        for (size_t i=0;i<length;++i) {
+            auto space = spaces_[i];
             if (space && space->isActive() && space->isVisible()) {
-                std::vector<GameObject *> objects;
-                
-                space->getRootGameObjects(objects);
-                
-                for (auto const &obj : objects) {
-                    if (obj && obj->isActive() && obj->canInteract()) {
-                        checkInput(input, obj, inputQueue);
+                //space->getRootGameObjects(rootGameObjects_);
+                auto& rootGameObjs = rootGameObjects_[i];
+
+                for (auto const &obj : rootGameObjs) {
+                    if (obj->canInteractLockless(space)) {
+                        checkInput(input, space, obj, inputEventWorkQueue_);
                     }
                 }
             }
         }
-        
-        if (inputQueue.size() > 0) {
-            auto spaceService = Game::getInstance()->getSpaceService();
 
-            inputEventQueue.push_back(inputQueue.back());
-            inputQueue.pop_back();
+        if (inputEventWorkQueue_.size() > 0) {
+            inputEventQueue_.push_back(inputEventWorkQueue_.back());
+            inputEventWorkQueue_.pop_back();
             
             // Now clear out any touch tags that match
-            for (auto &item : inputQueue) {
+            for (auto &item : inputEventWorkQueue_) {
+#ifdef OBSOLETE
                 auto space = spaceService->getSpace(item.spaceHandle);
+#else
+                auto space = item.space;
+#endif
                 
                 if (space) {
-                    auto button = space->getComponent(item.buttonComponentHandle);
+                    auto button = space->getComponentLockless(item.buttonComponentHandle);
                     
                     if (button) {
 #if TARGET_OS_IPHONE
@@ -420,7 +441,7 @@ void BGE::InputService::update(double deltaTime) {
                         }
 #endif /* TARGET_OS_IPHONE */
                     } else {
-                        auto inputTouch = space->getComponent(item.inputTouchComponentHandle);
+                        auto inputTouch = space->getComponentLockless(item.inputTouchComponentHandle);
                         
                         if (inputTouch) {
 #if TARGET_OS_IPHONE
@@ -434,6 +455,7 @@ void BGE::InputService::update(double deltaTime) {
             }
         }
     }
+    handleServicesUnlock();
 
     for (auto input : inputs_) {
         auto handle = input->getHandle();
@@ -444,8 +466,12 @@ void BGE::InputService::update(double deltaTime) {
     
     auto eventService = eventService_;
 
-    for (auto &item : inputEventQueue) {
-        auto space = Game::getInstance()->getSpaceService()->getSpace(item.spaceHandle);
+    for (auto &item : inputEventQueue_) {
+#ifdef OBSOLETE
+        auto space = spaceService->getSpace(item.spaceHandle);
+#else
+        auto space = item.space;
+#endif /* OBSOLETE */
         auto gameObj = space->getGameObject(item.gameObjHandle);
         
         if (gameObj) {
@@ -536,14 +562,14 @@ void BGE::InputService::update(double deltaTime) {
         bboxPoints_.clear();
         scaledBBoxPoints_.clear();
         
-        for (auto const &handle : spaceHandles) {
-            auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
-            
+        for (size_t i=0;i<length;++i) {
+            auto space = spaces_[i];
             if (space && space->isActive() && space->isVisible()) {
-                std::vector<GameObject *> objects;
-                space->getRootGameObjects(objects);
-                for (auto const &obj : objects) {
-                    getInputPoints(obj, bboxPoints_, scaledBBoxPoints_);
+                //space->getRootGameObjects(rootGameObjects_);
+                auto& rootGameObjs = rootGameObjects_[i];
+                
+                for (auto const &obj : rootGameObjs) {
+                    getInputPoints(space, obj, bboxPoints_, scaledBBoxPoints_);
                 }
             }
         }
@@ -554,29 +580,29 @@ void BGE::InputService::update(double deltaTime) {
     processingTime_ = now - startTime;
 #endif /* SUPPORT_PROFILING */
 
-    unlock();
+//    unlock();
 }
 
-void BGE::InputService::getInputPoints(GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints) {
-    if (gameObj && gameObj->isActive() && gameObj->canInteract()) {
-        auto button = gameObj->getComponent<ButtonComponent>();
-        auto xform = gameObj->getComponent<TransformComponent>();
+void BGE::InputService::getInputPoints(Space *space, GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints) {
+    if (gameObj && gameObj->isActive() && gameObj->canInteract(space)) {
+        auto button = gameObj->getComponent<ButtonComponent>(space);
+        auto xform = gameObj->getComponent<TransformComponent>(space);
         BoundingBoxComponent *bbox = nullptr;
         
         if (button) {
             // Buttons need to check their parent because often button's bezels are the ones not visible
-            auto parent = gameObj->getParent();
+            auto parent = gameObj->getParent(space);
             
-            if (!parent || (parent->isActive() && parent->canInteract())) {
+            if (!parent || (parent->isActive() && parent->canInteract(space))) {
                 // Compute collision if exists
                 bbox = button->getBoundingBox();
             }
         }
         else {
-            auto inputTouch = gameObj->getComponent<InputTouchComponent>();
+            auto inputTouch = gameObj->getComponent<InputTouchComponent>(space);
                 
             if (inputTouch) {
-                bbox = gameObj->getComponent<BoundingBoxComponent>();
+                bbox = gameObj->getComponent<BoundingBoxComponent>(space);
             }
         }
         
@@ -601,15 +627,15 @@ void BGE::InputService::getInputPoints(GameObject *gameObj, std::vector<Vector3>
             }
         }
         
-        for (uint32_t i=0;i<xform->getNumChildren();i++) {
-            auto childXform = xform->childAtIndex(i);
+        uint32_t numChildren = xform->getNumChildren();
+        for (uint32_t i=0;i<numChildren;i++) {
+            auto childXform = xform->childAtIndex(space, i);
             if (childXform->hasGameObject()) {
-                auto childObjHandle = childXform->getGameObjectHandle();
-                auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
+                auto childObj = childXform->getGameObjectLockless(space);
                 
                 // TODO: Have some better means of identifying the right child. For now brute force it
                 if (childObj) {
-                    getInputPoints(childObj, bboxPoints, scaledBBoxPoints);
+                    getInputPoints(space, childObj, bboxPoints, scaledBBoxPoints);
                 }
             }
         }

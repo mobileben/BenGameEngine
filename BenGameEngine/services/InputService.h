@@ -113,7 +113,10 @@ namespace BGE {
         };
         
         struct InputEventItem {
+            Space                               *space;
+#ifdef OBSOLETE
             SpaceHandle                         spaceHandle;
+#endif
             GameObjectHandle                    gameObjHandle;
             ButtonComponentHandle               buttonComponentHandle;
             InputTouchComponentHandle           inputTouchComponentHandle;
@@ -131,6 +134,8 @@ namespace BGE {
         InputHandleService                                                                  handleService_;
         std::shared_ptr<EventService>                                                       eventService_;
         InputVector                                                                         inputs_;
+        std::vector<InputEventItem>                                                         inputEventQueue_;
+        std::vector<InputEventItem>                                                         inputEventWorkQueue_;
         std::vector<InputButtonHandler>                                                     inputButtonHandlers_;
         std::unordered_map<Event, std::vector<EventHandlerHandle>>                          inputEventHandlers_;
 
@@ -138,6 +143,10 @@ namespace BGE {
         std::vector<Vector3>                                                                bboxPoints_;
         std::vector<Vector3>                                                                scaledBBoxPoints_;
 
+        std::vector<SpaceHandle>                                                            spaceHandles_;
+        std::vector<Space *>                                                                spaces_;
+        std::vector<std::vector<GameObject *>>                                              rootGameObjects_;
+        
 #ifdef SUPPORT_PROFILING
         int32_t     numProcessedObjects_;
         int64_t     processingTime_;
@@ -147,9 +156,9 @@ namespace BGE {
 #if TARGET_OS_IPHONE
         void touchEvent(TouchType type, NSSet* touches, UIView* view);
 #endif /* TARGET_OS_IPHONE */
-        void checkInput(Input *input, GameObject *gameObj, std::vector<InputEventItem> &queue);
-        void updateInputObject(GameObject *gameObj, double deltaTime);
-        void getInputPoints(GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints);
+        void checkInput(Input *input, Space *space, GameObject *gameObj, std::vector<InputEventItem> &queue);
+        void updateInputObject(Space *space, GameObject *gameObj, double deltaTime);
+        void getInputPoints(Space *space, GameObject *gameObj, std::vector<Vector3>& bboxPoints, std::vector<Vector3>& scaledBBoxPoints);
     };
 }
 

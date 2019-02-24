@@ -85,17 +85,15 @@ void BGE::MaskComponent::setWidthHeight(Vector2 &wh) {
 }
 
 void BGE::MaskComponent::reposition(Vector2 position) {
-    auto gameObj = getGameObject();
-    auto xform = gameObj->getComponent<TransformComponent>();
+    auto space = getSpace();
+    auto gameObj = getGameObject(space);
+    auto xform = gameObj->getComponent<TransformComponent>(space);
     
     xform->setPosition(position);
 }
 
 void BGE::MaskComponent::resetPosition() {
-    auto gameObj = getGameObject();
-    auto xform = gameObj->getComponent<TransformComponent>();
-    
-    xform->setPosition(Vector2{{0, 0}});
+    reposition(Vector2{{0, 0}});
 }
 
 void BGE::MaskComponent::resize(Vector2 size) {

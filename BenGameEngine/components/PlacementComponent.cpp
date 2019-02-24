@@ -42,20 +42,15 @@ void BGE::PlacementComponent::setWidthHeight(Vector2 &wh) {
 }
 
 void BGE::PlacementComponent::addChild(GameObjectHandle handle) {
-    auto gameObj = getGameObject();
+    auto space = getSpace();
+    auto gameObj = getGameObject(space);
     
     if (gameObj) {
-        auto xform = gameObj->getComponent<TransformComponent>();
-        
+        auto xform = gameObj->getComponent<TransformComponent>(space);
         if (xform) {
-            auto space = getSpace();
-            
-            if (space) {
-                auto otherGameObj = space->getGameObject(handle);
-                
-                if (otherGameObj) {
-                    xform->addChild(otherGameObj);
-                }
+            auto otherGameObj = space->getGameObject(handle);
+            if (otherGameObj) {
+                xform->addChild(otherGameObj);
             }
         } else {
             assert(false);
@@ -66,19 +61,19 @@ void BGE::PlacementComponent::addChild(GameObjectHandle handle) {
 }
 
 void BGE::PlacementComponent::addChild(GameObject *object) {
-    auto gameObj = getGameObject();
-    
-    if (gameObj) {
-        auto xform = gameObj->getComponent<TransformComponent>();
+    if (object) {
+        auto space = getSpace();
+        auto gameObj = getGameObject(space);
         
-        if (xform) {
-            if (object) {
+        if (gameObj) {
+            auto xform = gameObj->getComponent<TransformComponent>(space);
+            if (xform) {
                 xform->addChild(object);
+            } else {
+                assert(false);
             }
         } else {
             assert(false);
         }
-    } else {
-        assert(false);
     }
 }

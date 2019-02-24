@@ -101,15 +101,22 @@ namespace BGE {
 
         TransformComponentHandle getParentHandle() const { return parentHandle_; }
         TransformComponent *getParent() const;
-        
+        TransformComponent *getParent(const Space *space) const;
+        TransformComponent *getParentLockless(const Space *space) const;
+
         std::vector<TransformComponentHandle> getChildrenHandles() { return childrenHandles_; }
         std::vector<TransformComponentHandle> getOrderedChildrenHandles();
+        void getOrderedChildrenHandles(Space *space, std::vector<TransformComponentHandle>& children, std::vector<TransformComponent *>& orderedChildren);
         std::vector<TransformComponentHandle> getReverseOrderedChildrenHandles();
-        
+        void getReverseOrderedChildrenHandles(Space *space, std::vector<TransformComponentHandle>& children, std::vector<TransformComponent *>& orderedChildren);
+
         std::vector<TransformComponent *> getChildren();
+        void getChildren(Space *space, std::vector<TransformComponent *>& children);
         std::vector<TransformComponent *> getOrderedChildren();
+        void getOrderedChildren(Space *space, std::vector<TransformComponent *>& children);
         std::vector<TransformComponent *> getReverseOrderedChildren();
-        
+        void getReverseOrderedChildren(Space *space, std::vector<TransformComponent *>& children);
+
         uint32_t getNumChildren() const { return (uint32_t) childrenHandles_.size(); }
         
         void addChild(TransformComponentHandle handle);
@@ -136,6 +143,8 @@ namespace BGE {
         void moveToParent(GameObject *parentHandle);
         
         TransformComponent *childAtIndex(uint32_t index);
+        TransformComponent *childAtIndex(const Space *space, uint32_t index);
+        TransformComponent *childAtIndexLockless(const Space *space, uint32_t index);
         TransformComponentHandle childHandleAtIndex(uint32_t index);
         
         bool hasChild(TransformComponentHandle handle, bool descend=false);
@@ -144,6 +153,8 @@ namespace BGE {
         bool inParentHierarchy(TransformComponent *parent);
         
         void updateMatrix();
+        void updateMatrix(const Space* space);
+        void updateMatrixLockless(const Space *space);
         void updateMatrixAndChildren(bool parentDirty=false);
 
     protected:

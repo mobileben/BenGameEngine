@@ -48,6 +48,8 @@ static uint8_t MaskIdToMaskValue[] = {
     128
 };
 
+static size_t kDefaultOrderedChildrenHandlesSize = 32;
+
 BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), currentTextureId_(0) {
     shaderService_ = std::make_shared<ShaderServiceOpenGLES2>();
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
@@ -57,6 +59,11 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), current
 #ifdef SUPPORT_PROFILING
     resetProfilingStats();
 #endif /* SUPPORT_PROFILING */
+    
+    orderedChildrenHandles_ = std::vector<std::vector<TransformComponentHandle>>(kDefaultOrderedChildrenHandlesSize, std::vector<TransformComponentHandle>());
+    for (auto& handles : orderedChildrenHandles_) {
+        handles.reserve(kDefaultOrderedChildrenHandlesSize);
+    }
 }
 
 void BGE::RenderServiceOpenGLES2::initialize() {}
@@ -585,13 +592,13 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObject) {
     if (gameObject) {
-        auto flatRect = gameObject->getComponent<FlatRectRenderComponent>();
+        auto flatRect = gameObject->getComponentLockless<FlatRectRenderComponent>(space);
         
         if (flatRect) {
             Vertex *const vertices = flatRect->getVertices();
-            auto material = flatRect->getMaterial();
+            auto material = flatRect->getMaterialLockless();
             
             if (material) {
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
@@ -600,7 +607,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
                 GLint projectionLocation = glShader->locationForUniform("Projection");
                 GLint colorLocation = glShader->locationForUniform("Color");
                 GLint modelLocation = glShader->locationForUniform("ModelView");
-                auto transformComponent = gameObject->getComponent<TransformComponent>();
+                auto transformComponent = gameObject->getComponentLockless<TransformComponent>(space);
 
                 glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                       sizeof(Vertex), &vertices[0]);
@@ -635,18 +642,18 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(GameObject *gameObject) {
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObject) {
     if (gameObject) {
-        auto maskRect = gameObject->getComponent<MaskComponent>();
+        auto maskRect = gameObject->getComponentLockless<MaskComponent>(space);
         
         if (maskRect) {
             Vertex *const vertices = maskRect->getVertices();
             
-            auto material = maskRect->getMaterial();
+            auto material = maskRect->getMaterialLockless();
             
             if (material) {
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
-                auto transformComponent = gameObject->getComponent<TransformComponent>();
+                auto transformComponent = gameObject->getComponentLockless<TransformComponent>(space);
                 
                 GLint positionLocation = glShader->locationForAttribute("Position");
                 GLint projectionLocation = glShader->locationForUniform("Projection");
@@ -684,16 +691,16 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(GameObject *gameObject) {
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *gameObject) {
     if (gameObject) {
-        auto mask = gameObject->getComponent<TextureMaskComponent>();
+        auto mask = gameObject->getComponentLockless<TextureMaskComponent>(space);
         
         if (mask) {
             VertexTex * vertices = mask->getVertices();
-            auto material = mask->getMaterial();
+            auto material = mask->getMaterialLockless();
             if (material) {
                 auto textureHandle = material->getTextureHandle();
-                auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
+                auto texture = Game::getInstance()->getTextureService()->getTextureLockless(textureHandle);
                 
                 if (texture) {
                     if (texture && texture->isValid()) {
@@ -710,7 +717,7 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(GameObject *gameObject) {
                         GLint textureUniform = glShader->locationForUniform("Texture");
                         GLint projectionLocation = glShader->locationForUniform("Projection");
                         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
-                        auto transformComponent = gameObject->getComponent<TransformComponent>();
+                        auto transformComponent = gameObject->getComponentLockless<TransformComponent>(space);
                         GLint modelLocation = glShader->locationForUniform("ModelView");
                         
                         if (transformComponent) {
@@ -781,13 +788,13 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject) {
     if (gameObject) {
-        auto line = gameObject->getComponent<LineRenderComponent>();
+        auto line = gameObject->getComponentLockless<LineRenderComponent>(space);
         
         if (line) {
-            auto material = line->getMaterial();
-            auto xform = gameObject->getComponent<TransformComponent>();
+            auto material = line->getMaterialLockless();
+            auto xform = gameObject->getComponentLockless<TransformComponent>(space);
             const auto& points = line->getPoints();
             Vector3 vertices[points.size()];
 
@@ -848,12 +855,12 @@ void BGE::RenderServiceOpenGLES2::drawLines(GameObject *gameObject) {
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawPolyLines(GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameObject) {
     if (gameObject) {
-        auto line = gameObject->getComponent<PolyLineRenderComponent>();
+        auto line = gameObject->getComponentLockless<PolyLineRenderComponent>(space);
         
         if (line) {
-            auto xform = gameObject->getComponent<TransformComponent>();
+            auto xform = gameObject->getComponentLockless<TransformComponent>(space);
             const auto& points = line->getPoints();
             const auto& colors = line->getColors();
             
@@ -965,16 +972,16 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(GameObject *gameObject) {
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObject) {
     if (gameObject) {
-        auto sprite = gameObject->getComponent<SpriteRenderComponent>();
+        auto sprite = gameObject->getComponentLockless<SpriteRenderComponent>(space);
         
         if (sprite) {
             VertexTex * vertices = sprite->getVertices();
-            auto material = sprite->getMaterial();
+            auto material = sprite->getMaterialLockless();
             if (material) {
                 auto textureHandle = material->getTextureHandle();
-                auto texture = Game::getInstance()->getTextureService()->getTexture(textureHandle);
+                auto texture = Game::getInstance()->getTextureService()->getTextureLockless(textureHandle);
                 
                 if (texture) {
 #ifdef NOT_YET
@@ -999,7 +1006,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
                         GLint textureUniform = glShader->locationForUniform("Texture");
                         GLint projectionLocation = glShader->locationForUniform("Projection");
                         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
-                        auto transformComponent = gameObject->getComponent<TransformComponent>();
+                        auto transformComponent = gameObject->getComponentLockless<TransformComponent>(space);
                         GLint modelLocation = glShader->locationForUniform("ModelView");
                         GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
                         GLint colorMatOffsetLocation = glShader->locationForUniform("ColorMatOffset");
@@ -1049,42 +1056,43 @@ void BGE::RenderServiceOpenGLES2::drawSprite(GameObject *gameObject) {
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawString(TextComponent *text, Font *font, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum) {
+void BGE::RenderServiceOpenGLES2::drawString(Space *space, TextComponent *text, Font *font, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum) {
     if (text->isMultiline()) {
         auto multiText = text->getMultiText();
         auto yPos = text->getMultiTextY();
 
         if (text->isDropShadow()) {
             auto off = text->getDropShadowOffset();
-            drawString(multiText, font, off.x, off.y, yPos, text->getBoundsWidth(), transform, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+            drawString(space, multiText, font, off.x, off.y, yPos, text->getBoundsWidth(), transform, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
         }
 
-        drawString(multiText, font, 0, 0, yPos, text->getBoundsWidth(), transform, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+        drawString(space, multiText, font, 0, 0, yPos, text->getBoundsWidth(), transform, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
     } else {
         if (text->isDropShadow()) {
             auto off = text->getDropShadowOffset();
-            drawString(text->getText(), font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), off.x, off.y, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+            drawString(space, text->getText(), font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), off.x, off.y, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
         }
 
-        drawString(text->getText(), font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), 0, 0, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+        drawString(space, text->getText(), font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), 0, 0, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawString(std::vector<std::string> &strs, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::vector<std::string> &strs, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     const float *rawMatrix = transform->getWorldMatrixRaw();
     auto index = 0;
 
     for (auto &str : strs) {
         float yOff = yPos[index] + yOffset;
 
-        drawString(str, font, rawMatrix, defWidth, xOffset, yOff, color, colorMatrix, colorTransform, horizAlignment, vertAlignment, minimum);
+        drawString(space, str, font, rawMatrix, defWidth, xOffset, yOff, color, colorMatrix, colorTransform, horizAlignment, vertAlignment, minimum);
 
         index++;
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawString(std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
-    auto textureAtlas = Game::getInstance()->getTextureService()->getTextureAtlas(font->getTextureAtlasHandle());
+void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+    auto textureService = Game::getInstance()->getTextureService();
+    auto textureAtlas = textureService->getTextureAtlasLockless(font->getTextureAtlasHandle());
 
     if (str.length() > 0 && textureAtlas && textureAtlas->isValid()) {
         VertexTex vertices[4];
@@ -1092,16 +1100,15 @@ void BGE::RenderServiceOpenGLES2::drawString(std::string str, Font *font, const 
         // TODO: Adjustment based on alignment to be done here
         float x = xOffset;
         float y = yOffset;
-        std::shared_ptr<RenderServiceOpenGLES2> renderer = std::dynamic_pointer_cast<RenderServiceOpenGLES2>(Game::getInstance()->getRenderService());
 
         const char *chars = str.c_str();
         FontGlyph glyph;
         uint16_t code;
         size_t length = str.length();
         auto texHandle = textureAtlas->getTextureHandle();
-        auto tex = Game::getInstance()->getTextureService()->getTexture(texHandle);
+        auto tex = textureService->getTextureLockless(texHandle);
 
-        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(renderer->useShaderProgram("FullColorFont"));
+        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("FullColorFont"));
         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
         GLint positionLocation = glShader->locationForAttribute("Position");
 
@@ -1117,7 +1124,7 @@ void BGE::RenderServiceOpenGLES2::drawString(std::string str, Font *font, const 
         auto colorMultiplierLocation = glShader->locationForUniform("ColorMultiplier");
         auto colorOffsetLocation = glShader->locationForUniform("ColorOffset");
 
-        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) renderer->getMappedProjectionMatrix()->m);
+        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
         glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
 
         glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
@@ -1200,7 +1207,7 @@ void BGE::RenderServiceOpenGLES2::drawString(std::string str, Font *font, const 
                 y += glyph->second.getOffsetY();
 
                 auto texHandle = glyph->second.getTextureHandle();
-                auto tex = Game::getInstance()->getTextureService()->getTexture(texHandle);
+                auto tex = textureService->getTextureLockless(texHandle);
 
                 if (tex) {
                     const Vector2 *xys = tex->getXYs();
@@ -1254,7 +1261,7 @@ void BGE::RenderServiceOpenGLES2::drawString(std::string str, Font *font, const 
 }
 
 
-uint8_t BGE::RenderServiceOpenGLES2::enableMask(GameObject *gameObject) {
+uint8_t BGE::RenderServiceOpenGLES2::enableMask(Space *space, GameObject *gameObject) {
     uint8_t maskValue = 0;
     
     if (this->activeMasks_ != 0xFF) {
@@ -1277,9 +1284,9 @@ uint8_t BGE::RenderServiceOpenGLES2::enableMask(GameObject *gameObject) {
             glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
             
             if (gameObject->hasComponent<MaskComponent>()) {
-                drawMaskRect(gameObject);
+                drawMaskRect(space, gameObject);
             } else if (gameObject->hasComponent<TextureMaskComponent>()) {
-                drawTextureMask(gameObject);
+                drawTextureMask(space, gameObject);
             }
       
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -1367,19 +1374,16 @@ void BGE::RenderServiceOpenGLES2::render()
         mappedProjectionMatrix_ = projectionMatrix_;
         Matrix4Scale(mappedProjectionMatrix_, window->getToMappedXScale(), window->getToMappedYScale(), 1.0);
         
-        std::vector<SpaceHandle> spaceHandles = Game::getInstance()->getSpaceService()->getSpaces();
-        std::vector<GameObject *> objects;
-
-        for (auto const &handle : spaceHandles) {
-            auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
+        auto spaceService = Game::getInstance()->getSpaceService();
+        spaceService->getSpaces(spaceHandles_);
+        
+        for (auto const &handle : spaceHandles_) {
+            auto space = spaceService->getSpace(handle);
             
             if (space && space->isActive() && space->isVisible()) {
-                space->getRootGameObjects(objects);
-                
-                for (auto const &obj : objects) {
-                    if (obj) {
-                        renderGameObject(obj, true);
-                    }
+                space->getRootGameObjects(rootGameObjects_);
+                for (auto const &obj : rootGameObjects_) {
+                    renderGameObject(obj, space, 0);
                 }
             }
         }
@@ -1407,7 +1411,7 @@ void BGE::RenderServiceOpenGLES2::render()
     handleServicesUnlock();
 }
 
-int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool root, bool hasNextSibling) {
+int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, Space *space, uint32_t depth, bool hasNextSibling) {
     uint8_t maskValue = 0;
 
 #ifdef SUPPORT_PROFILING
@@ -1420,14 +1424,15 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
     }
     
     // TODO: Transform
-    auto transformComponent = gameObj->getComponent<TransformComponent>();
+    auto transformComponent = gameObj->getComponentLockless<TransformComponent>(space);
+    auto root = depth == 0;
     
     if (transformComponent) {
         if (!transformComponent->canRender()) {
             return maskValue;
         }
 
-        auto parent = transformComponent->getParent();
+        auto parent = transformComponent->getParentLockless(space);
 
         if (root && parent) {
             return maskValue;
@@ -1436,14 +1441,14 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         }
 
         // Need to update matrix
-        transformComponent->updateMatrix();
+        transformComponent->updateMatrixLockless(space);
 
         // Since we have the transform, push our
         pushColorMatrix();
         pushColorTransform();
         
-        auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();
-        auto colorTransform = gameObj->getComponent<ColorTransformComponent>();
+        auto colorMatrix = gameObj->getComponentLockless<ColorMatrixComponent>(space);
+        auto colorTransform = gameObj->getComponentLockless<ColorTransformComponent>(space);
         
         if (colorMatrix) {
             auto tMat = currentColorMatrix_ * colorMatrix->matrix;
@@ -1456,42 +1461,42 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
         }
         
         if (gameObj->hasComponent<SpriteRenderComponent>()) {
-            drawSprite(gameObj);
+            drawSprite(space, gameObj);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
 #endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<TextComponent>()) {
-            auto text = gameObj->getComponent<TextComponent>();
+            auto text = gameObj->getComponentLockless<TextComponent>(space);
             Font *font = Game::getInstance()->getFontService()->getFont(text->getFontHandle());
             
             if (font) {
-                drawString(text, font, transformComponent, currentColorMatrix_, currentColorTransform_);
+                drawString(space, text, font, transformComponent, currentColorMatrix_, currentColorTransform_);
             }
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
 #endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<PolyLineRenderComponent>()) {
-            drawPolyLines(gameObj);
+            drawPolyLines(space, gameObj);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
 #endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<LineRenderComponent>()) {
-            drawLines(gameObj);
+            drawLines(space, gameObj);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
 #endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<FlatRectRenderComponent>()) {
-            drawFlatRect(gameObj);
+            drawFlatRect(space, gameObj);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
 #endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<MaskComponent>() || gameObj->hasComponent<TextureMaskComponent>()) {
-            maskValue = enableMask(gameObj);
+            maskValue = enableMask(space, gameObj);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
@@ -1500,18 +1505,24 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, bool r
 
         uint8_t childrenMasks = 0;;
         
+        while (depth >= orderedChildrenHandles_.size()) {
+            orderedChildrenHandles_.push_back(std::vector<TransformComponentHandle>());
+        }
+        
         // Determine if we have children, if we do process them.
-        auto childrenHandles = transformComponent->getOrderedChildrenHandles();
-        for (size_t i=0;i<childrenHandles.size();++i) {
+        transformComponent->getOrderedChildrenHandles(space, orderedChildrenHandles_[depth], orderedChildrenScratch_);
+        auto length = orderedChildrenHandles_[depth].size();
+
+        for (size_t i=0;i<length;++i) {
+            auto& childrenHandles = orderedChildrenHandles_[depth];
             auto childXformHandle = childrenHandles[i];
-            auto childXform = componentService_->getComponent<TransformComponent>(childXformHandle.getHandle());
+            auto childXform = componentService_->getComponentLockless<TransformComponent>(childXformHandle.getHandle());
             
             if (childXform->hasGameObject()) {
-                auto childObjHandle = childXform->getGameObjectHandle();
-                auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
+                auto childObj = childXform->getGameObjectLockless(space);
                 
                 if (childObj) {
-                    childrenMasks |= renderGameObject(childObj, false, i < (transformComponent->getNumChildren() - 1));
+                    childrenMasks |= renderGameObject(childObj, space, depth + 1, i < (length - 1));
                 }
             }
         }

@@ -44,13 +44,14 @@ void BGE::AnimatorComponent::initialize(HandleBackingType handle, SpaceHandle sp
 }
 
 void BGE::AnimatorComponent::reset() {
-    setFrame(0);
+    auto space = getSpace();
+
+    setFrame(space, 0);
     iterations = 1;
     state = AnimState::Done;
 
-    auto gameObjHandle = getGameObjectHandle();
-    auto gameObj = getSpace()->getGameObject(gameObjHandle);
-    auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+    auto gameObj = getGameObject(space);
+    auto seq = gameObj->getComponent<AnimationSequenceComponent>(space);
     
     if (seq->frameRate != 0) {
         secPerFrame = 1.0 / (float) seq->frameRate;
@@ -63,6 +64,10 @@ void BGE::AnimatorComponent::reset() {
 
 void BGE::AnimatorComponent::setFrame(int32_t frame) {
     auto space = getSpace();
+    setFrame(space, frame);
+}
+
+void BGE::AnimatorComponent::setFrame(Space *space, int32_t frame) {
     auto gameObjHandle = getGameObjectHandle();
     auto gameObj = space->getGameObject(gameObjHandle);
 
@@ -70,28 +75,28 @@ void BGE::AnimatorComponent::setFrame(int32_t frame) {
     currentFrame = frame;
 
     if (gameObj) {
-        auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+        auto seq = gameObj->getComponent<AnimationSequenceComponent>(space);
         size_t numChannels = seq->channels.size();
         
         for (size_t i=0;i<numChannels;i++) {
             gameObj = space->getGameObject(gameObjHandle);
-            seq = gameObj->getComponent<AnimationSequenceComponent>();
+            seq = gameObj->getComponent<AnimationSequenceComponent>(space);
             
             auto childHandle = seq->channels[i];
             auto childObj = space->getGameObject(childHandle);
             
-            animateChannel(childObj, frame);
+            animateChannel(space, childObj, frame);
         }
         
         gameObj = space->getGameObject(gameObjHandle);
-        seq = gameObj->getComponent<AnimationSequenceComponent>();
+        seq = gameObj->getComponent<AnimationSequenceComponent>(space);
         
         // Update the bounds
         for (uint32_t i=0;i<seq->numBounds;i++) {
             auto bounds = seq->bounds[i];
             
             if (bounds.startFrame >= i && i < (bounds.startFrame + bounds.totalFrames)) {
-                auto bbox = gameObj->getComponent<BoundingBoxComponent>();
+                auto bbox = gameObj->getComponent<BoundingBoxComponent>(space);
                 
                 if (bbox) {
                     bbox->x = bounds.bounds->x;
@@ -107,20 +112,18 @@ void BGE::AnimatorComponent::setFrame(int32_t frame) {
 
 void BGE::AnimatorComponent::setToLastFrame() {
     auto space = getSpace();
-    auto gameObjHandle = getGameObjectHandle();
-    auto gameObj = space->getGameObject(gameObjHandle);
+    auto gameObj = getGameObject(space);
 
     if (gameObj) {
-        auto seq = gameObj->getComponent<AnimationSequenceComponent>();
-
-        setFrame(seq->totalFrames - 1);
+        auto seq = gameObj->getComponent<AnimationSequenceComponent>(space);
+        setFrame(space, seq->totalFrames - 1);
     }
 }
 
-void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) {
-    auto xform = gameObj->getComponent<TransformComponent>();
-    auto channel = gameObj->getComponent<AnimationChannelComponent>();
-    auto animator = gameObj->getComponent<ChannelFrameAnimatorComponent>();
+void BGE::AnimatorComponent::animateChannel(Space *space, GameObject *gameObj, int32_t frame) {
+    auto xform = gameObj->getComponent<TransformComponent>(space);
+    auto channel = gameObj->getComponent<AnimationChannelComponent>(space);
+    auto animator = gameObj->getComponent<ChannelFrameAnimatorComponent>(space);
     int32_t origFrame = animator->currKeyframe;
     int32_t channelFrame = origFrame;
     AnimationKeyframeReference *keyframe = channel->channel->keyframes[channelFrame];
@@ -167,20 +170,20 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
         
         Material *material = nullptr;
 
-        if (gameObj->getComponent<LineRenderComponent>()) {
-            auto render = gameObj->getComponent<LineRenderComponent>();
+        if (gameObj->getComponent<LineRenderComponent>(space)) {
+            auto render = gameObj->getComponent<LineRenderComponent>(space);
             material = render->getMaterial();
-        } else if (gameObj->getComponent<FlatRectRenderComponent>()) {
-            auto render = gameObj->getComponent<FlatRectRenderComponent>();
+        } else if (gameObj->getComponent<FlatRectRenderComponent>(space)) {
+            auto render = gameObj->getComponent<FlatRectRenderComponent>(space);
             material = render->getMaterial();
-        } else if (gameObj->getComponent<SpriteRenderComponent>()) {
-            auto render = gameObj->getComponent<SpriteRenderComponent>();
+        } else if (gameObj->getComponent<SpriteRenderComponent>(space)) {
+            auto render = gameObj->getComponent<SpriteRenderComponent>(space);
             material = render->getMaterial();
-        } else if (gameObj->getComponent<TextComponent>()) {
-            auto render = gameObj->getComponent<TextComponent>();
+        } else if (gameObj->getComponent<TextComponent>(space)) {
+            auto render = gameObj->getComponent<TextComponent>(space);
             material = render->getMaterial();
-        } else if (gameObj->getComponent<PolyLineRenderComponent>()) {
-            auto render = gameObj->getComponent<PolyLineRenderComponent>();
+        } else if (gameObj->getComponent<PolyLineRenderComponent>(space)) {
+            auto render = gameObj->getComponent<PolyLineRenderComponent>(space);
             material = render->getMaterial();
         }
 
@@ -212,9 +215,8 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
         } else {
             xform->setCollisionRectScale(Vector2{{1,1}});
         }
-        auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>();
-        auto colorTransform = gameObj->getComponent<ColorTransformComponent>();
-        auto space = gameObj->getSpace();
+        auto colorMatrix = gameObj->getComponent<ColorMatrixComponent>(space);
+        auto colorTransform = gameObj->getComponent<ColorTransformComponent>(space);
 
         if (keyframe->colorMatrix) {
             if (colorMatrix) {
@@ -256,34 +258,30 @@ void BGE::AnimatorComponent::animateChannel(GameObject *gameObj, int32_t frame) 
         // If this is a Keyframe reference, update
         if (channel->channel->referenceType == GfxReferenceTypeKeyframe) {
             // Find the appropriate child
-            for (uint32_t i=0;i<xform->getNumChildren();i++) {
+            uint32_t numChildren = xform->getNumChildren();
+            for (uint32_t i=0;i<numChildren;i++) {
                 auto childXform = xform->childAtIndex(i);
                 if (childXform->hasGameObject()) {
-                    auto childObjHandle = childXform->getGameObjectHandle();
-                    auto childObj = childXform->getSpace()->getGameObject(childObjHandle);
+                    auto childObj = childXform->getGameObject(space);
 
                     childXform->forceDirty();
                     // TODO: Have some better means of identifying the right child. For now brute force it
                     if (childObj) {
-                        auto childAnimator = childObj->getComponent<FrameAnimatorComponent>();
+                        auto childAnimator = childObj->getComponent<FrameAnimatorComponent>(space);
 
                         if (childAnimator) {
-                            auto childSeq = childObj->getComponent<AnimationSequenceComponent>();
+                            auto childSeq = childObj->getComponent<AnimationSequenceComponent>(space);
                             animateSequenceByFrame(space, childSeq, childAnimator, keyframe->frame);
-
 
                             // Update the bounds
                             for (uint32_t bi=0;i<childSeq->numBounds;bi++) {
                                 auto bounds = childSeq->bounds[bi];
 
                                 if (bounds.startFrame >= bi && bi < (bounds.startFrame + bounds.totalFrames)) {
-                                    auto bbox = childObj->getComponent<BoundingBoxComponent>();
+                                    auto bbox = childObj->getComponent<BoundingBoxComponent>(space);
 
                                     if (!bbox) {
-                                        auto space = childObj->getSpace();
-
                                         bbox = space->createComponent<BGE::BoundingBoxComponent>();
-
                                         childObj->addComponent(bbox);
                                     }
 
@@ -308,13 +306,14 @@ void BGE::AnimatorComponent::animateSequenceByFrame(Space *space, AnimationSeque
 
     for (auto const &childHandle : seq->channels) {
         auto child = space->getGameObject(childHandle);
-        animateChannel(child, frame);
+        animateChannel(space, child, frame);
     }
 }
 
 void BGE::AnimatorComponent::play(int32_t iterations, bool forward, float speed) {
-    auto gameObj = getGameObject();
-    auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+    auto space = getSpace();
+    auto gameObj = getGameObject(space);
+    auto seq = gameObj->getComponent<AnimationSequenceComponent>(space);
 
     if (seq->frameRate != 0) {
         secPerFrame = 1.0 / (float) seq->frameRate;
@@ -331,15 +330,16 @@ void BGE::AnimatorComponent::play(int32_t iterations, bool forward, float speed)
     this->frameRemainderTime = 0;
 
     if (forward) {
-        this->setFrame(0);
+        this->setFrame(space, 0);
     } else {
-        this->setFrame(seq->totalFrames - 1);
+        this->setFrame(space, seq->totalFrames - 1);
     }
 }
 
 void BGE::AnimatorComponent::playToFrame(int32_t endFrame, float speed) {
-    auto gameObj = getGameObject();
-    auto seq = gameObj->getComponent<AnimationSequenceComponent>();
+    auto space = getSpace();
+    auto gameObj = getGameObject(space);
+    auto seq = gameObj->getComponent<AnimationSequenceComponent>(space);
 
     if (seq->frameRate != 0) {
         secPerFrame = 1.0 / (float) seq->frameRate;
@@ -359,7 +359,7 @@ void BGE::AnimatorComponent::playToFrame(int32_t endFrame, float speed) {
     this->endFrame = endFrame;
     this->frameRemainderTime = 0;
 
-    this->setFrame(0);
+    this->setFrame(space, 0);
 }
 
 void BGE::AnimatorComponent::reverse(float speed) {

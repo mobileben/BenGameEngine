@@ -54,6 +54,7 @@ namespace BGE {
         inline bool hasMaterials() const { return materialHandles_.size(); }
         MaterialHandle getMaterialHandle(uint32_t index=0) const;
         Material *getMaterial(uint32_t index=0) const;
+        Material *getMaterialLockless(uint32_t index=0) const;
         std::vector<MaterialHandle> getMaterialHandles() const;
         std::vector<Material *> getMaterials() const;
         

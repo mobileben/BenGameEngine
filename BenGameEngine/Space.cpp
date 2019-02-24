@@ -43,7 +43,7 @@ BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, nam
 #endif /* SUPPORT_PROFILING */
 }
 
-void BGE::Space::initialize(SpaceHandle handle, std::string name, std::shared_ptr<SpaceService> service) {
+void BGE::Space::initialize(SpaceHandle handle, std::string name, uint32_t order, std::shared_ptr<SpaceService> service) {
     spaceHandle_ = handle;
     setName(name);
     spaceService_ = service;
@@ -54,7 +54,7 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name, std::shared_pt
     updatable_ = false;
     resetting_ = false;
 
-    order_ = 0;
+    order_ = order;
 
 #ifdef SUPPORT_PROFILING
     resetTime_ = 0;
@@ -285,20 +285,40 @@ BGE::GameObjectHandle BGE::Space::getGameObjectHandle(ObjectId objId) const {
     return gameObjectService_->getGameObjectHandle(objId);
 }
 
+BGE::GameObjectHandle BGE::Space::getGameObjectHandleLockless(ObjectId objId) const {
+    return gameObjectService_->getGameObjectHandleLockless(objId);
+}
+
 BGE::GameObjectHandle BGE::Space::getGameObjectHandle(std::string name) const {
     return gameObjectService_->getGameObjectHandle(name);
+}
+
+BGE::GameObjectHandle BGE::Space::getGameObjectHandleLockless(std::string name) const {
+    return gameObjectService_->getGameObjectHandleLockless(name);
 }
 
 BGE::GameObject *BGE::Space::getGameObject(ObjectId objId) const {
     return gameObjectService_->getGameObject(objId);
 }
 
+BGE::GameObject *BGE::Space::getGameObjectLockless(ObjectId objId) const {
+    return gameObjectService_->getGameObjectLockless(objId);
+}
+
 BGE::GameObject *BGE::Space::getGameObject(std::string name) const {
     return gameObjectService_->getGameObject(name);
 }
 
+BGE::GameObject *BGE::Space::getGameObjectLockless(std::string name) const {
+    return gameObjectService_->getGameObjectLockless(name);
+}
+
 BGE::GameObject *BGE::Space::getGameObject(GameObjectHandle handle) const {
     return gameObjectService_->getGameObject(handle);
+}
+
+BGE::GameObject *BGE::Space::getGameObjectLockless(GameObjectHandle handle) const {
+    return gameObjectService_->getGameObjectLockless(handle);
 }
 
 void BGE::Space::removeGameObject(GameObjectHandle handle) {
@@ -318,43 +338,47 @@ const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
 }
 
 void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
-    auto handles = getGameObjects();
+    auto& handles = getGameObjects();
     objects.clear();
     objects.reserve(handles.size());
     
+    handleServicesLock();
     for (auto const &handle : handles) {
-        auto obj = getGameObject(handle);
+        auto obj = getGameObjectLockless(handle);
         // Only active root game objects can be returned
         if (obj && obj->isActive()) {
-            auto xform = obj->getComponent<TransformComponent>();
+            auto xform = obj->getComponentLockless<TransformComponent>(this);
 
             if (xform) {
-                if (!xform->getParent()) {
+                if (!xform->getParentLockless(this)) {
                     objects.push_back(obj);
                 }
             }
         }
     }
+    handleServicesUnlock();
 }
 
 void BGE::Space::getReverseRootGameObjects(std::vector<GameObject *> &objects) {
-    auto handles = getGameObjects();
+    auto& handles = getGameObjects();
     objects.clear();
     objects.reserve(handles.size());
 
+    handleServicesLock();
     for (int32_t i=static_cast<int32_t>(handles.size())-1;i>=0;--i) {
-        auto obj = getGameObject(handles[i]);
+        auto obj = getGameObjectLockless(handles[i]);
         // Only active root game objects can be returned
         if (obj && obj->isActive()) {
-            auto xform = obj->getComponent<TransformComponent>();
+            auto xform = obj->getComponentLockless<TransformComponent>(this);
 
             if (xform) {
-                if (!xform->getParent()) {
+                if (!xform->getParentLockless(this)) {
                     objects.push_back(obj);
                 }
             }
         }
     }
+    handleServicesUnlock();
 }
 
 void BGE::Space::getTransforms(std::vector<TransformComponent *> &xforms) const {
@@ -368,12 +392,18 @@ void BGE::Space::getRootTransforms(std::vector<TransformComponent *> &xforms) co
     for (auto const &handle : handles) {
         auto xform = handleService->dereference(TransformComponentHandle(handle.handle));
         
-        if ( xform->getParent() == nullptr) {
+        if ( xform->getParent(this) == nullptr) {
             xforms.push_back(xform);
         }
     }
 
     componentService_->getComponents<TransformComponent>(xforms);
+}
+
+void BGE::Space::setOrder(uint32_t order) {
+    order_ = order;
+    
+    spaceService_->reorderSpaces();
 }
 
 void BGE::Space::loadAllTextures(std::function<void()> callback) {
@@ -450,7 +480,7 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
         
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
-        animator = obj->getComponent<AnimatorComponent>();
+        animator = obj->getComponent<AnimatorComponent>(this);
         
         animator->setFrame(0);
         
@@ -1004,7 +1034,7 @@ void BGE::Space::createAutoDisplayObjectsSynchronous_(GameObjectHandle rootHandl
             }
 
             if (obj) {
-                auto xform = obj->getComponent<TransformComponent>();
+                auto xform = obj->getComponent<TransformComponent>(this);
 
                 if (elem->position) {
                     xform->setPosition(*elem->position);
@@ -1038,14 +1068,14 @@ void BGE::Space::createAutoDisplayObjectsSynchronous_(GameObjectHandle rootHandl
         auto root = getGameObject(rootHandle);
 
         if (root) {
-            rootXform = root->getComponent<TransformComponent>();
+            rootXform = root->getComponent<TransformComponent>(this);
         }
 
         for (auto const &objHandle : topLevelObjects) {
             auto obj = getGameObject(objHandle);
 
             if (rootXform) {
-                auto xform = obj->getComponent<TransformComponent>();
+                auto xform = obj->getComponent<TransformComponent>(this);
                 rootXform->addChild(xform);
             }
 
@@ -1128,7 +1158,7 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
             objects->push_back(std::make_pair(AnimationSequenceComponent::typeId_, animSequence->getHandle()));
         }
         
-        auto animSeqComponent = animSequence->getComponent<AnimationSequenceComponent>();
+        auto animSeqComponent = animSequence->getComponent<AnimationSequenceComponent>(this);
         auto pushSprites = pushBitmask & SpriteRenderComponent::bitmask_;
         auto pushButtons = pushBitmask & ButtonComponent::bitmask_;
         auto pushAnims = pushBitmask & AnimationSequenceComponent::bitmask_;
@@ -1142,12 +1172,12 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                 auto channelObj = getGameObject(channel);
                 
                 if (channelObj) {
-                    auto channelComponent = channelObj->getComponent<AnimationChannelComponent>();
+                    auto channelComponent = channelObj->getComponent<AnimationChannelComponent>(this);
                     
                     if (channelComponent) {
                         switch (channelComponent->channel->referenceType) {
                             case GfxReferenceTypeSprite: {
-                                auto sprite = channelObj->getComponent<SpriteRenderComponent>();
+                                auto sprite = channelObj->getComponent<SpriteRenderComponent>(this);
                                 
                                 if (sprite) {
                                     if (pushSprites) {
@@ -1160,7 +1190,7 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                                 break;
                                 
                             case GfxReferenceTypeButton:{
-                                auto button = channelObj->getComponent<ButtonComponent>();
+                                auto button = channelObj->getComponent<ButtonComponent>(this);
                                 
                                 if (button) {
                                     if (pushButtons) {
@@ -1174,13 +1204,13 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                                 
                             case GfxReferenceTypeKeyframe: {
                                 // Keyframe has sequence on child
-                                auto xform = channelObj->getComponent<TransformComponent>();
+                                auto xform = channelObj->getComponent<TransformComponent>(this);
                                 auto childXform = xform->childAtIndex(0);
                                 
                                 if (childXform) {
                                     auto child = childXform->getGameObject();
                                     if (child) {
-                                        auto animSeq = child->getComponent<AnimationSequenceComponent>();
+                                        auto animSeq = child->getComponent<AnimationSequenceComponent>(this);
                                         
                                         if (animSeq) {
                                             if (pushAnims) {
@@ -1197,7 +1227,7 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                                 break;
                                 
                             case GfxReferenceTypeAnimationSequence: {
-                                auto animSeq = channelObj->getComponent<AnimationSequenceComponent>();
+                                auto animSeq = channelObj->getComponent<AnimationSequenceComponent>(this);
                                 
                                 if (animSeq) {
                                     if (pushAnims) {
@@ -1212,7 +1242,7 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                                 break;
                                 
                             case GfxReferenceTypeMask: {
-                                auto mask = channelObj->getComponent<MaskComponent>();
+                                auto mask = channelObj->getComponent<MaskComponent>(this);
                                 
                                 if (mask) {
                                     if (pushMasks) {
@@ -1225,7 +1255,7 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                                 break;
                                 
                             case GfxReferenceTypeText: {
-                                auto text = channelObj->getComponent<TextComponent>();
+                                auto text = channelObj->getComponent<TextComponent>(this);
                                 
                                 if (text) {
                                     if (pushText) {
@@ -1238,7 +1268,7 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                                 break;
                                 
                             case GfxReferenceTypePlacement: {
-                                auto placement = channelObj->getComponent<PlacementComponent>();
+                                auto placement = channelObj->getComponent<PlacementComponent>(this);
                                 
                                 if (placement) {
                                     if (pushPlacements) {
@@ -1251,7 +1281,7 @@ void BGE::Space::addCreatedGameObjectsForAnimSequence(GameObject *animSequence, 
                                 break;
                                 
                             case GfxReferenceTypeTextureMask: {
-                                auto mask = channelObj->getComponent<TextureMaskComponent>();
+                                auto mask = channelObj->getComponent<TextureMaskComponent>(this);
                                 
                                 if (mask) {
                                     if (pushMasks) {
@@ -1291,7 +1321,7 @@ void BGE::Space::addCreatedGameObjectsForButton(GameObject *button, uint32_t pus
         auto pushSprites = pushBitmask & SpriteRenderComponent::bitmask_;
         auto pushAnims = pushBitmask & AnimationSequenceComponent::bitmask_;
         
-        auto buttonComponent = button->getComponent<ButtonComponent>();
+        auto buttonComponent = button->getComponent<ButtonComponent>(this);
         
         auto state = getGameObject(buttonComponent->disabledButtonHandle);
         
@@ -1496,7 +1526,7 @@ void BGE::Space::setAnimationSequenceReference(AnimationSequenceComponentHandle 
     NSLog(@"setAnimationSequenceReference");
 #endif
     auto root = animSeq->getGameObject();
-    auto seqXform = root->getComponent<TransformComponent>();
+    auto seqXform = root->getComponent<TransformComponent>(this);
     
     if (seqXform) {
         seqXform->removeAllChildren();
@@ -1508,13 +1538,13 @@ void BGE::Space::setAnimationSequenceReference(AnimationSequenceComponentHandle 
     for (auto i=0u;i<numChannels;i++) {
         auto channelRef = &channels[i];
         auto obj = this->createAnimChannel(channelRef->reference, channelRef->name, channelRef, nullptr);
-        auto xform = obj->getComponent<TransformComponent>();
+        auto xform = obj->getComponent<TransformComponent>(this);
         auto xformHandle = xform->getHandle<TransformComponent>();
         
         // Refresh root/seqXform in case handle capacity changed
         animSeq = getComponent(animSeqHandle);
         root = animSeq->getGameObject();
-        seqXform = root->getComponent<TransformComponent>();
+        seqXform = root->getComponent<TransformComponent>(this);
         
         seqXform->addChild(xform);
         
@@ -1531,7 +1561,7 @@ void BGE::Space::setAnimationSequenceReference(AnimationSequenceComponentHandle 
             auto newObj = this->createFrameAnimSequence(channelRef->reference, channelRef->name, animSeqRef.scenePackage, nullptr);
             
             if (newObj) {
-                auto newXform = newObj->getComponent<TransformComponent>();
+                auto newXform = newObj->getComponent<TransformComponent>(this);
                 
                 // Force update xform in case a resize of handle capacity occurred
                 xform = this->getComponent(xformHandle);

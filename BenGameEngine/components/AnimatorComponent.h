@@ -55,6 +55,7 @@ namespace BGE {
         // TODO: Look at possibly having an animation controller to wrap around this.
         void reset();
         void setFrame(int32_t frame);
+        void setFrame(Space *space, int32_t frame);
         void setToLastFrame();
         void play(int32_t iterations=1, bool forward=true, float speed=1.0);
         void playToFrame(int32_t endFrame, float speed=1.0);
@@ -67,7 +68,7 @@ namespace BGE {
         void stop();
         
     private:
-        void animateChannel(GameObject *gameObj, int32_t frame);
+        void animateChannel(Space *space, GameObject *gameObj, int32_t frame);
         void animateSequenceByFrame(Space *space, AnimationSequenceComponent *seq, FrameAnimatorComponent *animator, int32_t frame) ;
     };
 }

@@ -42,7 +42,7 @@ namespace BGE {
 
         ~Space() {}
         
-        void initialize(SpaceHandle handle, std::string name, std::shared_ptr<SpaceService> service);
+        void initialize(SpaceHandle handle, std::string name, uint32_t order, std::shared_ptr<SpaceService> service);
         void destroy();
         void reset(std::function<void()> callback);
         
@@ -54,12 +54,17 @@ namespace BGE {
         GameObject *createGameObject(std::string name = "");
         
         GameObjectHandle getGameObjectHandle(ObjectId objId) const;
+        GameObjectHandle getGameObjectHandleLockless(ObjectId objId) const;
         GameObjectHandle getGameObjectHandle(std::string name) const;
-        
+        GameObjectHandle getGameObjectHandleLockless(std::string name) const;
+
         GameObject *getGameObject(ObjectId objId) const;
+        GameObject *getGameObjectLockless(ObjectId objId) const;
         GameObject *getGameObject(std::string name) const;
+        GameObject *getGameObjectLockless(std::string name) const;
         GameObject *getGameObject(GameObjectHandle handle) const;
-        
+        GameObject *getGameObjectLockless(GameObjectHandle handle) const;
+
         void removeGameObject(GameObjectHandle handle);
         void removeGameObject(GameObject *object);
         
@@ -88,12 +93,24 @@ namespace BGE {
             return componentService_->getComponent<T>(handle);
         }
         
+        template <typename T> inline T *getComponentLockless(Handle<T> handle) const {
+            return componentService_->getComponentLockless<T>(handle);
+        }
+
         template <typename T> inline T *getComponent(ComponentHandle handle) const {
             return getComponent<T>(handle.handle);
         }
-        
+
+        template <typename T> inline T *getComponentLockless(ComponentHandle handle) const {
+            return getComponentLockless<T>(handle.handle);
+        }
+
         template <typename T> inline T *getComponent(HandleBackingType handle) const {
             return componentService_->getComponent<T>(handle);
+        }
+
+        template <typename T> inline T *getComponentLockless(HandleBackingType handle) const {
+            return componentService_->getComponentLockless<T>(handle);
         }
 
         template <typename T> inline void getComponents(std::vector<T *> &components) const {
@@ -133,7 +150,7 @@ namespace BGE {
         }
         
         inline uint32_t getOrder() const { return order_; }
-        inline void setOrder(uint32_t order) { order_ = order; }
+        void setOrder(uint32_t order);
 
         void loadAllTextures(std::function<void()> callback);
         void linkAll();

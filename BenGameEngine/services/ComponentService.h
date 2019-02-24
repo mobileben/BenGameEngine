@@ -139,11 +139,24 @@ namespace BGE {
             auto tHandle = Handle<T>(handle);
             return handleService->dereference(tHandle);
         }
+        
+        template <typename T> T *getComponentLockless(HandleBackingType handle) const {
+            auto typeId = T::typeId_;
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
+            auto tHandle = Handle<T>(handle);
+            return handleService->dereferenceLockless(tHandle);
+        }
 
         template <typename T> T *getComponent(Handle<T> handle) const {
             auto typeId = T::typeId_;
             auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
             return handleService->dereference(handle);
+        }
+
+        template <typename T> T *getComponentLockless(Handle<T> handle) const {
+            auto typeId = T::typeId_;
+            auto handleService = static_cast<HandleService<T, Handle<T>> *>(componentHandleServices_[typeId]);
+            return handleService->dereferenceLockless(handle);
         }
 
         template <typename T> void getComponents(std::vector<T *> &components) const {

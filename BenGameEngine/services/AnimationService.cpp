@@ -36,17 +36,23 @@ void BGE::AnimationService::update(double deltaTime) {
 
     float dt = (float)deltaTime;
 
+    handleServicesLock();
+    
     // For all the spaces
-    for (auto handle : Game::getInstance()->getSpaceService()->getSpaces()) {
-        auto space = Game::getInstance()->getSpaceService()->getSpace(handle);
+    spaceService->getSpaces(spaceHandles_);
+
+    for (auto handle : spaceHandles_) {
+        auto space = spaceService->getSpace(handle);
         
         if (space && space->isVisible()) {
-            for (auto const &handle : space->getGameObjects()) {
-                auto obj = space->getGameObject(handle);
+            auto& objects = space->getGameObjects();
+            
+            for (auto const &handle : objects) {
+                auto obj = space->getGameObjectLockless(handle);
                 
-                if (obj && obj->isActive() && obj->isVisible()) {
-                    auto animSeq = obj->getComponent<AnimationSequenceComponent>();
-                    auto animator = obj->getComponent<AnimatorComponent>();
+                if (obj && obj->isActive() && obj->isVisibleLockless(space)) {
+                    auto animSeq = obj->getComponentLockless<AnimationSequenceComponent>(space);
+                    auto animator = obj->getComponentLockless<AnimatorComponent>(space);
                     
                     if (animSeq && animator) {
                         animateSequence(space, animSeq, animator, dt);
@@ -59,6 +65,7 @@ void BGE::AnimationService::update(double deltaTime) {
         }
     }
 
+    handleServicesUnlock();
     spaceService->unlock();
     
     processEvents();
@@ -151,9 +158,10 @@ void BGE::AnimationService::queueEvent(SpaceHandle spaceHandle, GameObjectHandle
 
 void BGE::AnimationService::processEvents() {
     auto eventService = eventService_;
+    auto spaceService = Game::getInstance()->getSpaceService();
     
     for (auto const &event : events_) {
-        auto space = Game::getInstance()->getSpaceService()->getSpace(event.spaceHandle);
+        auto space = spaceService->getSpace(event.spaceHandle);
         auto gameObj = space->getGameObject(event.gameObjHandle);
         
         if (gameObj) {
@@ -255,7 +263,7 @@ void BGE::AnimationService::animateSequence(Space *space, AnimationSequenceCompo
             }
             
             if (origFrame != frame) {
-                animator->setFrame(frame);
+                animator->setFrame(space, frame);
             }
             
             // Only trigger when done

@@ -82,7 +82,7 @@ void BGE::LogicService::update(double deltaTime) {
             auto gameObj = space->getGameObject(gameObjHandle);
             
             if (gameObj) {
-                auto logic = gameObj->getComponent<LogicComponent>();
+                auto logic = gameObj->getComponent<LogicComponent>(space);
 
                 if (logic && logic->update) {
                     // As long as we have a valid gameObj and logic ptr and an update, then don't remove
@@ -117,7 +117,7 @@ void BGE::LogicService::update(double deltaTime) {
             auto gameObj = space->getGameObject(item.second);
             
             if (gameObj) {
-                auto logic = gameObj->getComponent<LogicComponent>();
+                auto logic = gameObj->getComponent<LogicComponent>(space);
                 
                 if (logic) {
                     logic->update(gameObj, deltaTime);

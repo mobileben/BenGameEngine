@@ -61,6 +61,8 @@ namespace BGE {
         std::unordered_map<Event, std::vector<EventHandlerHandle>>  eventHandlers_;
         std::vector<AnimationEvent>                                 events_;
 
+        std::vector<SpaceHandle>                                    spaceHandles_;
+
 #ifdef SUPPORT_PROFILING
         int32_t     numProcessedObjects_;
         int64_t     processingTime_;

@@ -119,12 +119,12 @@ void BGE::ButtonComponent::setButtonReference(ButtonReference *buttonRef) {
 
 void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) {
     auto space = Game::getInstance()->getSpaceService()->getSpace(getSpaceHandle());
-    auto gameObj = space->getGameObject(getGameObjectHandle());
+    auto gameObj = getGameObject(space);
     
     assert(gameObj);
     
     if (gameObj) {
-        auto xform = gameObj->getComponent<TransformComponent>();
+        auto xform = gameObj->getComponent<TransformComponent>(space);
         GameObject *disabledButton = nullptr;
         GameObject *disabledAnimButton = nullptr;
         GameObject *normalButton = nullptr;
@@ -158,8 +158,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     disabledButtonHandle = disabledButton->getHandle();
                     
                     gameObj = space->getGameObject(getGameObjectHandle());
-                    xform = gameObj->getComponent<TransformComponent>();
-                    xform->addChild(disabledButton->getComponent<TransformComponent>());
+                    xform = gameObj->getComponent<TransformComponent>(space);
+                    xform->addChild(disabledButton->getComponent<TransformComponent>(space));
                 } else if (!strcmp(ButtonStateDisabledAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
                         strcpy(catstr, state->reference);
@@ -173,8 +173,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     disabledAnimButtonHandle = disabledAnimButton->getHandle();
                     
                     gameObj = space->getGameObject(getGameObjectHandle());
-                    xform = gameObj->getComponent<TransformComponent>();
-                    xform->addChild(disabledAnimButton->getComponent<TransformComponent>());
+                    xform = gameObj->getComponent<TransformComponent>(space);
+                    xform->addChild(disabledAnimButton->getComponent<TransformComponent>(space));
                 } else if (!strcmp(ButtonStateNormalString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
                         strcpy(catstr, state->reference);
@@ -193,8 +193,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     normalButtonHandle = normalButton->getHandle();
                     
                     gameObj = space->getGameObject(getGameObjectHandle());
-                    xform = gameObj->getComponent<TransformComponent>();
-                    xform->addChild(normalButton->getComponent<TransformComponent>());
+                    xform = gameObj->getComponent<TransformComponent>(space);
+                    xform->addChild(normalButton->getComponent<TransformComponent>(space));
                 } else if (!strcmp(ButtonStateNormalAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
                         strcpy(catstr, state->reference);
@@ -208,8 +208,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     normalAnimButtonHandle = normalAnimButton->getHandle();
 
                     gameObj = space->getGameObject(getGameObjectHandle());
-                    xform = gameObj->getComponent<TransformComponent>();
-                    xform->addChild(normalAnimButton->getComponent<TransformComponent>());
+                    xform = gameObj->getComponent<TransformComponent>(space);
+                    xform->addChild(normalAnimButton->getComponent<TransformComponent>(space));
                 } else if (!strcmp(ButtonStateHighlightedString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
                         strcpy(catstr, state->reference);
@@ -228,8 +228,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     highlightedButtonHandle = highlightedButton->getHandle();
                     
                     gameObj = space->getGameObject(getGameObjectHandle());
-                    xform = gameObj->getComponent<TransformComponent>();
-                    xform->addChild(highlightedButton->getComponent<TransformComponent>());
+                    xform = gameObj->getComponent<TransformComponent>(space);
+                    xform->addChild(highlightedButton->getComponent<TransformComponent>(space));
                 } else if (!strcmp(ButtonStateHighlightedAnimString, state->state)) {
                     if (state->referenceType == GfxReferenceTypeAnimationSequence) {
                         strcpy(catstr, state->reference);
@@ -244,8 +244,8 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
                     highlightedAnimHandlerHandle = Game::getInstance()->getAnimationService()->registerEventHandler(highlightedAnimButton, BGE::Event::AnimationReachedEnd, std::bind(&ButtonComponent::handleHighlightedAnimEndHandler, this, std::placeholders::_1, std::placeholders::_2));
 
                     gameObj = space->getGameObject(getGameObjectHandle());
-                    xform = gameObj->getComponent<TransformComponent>();
-                    xform->addChild(highlightedAnimButton->getComponent<TransformComponent>());
+                    xform = gameObj->getComponent<TransformComponent>(space);
+                    xform->addChild(highlightedAnimButton->getComponent<TransformComponent>(space));
                 }
             }
             
@@ -280,15 +280,14 @@ void BGE::ButtonComponent::setButtonReference(const ButtonReference &buttonRef) 
 }
 
 BGE::BoundingBoxComponent *BGE::ButtonComponent::getBoundingBox() {
-    auto currentButton = getSpace()->getGameObject(currentButtonHandle);
+    auto space = getSpace();
+    auto currentButton = space->getGameObject(currentButtonHandle);
     
     if (currentButton) {
-        return currentButton->getComponent<BoundingBoxComponent>();
+        return currentButton->getComponent<BoundingBoxComponent>(space);
     } else {
-        auto gameObjHandle = getGameObjectHandle();
-        auto gameObj = getSpace()->getGameObject(gameObjHandle);
-        
-        return gameObj->getComponent<BoundingBoxComponent>();
+        auto gameObj = getGameObject(space);
+        return gameObj->getComponent<BoundingBoxComponent>(space);
     }
 }
 
@@ -481,12 +480,12 @@ void BGE::ButtonComponent::useHighlightedButton() {
         currentButton->setActive(false);
         
         if (currentButton->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
-            auto animator = currentButton->getComponent<AnimatorComponent>();
+            auto animator = currentButton->getComponent<AnimatorComponent>(space);
             animator->stop();
         }
         
         currentButtonHandle = highlightedButtonHandle;
-        currentButton = getSpace()->getGameObject(currentButtonHandle);
+        currentButton = space->getGameObject(currentButtonHandle);
         
         if (!currentButton) {
             GameObject *button;
@@ -502,13 +501,13 @@ void BGE::ButtonComponent::useHighlightedButton() {
             }
         }
 
-        currentButton = getSpace()->getGameObject(currentButtonHandle);
+        currentButton = space->getGameObject(currentButtonHandle);
 
         if (currentButton) {
             currentButton->setActive(true);
             
             if (playAnim) {
-                auto animator = currentButton->getComponent<AnimatorComponent>();
+                auto animator = currentButton->getComponent<AnimatorComponent>(space);
                 
                 if (animator->state == AnimState::Done) {
                     animator->play(AnimPlayForever);
@@ -527,7 +526,7 @@ void BGE::ButtonComponent::useDisabledButton() {
     currentButton->setActive(false);
     
     if (currentButton->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
-        auto animator = currentButton->getComponent<AnimatorComponent>();
+        auto animator = currentButton->getComponent<AnimatorComponent>(space);
         animator->stop();
     }
     
@@ -550,7 +549,7 @@ void BGE::ButtonComponent::useDisabledButton() {
     } else {
         currentButtonHandle = disabledButtonHandle;
 
-        currentButton = getSpace()->getGameObject(currentButtonHandle);
+        currentButton = space->getGameObject(currentButtonHandle);
 
         if (!currentButton) {
             // Fallback as we don't have this
@@ -568,13 +567,13 @@ void BGE::ButtonComponent::useDisabledButton() {
         }
     }
     
-    currentButton = getSpace()->getGameObject(currentButtonHandle);
+    currentButton = space->getGameObject(currentButtonHandle);
     
     if (currentButton) {
         currentButton->setActive(true);
         
         if (playAnim) {
-            auto animator = currentButton->getComponent<AnimatorComponent>();
+            auto animator = currentButton->getComponent<AnimatorComponent>(space);
             
             if (animator->state == AnimState::Done) {
                 animator->play(AnimPlayForever);
@@ -592,7 +591,7 @@ void BGE::ButtonComponent::useNormalButton() {
     currentButton->setActive(false);
     
     if (currentButton->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
-        auto animator = currentButton->getComponent<AnimatorComponent>();
+        auto animator = currentButton->getComponent<AnimatorComponent>(space);
         animator->stop();
     }
     
@@ -629,7 +628,7 @@ void BGE::ButtonComponent::useNormalButton() {
         currentButton->setActive(true);
         
         if (playAnim) {
-            auto animator = currentButton->getComponent<AnimatorComponent>();
+            auto animator = currentButton->getComponent<AnimatorComponent>(space);
             
             if (animator->state == AnimState::Done) {
                 animator->play(AnimPlayForever);
@@ -648,7 +647,7 @@ void BGE::ButtonComponent::animateHighlightedButton() {
         currentButton->setActive(false);
         
         if (currentButton->getComponentBitmask() & Component::getBitmask<AnimatorComponent>()) {
-            auto animator = currentButton->getComponent<AnimatorComponent>();
+            auto animator = currentButton->getComponent<AnimatorComponent>(space);
             animator->stop();
         }
         
@@ -670,13 +669,13 @@ void BGE::ButtonComponent::animateHighlightedButton() {
             assert(false);
         }
         
-        currentButton = getSpace()->getGameObject(currentButtonHandle);
+        currentButton = space->getGameObject(currentButtonHandle);
         
         if (currentButton) {
             currentButton->setActive(true);
             
             if (playAnim) {
-                auto animator = currentButton->getComponent<AnimatorComponent>();
+                auto animator = currentButton->getComponent<AnimatorComponent>(space);
                 
                 if (animator->state == AnimState::Done) {
                     animator->play(count);

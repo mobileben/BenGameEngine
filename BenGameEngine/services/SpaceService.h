@@ -49,7 +49,7 @@ namespace BGE {
         void outputResourceBreakdown(uint32_t numTabs) const final;
         void outputMemoryBreakdown(uint32_t numTabs) const final;
 
-        Space *createSpace(std::string name);
+        Space *createSpace(std::string name, uint32_t order=0);
 
         void removeSpace(SpaceHandle spaceHandle);
         void removeSpace(std::string name);
@@ -57,10 +57,16 @@ namespace BGE {
         void queueReset(SpaceHandle spaceHandle);
 
         Space *getSpace(SpaceHandle spaceHandle) const;
+        Space *getSpaceLockless(SpaceHandle spaceHandle) const;
         Space *getSpace(std::string name) const;
-        
+        Space *getSpaceLockless(std::string name) const;
+
         std::vector<SpaceHandle> getSpaces() const;
+        void getSpaces(std::vector<SpaceHandle>& spaces) const;
         std::vector<SpaceHandle> getReversedSpaces() const;
+        void getReversedSpaces(std::vector<SpaceHandle>& spaces) const;
+        
+        void reorderSpaces();
         
     private:
         static const uint32_t InitialSpaceReserve = 32;

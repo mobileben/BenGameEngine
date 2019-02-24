@@ -143,6 +143,10 @@ BGE::Material *BGE::MaterialService::getMaterial(MaterialHandle handle) const {
     return handleService_.dereference(handle);
 }
 
+BGE::Material *BGE::MaterialService::getMaterialLockless(MaterialHandle handle) const {
+    return handleService_.dereferenceLockless(handle);
+}
+
 BGE::Material *BGE::MaterialService::getMaterial(ObjectId matId) const {
     auto it = materials_.find(matId);
     
@@ -150,6 +154,16 @@ BGE::Material *BGE::MaterialService::getMaterial(ObjectId matId) const {
         return handleService_.dereference(it->second);
     }
 
+    return nullptr;
+}
+
+BGE::Material *BGE::MaterialService::getMaterialLockless(ObjectId matId) const {
+    auto it = materials_.find(matId);
+    
+    if (it != materials_.end()) {
+        return handleService_.dereferenceLockless(it->second);
+    }
+    
     return nullptr;
 }
 

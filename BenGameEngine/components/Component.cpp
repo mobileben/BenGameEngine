@@ -48,3 +48,15 @@ BGE::GameObject *BGE::Component::getGameObject() const {
     return nullptr;
 }
 
+BGE::GameObject *BGE::Component::getGameObjectLockless() const {
+    auto space = getSpace();
+    return getGameObjectLockless(space);
+}
+
+BGE::GameObject *BGE::Component::getGameObject(const Space *space) const {
+    return space->getGameObject(gameObjectHandle_);
+}
+
+BGE::GameObject *BGE::Component::getGameObjectLockless(const Space *space) const {
+    return space->getGameObjectLockless(gameObjectHandle_);
+}

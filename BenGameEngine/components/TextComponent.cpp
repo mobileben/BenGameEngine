@@ -83,9 +83,9 @@ void BGE::TextComponent::setMultiline(bool multi) {
 
 void BGE::TextComponent::updateBoundingBox() {
     float width, height;
-    auto gameObjHandle = getGameObjectHandle();
-    auto gameObj = getSpace()->getGameObject(gameObjHandle);
-    auto bbox = gameObj->getComponent<BoundingBoxComponent>();
+    auto space = getSpace();
+    auto gameObj = getGameObject(space);
+    auto bbox = gameObj->getComponent<BoundingBoxComponent>(space);
     
     getWidthHeight(width, height);
     

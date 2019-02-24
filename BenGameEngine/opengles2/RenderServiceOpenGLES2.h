@@ -71,21 +71,21 @@ namespace BGE {
         void drawTexture(Vector2 &position, std::shared_ptr<Texture> texture);
         
         // Using the more updated means
-        void drawFlatRect(GameObject *gameObject);
-        void drawMaskRect(GameObject *gameObject);
-        void drawTextureMask(GameObject *gameObject);
-        void drawLines(GameObject *gameObject);
-        void drawPolyLines(GameObject *gameObject);
+        void drawFlatRect(Space *space, GameObject *gameObject);
+        void drawMaskRect(Space *space, GameObject *gameObject);
+        void drawTextureMask(Space *space, GameObject *gameObject);
+        void drawLines(Space *space, GameObject *gameObject);
+        void drawPolyLines(Space *space, GameObject *gameObject);
         
-        void drawSprite(GameObject *gameObject);
+        void drawSprite(Space *space, GameObject *gameObject);
 
         void drawDebugQuads(std::vector<Vector3> points, Color &color);
 
-        void drawString(TextComponent *text, Font *font, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum=true);
+        void drawString(Space *space, TextComponent *text, Font *font, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum=true);
 
-        void drawString(std::vector<std::string> &strs, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        void drawString(Space *space, std::vector<std::string> &strs, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
 
-        uint8_t enableMask(GameObject *gameObject);
+        uint8_t enableMask(Space *space, GameObject *gameObject);
         void disableMask(uint8_t maskBits);
         
         void render();
@@ -119,9 +119,14 @@ namespace BGE {
         GLuint currentTextureId_;
         std::shared_ptr<ShaderProgram> currentShader_;
 
+        std::vector<SpaceHandle>                            spaceHandles_;
+        std::vector<GameObject *>                           rootGameObjects_;
+        std::vector<std::vector<TransformComponentHandle>>  orderedChildrenHandles_;
+        std::vector<TransformComponent *>                   orderedChildrenScratch_;
+        
         void queueRender(double deltaTime);
         
-        int8_t renderGameObject(GameObject *gameObj, bool root, bool hasNextSibling = false);
+        int8_t renderGameObject(GameObject *gameObj, Space *space, uint32_t depth, bool hasNextSibling = false);
 
         void resetStacks();
         
@@ -133,7 +138,7 @@ namespace BGE {
 
         void setTexture(GLenum target, GLuint texId);
 
-        void drawString(std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        void drawString(Space *space, std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
     };
 }
 

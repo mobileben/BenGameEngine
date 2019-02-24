@@ -56,19 +56,31 @@ namespace BGE {
         GameObject *createGameObject(std::string name="");
         
         GameObjectHandle getGameObjectHandle(ObjectId objId) const;
+        GameObjectHandle getGameObjectHandleLockless(ObjectId objId) const;
         GameObjectHandle getGameObjectHandle(std::string name) const;
+        GameObjectHandle getGameObjectHandleLockless(std::string name) const;
+
         inline GameObject *getGameObject(ObjectId objId) const {
             return handleService_.dereference(getGameObjectHandle(objId));
         }
-        
+        inline GameObject *getGameObjectLockless(ObjectId objId) const {
+            return handleService_.dereferenceLockless(getGameObjectHandleLockless(objId));
+        }
+
         inline GameObject *getGameObject(std::string name) const  {
             return handleService_.dereference(getGameObjectHandle(name));
         }
-        
+        inline GameObject *getGameObjectLockless(std::string name) const  {
+            return handleService_.dereferenceLockless(getGameObjectHandleLockless(name));
+        }
+
         inline GameObject *getGameObject(GameObjectHandle handle) const  {
             return handleService_.dereference(handle);
         }
-        
+        inline GameObject *getGameObjectLockless(GameObjectHandle handle) const  {
+            return handleService_.dereferenceLockless(handle);
+        }
+
 #ifdef NOT_YET
         void removeGameObject(GameObjectHandle handle);
         

@@ -76,9 +76,37 @@ BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(ObjectId objId
     return GameObjectHandle();
 }
 
+BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandleLockless(ObjectId objId) const {
+    for (auto const &handle : gameObjects_) {
+        auto obj = getGameObjectLockless(handle);
+        
+        if (obj) {
+            if (obj->getInstanceId() == objId) {
+                return handle;
+            }
+        }
+    }
+    
+    return GameObjectHandle();
+}
+
 BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandle(std::string name) const {
     for (auto const &handle : gameObjects_) {
         auto obj = getGameObject(handle);
+        
+        if (obj) {
+            if (obj->getName() == name) {
+                return handle;
+            }
+        }
+    }
+    
+    return GameObjectHandle();
+}
+
+BGE::GameObjectHandle BGE::GameObjectService::getGameObjectHandleLockless(std::string name) const {
+    for (auto const &handle : gameObjects_) {
+        auto obj = getGameObjectLockless(handle);
         
         if (obj) {
             if (obj->getName() == name) {

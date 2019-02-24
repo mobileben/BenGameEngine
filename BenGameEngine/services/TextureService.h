@@ -94,12 +94,18 @@ namespace BGE {
         inline Texture *getTexture(TextureHandle handle) {
             return textureHandleService_.dereference(handle);
         }
+        inline Texture *getTextureLockless(TextureHandle handle) {
+            return textureHandleService_.dereferenceLockless(handle);
+        }
 
         TextureAtlas *getTextureAtlas(ScenePackageHandle scenePackageHandle, const std::string& name);
         TextureAtlas *getTextureAtlas(SpaceHandle spaceHandle, const std::string& name);
         TextureAtlas *getTextureAtlas(FontHandle fontHandle, const std::string& name);
         inline TextureAtlas *getTextureAtlas(TextureAtlasHandle handle) {
             return textureAtlasHandleService_.dereference(handle);
+        }
+        inline TextureAtlas *getTextureAtlasLockless(TextureAtlasHandle handle) {
+            return textureAtlasHandleService_.dereferenceLockless(handle);
         }
 
         // Rename texture right now only allowed through SpaceHandle

@@ -101,9 +101,9 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices(bool force) {
         assert(texture);
         
         if (texture) {
-            auto gameObjHandle = getGameObjectHandle();
-            auto gameObj = getSpace()->getGameObject(gameObjHandle);
-            auto bbox = gameObj->getComponent<BoundingBoxComponent>();
+            auto space = getSpace();
+            auto gameObj = getGameObject(space);
+            auto bbox = gameObj->getComponent<BoundingBoxComponent>(space);
 
             if (BGE::nearlyZero(bbox->width) || BGE::nearlyZero(bbox->height) || force) {
                 bbox->x = 0.0F;

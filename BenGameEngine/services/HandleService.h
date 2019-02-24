@@ -27,7 +27,7 @@ namespace BGE {
     template <typename DATA, typename HANDLE>
     class HandleService : public Service {
     public:
-        HandleService(uint32_t reserve, uint32_t maxLimit) : numResizes_(0), maxAllocated_(0), maxLimit_(maxLimit) {
+        HandleService(uint32_t reserve, uint32_t maxLimit) : numResizes_(0), maxAllocated_(0), maxLimit_(maxLimit), dataSize_(0), magicSize_(0) {
 #if UNIT_TESTING
             if (reserve == 0) {
                 throw std::exception();
@@ -64,21 +64,23 @@ namespace BGE {
             
             if (freeSlots_.empty()) {
                 // We have no free slots, so create a new one if we are not at our limit
-                if (maxLimit_ != HandleServiceNoMaxLimit && data_.size() >= maxLimit_) {
+                if (maxLimit_ != HandleServiceNoMaxLimit && dataSize_ >= maxLimit_) {
                     handle.nullify();
                     handleServicesUnlock();
 
                     return nullptr;
                 }
                 
-                index = (HandleBackingType) magic_.size();
+                index = (HandleBackingType) magicSize_;
                 handle.init(index);
                 
                 data_.push_back(DATA());
+                dataSize_ = data_.size();
                 magic_.push_back(handle.getMagic());
+                magicSize_ = magic_.size();
                 
-                if (data_.size() > maxAllocated_) {
-                    maxAllocated_ = (uint32_t) data_.size();
+                if (dataSize_ > maxAllocated_) {
+                    maxAllocated_ = (uint32_t) dataSize_;
                 }
                 
                 if (data_.capacity() != currCapacity_) {
@@ -122,13 +124,13 @@ namespace BGE {
             }
             
 #if UNIT_TESTING
-            if (index >= data_.size()) {
+            if (index >= dataSize_) {
                 std::exception();
             } else if (magic_[index] != handle.getMagic()) {
                 std::exception();
             }
 #else
-            assert(index < data_.size());
+            assert(index < dataSize_);
             assert(magic_[index] == handle.getMagic());
 #endif
             magic_[index] = 0;
@@ -146,7 +148,7 @@ namespace BGE {
             
             handleServicesLock();
             
-            if (index < data_.size()) {
+            if (index < dataSize_) {
                 auto magicIndex = magic_[index];
                 
                 if (magicIndex != handle.getMagic() || magicIndex == 0) {
@@ -163,7 +165,29 @@ namespace BGE {
             handleServicesUnlock();
             return retVal;
         }
-
+        
+        DATA *dereferenceLockless(HANDLE handle) const {
+            if (handle.isNull()) {
+                return nullptr;
+            }
+            
+            auto index = handle.getIndex();
+            
+            if (index < dataSize_) {
+                auto magicIndex = magic_[index];
+                
+                if (magicIndex != handle.getMagic() || magicIndex == 0) {
+                    return nullptr;
+                }
+            } else {
+                return nullptr;
+            }
+            
+            auto retVal = const_cast<DATA *>(&data_[index]);
+            
+            return retVal;
+        }
+        
         void garbageCollect() {
             freeSlots_.insert(freeSlots_.end(), toBeFreeSlots_.begin(), toBeFreeSlots_.end());
             toBeFreeSlots_.clear();
@@ -173,7 +197,7 @@ namespace BGE {
             std::vector<DATA *> pointers;
             handleServicesLock();
             
-            for (auto i=0u;i<data_.size();i++) {
+            for (auto i=0u;i<dataSize_;i++) {
                 if (magic_[i] != 0) {
                     DATA *ptr = const_cast<DATA *>(&data_[i]);
                     
@@ -266,7 +290,9 @@ namespace BGE {
         uint32_t        maxAllocated_;
         uint32_t        maxLimit_;
         DataVector      data_;
+        size_t          dataSize_;
         MagicVector     magic_;
+        size_t          magicSize_;
         FreeVector      freeSlots_;
         ToBeFreeVector  toBeFreeSlots_;
     };

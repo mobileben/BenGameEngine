@@ -57,10 +57,12 @@ namespace BGE {
         void removeMaterial(ObjectId matId);
         
         MaterialHandle getMaterialHandle(ObjectId matId) const;
-        
+
         Material *getMaterial(MaterialHandle handle) const;
+        Material *getMaterialLockless(MaterialHandle handle) const;
         Material *getMaterial(ObjectId matId) const;
-        
+        Material *getMaterialLockless(ObjectId matId) const;
+
     private:
         static const uint32_t InitialMaterialReserve = 2048;
         

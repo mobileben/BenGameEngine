@@ -59,6 +59,15 @@ BGE::Material *BGE::RenderComponent::getMaterial(uint32_t index) const {
     return nullptr;
 }
 
+BGE::Material *BGE::RenderComponent::getMaterialLockless(uint32_t index) const {
+    if (index < materialHandles_.size()) {
+        auto handle = materialHandles_[index];
+        return Game::getInstance()->getMaterialService()->getMaterialLockless(handle);
+    }
+    
+    return nullptr;
+}
+
 std::vector<BGE::MaterialHandle> BGE::RenderComponent::getMaterialHandles() const {
     return materialHandles_;
 }

@@ -40,11 +40,12 @@ void BGE::GameObject::markForDestroy() {
         active_ = false;
         destroy_ = true;
 
+        auto space = getSpace();
         // Now tag all children to be destroyed
-        auto xform = getComponent<TransformComponent>();
+        auto xform = getComponent<TransformComponent>(space);
         if (xform) {
             for (auto &childXform : xform->getChildren()) {
-                auto child = childXform->getGameObject();
+                auto child = childXform->getGameObject(space);
                 if (child) {
                     child->markForDestroy();
                 }
@@ -116,11 +117,12 @@ BGE::GameObject *BGE::GameObject::find(ComponentTypeId componentTypeId, const st
         }
     }
     
-    auto xform = getComponent<TransformComponent>();
+    auto space = getSpace();
+    auto xform = getComponent<TransformComponent>(space);
     
     if (xform) {
         for (auto &childXform : xform->getChildren()) {
-            auto child = childXform->getGameObject();
+            auto child = childXform->getGameObject(space);
             
             if (child) {
                 auto found = child->find(componentTypeId, name);
@@ -173,6 +175,26 @@ bool BGE::GameObject::isVisible(void) {
     return false;
 }
 
+bool BGE::GameObject::isVisible(const Space *space) {
+    auto xform = getComponent<TransformComponent>(space);
+    
+    if (xform) {
+        return xform->isVisible();
+    }
+    
+    return false;
+}
+
+bool BGE::GameObject::isVisibleLockless(const Space *space) {
+    auto xform = getComponentLockless<TransformComponent>(space);
+    
+    if (xform) {
+        return xform->isVisible();
+    }
+    
+    return false;
+}
+
 void BGE::GameObject::setVisibility(bool visible) {
     auto xform = getComponent<TransformComponent>();
     if (xform) {
@@ -213,8 +235,38 @@ bool BGE::GameObject::canRender() {
     return false;
 }
 
+bool BGE::GameObject::canRender(const Space *space) {
+    auto xform = getComponent<TransformComponent>(space);
+    
+    if (xform) {
+        return xform->canRender();
+    }
+    
+    return false;
+}
+
 bool BGE::GameObject::canInteract() {
     auto xform = getComponent<TransformComponent>();
+    
+    if (xform) {
+        return xform->canInteract();
+    }
+    
+    return false;
+}
+
+bool BGE::GameObject::canInteract(const Space *space) {
+    auto xform = getComponent<TransformComponent>(space);
+    
+    if (xform) {
+        return xform->canInteract();
+    }
+    
+    return false;
+}
+
+bool BGE::GameObject::canInteractLockless(const Space *space) {
+    auto xform = getComponentLockless<TransformComponent>(space);
     
     if (xform) {
         return xform->canInteract();
@@ -231,6 +283,20 @@ BGE::GameObject * BGE::GameObject::getParent() {
         
         if (parentXform) {
             return parentXform->getGameObject();
+        }
+    }
+    
+    return nullptr;
+}
+
+BGE::GameObject * BGE::GameObject::getParent(const Space *space) {
+    auto xform = getComponent<TransformComponent>(space);
+    
+    if (xform) {
+        auto parentXform = xform->getParent(space);
+        
+        if (parentXform) {
+            return parentXform->getGameObject(space);
         }
     }
     

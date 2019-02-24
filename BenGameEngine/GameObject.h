@@ -58,6 +58,22 @@ namespace BGE {
             addComponentEpilogue(T::typeId_);
         }
         
+        template <typename T> void addComponent(T *component, const Space *space) {
+            assert(!component->hasGameObject());
+            auto bitmask = T::bitmask_;
+            ComponentHandle handle{T::typeId_, component->getRawHandle()};
+            componentBitmask_ |= bitmask;
+#if DEBUG
+            for (auto &h : components_) {
+                assert(h.typeId != T::typeId_);
+            }
+#endif
+            components_.push_back(handle);
+            space->setGameObjectHandle(component, getHandle());
+            
+            addComponentEpilogue(T::typeId_);
+        }
+        
         template <typename T> T *getComponent() {
             if (hasComponent<T>()) {
                 auto typeId = T::typeId_;
@@ -67,6 +83,34 @@ namespace BGE {
                         auto space = getSpace();
                         
                         return space->getComponent<T>(handle);
+                    }
+                }
+            }
+            
+            return nullptr;
+        }
+        
+        template <typename T> T *getComponent(const Space *space) {
+            if (hasComponent<T>()) {
+                auto typeId = T::typeId_;
+                
+                for (auto const &handle : components_) {
+                    if (handle.typeId == typeId) {
+                        return space->getComponent<T>(handle);
+                    }
+                }
+            }
+            
+            return nullptr;
+        }
+        
+        template <typename T> T *getComponentLockless(const Space *space) {
+            if (hasComponent<T>()) {
+                auto typeId = T::typeId_;
+                
+                for (auto const &handle : components_) {
+                    if (handle.typeId == typeId) {
+                        return space->getComponentLockless<T>(handle);
                     }
                 }
             }
@@ -108,6 +152,24 @@ namespace BGE {
             }
         }
         
+        template <typename T> void removeComponent(Space *space) {
+            if (hasComponent<T>()) {
+                auto typeId = T::typeId_;
+                
+                for (auto it = components_.begin();it != components_.end();++it) {
+                    if (it->typeId == typeId) {
+                        removeComponentPrologue(T::typeId_);
+                        
+                        space->removeComponent(*it);
+                        componentBitmask_ &= ~T::bitmask_;
+                        
+                        components_.erase(it);
+                        return;
+                    }
+                }
+            }
+        }
+        
         void listComponents() const;
         
         void removeAllComponents();
@@ -126,6 +188,7 @@ namespace BGE {
         GameObject *findWithPrefix(ComponentTypeId componentTypeId, const std::string& name);
         
         GameObject *getParent();
+        GameObject *getParent(const Space *space);
 
         bool hasChildren();
         uint32_t numChildren();
@@ -157,14 +220,19 @@ namespace BGE {
         
         // Convenience methods
         bool isVisible(void);
+        bool isVisible(const Space *space);
+        bool isVisibleLockless(const Space *space);
         void setVisibility(bool visible);
         
         bool isClipped(void);
         void setClipped(bool clipped);
         
         bool canRender();
+        bool canRender(const Space *space);
         bool canInteract();
-        
+        bool canInteract(const Space *space);
+        bool canInteractLockless(const Space *space);
+
         inline bool operator==(const GameObject &other) const {
             return getInstanceId() == other.getInstanceId();
         }
