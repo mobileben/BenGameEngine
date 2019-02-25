@@ -66,7 +66,6 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), current
     }
 }
 
-void BGE::RenderServiceOpenGLES2::initialize() {}
 void BGE::RenderServiceOpenGLES2::reset() {}
 
 void BGE::RenderServiceOpenGLES2::platformSuspending() {
@@ -777,7 +776,8 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
 
     glLineWidth(2);
 
-    for (size_t index=0;index<points.size();index += 4) {
+    auto numPoints = points.size();
+    for (size_t index=0;index<numPoints;index += 4) {
         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                               sizeof(Vertex), &points[index]);
         glDrawArrays(GL_LINE_LOOP, 0, (GLsizei) 4);
@@ -892,9 +892,10 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
             VASEr::Vec2 *vPoints = new VASEr::Vec2[points.size()];
             VASEr::Color *vColors = new VASEr::Color[points.size()];
             
-            assert(points.size() == numColors || numColors == 1);
+            auto numPoints = points.size();
+            assert(numPoints == numColors || numColors == 1);
             
-            for (size_t i=0;i<points.size();++i) {
+            for (size_t i=0;i<numPoints;++i) {
                 auto colorIndex = i;
                 vPoints[i].x = points[i].x;
                 vPoints[i].y = points[i].y;
@@ -1314,23 +1315,23 @@ void BGE::RenderServiceOpenGLES2::disableMask(uint8_t maskBits)
 }
 
 void BGE::RenderServiceOpenGLES2::queueRender(__attribute__ ((unused)) double time) {
-    lock();
-
-    if (!isBackgrounded()) {
-        [this->getRenderWindow()->getView() display];
+    if (trylock()) {
+        if (!isBackgrounded()) {
+            [this->getRenderWindow()->getView() display];
+        }
+        
+        unlock();
     }
-    
-    unlock();
 }
 
 void BGE::RenderServiceOpenGLES2::render()
 {
-    handleServicesLock();
     lock();
+    handleServicesLock();
 
     if (isBackgrounded()) {
-        unlock();
         handleServicesUnlock();
+        unlock();
         return;
     }
 
@@ -1407,8 +1408,8 @@ void BGE::RenderServiceOpenGLES2::render()
     processingTime_ = now - startTime;
     frameRateCalculator_.nextFrame();
 #endif /* SUPPORT_PROFILING */
-    unlock();
     handleServicesUnlock();
+    unlock();
 }
 
 int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, Space *space, uint32_t depth, bool hasNextSibling) {

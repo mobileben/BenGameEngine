@@ -40,7 +40,6 @@ namespace BGE {
         RenderServiceOpenGLES2();
         ~RenderServiceOpenGLES2() {}
         
-        virtual void initialize() final;
         virtual void reset() final;
         virtual void platformSuspending() final;
         virtual void platformResuming() final;
