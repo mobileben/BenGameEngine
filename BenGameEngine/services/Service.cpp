@@ -36,6 +36,10 @@ void BGE::Service::lock() const {
     pthread_mutex_lock((pthread_mutex_t *)&mutex_);
 }
 
+bool BGE::Service::trylock() const {
+    return pthread_mutex_trylock((pthread_mutex_t *)&mutex_) == 0;
+}
+
 void BGE::Service::unlock() const {
     pthread_mutex_unlock((pthread_mutex_t *)&mutex_);
 }

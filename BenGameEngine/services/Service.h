@@ -73,13 +73,15 @@ namespace BGE {
         
         // Synchronization
         void lock() const;
+        bool trylock() const;
         void unlock() const;
 
     protected:
+        pthread_mutex_t         mutex_;
+
         ObjectId getIdAndIncrement();
         
     private:
-        pthread_mutex_t mutex_;
         
         std::atomic<ObjectId>   identifier_;
         
