@@ -20,6 +20,7 @@
 
 #include <Foundation/Foundation.h>
 
+#include <atomic>
 #include <functional>
 
 #if TARGET_OS_IPHONE
@@ -71,7 +72,8 @@ namespace BGE {
     class Audio : public NamedObject {
     public:
         Audio();
-
+        Audio(const Audio& other);
+        
         ~Audio() {}
         
         void initialize(AudioHandle handle, const std::string& name, AudioBuffer *audioBuffer);
@@ -139,7 +141,7 @@ namespace BGE {
     private:
         AudioHandle                     handle_;
         bool                            valid_;
-        AudioPlayState                  state_;
+        std::atomic<AudioPlayState>     state_;
         AudioType                       type_;
         AudioBufferHandle               audioBufferHandle_;
 

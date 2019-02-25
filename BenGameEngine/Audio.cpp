@@ -200,6 +200,19 @@ BGE::Audio::Audio() : doneCallback(nullptr), valid_(false), state_(AudioPlayStat
 #endif /* TARGET_OS_IPHONE */
 }
 
+BGE::Audio::Audio(const Audio& other) : handle_(other.handle_), valid_(other.valid_), state_(other.state_.load()), type_(other.type_), audioBufferHandle_(other.audioBufferHandle_), streaming_(other.streaming_), looping_(other.looping_), pauseSource_(other.pauseSource_), enablePlaybackRate_(other.enablePlaybackRate_), playbackRate_(other.playbackRate_), volume_(other.volume_)
+#if TARGET_OS_IPHONE
+    , audioFileId_(other.audioFileId_), audioBuffer_(other.audioBuffer_), audioBufferSize_(other.audioBufferSize_), queue_(other.queue_), actualBuffersUsed_(other.actualBuffersUsed_), packetInfo_(other.packetInfo_), bufferSize_(other.bufferSize_), currPacket_(other.currPacket_), numPacketsToRead_(other.numPacketsToRead_), packetDesc_(other.packetDesc_), streamBasicDesc_(other.streamBasicDesc_), memoryImageIndex_(other.memoryImageIndex_)
+#endif /* TARGET_OS_IPHONE */
+{
+#if TARGET_OS_IPHONE
+    for (auto i=0;i<kAudioQueueNumBuffers;++i) {
+        buffers_[i] = other.buffers_[i];
+    }
+#endif /* TARGET_OS_IPHONE */
+}
+
+
 void BGE::Audio::initialize(AudioHandle handle, const std::string& name, AudioBuffer *audioBuffer) {
     setName(name);
     handle_ = handle;

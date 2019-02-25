@@ -44,10 +44,12 @@ BGE::Space::Space(ObjectId spaceId, std::string name) : NamedObject(spaceId, nam
 }
 
 void BGE::Space::initialize(SpaceHandle handle, std::string name, uint32_t order, std::shared_ptr<SpaceService> service) {
-    spaceHandle_ = handle;
-    setName(name);
     spaceService_ = service;
 
+    lock();
+    spaceHandle_ = handle;
+    setName(name);
+    
     // By default, spaces are not active or visible or updatable
     active_ = false;
     visible_ = false;
@@ -65,6 +67,7 @@ void BGE::Space::initialize(SpaceHandle handle, std::string name, uint32_t order
     
     componentService_ = std::make_shared<ComponentService>();
     componentService_->setSpaceHandle(spaceHandle_);
+    unlock();
 }
 
 void BGE::Space::destroy() {
@@ -149,7 +152,10 @@ void BGE::Space::reset_() {
     // Remove any outstanding events
     
     textures_.clear();
+    lock();
     resetting_ = false;
+    unlock();
+    
 #ifdef SUPPORT_PROFILING
     resetTime_ = profiling::EpochTime::timeInMicroSec() - startTime;
 #endif /* SUPPORT_PROFILING */

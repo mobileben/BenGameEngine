@@ -90,6 +90,7 @@ void BGE::MaterialService::addMaterial(MaterialHandle handle) {
     auto material = getMaterial(handle);
     
     if (material) {
+        lock();
         MaterialMapIterator it = materials_.find(material->getInstanceId());
         
         if (it != materials_.end()) {
@@ -98,6 +99,7 @@ void BGE::MaterialService::addMaterial(MaterialHandle handle) {
         } else {
             materials_[material->getInstanceId()] = handle;
         }
+        unlock();
     } else {
         // TODO: Error, what do we do?
     }
@@ -107,6 +109,7 @@ void BGE::MaterialService::removeMaterial(MaterialHandle handle) {
     auto material = getMaterial(handle);
     
     if (material) {
+        lock();
         MaterialMapIterator it = materials_.find(material->getInstanceId());
         
         if (it != materials_.end()) {
@@ -114,10 +117,12 @@ void BGE::MaterialService::removeMaterial(MaterialHandle handle) {
             handleService_.release(handle);
             materials_.erase(it);
         }
+        unlock();
     }
 }
 
 void BGE::MaterialService::removeMaterial(ObjectId matId) {
+    lock();
     MaterialMapIterator it = materials_.find(matId);
     
     if (it != materials_.end()) {
@@ -127,14 +132,18 @@ void BGE::MaterialService::removeMaterial(ObjectId matId) {
         handleService_.release(it->second);
         materials_.erase(it);
     }
+    unlock();
 }
 
 BGE::MaterialHandle BGE::MaterialService::getMaterialHandle(ObjectId matId) const {
+    lock();
     auto it = materials_.find(matId);
 
     if (it != materials_.end()) {
+        unlock();
         return it->second;
     } else {
+        unlock();
         return MaterialHandle();
     }
 }
@@ -148,22 +157,27 @@ BGE::Material *BGE::MaterialService::getMaterialLockless(MaterialHandle handle) 
 }
 
 BGE::Material *BGE::MaterialService::getMaterial(ObjectId matId) const {
+    lock();
     auto it = materials_.find(matId);
     
     if (it != materials_.end()) {
+        unlock();
         return handleService_.dereference(it->second);
     }
+    unlock();
 
     return nullptr;
 }
 
 BGE::Material *BGE::MaterialService::getMaterialLockless(ObjectId matId) const {
+    lock();
     auto it = materials_.find(matId);
     
     if (it != materials_.end()) {
+        unlock();
         return handleService_.dereferenceLockless(it->second);
     }
-    
+    unlock();
     return nullptr;
 }
 
