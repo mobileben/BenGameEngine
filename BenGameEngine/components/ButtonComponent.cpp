@@ -291,6 +291,16 @@ BGE::BoundingBoxComponent *BGE::ButtonComponent::getBoundingBox() {
     }
 }
 
+BGE::BoundingBoxComponent *BGE::ButtonComponent::getBoundingBoxLockless(Space *space, GameObject *root) {
+    auto currentButton = space->getGameObject(currentButtonHandle);
+    
+    if (currentButton) {
+        return currentButton->getComponentLockless<BoundingBoxComponent>(space);
+    } else {
+        return root->getComponent<BoundingBoxComponent>(space);
+    }
+}
+
 bool BGE::ButtonComponent::isAnimating() const {
     return animate;
 }
