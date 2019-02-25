@@ -18,7 +18,7 @@
 #include "Profiling.h"
 #endif /* SUPPORT_PROFILING */
 
-BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0), currentDispatchQueue_(0) {
+BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0), threadRunning_(false), currentDispatchQueue_(0) {
 #if TARGET_OS_IPHONE
     iosHeartbeat_ = [[BGEHeartbeatIOS alloc] init];
 #endif /* TARGET_OS_IPHONE */
@@ -30,16 +30,28 @@ BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCou
     counter_ = mach_absolute_time();
     
     lastCounter_ = counter_;
+}
 
+BGE::HeartbeatService::~HeartbeatService() {
+    std::lock_guard<std::mutex> lock(threadRunningMutex_);
+    threadRunning_ = false;
+    queuedItems_.quit();
+    try {
+        thread_.join();
+    } catch(std::exception& e) {
+        printf("Exception trying to join thread %s\n", e.what());
+    }
+}
+
+void BGE::HeartbeatService::initialize() {
     thread_ = std::thread(&HeartbeatService::threadFunction, this);
-
+    
 #if TARGET_OS_IPHONE
     // Attach
     iosHeartbeat_.tickHandler = std::bind(&HeartbeatService::queueTickHandler, this);
 #endif /* TARGET_OS_IPHONE */
 }
 
-void BGE::HeartbeatService::initialize() {}
 void BGE::HeartbeatService::reset() {}
 void BGE::HeartbeatService::platformSuspending() {
     Service::platformSuspending();
@@ -75,11 +87,17 @@ void BGE::HeartbeatService::setRunning(bool running) {
 }
 
 void BGE::HeartbeatService::threadFunction() {
-    auto native = thread_.native_handle();
-    if (native == pthread_self()) {
-        pthread_setname_np("heartbeat");
-    }
+    pthread_setname_np("heartbeat");
+    threadRunning_ = true;
+    
     while (true) {
+        std::unique_lock<std::mutex> lock(threadRunningMutex_);
+        if (!threadRunning_) {
+            lock.unlock();
+            return;
+        }
+        lock.unlock();
+
         queuedItems_.pop();
         tickHandler();
     }

@@ -48,9 +48,9 @@ namespace BGE {
     class ScenePackageService : public Service {
     public:
         ScenePackageService();
-        ~ScenePackageService() {}
+        ~ScenePackageService();
         
-        void initialize() final {}
+        void initialize() final;
         void reset() final {}
         void platformSuspending() final { Service::platformSuspending(); }
         void platformResuming() final { Service::platformResuming(); }
@@ -123,7 +123,9 @@ namespace BGE {
             std::vector<SpaceHandle>    references;
         };
         
-        std::thread                         loadThread_;
+        bool                                threadRunning_;
+        std::mutex                          threadRunningMutex_;
+        std::thread                         thread_;
         ScenePackageHandleService           handleService_;
         std::vector<ScenePackageReference>  scenePackages_;
         Queue<ScenePackageLoadItem>         queuedLoadItems_;

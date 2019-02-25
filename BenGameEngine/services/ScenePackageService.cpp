@@ -15,8 +15,22 @@
 #include <pthread.h>
 #endif
 
-BGE::ScenePackageService::ScenePackageService() : handleService_(InitialScenePackageReserve, HandleServiceNoMaxLimit) {
-    loadThread_ = std::thread(&ScenePackageService::loadThreadFunction, this);
+BGE::ScenePackageService::ScenePackageService() : threadRunning_(false), handleService_(InitialScenePackageReserve, HandleServiceNoMaxLimit) {
+}
+
+BGE::ScenePackageService::~ScenePackageService() {
+    std::lock_guard<std::mutex> lock(threadRunningMutex_);
+    threadRunning_ = false;
+    queuedLoadItems_.quit();
+    try {
+        thread_.join();
+    } catch(std::exception& e) {
+        printf("Exception trying to join thread %s\n", e.what());
+    }
+}
+
+void BGE::ScenePackageService::initialize() {
+    thread_ = std::thread(&ScenePackageService::loadThreadFunction, this);
 }
 
 uint32_t BGE::ScenePackageService::numUsedHandles() const {
@@ -49,7 +63,7 @@ size_t BGE::ScenePackageService::totalHandleMemory() const {
 
 size_t BGE::ScenePackageService::totalMemory() const {
     size_t total = 0;
-    
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -57,13 +71,13 @@ size_t BGE::ScenePackageService::totalMemory() const {
             total += package->getMemoryUsage();
         }
     }
-    
+    unlock();
     return total;
 }
 
 uint32_t BGE::ScenePackageService::numScenePackages() const {
     uint32_t num = 0;
-    
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -71,7 +85,7 @@ uint32_t BGE::ScenePackageService::numScenePackages() const {
             num++;
         }
     }
-    
+    unlock();
     return num;
 }
 
@@ -117,6 +131,7 @@ void BGE::ScenePackageService::createPackage(SpaceHandle spaceHandle, std::strin
 }
 
 void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, ScenePackageLoadCompletionHandler callback) {
+    lock();
     for (auto &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -142,9 +157,11 @@ void BGE::ScenePackageService::createPackage(ScenePackageLoadItem loadable, Scen
             if (callback) {
                 callback(packageRef.handle, nullptr);
             }
+            unlock();
             return;
         }
     }
+    unlock();
     
     auto ext = loadable.filePath.extension();
 
@@ -180,7 +197,9 @@ void BGE::ScenePackageService::createPackageFromSPKGBinary(SpaceHandle spaceHand
 
             // Now create an entry for this
             ScenePackageReference ref{ handle, { spaceHandle }};
+            lock();
             scenePackages_.push_back(ref);
+            unlock();
 
             // The loading system relies on having the package initalized with handle
             package->create(packageBuffer, bufferSize, managed, [this, spaceHandle, callback, handle](ScenePackage * package) {
@@ -245,8 +264,10 @@ void BGE::ScenePackageService::createPackageFromJSONDict(SpaceHandle spaceHandle
 
             // Now create an entry for this
             ScenePackageReference ref{ handle, { spaceHandle }};
+            lock();
             scenePackages_.push_back(ref);
-
+            unlock();
+            
             // The loading system relies on having the package initalized with handle
             package->create(jsonDict, [this, spaceHandle, callback, handle](ScenePackage * package) {
                 auto tHandle = handle;
@@ -328,19 +349,22 @@ void BGE::ScenePackageService::completionPackage(__attribute__ ((unused)) SceneP
 }
 
 BGE::ScenePackageHandle BGE::ScenePackageService::getScenePackageHandle(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
         if (package && package->getName() == name) {
+            unlock();
             return package->getHandle();
         }
     }
-    
+    unlock();
     return ScenePackageHandle();
 }
 
 
 void BGE::ScenePackageService::addSpaceHandleReference(SpaceHandle spaceHandle, ScenePackageHandle packageHandle) {
+    lock();
     for (auto &pkgRef : scenePackages_) {
         if (pkgRef.handle == packageHandle) {
             bool found = false;
@@ -362,6 +386,7 @@ void BGE::ScenePackageService::addSpaceHandleReference(SpaceHandle spaceHandle, 
             break;
         }
     }
+    unlock();
 }
 
 BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(std::string name) const {
@@ -375,6 +400,7 @@ BGE::ScenePackage *BGE::ScenePackageService::getScenePackage(ScenePackageHandle 
 }
 
 void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, std::string name) {
+    lock();
     for (auto it=scenePackages_.begin(); it!=scenePackages_.end(); ++it) {
         auto package = getScenePackage(it->handle);
         
@@ -382,9 +408,11 @@ void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, std::strin
             removePackage(spaceHandle, it->handle);
         }
     }
+    unlock();
 }
 
 void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, ScenePackageHandle handle) {
+    lock();
     for (auto it=scenePackages_.begin(); it!=scenePackages_.end(); ++it) {
         if (it->handle == handle) {
             auto package = getScenePackage(handle);
@@ -411,6 +439,7 @@ void BGE::ScenePackageService::removePackage(SpaceHandle spaceHandle, ScenePacka
             break;
         }
     }
+    unlock();
 }
 
 void BGE::ScenePackageService::resetPackage(__attribute__ ((unused)) std::string name) {
@@ -430,6 +459,7 @@ void BGE::ScenePackageService::releasePackage(ScenePackage *package) {
 
 void BGE::ScenePackageService::link() {
     // TODO: Build dependency lists
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
 
@@ -437,9 +467,11 @@ void BGE::ScenePackageService::link() {
             package->link();
         }
     }
+    unlock();
 }
 
 BGE::ButtonReference *BGE::ScenePackageService::getButtonReference(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -447,15 +479,17 @@ BGE::ButtonReference *BGE::ScenePackageService::getButtonReference(std::string n
             auto button = package->getButtonReference(name);
             
             if (button) {
+                unlock();
                 return button;
             }
         }
     }
-    
+    unlock();
     return nullptr;
 }
 
 BGE::MaskReference *BGE::ScenePackageService::getMaskReference(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -463,15 +497,17 @@ BGE::MaskReference *BGE::ScenePackageService::getMaskReference(std::string name)
             auto mask = package->getMaskReference(name);
             
             if (mask) {
+                unlock();
                 return mask;
             }
         }
     }
-    
+    unlock();
     return nullptr;
 }
 
 BGE::TextureMaskReference *BGE::ScenePackageService::getTextureMaskReference(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -479,15 +515,17 @@ BGE::TextureMaskReference *BGE::ScenePackageService::getTextureMaskReference(std
             auto mask = package->getTextureMaskReference(name);
             
             if (mask) {
+                unlock();
                 return mask;
             }
         }
     }
-    
+    unlock();
     return nullptr;
 }
 
 BGE::PlacementReference *BGE::ScenePackageService::getPlacementReference(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -495,15 +533,17 @@ BGE::PlacementReference *BGE::ScenePackageService::getPlacementReference(std::st
             auto placement = package->getPlacementReference(name);
             
             if (placement) {
+                unlock();
                 return placement;
             }
         }
     }
-    
+    unlock();
     return nullptr;
 }
 
 BGE::TextureReference *BGE::ScenePackageService::getTextureReference(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -511,15 +551,17 @@ BGE::TextureReference *BGE::ScenePackageService::getTextureReference(std::string
             auto texture = package->getTextureReference(name);
             
             if (texture) {
+                unlock();
                 return texture;
             }
         }
     }
-    
+    unlock();
     return nullptr;
 }
 
 BGE::TextReference *BGE::ScenePackageService::getTextReference(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -527,15 +569,17 @@ BGE::TextReference *BGE::ScenePackageService::getTextReference(std::string name)
             auto text = package->getTextReference(name);
             
             if (text) {
+                unlock();
                 return text;
             }
         }
     }
-    
+    unlock();
     return nullptr;
 }
 
 BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceReference(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -543,15 +587,17 @@ BGE::AnimationSequenceReference *BGE::ScenePackageService::getAnimationSequenceR
             auto animSeq = package->getAnimationSequenceReference(name);
             
             if (animSeq) {
+                unlock();
                 return animSeq;
             }
         }
     }
-    
+    unlock();
     return nullptr;
 }
 
 BGE::ExternalPackageReference *BGE::ScenePackageService::getExternalReference(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -559,15 +605,17 @@ BGE::ExternalPackageReference *BGE::ScenePackageService::getExternalReference(st
             auto extRef = package->getExternalReference(name);
             
             if (extRef) {
+                unlock();
                 return extRef;
             }
         }
     }
-    
+    unlock();
     return nullptr;
 }
 
 BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string name) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -575,20 +623,26 @@ BGE::GfxReferenceType BGE::ScenePackageService::getReferenceType(std::string nam
             auto type = package->getReferenceType(name);
             
             if (type != GfxReferenceTypeUnknown) {
+                unlock();
                 return type;
             }
         }
     }
-
+    unlock();
     return GfxReferenceTypeUnknown;
 }
 
 void BGE::ScenePackageService::loadThreadFunction() {
-    auto native = loadThread_.native_handle();
-    if (native == pthread_self()) {
-        pthread_setname_np("scenepackage");
-    }
+    pthread_setname_np("scenepackage");
+    threadRunning_ = true;
     while (true) {
+        std::unique_lock<std::mutex> lock(threadRunningMutex_);
+        if (!threadRunning_) {
+            lock.unlock();
+            return;
+        }
+        lock.unlock();
+        
         auto loadable = queuedLoadItems_.pop();
 
         if (loadable.type == ScenePackageLoadItem::LoadType::Package) {
@@ -616,6 +670,7 @@ void BGE::ScenePackageService::loadThreadFunction() {
 }
 
 void BGE::ScenePackageService::outputResourceBreakdown(uint32_t numTabs) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -625,9 +680,11 @@ void BGE::ScenePackageService::outputResourceBreakdown(uint32_t numTabs) const {
             assert(false);
         }
     }
+    unlock();
 }
 
 void BGE::ScenePackageService::outputMemoryBreakdown(uint32_t numTabs) const {
+    lock();
     for (auto const &packageRef : scenePackages_) {
         auto package = getScenePackage(packageRef.handle);
         
@@ -637,5 +694,6 @@ void BGE::ScenePackageService::outputMemoryBreakdown(uint32_t numTabs) const {
             assert(false);
         }
     }
+    unlock();
 }
 

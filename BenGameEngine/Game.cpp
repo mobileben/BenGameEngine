@@ -192,6 +192,18 @@ void BGE::Game::initialize() {
     ComponentService::registerComponents();
     
     renderService_->setComponentService(componentService_);
+    
+    materialService_->initialize();
+    eventService_->initialize();
+    animationService_->initialize();
+    inputService_->initialize();
+    spaceService_->initialize();
+    fontService_->initialize();
+    logicService_->initialize();
+    audioService_->initialize();
+    scenePackageService_->initialize();
+    renderService_->initialize();
+    heartbeatService_->initialize();
 }
 
 void BGE::Game::start() {

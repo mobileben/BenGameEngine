@@ -15,13 +15,11 @@
 
 const std::string BGE::RenderService::ErrorDomain = "RenderService";
 
-BGE::RenderService::RenderService() : ready_(false), backgroundColor_({{0, 0, 0, 1}}) {
-    threadRunning_ = true;
-    thread_ = std::thread(&RenderService::threadFunction, this);
+BGE::RenderService::RenderService() : ready_(false), backgroundColor_({{0, 0, 0, 1}}), threadRunning_(false) {
 }
 
 BGE::RenderService::~RenderService() {
-    // TODO: Make threadRunning_ protected by a mutex
+    std::lock_guard<std::mutex> lock(threadRunningMutex_);
     threadRunning_ = false;
     renderQueue_.quit();
     try {
@@ -29,6 +27,10 @@ BGE::RenderService::~RenderService() {
     } catch(std::exception& e) {
         printf("Exception trying to join thread %s\n", e.what());
     }
+}
+
+void BGE::RenderService::initialize() {
+    thread_ = std::thread(&RenderService::threadFunction, this);
 }
 
 void BGE::RenderService::bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window)
@@ -167,13 +169,18 @@ void BGE::RenderService::destroyTexture(const RenderCommandItem& item) {
 }
 
 void BGE::RenderService::threadFunction() {
-    auto native = thread_.native_handle();
-    if (native == pthread_self()) {
-        pthread_setname_np("render");
-    }
-    
+    pthread_setname_np("render");
+    threadRunning_ = true;
+
     // TODO: Make threadRunning_ protected by a mutex
-    while(threadRunning_) {
+    while(true) {
+        std::unique_lock<std::mutex> lock(threadRunningMutex_);
+        if (!threadRunning_) {
+            lock.unlock();
+            return;
+        }
+        lock.unlock();
+        
         auto command = renderQueue_.pop();
         switch (command.command) {
             case RenderCommand::BindWindow: {

@@ -146,6 +146,8 @@ namespace BGE {
         RenderService();
         virtual ~RenderService();
 
+        virtual void initialize() final;
+
         virtual void bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window);
         virtual void resizeRenderWindow();
         virtual void createShaders();
@@ -258,7 +260,9 @@ namespace BGE {
         
         Color backgroundColor_;
 
+        
         bool            threadRunning_;
+        std::mutex      threadRunningMutex_;
         std::thread     thread_;
 
         virtual void threadFunction();

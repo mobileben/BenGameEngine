@@ -13,7 +13,21 @@
 #include <pthread.h>
 #endif
 
-BGE::SpaceService::SpaceService() : handleService_(InitialSpaceReserve, HandleServiceNoMaxLimit){
+BGE::SpaceService::SpaceService() : handleService_(InitialSpaceReserve, HandleServiceNoMaxLimit), threadRunning_(false) {
+}
+
+BGE::SpaceService::~SpaceService() {
+    std::lock_guard<std::mutex> lock(threadRunningMutex_);
+    threadRunning_ = false;
+    resetQueue_.quit();
+    try {
+        thread_.join();
+    } catch(std::exception& e) {
+        printf("Exception trying to join thread %s\n", e.what());
+    }
+}
+
+void BGE::SpaceService::initialize() {
     thread_ = std::thread(&SpaceService::threadFunction, this);
 }
 
@@ -231,11 +245,16 @@ void BGE::SpaceService::reorderSpaces() {
 }
 
 void BGE::SpaceService::threadFunction() {
-    auto native = thread_.native_handle();
-    if (native == pthread_self()) {
-        pthread_setname_np("space");
-    }
+    pthread_setname_np("space");
+    threadRunning_ = true;
     while(true) {
+        std::unique_lock<std::mutex> lock(threadRunningMutex_);
+        if (!threadRunning_) {
+            lock.unlock();
+            return;
+        }
+        lock.unlock();
+
         auto handle = resetQueue_.pop();
         auto space = getSpace(handle);
         if (space) {

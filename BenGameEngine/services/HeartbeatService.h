@@ -38,7 +38,7 @@ namespace BGE {
     class HeartbeatService : public Service {
     public:
         HeartbeatService();
-        virtual ~HeartbeatService() {}
+        virtual ~HeartbeatService();
         
         virtual void initialize();
         virtual void reset();
@@ -76,6 +76,8 @@ namespace BGE {
         uint64_t                    lastCounter_;
         mach_timebase_info_data_t   timebaseInfo_;
         double                      timebaseMultiplier_;
+        bool                        threadRunning_;
+        std::mutex                  threadRunningMutex_;
         std::thread                 thread_;
         Queue<HeartbeatService *>   queuedItems_;
         

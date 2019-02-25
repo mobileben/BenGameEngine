@@ -23,9 +23,9 @@ namespace BGE {
     class SpaceService : public Service, public std::enable_shared_from_this<SpaceService> {
     public:
         SpaceService();
-        ~SpaceService() {}
+        ~SpaceService();
         
-        void initialize() final {}
+        void initialize() final;
         void reset() final {}
         void platformSuspending() final { Service::platformSuspending(); }
         void platformResuming() final { Service::platformResuming(); }
@@ -81,7 +81,9 @@ namespace BGE {
 
         // TODO: Should just create sorted vector here each time space is removed or added, but also must think how to handle order change
 
-        std::thread  thread_;
+        bool        threadRunning_;
+        std::mutex  threadRunningMutex_;
+        std::thread thread_;
 
         void threadFunction();
 
