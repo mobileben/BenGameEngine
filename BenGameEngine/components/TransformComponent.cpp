@@ -643,7 +643,8 @@ std::vector<BGE::TransformComponent *> BGE::TransformComponent::getOrderedChildr
     
     size_t i, j;
     
-    for (i=1;i<children.size();++i) {
+    auto size = children.size();
+    for (i=1;i<size;++i) {
         j = i;
         
         while (j > 0 && xforms[j]->getZ() < xforms[j-1]->getZ()) {
@@ -679,7 +680,8 @@ void BGE::TransformComponent::getOrderedChildren(Space *space, std::vector<BGE::
     
     size_t i, j;
     
-    for (i=1;i<children.size();++i) {
+    auto size = children.size();
+    for (i=1;i<size;++i) {
         j = i;
         
         while (j > 0 && xforms[j]->getZ() < xforms[j-1]->getZ()) {
@@ -712,7 +714,8 @@ std::vector<BGE::TransformComponent *> BGE::TransformComponent::getReverseOrdere
     
     size_t i, j;
     
-    for (i=1;i<children.size();++i) {
+    auto size = children.size();
+    for (i=1;i<size;++i) {
         j = i;
         
         while (j > 0 && xforms[j]->getZ() > xforms[j-1]->getZ()) {
@@ -746,7 +749,8 @@ void BGE::TransformComponent::getReverseOrderedChildren(Space *space, std::vecto
     
     size_t i, j;
     
-    for (i=1;i<children.size();++i) {
+    auto size = children.size();
+    for (i=1;i<size;++i) {
         j = i;
         
         while (j > 0 && xforms[j]->getZ() > xforms[j-1]->getZ()) {

@@ -113,7 +113,7 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
 
     auto isHandleBackingNull = componentHandleServiceIsHandleBackingNull_[typeId];
     if (!isHandleBackingNull(handle.handle)) {
-        for (size_t i=0;i<handles.size();++i) {
+        for (size_t i=0;i<size;++i) {
             auto& h = handles[i];
             if (h.handle == handle.handle) {
                 if (typeId == TransformComponent::typeId_) {
@@ -179,7 +179,8 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
 
 void BGE::ComponentService::removeAllComponents() {
     lock();
-    for (ComponentTypeId typeId=0;typeId<componentHandles_.size();++typeId) {
+    auto size = componentHandles_.size();
+    for (ComponentTypeId typeId=0;typeId<size;++typeId) {
         auto& handles = componentHandles_[typeId];
         auto isHandleBackingNull = componentHandleServiceIsHandleBackingNull_[typeId];
         for (auto const &handle : handles) {
