@@ -213,7 +213,7 @@ void BGE::InputService::updateInputObject(Space *space, GameObject *gameObj, dou
 }
 
 void BGE::InputService::checkInput(Input *input, Space *space, GameObject *gameObj, std::vector<InputEventItem> &queue) {
-    auto xform = gameObj->getComponent<TransformComponent>(space);
+    auto xform = gameObj->getComponentLockless<TransformComponent>(space);
     
     if (xform && xform->canInteract()) {
 #ifdef SUPPORT_PROFILING
@@ -223,7 +223,7 @@ void BGE::InputService::checkInput(Input *input, Space *space, GameObject *gameO
         
         if (button) {
             // Compute collision if exists
-            auto bbox = button->getBoundingBox();
+            auto bbox = button->getBoundingBoxLockless(space, gameObj);
             
             if (bbox) {
                 Matrix4 matrix;
@@ -339,7 +339,7 @@ void BGE::InputService::checkInput(Input *input, Space *space, GameObject *gameO
         // Determine if we have children, if we do process them.
         uint32_t numChildren = xform->getNumChildren();
         for (uint32_t i=0;i<numChildren;i++) {
-            auto childXform = xform->childAtIndex(space, i);
+            auto childXform = xform->childAtIndexLockless(space, i);
             if (childXform->hasGameObject()) {
                 auto childObj = childXform->getGameObjectLockless(space);
                 
@@ -370,8 +370,6 @@ void BGE::InputService::update(double deltaTime) {
     
     spaceService->getSpaces(spaceHandles_);
 
-    handleServicesLock();
-    
     auto length = spaceHandles_.size();
     spaces_.clear();
     spaces_.reserve(length);
@@ -382,6 +380,8 @@ void BGE::InputService::update(double deltaTime) {
     }
     
     for (size_t i=0;i<length;++i) {
+        handleServicesLock();
+        
         auto const& handle = spaceHandles_[i];
         auto space = spaceService->getSpaceLockless(handle);
         spaces_.push_back(space);
@@ -393,21 +393,21 @@ void BGE::InputService::update(double deltaTime) {
                 updateInputObject(space, obj, deltaTime);
             }
         }
+        handleServicesUnlock();
     }
 
-    handleServicesUnlock();
     
     // Sort inputs
     std::sort(inputs_.begin(), inputs_.end(), compareInputPointers);
 
     inputEventQueue_.clear();
     
-    handleServicesLock();
     for (auto input : inputs_) {
         inputEventWorkQueue_.clear();
         for (size_t i=0;i<length;++i) {
             auto space = spaces_[i];
             if (space && space->isActive() && space->isVisible()) {
+                handleServicesLock();
                 //space->getRootGameObjects(rootGameObjects_);
                 auto& rootGameObjs = rootGameObjects_[i];
 
@@ -416,6 +416,7 @@ void BGE::InputService::update(double deltaTime) {
                         checkInput(input, space, obj, inputEventWorkQueue_);
                     }
                 }
+                handleServicesUnlock();
             }
         }
 
@@ -424,6 +425,7 @@ void BGE::InputService::update(double deltaTime) {
             inputEventWorkQueue_.pop_back();
             
             // Now clear out any touch tags that match
+            handleServicesLock();
             for (auto &item : inputEventWorkQueue_) {
 #ifdef OBSOLETE
                 auto space = spaceService->getSpace(item.spaceHandle);
@@ -453,9 +455,9 @@ void BGE::InputService::update(double deltaTime) {
                     }
                 }
             }
+            handleServicesUnlock();
         }
     }
-    handleServicesUnlock();
 
     for (auto input : inputs_) {
         auto handle = input->getHandle();
