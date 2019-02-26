@@ -200,6 +200,7 @@ namespace BGE {
         
         void setParentHandle(TransformComponentHandle parentHandle);
         void setParent(TransformComponent *parent);
+        void markChildrenWorldMatrixAsDirty(Space *space);
 
         void destroyFast() final;
     };

@@ -419,6 +419,12 @@ void BGE::GameObject::removeFromParent() {
 void BGE::GameObject::addComponentEpilogue(ComponentTypeId componentTypeId) {
     if (componentTypeId == LogicComponent::typeId_) {
         Game::getInstance()->getLogicService()->addGameObject(this);
+    } if (componentTypeId == AnimationSequenceComponent::typeId_) {
+        auto space = getSpace();
+        auto animSeq = getComponent<AnimationSequenceComponent>();
+        if (animSeq->totalFrames > 1) {
+            space->addAnimObject(getHandle());
+        }
     }
 }
 

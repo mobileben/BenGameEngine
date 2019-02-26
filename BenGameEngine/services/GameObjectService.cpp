@@ -149,15 +149,14 @@ void BGE::GameObjectService::removeGameObject(GameObject *object) {
         if (xform) {
             xform->removeFromParent();
         }
-        
-        std::vector<GameObject *> objects;
-        
-        getAllChildGameObjects(object, objects);
+
+        lock();
+        childGameObjectsScratch_.clear();
+        getAllChildGameObjects(object, childGameObjectsScratch_);
 
         // Add the game object to the end to ensure it gets removed
-        objects.push_back(object);
-        
-        for (auto object : objects) {
+        childGameObjectsScratch_.push_back(object);
+        for (auto object : childGameObjectsScratch_) {
             auto handle = object->getHandle();
             
             for (auto it = gameObjects_.begin();it != gameObjects_.end();++it) {
@@ -168,6 +167,7 @@ void BGE::GameObjectService::removeGameObject(GameObject *object) {
                 }
             }
         }
+        unlock();
     }
 }
 

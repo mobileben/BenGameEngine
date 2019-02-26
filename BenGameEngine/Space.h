@@ -32,6 +32,7 @@ namespace BGE {
     class GameObject;
     class GameObjectService;
     class SpaceService;
+    class AnimationService;
     
     class Space : public NamedObject
     {
@@ -158,6 +159,13 @@ namespace BGE {
 #ifdef SUPPORT_PROFILING
         int64_t timeForLastReset() const { return resetTime_; }
 #endif /* SUPPORT_PROFILING */
+        
+        void addRootObject(GameObjectHandle obj);
+        void removeRootObject(GameObjectHandle obj);
+        
+        inline std::vector<GameObjectHandle>& getAnimObjects() { return animObjects_; }
+        void addAnimObject(GameObjectHandle obj);
+        void removeAnimObject(GameObjectHandle obj);
 
         // Component management
         GameObject *createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
@@ -176,7 +184,6 @@ namespace BGE {
         void createAutoDisplayObjects(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, std::function<void()> callback);
         void createAutoDisplayObjectsSynchronous(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate);
         void createAutoDisplayObjectsSynchronous(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, std::vector<GameObjectHandle>& topLevelObjects);
-
 
         // Font management
         std::pair<FontHandle, std::shared_ptr<Error>> createFont(std::string name, uint32_t pxSize);
@@ -222,6 +229,7 @@ namespace BGE {
         
     private:
         friend SpaceService;
+        friend AnimationService;
         friend Game;
         friend AnimationSequenceComponent;
         
@@ -235,6 +243,9 @@ namespace BGE {
         std::vector<FontHandle>             fonts_;
         std::vector<TextureHandle>          textures_;
         std::vector<TextureAtlasHandle>     textureAtlases_;
+
+        std::vector<GameObjectHandle>       rootObjects_;
+        std::vector<GameObjectHandle>       animObjects_;
 
         bool        active_;    // Active
         bool        visible_;   // Space can be rendered
@@ -255,7 +266,7 @@ namespace BGE {
         static uint32_t handlerBitmaskForSceneObjectCreatedDelegate(SceneObjectCreatedDelegate *delegate);
         
         GameObjectHandle handleForGameObject(GameObject *object) const;
-        
+
         GameObject *createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, uint32_t pushBitmask, CreatedGameObjectVector *objects);
         GameObject *createAnimChannel(std::string name, std::string instanceName, const AnimationChannelReference *channelRef, SceneObjectCreatedDelegate *delegate);
         GameObject *createFrameAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate);
@@ -277,8 +288,8 @@ namespace BGE {
             }
         }
         
-        void setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, AnimationSequenceReference *animSeqRef);
-        void setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, const AnimationSequenceReference& animSeqRef);
+        void addAnimationSequenceComponentAndSetAnimationSequenceReference(GameObject *root, AnimationSequenceComponent *animSeq, AnimationSequenceReference *animSeqRef);
+        void addAnimationSequenceComponentAndSetAnimationSequenceReference(GameObject *root, AnimationSequenceComponent *animSeq, const AnimationSequenceReference& animSeqRef);
 
         void createAutoDisplayObjects_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, std::function<void()> callback);
         void createAutoDisplayObjectsSynchronous_(GameObjectHandle rootHandle, ScenePackageHandle packageHandle, bool initiallyActive, SceneObjectCreatedDelegate *delegate, CreatedGameObjectVector& createdObjects, std::vector<GameObjectHandle>& topLevelObjects);

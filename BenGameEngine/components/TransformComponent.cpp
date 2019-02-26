@@ -83,11 +83,25 @@ void BGE::TransformComponent::destroyFast() {
 void BGE::TransformComponent::setParentHandle(TransformComponentHandle parentHandle) {
     parentHandle_ = parentHandle;
     worldDirty_ = true;
+    markChildrenWorldMatrixAsDirty(getSpace());
 }
 
 void BGE::TransformComponent::setParent(TransformComponent *parent) {
+    auto space = getSpace();
     if (parent) {
         setParentHandle(parent->getHandle<TransformComponent>());
+        space->removeRootObject(getGameObjectHandle());
+    } else {
+        setParentHandle(TransformComponentHandle());
+        space->addRootObject(getGameObjectHandle());
+    }
+}
+
+void BGE::TransformComponent::markChildrenWorldMatrixAsDirty(Space *space) {
+    for (auto childHandle : childrenHandles_) {
+        auto child = space->getComponent(childHandle);
+        child->worldDirty_ = true;
+        child->markChildrenWorldMatrixAsDirty(space);
     }
 }
 
@@ -124,6 +138,7 @@ void BGE::TransformComponent::setX(float x) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -136,6 +151,7 @@ void BGE::TransformComponent::setY(float y) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -148,6 +164,7 @@ void BGE::TransformComponent::setZ(float z) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -165,6 +182,7 @@ void BGE::TransformComponent::setPosition(Vector2 &position) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -182,6 +200,7 @@ void BGE::TransformComponent::setPosition(const Vector2 &position) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -199,6 +218,7 @@ void BGE::TransformComponent::setPosition(Vector2 &&position) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -216,6 +236,7 @@ void BGE::TransformComponent::setPosition(const Vector2 &&position) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -228,6 +249,7 @@ void BGE::TransformComponent::setScaleX(float x) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -240,6 +262,7 @@ void BGE::TransformComponent::setScaleY(float y) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -257,6 +280,7 @@ void BGE::TransformComponent::setScale(Vector2 &scale) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -274,6 +298,7 @@ void BGE::TransformComponent::setScale(Vector2 &&scale) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -289,6 +314,7 @@ void BGE::TransformComponent::setSkewX(float x) {
         }
         
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -304,6 +330,7 @@ void BGE::TransformComponent::setSkewY(float y) {
         }
         
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -320,6 +347,7 @@ void BGE::TransformComponent::setSkew(Vector2 &skew) {
         }
         
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -336,6 +364,7 @@ void BGE::TransformComponent::setSkew(Vector2 &&skew) {
         }
         
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
@@ -354,11 +383,13 @@ void BGE::TransformComponent::setRotationInRadians(float rotation) {
         }
 
         localDirty_ = worldDirty_ = true;
+        markChildrenWorldMatrixAsDirty(getSpace());
     }
 }
 
 void BGE::TransformComponent::forceDirty() {
     worldDirty_ = true;
+    markChildrenWorldMatrixAsDirty(getSpace());
 }
 
 void BGE::TransformComponent::updateMatrix() {
@@ -391,7 +422,7 @@ void BGE::TransformComponent::updateMatrix(const Space *space) {
         localMatrix_ = mat1 * localMatrix_;
     }
     
-    if (worldDirty_ || localDirty_ || true) {
+    if (worldDirty_ || localDirty_) {
         auto parent = getParent(space);
         
         if (parent) {
@@ -424,7 +455,7 @@ void BGE::TransformComponent::updateMatrixLockless(const Space *space) {
         localMatrix_ = mat1 * localMatrix_;
     }
     
-    if (worldDirty_ || localDirty_ || true) {
+    if (worldDirty_ || localDirty_) {
         auto parent = getParentLockless(space);
         
         if (parent) {
@@ -521,6 +552,7 @@ void BGE::TransformComponent::setLocalMatrix(const Matrix4& matrix) {
     localMatrix_ = matrix;
     localDirty_ = false;
     worldDirty_ = true;
+    markChildrenWorldMatrixAsDirty(getSpace());
 }
 
 BGE::TransformComponent *BGE::TransformComponent::getParent() const {
@@ -789,21 +821,16 @@ void BGE::TransformComponent::addChild(GameObjectHandle handle) {
     auto space = getSpace();
     
     if (space) {
-        // Get GameObject from space so we don't get space twice (this->getGameObject would do it)
-        auto gameObj = space->getGameObject(getGameObjectHandle());
+        auto otherGameObj = space->getGameObject(handle);
         
-        if (gameObj) {
-            auto otherGameObj = space->getGameObject(handle);
+        if (otherGameObj) {
+            auto otherXform = otherGameObj->getComponent<TransformComponent>();
             
-            if (otherGameObj) {
-                auto otherXform = otherGameObj->getComponent<TransformComponent>();
+            if (otherXform) {
+                assert(!otherXform->getParent());
                 
-                if (otherXform) {
-                    assert(!otherXform->getParent());
-                    
-                    childrenHandles_.push_back(otherXform->getHandle<TransformComponent>());
-                    otherXform->setParent(this);
-                }
+                childrenHandles_.push_back(otherXform->getHandle<TransformComponent>());
+                otherXform->setParent(this);
             }
         }
     }

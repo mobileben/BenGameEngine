@@ -150,6 +150,8 @@ void BGE::Space::reset_() {
     }
     
     // Remove any outstanding events
+    rootObjects_.clear();
+    animObjects_.clear();
     
     textures_.clear();
     lock();
@@ -281,6 +283,7 @@ BGE::GameObject *BGE::Space::createGameObject(std::string name ) {
     lock();
     
     auto obj = gameObjectService_->createGameObject(name);
+    rootObjects_.push_back(obj->getHandle());
     
     unlock();
     
@@ -330,12 +333,17 @@ BGE::GameObject *BGE::Space::getGameObjectLockless(GameObjectHandle handle) cons
 void BGE::Space::removeGameObject(GameObjectHandle handle) {
     lock();
     gameObjectService_->removeGameObject(handle);
+    removeRootObject(handle);
+    removeAnimObject(handle);
     unlock();
 }
 
 void BGE::Space::removeGameObject(GameObject *object) {
     lock();
+    auto handle = object->getHandle();
     gameObjectService_->removeGameObject(object);
+    removeRootObject(handle);
+    removeAnimObject(handle);
     unlock();
 }
 
@@ -344,17 +352,15 @@ const std::vector<BGE::GameObjectHandle>& BGE::Space::getGameObjects() const {
 }
 
 void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
-    auto& handles = getGameObjects();
     objects.clear();
-    objects.reserve(handles.size());
-    
+    objects.reserve(rootObjects_.size());
     handleServicesLock();
-    for (auto const &handle : handles) {
+    for (auto handle : rootObjects_) {
         auto obj = getGameObjectLockless(handle);
         // Only active root game objects can be returned
         if (obj && obj->isActive()) {
             auto xform = obj->getComponentLockless<TransformComponent>(this);
-
+            
             if (xform) {
                 if (!xform->getParentLockless(this)) {
                     objects.push_back(obj);
@@ -366,7 +372,7 @@ void BGE::Space::getRootGameObjects(std::vector<GameObject *> &objects) {
 }
 
 void BGE::Space::getReverseRootGameObjects(std::vector<GameObject *> &objects) {
-    auto& handles = getGameObjects();
+    auto& handles = rootObjects_;
     objects.clear();
     objects.reserve(handles.size());
 
@@ -441,6 +447,52 @@ void BGE::Space::linkAll() {
     }
 }
 
+void BGE::Space::addRootObject(GameObjectHandle obj) {
+    bool found = false;
+    for (auto h : rootObjects_) {
+        if (h == obj) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        // We check if we're found because it is possible an object gets added multiple times
+        rootObjects_.push_back(obj);
+    }
+}
+
+void BGE::Space::removeRootObject(GameObjectHandle obj) {
+    for (auto it = rootObjects_.begin();it != rootObjects_.end();++it) {
+        if (*it == obj) {
+            it = rootObjects_.erase(it);
+            return;
+        }
+    }
+}
+
+void BGE::Space::addAnimObject(GameObjectHandle obj) {
+    bool found = false;
+    for (auto h : animObjects_) {
+        if (h == obj) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        // We check if we're found because it is possible an object gets added multiple times
+        animObjects_.push_back(obj);
+    }
+}
+
+void BGE::Space::removeAnimObject(GameObjectHandle obj) {
+    for (auto it = animObjects_.begin();it != animObjects_.end();++it) {
+        if (*it == obj) {
+            it = animObjects_.erase(it);
+            return;
+        }
+    }
+}
+
 BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string instanceName, ScenePackageHandle handle, SceneObjectCreatedDelegate *delegate) {
     lock();
     
@@ -476,13 +528,12 @@ BGE::GameObject *BGE::Space::createAnimSequence(std::string name, std::string in
 
         auto animSeq = createComponent<AnimationSequenceComponent>();
         auto animator = createComponent<AnimatorComponent>();
-        
+
         obj->addComponent(xform);
         obj->addComponent(boundingBox);
-        obj->addComponent(animSeq);
         obj->addComponent(animator);
-        
-        setAnimationSequenceReference(animSeq->getHandle<AnimationSequenceComponent>(), animSeqRef);
+        // This call adds animSeq component to obj
+        addAnimationSequenceComponentAndSetAnimationSequenceReference(obj, animSeq, animSeqRef);
         
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
@@ -550,10 +601,9 @@ BGE::GameObject *BGE::Space::createFrameAnimSequence(std::string name, std::stri
         auto animator = createComponent<FrameAnimatorComponent>();
         
         obj->addComponent(xform);
-        obj->addComponent(animSeq);
         obj->addComponent(animator);
-        
-        setAnimationSequenceReference(animSeq->getHandle<AnimationSequenceComponent>(), animSeqRef);
+        // This call adds animSeq component to obj
+        addAnimationSequenceComponentAndSetAnimationSequenceReference(obj, animSeq, animSeqRef);
         
         // Refresh obj/animator in case handle capacity increased
         obj = getGameObject(objHandle);
@@ -1514,24 +1564,27 @@ void BGE::Space::removeTextureAtlas(TextureAtlasHandle handle) {
     Game::getInstance()->getTextureService()->removeTextureAtlas(spaceHandle_, handle);
 }
 
-void BGE::Space::setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, AnimationSequenceReference *animSeqRef) {
+void BGE::Space::addAnimationSequenceComponentAndSetAnimationSequenceReference(GameObject *root, AnimationSequenceComponent *animSeq, AnimationSequenceReference *animSeqRef) {
     if (animSeqRef) {
-        setAnimationSequenceReference(animSeqHandle, *animSeqRef);
+        addAnimationSequenceComponentAndSetAnimationSequenceReference(root, animSeq, *animSeqRef);
     }
 }
 
-void BGE::Space::setAnimationSequenceReference(AnimationSequenceComponentHandle animSeqHandle, const AnimationSequenceReference& animSeqRef) {
-    auto animSeq = getComponent(animSeqHandle);
+void BGE::Space::addAnimationSequenceComponentAndSetAnimationSequenceReference(GameObject *root, AnimationSequenceComponent *animSeq, const AnimationSequenceReference& animSeqRef) {
+
+    auto animSeqHandle = animSeq->getHandle<AnimationSequenceComponent>();
     
     animSeq->frameRate = animSeqRef.frameRate;
     animSeq->totalFrames = animSeqRef.totalFrames;
     animSeq->numChannels = animSeqRef.numChannels;
     animSeq->numBounds = animSeqRef.numBounds;
-    
+
+    // Add component after totalFrames has been set because addComponentEpilogue relies on this
+    root->addComponent(animSeq);
+
 #ifdef NOT_YET
     NSLog(@"setAnimationSequenceReference");
 #endif
-    auto root = animSeq->getGameObject();
     auto seqXform = root->getComponent<TransformComponent>(this);
     
     if (seqXform) {

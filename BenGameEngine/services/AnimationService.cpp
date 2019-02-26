@@ -35,8 +35,6 @@ void BGE::AnimationService::update(double deltaTime) {
 #endif /* SUPPORT_PROFILING */
 
     float dt = (float)deltaTime;
-
-    handleServicesLock();
     
     // For all the spaces
     spaceService->getSpaces(spaceHandles_);
@@ -45,27 +43,27 @@ void BGE::AnimationService::update(double deltaTime) {
         auto space = spaceService->getSpace(handle);
         
         if (space && space->isVisible()) {
-            auto& objects = space->getGameObjects();
-            
+            auto& objects = space->getAnimObjects();
             for (auto const &handle : objects) {
+                handleServicesLock();
                 auto obj = space->getGameObjectLockless(handle);
                 
                 if (obj && obj->isActive() && obj->isVisibleLockless(space)) {
                     auto animSeq = obj->getComponentLockless<AnimationSequenceComponent>(space);
                     auto animator = obj->getComponentLockless<AnimatorComponent>(space);
                     
-                    if (animSeq && animator) {
+                    if (animSeq) {
                         animateSequence(space, animSeq, animator, dt);
 #ifdef SUPPORT_PROFILING
                         ++numProcessedObjects_;
 #endif /* SUPPORT_PROFILING */
                     }
                 }
+                handleServicesUnlock();
             }
         }
     }
-
-    handleServicesUnlock();
+    
     spaceService->unlock();
     
     processEvents();

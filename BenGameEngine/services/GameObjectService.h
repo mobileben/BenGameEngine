@@ -116,6 +116,8 @@ namespace BGE {
         SpaceHandle         spaceHandle_;
         GameObjectVector    gameObjects_;
         
+        std::vector<GameObject*>    childGameObjectsScratch_;
+        
         void getAllChildGameObjects(GameObject *root, std::vector<GameObject *> &objects);
         void releaseObject(GameObjectHandle handle);
         void releaseObjectDontReleaseComponents(GameObjectHandle handle);
