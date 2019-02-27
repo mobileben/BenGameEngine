@@ -114,10 +114,12 @@ void BGE::MaterialService::removeMaterial(MaterialHandle handle) {
         
         if (it != materials_.end()) {
             material->destroy();
-            handleService_.release(handle);
             materials_.erase(it);
+            unlock();
+            handleService_.release(handle);
+        } else {
+            unlock();
         }
-        unlock();
     }
 }
 
@@ -129,10 +131,12 @@ void BGE::MaterialService::removeMaterial(ObjectId matId) {
         auto material = getMaterial(it->second);
         
         material->destroy();
-        handleService_.release(it->second);
         materials_.erase(it);
+        unlock();
+        handleService_.release(it->second);
+    } else {
+        unlock();
     }
-    unlock();
 }
 
 BGE::MaterialHandle BGE::MaterialService::getMaterialHandle(ObjectId matId) const {
