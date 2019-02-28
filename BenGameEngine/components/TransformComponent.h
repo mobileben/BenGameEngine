@@ -35,7 +35,13 @@ namespace BGE {
         void destroy() final;
         
         bool isVisible() const { return visible_; }
-        void setVisibility(bool visible) { visible_ = visible; }
+        void setVisibility(bool visible) {
+            auto obj = getGameObject();
+            if (obj) {
+                
+            }
+            visible_ = visible;
+        }
         
         bool isClipped() const { return clipped_; }
         void setClipped(bool clipped) { clipped_ = clipped; }
@@ -106,9 +112,9 @@ namespace BGE {
 
         std::vector<TransformComponentHandle> getChildrenHandles() { return childrenHandles_; }
         std::vector<TransformComponentHandle> getOrderedChildrenHandles();
-        void getOrderedChildrenHandles(Space *space, std::vector<TransformComponentHandle>& children, std::vector<TransformComponent *>& orderedChildren);
+        void getOrderedChildrenHandles(std::vector<TransformComponentHandle>& children);
         std::vector<TransformComponentHandle> getReverseOrderedChildrenHandles();
-        void getReverseOrderedChildrenHandles(Space *space, std::vector<TransformComponentHandle>& children, std::vector<TransformComponent *>& orderedChildren);
+        void getReverseOrderedChildrenHandles(std::vector<TransformComponentHandle>& children);
 
         std::vector<TransformComponent *> getChildren();
         void getChildren(Space *space, std::vector<TransformComponent *>& children);
@@ -198,10 +204,19 @@ namespace BGE {
         float           speed_;
         bool            paused_;
         
+        // Note that setParent resorts
+        // setParentHandle should only be called by setParent or functions
+        // that removes from childrenHandles_ (since this is already sorted)
         void setParentHandle(TransformComponentHandle parentHandle);
         void setParent(TransformComponent *parent);
+        
         void markChildrenWorldMatrixAsDirty(Space *space);
-
+        void sortChildren(Space *space);
+        
+        inline void setVisibility_(bool visible) {
+            visible_ = visible;
+        }
+        
         void destroyFast() final;
     };
 }
