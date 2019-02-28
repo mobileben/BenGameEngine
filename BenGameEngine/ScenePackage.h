@@ -316,6 +316,9 @@ namespace BGE {
             std::string     name;
             FilePath        filePath;
             TextureFormat   format;
+            bool            createVbo;
+            
+            TextureQueueItem() = delete;
         };
         
         ScenePackageStatus                                  status_;

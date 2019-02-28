@@ -8,6 +8,7 @@
 
 #include "ShaderProgram.h"
 
-BGE::ShaderProgram::ShaderProgram(std::string name, __attribute__ ((unused)) std::vector<std::shared_ptr<Shader>> shaders) : name_(name), state_(ShaderProgramState::Unitialized)
+BGE::ShaderProgram::ShaderProgram(ShaderProgramId id, std::string name, __attribute__ ((unused)) std::vector<std::shared_ptr<Shader>> shaders) : id_(id), name_(name), state_(ShaderProgramState::Uninitialized)
 {
+    assert(id != ShaderProgramIdUndefined);
 }

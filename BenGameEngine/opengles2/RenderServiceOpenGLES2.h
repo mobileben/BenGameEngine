@@ -58,7 +58,8 @@ namespace BGE {
         void resizeRenderWindow();
         void createShaders();
 
-        std::shared_ptr<ShaderProgram> useShaderProgram(const std::string& program);
+        std::shared_ptr<ShaderProgram> useShaderProgram(ShaderProgramId program, bool& changed);
+        std::shared_ptr<ShaderProgram> useShaderProgram(const std::string& program, bool& changed);
         std::shared_ptr<ShaderProgram> pushShaderProgram(const std::string& program);
         std::shared_ptr<ShaderProgram> popShaderProgram();
         
@@ -70,13 +71,13 @@ namespace BGE {
         void drawTexture(Vector2 &position, std::shared_ptr<Texture> texture);
         
         // Using the more updated means
-        void drawFlatRect(Space *space, GameObject *gameObject);
-        void drawMaskRect(Space *space, GameObject *gameObject);
-        void drawTextureMask(Space *space, GameObject *gameObject);
-        void drawLines(Space *space, GameObject *gameObject);
-        void drawPolyLines(Space *space, GameObject *gameObject);
+        void drawFlatRect(Space *space, GameObject *gameObject, TransformComponent *transform);
+        void drawMaskRect(Space *space, GameObject *gameObject, TransformComponent *transform);
+        void drawTextureMask(Space *space, GameObject *gameObject, TransformComponent *transform);
+        void drawLines(Space *space, GameObject *gameObject, TransformComponent *transform);
+        void drawPolyLines(Space *space, GameObject *gameObject, TransformComponent *transform);
         
-        void drawSprite(Space *space, GameObject *gameObject);
+        void drawSprite(Space *space, GameObject *gameObject, TransformComponent *transform);
 
         void drawDebugQuads(std::vector<Vector3> points, Color &color);
 
@@ -84,7 +85,7 @@ namespace BGE {
 
         void drawString(Space *space, std::vector<std::string> &strs, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
 
-        uint8_t enableMask(Space *space, GameObject *gameObject);
+        uint8_t enableMask(Space *space, GameObject *gameObject, TransformComponent *transform);
         void disableMask(uint8_t maskBits);
         
         void render();
@@ -101,6 +102,12 @@ namespace BGE {
         virtual void createTexture(const RenderCommandItem& item);
         virtual void destroyTexture(const RenderCommandItem& item);
 
+        virtual void createVbo(const RenderCommandItem& item);
+        virtual void destroyVbo(const RenderCommandItem& item);
+
+        virtual void createIbo(const RenderCommandItem& item);
+        virtual void destroyIbo(const RenderCommandItem& item);
+
     private:
         ColorMatrix currentColorMatrix_;
         std::vector<ColorMatrix> colorMatrixStack_;
@@ -114,14 +121,20 @@ namespace BGE {
         GLKTextureInfo *textureInfo_;
         uint8_t activeMasks_;
 
+        // IBO
+        GLuint                          indexBufferId_;
+        
         // TODO: Proper way for maintaining texture state would be for each texture unit as well as tracking the target
-        GLuint currentTextureId_;
-        std::shared_ptr<ShaderProgram> currentShader_;
+        GLuint                          currentTextureId_;
+        ShaderProgramId                 currentShaderProgramId_;
+        std::shared_ptr<ShaderProgram>  currentShaderProgram_;
 
         std::vector<SpaceHandle>                            spaceHandles_;
         std::vector<GameObject *>                           rootGameObjects_;
         std::vector<std::vector<TransformComponentHandle>>  orderedChildrenHandles_;
-        std::vector<TransformComponent *>                   orderedChildrenScratch_;
+        
+        std::vector<VertexTex>                              stringVertexData_;
+        std::vector<GLushort>                               stringIndices_;
         
         void queueRender(double deltaTime);
         

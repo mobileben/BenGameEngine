@@ -194,8 +194,8 @@ namespace BGE {
 #if TARGET_OS_IPHONE
         std::pair<Texture *, std::shared_ptr<Error>> createTextureFromUIImage(const std::string& name, UIImage *image);
 #endif /* TARGET_OS_IPHONE */
-        std::pair<TextureAtlas *, std::shared_ptr<Error>> createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format);
-        std::pair<TextureAtlas *, std::shared_ptr<Error>> createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs);
+        std::pair<TextureAtlas *, std::shared_ptr<Error>> createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, bool createVbo);
+        std::pair<TextureAtlas *, std::shared_ptr<Error>> createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, bool createVbo);
 
         TextureHandle getTextureHandle(std::string name) const;
         TextureAtlasHandle getTextureAtlasHandle(std::string name) const;

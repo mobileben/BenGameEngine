@@ -9,6 +9,8 @@
 #include "TextureAtlas.h"
 #include "Game.h"
 
+#include <future>
+
 const std::string BGE::TextureAtlas::ErrorDomain = "TextureAtlas";
 
 BGE::TextureAtlas::TextureAtlas() : NamedObject(), valid_(false), width_(0), height_(0), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None) {
@@ -104,7 +106,7 @@ size_t BGE::TextureAtlas::getMemoryUsage() const {
     return 0;
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format, bool createVbo) {
     Texture *texture;
     std::shared_ptr<Error> error;
     std::tie(texture, error) = Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), atlasTextureKey(), filename, format);
@@ -134,6 +136,10 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
                         this->subTextures_[key] = subTex->getHandle();
                     }
                 }
+                
+                if (createVbo) {
+                    buildVertexTexData(texture);
+                }
             } else {
                 valid_ = false;
                 format_ = TextureFormat::Undefined;
@@ -158,10 +164,11 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
     }
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, bool createVbo) {
     Texture *texture;
     std::shared_ptr<Error> error;
-    std::tie(texture, error) = Game::getInstance()->getTextureService()->createTextureFromBuffer(getHandle(), atlasTextureKey(), buffer, format, width, height);
+    auto textureService = Game::getInstance()->getTextureService();
+    std::tie(texture, error) = textureService->createTextureFromBuffer(getHandle(), atlasTextureKey(), buffer, format, width, height);
     if (!error) {
         TextureAtlas *atlas = this;
         if (texture) {
@@ -181,11 +188,14 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
             if (subTextures.size() > 0) {
                 for (auto const &st : subTextures) {
                     std::string key = st.name;
-                    auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
+                    auto subTex = textureService->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
 
                     if (subTex) {
                         subTextures_[key] = subTex->getHandle();
                     }
+                }
+                if (createVbo) {
+                    buildVertexTexData(texture);
                 }
             } else {
                 valid_ = false;
@@ -213,4 +223,69 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
 
 const std::map<std::string, BGE::TextureHandle>& BGE::TextureAtlas::getSubTextures() const {
     return subTextures_;
+}
+
+void BGE::TextureAtlas::buildVertexTexData(Texture *texture) {
+    if (texture) {
+        texture->buildVertexTexData(subTextures_);
+
+        auto renderService = Game::getInstance()->getRenderService();
+        auto textureService = Game::getInstance()->getTextureService();
+
+        RenderVboCommandData data(&texture->vertexTexData_[0], static_cast<uint32_t>(texture->vertexTexData_.size()));
+        auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
+        auto fut = prom->get_future();
+
+        renderService->queueCreateVbo(data, [this, texture, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
+            if (!error) {
+                auto data = std::dynamic_pointer_cast<RenderVboCommandData>(command.data);
+#ifdef SUPPORT_OPENGL
+                texture->vboId_ = data->glVboId;
+                if (texture->vboId_) {
+                    auto textureService = Game::getInstance()->getTextureService();
+                    for (auto it : subTextures_) {
+                        auto subTex = textureService->getTexture(it.second);
+                        if (subTex) {
+                            subTex->vboId_ = texture->vboId_;
+                        }
+                    }
+                }
+#endif /* SUPPORT_OPENGL */
+            } else {
+                
+            }
+            prom->set_value(error);
+        });
+        
+        fut.get();
+        
+#ifdef SUPPORT_OPENGL
+        std::vector<std::shared_future<std::shared_ptr<Error>>> futures;
+        
+        for (auto& it : subTextures_) {
+            auto subTexHandle = it.second;
+            auto subTex = textureService->getTexture(subTexHandle);
+            if (subTex) {
+                RenderIboCommandData data(subTex->getVboIndices(), static_cast<uint32_t>(subTex->getVboIndicesCount()), static_cast<uint32_t>(subTex->getVboIndicesSize() / subTex->getVboIndicesCount()));
+                auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
+                futures.push_back(std::shared_future<std::shared_ptr<Error>>(prom->get_future()));
+                
+                renderService->queueCreateIbo(data, [textureService, subTexHandle, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
+                    if (!error) {
+                        auto subTex = textureService->getTexture(subTexHandle);
+                        if (subTex) {
+                            auto data = std::dynamic_pointer_cast<RenderIboCommandData>(command.data);
+                            subTex->iboId_ = data->glIboId;
+                        }
+                    }
+                    prom->set_value(error);
+                });
+            }
+        }
+        
+        for (auto& f : futures) {
+            f.get();
+        }
+#endif /* SUPPORT_OPENGL */
+    }
 }

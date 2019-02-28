@@ -19,7 +19,7 @@ namespace BGE {
     };
     
     enum class ShaderState {
-        Unitialized = 0,
+        Uninitialized = 0,
         UnsupportedType,
         FileError,
         GLError,
@@ -27,19 +27,25 @@ namespace BGE {
         Ready
     };
     
+    using ShaderId = int32_t;
+    const ShaderId ShaderIdUndefined = -1;
+    
     class Shader
     {
     public:
-        Shader(ShaderType shaderType, std::string name);
+        Shader() : id_(ShaderIdUndefined), shaderType_(ShaderType::Vertex), state_(ShaderState::Uninitialized) {}
+        Shader(ShaderType shaderType, ShaderId id, std::string name);
         virtual ~Shader() {}
         
-        ShaderType getType() { return shaderType_; }
-        std::string getName() { return name_; }
-        ShaderState getState() { return state_; }
+        inline ShaderId getId() const { return id_; }
+        inline std::string getName() const { return name_; }
+        inline ShaderType getType() const { return shaderType_; }
+        inline ShaderState getState() const { return state_; }
         
     protected:
+        ShaderId    id_;
         std::string name_;
-        ShaderType shaderType_;
+        ShaderType  shaderType_;
         ShaderState state_;
     };
 }

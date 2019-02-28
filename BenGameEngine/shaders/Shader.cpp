@@ -8,6 +8,7 @@
 
 #include "Shader.h"
 
-BGE::Shader::Shader(ShaderType shaderType, std::string name) : name_(name), shaderType_(shaderType), state_(ShaderState::Unitialized)
+BGE::Shader::Shader(ShaderType shaderType, ShaderId id, std::string name) : id_(id), name_(name), shaderType_(shaderType), state_(ShaderState::Uninitialized)
 {
+    assert(id != ShaderIdUndefined);
 }

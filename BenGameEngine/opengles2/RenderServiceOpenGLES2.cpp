@@ -31,9 +31,9 @@
 #include "Profiling.h"
 #endif /* SUPPORT_PROFILING */
 
-const GLubyte Indices[] = {
-    0, 1, 2,
-    2, 3, 0
+const GLubyte VertexIndices[] = {
+    0, 3, 2,
+    0, 2, 1
 };
 
 int8_t BGE::RenderServiceOpenGLES2::MaxActiveMasks = 8;
@@ -50,7 +50,76 @@ static uint8_t MaskIdToMaskValue[] = {
 
 static size_t kDefaultOrderedChildrenHandlesSize = 32;
 
-BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), currentTextureId_(0) {
+// Shaders and Programs
+
+namespace BGE {
+    static const ShaderId SimpleVertexShaderId = 0;
+    static const ShaderId SimpleFragmentShaderId = 1;
+    static const ShaderId LineVertexShaderId = 2;
+    static const ShaderId LineFragmentShaderId = 3;
+    static const ShaderId TextureVertexShaderId = 4;
+    static const ShaderId TextureFragmentShaderId = 5;
+    static const ShaderId ColorMatrixTextureVertexShaderId = 6;
+    static const ShaderId ColorMatrixTextureFragmentShaderId = 7;
+    static const ShaderId FullColorTextureVertexShaderId = 8;
+    static const ShaderId FullColorTextureFragmentShaderId = 9;
+    static const ShaderId MaskColorMatrixTextureVertexShaderId = 10;
+    static const ShaderId MaskColorMatrixTextureFragmentShaderId = 11;
+    static const ShaderId FontVertexShaderId = 12;
+    static const ShaderId FontFragmentShaderId = 13;
+    static const ShaderId FullColorFontVertexShaderId = 14;
+    static const ShaderId FullColorFontFragmentShaderId = 15;
+    static const ShaderId PolyLineVertexShaderId = 16;
+    static const ShaderId PolyLineFragmentShaderId = 17;
+    
+    static const ShaderProgramId SimpleShaderProgramId = 0;
+    static const ShaderProgramId LineShaderProgramId = 1;
+    static const ShaderProgramId TextureShaderProgramId = 2;
+    static const ShaderProgramId ColorMatrixTextureShaderProgramId = 3;
+    static const ShaderProgramId FullColorTextureShaderProgramId = 4;
+    static const ShaderProgramId MaskColorMatrixTextureShaderProgramId = 5;
+    static const ShaderProgramId FontShaderProgramId = 6;
+    static const ShaderProgramId FullColorFontShaderProgramId = 7;
+    static const ShaderProgramId PolyLineShaderProgramId = 8;
+
+    static const std::string SimpleVertexShaderName = "SimpleVertex";
+    static const std::string SimpleFragmentShaderName = "SimpleFragment";
+    static const std::string SimpleShaderProgramName = "Default";
+    
+    static const std::string LineVertexShaderName = "LineVertex";
+    static const std::string LineFragmentShaderName = "LineFragment";
+    static const std::string LineShaderProgramName = "Line";
+
+    static const std::string TextureVertexShaderName = "TextureVertex";
+    static const std::string TextureFragmentShaderName = "TextureFragment";
+    static const std::string TextureShaderProgramName = "Texture";
+
+    static const std::string ColorMatrixTextureVertexShaderName = "ColorMatrixTextureVertex";
+    static const std::string ColorMatrixTextureFragmentShaderName = "ColorMatrixTextureFragment";
+    static const std::string ColorMatrixTextureShaderProgramName = "ColorMatrixTexture";
+
+    static const std::string FullColorTextureVertexShaderName = "FullColorTextureVertex";
+    static const std::string FullColorTextureFragmentShaderName = "FullColorTextureFragment";
+    static const std::string FullColorTextureShaderProgramName = "FullColorTexture";
+
+    static const std::string MaskColorMatrixTextureVertexShaderName = "MaskColorMatrixTextureVertex";
+    static const std::string MaskColorMatrixTextureFragmentShaderName = "MaskColorMatrixTextureFragment";
+    static const std::string MaskColorMatrixTextureShaderProgramName = "MaskColorMatrixTexture";
+
+    static const std::string FontVertexShaderName = "FontVertex";
+    static const std::string FontFragmentShaderName = "FontFragment";
+    static const std::string FontShaderProgramName = "Font";
+
+    static const std::string FullColorFontVertexShaderName = "FullColorFontVertex";
+    static const std::string FullColorFontFragmentShaderName = "FullColorFontFragment";
+    static const std::string FullColorFontShaderProgramName = "FullColorFont";
+
+    static const std::string PolyLineVertexShaderName = "PolyLineVertex";
+    static const std::string PolyLineFragmentShaderName = "PolyLineFragment";
+    static const std::string PolyLineShaderProgramName = "PolyLine";
+}
+
+BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), indexBufferId_(0), currentTextureId_(0), currentShaderProgramId_(ShaderProgramIdUndefined) {
     shaderService_ = std::make_shared<ShaderServiceOpenGLES2>();
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
     
@@ -59,6 +128,11 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), current
 #ifdef SUPPORT_PROFILING
     resetProfilingStats();
 #endif /* SUPPORT_PROFILING */
+    
+    for (uint32_t i=0;i<MaxTextureUnits;++i) {
+        texturingEnabled_[i] = false;
+        currentTexture_[i] = 0;
+    }
     
     orderedChildrenHandles_ = std::vector<std::vector<TransformComponentHandle>>(kDefaultOrderedChildrenHandlesSize, std::vector<TransformComponentHandle>());
     for (auto& handles : orderedChildrenHandles_) {
@@ -201,11 +275,7 @@ void BGE::RenderServiceOpenGLES2::bindRenderWindow(std::shared_ptr<RenderContext
 //    eaglLayer.contentsScale = window->getView().contentScaleFactor;
 #endif /* TARGET_OS_IPHONE */
 
-#if 1
     setCoordinateSystem2D(Render2DCoordinateSystem::OpenGLCentered);
-#else
-    setCoordinateSystem2D(Render2DCoordinateSystem::Traditional);
-#endif
 }
 
 void BGE::RenderServiceOpenGLES2::resizeRenderWindow()
@@ -214,54 +284,76 @@ void BGE::RenderServiceOpenGLES2::resizeRenderWindow()
 
 void BGE::RenderServiceOpenGLES2::createShaders()
 {
-    std::shared_ptr<Shader> vShader = this->getShaderService()->createShader(ShaderType::Vertex, "SimpleVertex");
-    std::shared_ptr<Shader> fShader = this->getShaderService()->createShader(ShaderType::Fragment, "SimpleFragment");
-    std::shared_ptr<ShaderProgram> program = this->getShaderService()->createShaderProgram("Default", {vShader,  fShader}, { "Position", "SourceColor" }, { "ModelView", "Projection" });
+    std::shared_ptr<Shader> vShader = this->getShaderService()->createShader(ShaderType::Vertex, SimpleVertexShaderId, SimpleVertexShaderName);
+    std::shared_ptr<Shader> fShader = this->getShaderService()->createShader(ShaderType::Fragment, SimpleFragmentShaderId, SimpleFragmentShaderName);
+    std::shared_ptr<ShaderProgram> program = this->getShaderService()->createShaderProgram(SimpleShaderProgramId, SimpleShaderProgramName, {vShader,  fShader}, { "Position", "SourceColor" }, { "ModelView", "Projection" });
 
-    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "LineVertex");
-    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "LineFragment");
-    program = this->getShaderService()->createShaderProgram("Line", {vShader,  fShader}, { "Position" }, { "ModelView", "Projection", "Color" });
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, LineVertexShaderId, LineVertexShaderName);
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, LineFragmentShaderId, LineFragmentShaderName);
+    program = this->getShaderService()->createShaderProgram(LineShaderProgramId, LineShaderProgramName, {vShader,  fShader}, { "Position" }, { "ModelView", "Projection", "Color" });
     
-    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "TextureVertex");
-    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "TextureFragment");
-    program = this->getShaderService()->createShaderProgram("Texture", {vShader,  fShader}, { "Position", "SourceColor", "TexCoordIn" }, { "ModelView", "Projection", "Texture" });
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, TextureVertexShaderId, TextureVertexShaderName);
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, TextureFragmentShaderId, TextureFragmentShaderName);
+    program = this->getShaderService()->createShaderProgram(TextureShaderProgramId, TextureShaderProgramName, {vShader,  fShader}, { "Position", "SourceColor", "TexCoordIn" }, { "ModelView", "Projection", "Texture" });
     
-    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "ColorMatrixTextureVertex");
-    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "ColorMatrixTextureFragment");
-    program = this->getShaderService()->createShaderProgram("ColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "ColorMatrix", "ColorMatOffset" });
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, ColorMatrixTextureVertexShaderId, ColorMatrixTextureVertexShaderName);
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, ColorMatrixTextureFragmentShaderId, ColorMatrixTextureFragmentShaderName);
+    program = this->getShaderService()->createShaderProgram(ColorMatrixTextureShaderProgramId, ColorMatrixTextureShaderProgramName, {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "ColorMatrix", "ColorMatOffset" });
     
-    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "FullColorTextureVertex");
-    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "FullColorTextureFragment");
-    program = this->getShaderService()->createShaderProgram("FullColorTexture", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "ColorMatrix", "ColorMatOffset", "ColorMultiplier", "ColorOffset" });
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, FullColorTextureVertexShaderId, FullColorTextureVertexShaderName);
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, FullColorTextureFragmentShaderId, FullColorTextureFragmentShaderName);
+    program = this->getShaderService()->createShaderProgram(FullColorTextureShaderProgramId, FullColorTextureShaderProgramName, {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "ColorMatrix", "ColorMatOffset", "ColorMultiplier", "ColorOffset" });
     
-    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "MaskColorMatrixTextureVertex");
-    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "MaskColorMatrixTextureFragment");
-    program = this->getShaderService()->createShaderProgram("MaskColorMatrixTexture", {vShader,  fShader}, { "Position", "TexCoordIn", "MaskTexCoordIn" }, { "ModelView", "Projection", "Texture", "MaskTexture", "ColorMatrix", "ColorMatOffset" });
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, MaskColorMatrixTextureVertexShaderId, MaskColorMatrixTextureVertexShaderName);
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, MaskColorMatrixTextureFragmentShaderId, MaskColorMatrixTextureFragmentShaderName);
+    program = this->getShaderService()->createShaderProgram(MaskColorMatrixTextureShaderProgramId, MaskColorMatrixTextureShaderProgramName, {vShader,  fShader}, { "Position", "TexCoordIn", "MaskTexCoordIn" }, { "ModelView", "Projection", "Texture", "MaskTexture", "ColorMatrix", "ColorMatOffset" });
     
-    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "FontVertex");
-    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "FontFragment");
-    program = this->getShaderService()->createShaderProgram("Font", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "SourceColor" });
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, FontVertexShaderId, FontVertexShaderName);
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, FontFragmentShaderId, FontFragmentShaderName);
+    program = this->getShaderService()->createShaderProgram(FontShaderProgramId, FontShaderProgramName, {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "SourceColor" });
     
-    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "FullColorFontVertex");
-    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "FullColorFontFragment");
-    program = this->getShaderService()->createShaderProgram("FullColorFont", {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "SourceColor", "ColorMatrix", "ColorMatOffset", "ColorMultiplier", "ColorOffset" });
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, FullColorFontVertexShaderId, FullColorFontVertexShaderName);
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, FullColorFontFragmentShaderId, FullColorFontFragmentShaderName);
+    program = this->getShaderService()->createShaderProgram(FullColorFontShaderProgramId, FullColorFontShaderProgramName, {vShader,  fShader}, { "Position", "TexCoordIn" }, { "ModelView", "Projection", "Texture", "SourceColor", "ColorMatrix", "ColorMatOffset", "ColorMultiplier", "ColorOffset" });
     
-    vShader = this->getShaderService()->createShader(ShaderType::Vertex, "PolyLineVertex");
-    fShader = this->getShaderService()->createShader(ShaderType::Fragment, "PolyLineFragment");
-    program = this->getShaderService()->createShaderProgram("PolyLine", {vShader,  fShader}, { "Position", "SourceColor" }, { "ModelView", "Projection" });
+    vShader = this->getShaderService()->createShader(ShaderType::Vertex, PolyLineVertexShaderId, PolyLineVertexShaderName);
+    fShader = this->getShaderService()->createShader(ShaderType::Fragment, PolyLineFragmentShaderId, PolyLineFragmentShaderName);
+    program = this->getShaderService()->createShaderProgram(PolyLineShaderProgramId, PolyLineShaderProgramName, {vShader,  fShader}, { "Position", "SourceColor" }, { "ModelView", "Projection" });
 }
-std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::useShaderProgram(const std::string& program) {
-    auto shaderProgram = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(shaderService_->getShaderProgram(program));
-    if (shaderProgram) {
-        if (currentShader_ != shaderProgram) {
+
+std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::useShaderProgram(ShaderProgramId program, bool& changed) {
+    changed = false;
+    if (currentShaderProgramId_ != program) {
+        auto shaderProgram = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(shaderService_->getShaderProgram(program));
+        if (shaderProgram) {
             glUseProgram(shaderProgram->getProgram());
-            currentShader_ = shaderProgram;
+            currentShaderProgramId_ = program;
+            currentShaderProgram_ = shaderProgram;
+            changed = true;
 #ifdef SUPPORT_PROFILING
             ++numShadersChanged_;
 #endif /* SUPPORT_PROFILING */
         }
     }
-    return currentShader_;
+    return currentShaderProgram_;
+}
+
+std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::useShaderProgram(const std::string& program, bool& changed) {
+    changed = false;
+    
+    auto shaderProgram = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(shaderService_->getShaderProgram(program));
+    if (shaderProgram) {
+        if (currentShaderProgram_ != shaderProgram) {
+            glUseProgram(shaderProgram->getProgram());
+            currentShaderProgramId_ = shaderProgram->getId();
+            currentShaderProgram_ = shaderProgram;
+            changed = true;
+#ifdef SUPPORT_PROFILING
+            ++numShadersChanged_;
+#endif /* SUPPORT_PROFILING */
+        }
+    }
+    return currentShaderProgram_;
 }
 
 std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::pushShaderProgram(const std::string& program)
@@ -328,6 +420,9 @@ void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vec
          
             0 - 1 - 2
             0 - 2 - 3
+         
+         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+         
          */
         
         vertices[0].position.x = position.x;
@@ -390,7 +485,8 @@ void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vec
         vertices[3].color = color;
     }
 
-    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Default"));
+    bool shaderChanged;
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(SimpleShaderProgramId, shaderChanged));
     
     GLint positionLocation = glShader->locationForAttribute("Position");
     GLint colorLocation = glShader->locationForAttribute("SourceColor");
@@ -430,6 +526,9 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
          
          0 - 1 - 2
          0 - 2 - 3
+         
+         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+         
          */
         
         vertices[0].position.x = position.x;
@@ -491,7 +590,8 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
         vertices[3].color = color[3];
     }
     
-    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Default"));
+    bool shaderChanged;
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(SimpleShaderProgramId, shaderChanged));
     
     GLint positionLocation = glShader->locationForAttribute("Position");
     GLint colorLocation = glShader->locationForAttribute("SourceColor");
@@ -543,7 +643,8 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             vertices[3].tex.x = uvs[3].x;
             vertices[3].tex.y = uvs[3].y;
 
-            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Texture"));
+            bool shaderChanged;
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(TextureShaderProgramId, shaderChanged));
             
             GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
             
@@ -569,10 +670,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             glEnable(GL_BLEND);
             
-            glActiveTexture(GL_TEXTURE0);
             setTexture(texture->getTarget(), texture->getHWTextureId());
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), &vertices[0]);
@@ -591,7 +689,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObject, TransformComponent *transform) {
     if (gameObject) {
         auto flatRect = gameObject->getComponentLockless<FlatRectRenderComponent>(space);
         
@@ -600,13 +698,13 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
             auto material = flatRect->getMaterialLockless();
             
             if (material) {
-                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
+                bool shaderChanged;
+                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
 
                 GLint positionLocation = glShader->locationForAttribute("Position");
                 GLint projectionLocation = glShader->locationForUniform("Projection");
                 GLint colorLocation = glShader->locationForUniform("Color");
                 GLint modelLocation = glShader->locationForUniform("ModelView");
-                auto transformComponent = gameObject->getComponentLockless<TransformComponent>(space);
 
                 glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                       sizeof(Vertex), &vertices[0]);
@@ -620,8 +718,8 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
                 glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
 
-                if (transformComponent) {
-                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->worldMatrix_.m);
+                if (transform) {
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
                 } else {
                     // TODO: This is a hack for now
                     Matrix4 mat;
@@ -630,8 +728,8 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
                     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
                 }
 
-                glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
-                               GL_UNSIGNED_BYTE, &Indices[0]);
+                glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
+                               GL_UNSIGNED_BYTE, &VertexIndices[0]);
 #ifdef SUPPORT_PROFILING
                 ++numRectsDrawn_;
                 ++numDrawCalls_;
@@ -641,7 +739,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObject, TransformComponent *transform) {
     if (gameObject) {
         auto maskRect = gameObject->getComponentLockless<MaskComponent>(space);
         
@@ -651,8 +749,8 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
             auto material = maskRect->getMaterialLockless();
             
             if (material) {
-                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
-                auto transformComponent = gameObject->getComponentLockless<TransformComponent>(space);
+                bool shaderChanged;
+                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
                 
                 GLint positionLocation = glShader->locationForAttribute("Position");
                 GLint projectionLocation = glShader->locationForUniform("Projection");
@@ -661,8 +759,8 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
 
                 glEnableVertexAttribArray(positionLocation);
 
-                if (transformComponent) {
-                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->worldMatrix_.m);
+                if (transform) {
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
                 } else {
                     // This is a hack for now
                     Matrix4 mat;
@@ -679,8 +777,8 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
                 material->getColor(color);
                 glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
-                glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
-                               GL_UNSIGNED_BYTE, &Indices[0]);
+                glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
+                               GL_UNSIGNED_BYTE, &VertexIndices[0]);
 #ifdef SUPPORT_PROFILING
                 ++numMasksDrawn_;
                 ++numDrawCalls_;
@@ -690,7 +788,7 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *gameObject, TransformComponent *transform) {
     if (gameObject) {
         auto mask = gameObject->getComponentLockless<TextureMaskComponent>(space);
         
@@ -703,7 +801,8 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                 
                 if (texture) {
                     if (texture && texture->isValid()) {
-                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Texture"));
+                        bool shaderChanged;
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(TextureShaderProgramId, shaderChanged));
                         
                         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
                         
@@ -716,11 +815,10 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                         GLint textureUniform = glShader->locationForUniform("Texture");
                         GLint projectionLocation = glShader->locationForUniform("Projection");
                         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
-                        auto transformComponent = gameObject->getComponentLockless<TransformComponent>(space);
                         GLint modelLocation = glShader->locationForUniform("ModelView");
                         
-                        if (transformComponent) {
-                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->worldMatrix_.m);
+                        if (transform) {
+                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
                         } else {
                             // TODO: This is a hack for now
                             Matrix4 mat;
@@ -731,11 +829,7 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                         
                         glDisable(GL_BLEND);
                         
-                        glActiveTexture(GL_TEXTURE0);
                         setTexture(texture->getTarget(), texture->getHWTextureId());
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                        
                         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                               sizeof(VertexTex), &vertices[0]);
                         glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
@@ -743,8 +837,8 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                         
                         glUniform1i(textureUniform, 0);
                         
-                        glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
-                                       GL_UNSIGNED_BYTE, &Indices[0]);
+                        glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
+                                       GL_UNSIGNED_BYTE, &VertexIndices[0]);
 #ifdef SUPPORT_PROFILING
                         ++numMasksDrawn_;
                         ++numDrawCalls_;
@@ -757,7 +851,8 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
 }
 
 void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Color &color) {
-    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
+    bool shaderChanged;
+    std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
     
     GLint positionLocation = glShader->locationForAttribute("Position");
     GLint projectionLocation = glShader->locationForUniform("Projection");
@@ -788,13 +883,12 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject, TransformComponent *transform) {
     if (gameObject) {
         auto line = gameObject->getComponentLockless<LineRenderComponent>(space);
         
         if (line) {
             auto material = line->getMaterialLockless();
-            auto xform = gameObject->getComponentLockless<TransformComponent>(space);
             const auto& points = line->getPoints();
             Vector3 vertices[points.size()];
 
@@ -808,7 +902,8 @@ void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject
                 index++;
             }
             
-            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("Line"));
+            bool shaderChanged;
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
             
             GLint positionLocation = glShader->locationForAttribute("Position");
             GLint projectionLocation = glShader->locationForUniform("Projection");
@@ -822,8 +917,8 @@ void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject
             material->getColor(color);
             glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
 
-            if (xform) {
-                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) xform->worldMatrix_.m);
+            if (transform) {
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
             } else {
                 // TODO: This is a hack for now
                 Matrix4 mat;
@@ -855,16 +950,16 @@ void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameObject, TransformComponent *transform) {
     if (gameObject) {
         auto line = gameObject->getComponentLockless<PolyLineRenderComponent>(space);
         
         if (line) {
-            auto xform = gameObject->getComponentLockless<TransformComponent>(space);
             const auto& points = line->getPoints();
             const auto& colors = line->getColors();
             
-            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("PolyLine"));
+            bool shaderChanged;
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(PolyLineShaderProgramId, shaderChanged));
             
             GLint positionLocation = glShader->locationForAttribute("Position");
             GLint colorLocation = glShader->locationForAttribute("SourceColor");
@@ -875,8 +970,8 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
             
             glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
             
-            if (xform) {
-                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) xform->worldMatrix_.m);
+            if (transform) {
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
             } else {
                 // TODO: This is a hack for now
                 Matrix4 mat;
@@ -973,7 +1068,7 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
     }
 }
 
-void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObject) {
+void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObject, TransformComponent *transform) {
     if (gameObject) {
         auto sprite = gameObject->getComponentLockless<SpriteRenderComponent>(space);
         
@@ -990,10 +1085,11 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
 #endif
                     
                     if (texture && texture->isValid()) {
+                        bool shaderChanged;
 #if 0
-                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("ColorMatrixTexture"));
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(ColorMatrixTextureShaderProgramId, shaderChanged));
 #else
-                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("FullColorTexture"));
+                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorTextureShaderProgramId, shaderChanged));
 #endif
                         
                         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
@@ -1007,15 +1103,14 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         GLint textureUniform = glShader->locationForUniform("Texture");
                         GLint projectionLocation = glShader->locationForUniform("Projection");
                         glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
-                        auto transformComponent = gameObject->getComponentLockless<TransformComponent>(space);
                         GLint modelLocation = glShader->locationForUniform("ModelView");
                         GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
                         GLint colorMatOffsetLocation = glShader->locationForUniform("ColorMatOffset");
                         auto colorMultiplierLocation = glShader->locationForUniform("ColorMultiplier");
                         auto colorOffsetLocation = glShader->locationForUniform("ColorOffset");
                         
-                        if (transformComponent) {
-                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transformComponent->worldMatrix_.m);
+                        if (transform) {
+                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
                         } else {
                             // TODO: This is a hack for now
                             Matrix4 mat;
@@ -1032,20 +1127,39 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         
                         glDisable(GL_BLEND);
                         
-                        glActiveTexture(GL_TEXTURE0);
                         setTexture(texture->getTarget(), texture->getHWTextureId());
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                        
-                        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                              sizeof(VertexTex), &vertices[0]);
-                        glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                                              sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
-                        
+
                         glUniform1i(textureUniform, 0);
+
+                        auto vboId = texture->getHWVboId();
+                        if (vboId) {
+                            glBindBuffer(GL_ARRAY_BUFFER, texture->getHWVboId());
+                            auto iboId = texture->getHWIboId();
+                            if (iboId) {
+                                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
+                            } else {
+                                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId_);
+                                glBufferData(GL_ELEMENT_ARRAY_BUFFER, texture->getVboIndicesSize(), texture->getVboIndices(), GL_DYNAMIC_DRAW);
+                            }
+                            
+                            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                                  sizeof(VertexTex), 0);
+                            glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                                                  sizeof(VertexTex), (void *) sizeof(Vector3));
+// glDrawElements(GL_TRIANGLES, texture->getVboIndicesSize(), texture->getVboIndexType(), texture->getVboIndices());
+                            glDrawElements(GL_TRIANGLES, texture->getVboIndicesCount(), texture->getVboIndexType(), 0);
+                            
+                            glBindBuffer(GL_ARRAY_BUFFER, 0);
+                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                        } else {
+                            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                                  sizeof(VertexTex), &vertices[0]);
+                            glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                                                  sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
+                            glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
+                                           GL_UNSIGNED_BYTE, &VertexIndices[0]);
+                        }
                         
-                        glDrawElements(GL_TRIANGLES, sizeof(Indices)/sizeof(Indices[0]),
-                                       GL_UNSIGNED_BYTE, &Indices[0]);
 #ifdef SUPPORT_PROFILING
                         ++numSpritesDrawn_;
                         ++numDrawCalls_;
@@ -1091,17 +1205,22 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::vector<std::stri
     }
 }
 
+#define RENDER_STRING_WITH_GL_ARRAY
+
 void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     auto textureService = Game::getInstance()->getTextureService();
     auto textureAtlas = textureService->getTextureAtlasLockless(font->getTextureAtlasHandle());
 
     if (str.length() > 0 && textureAtlas && textureAtlas->isValid()) {
-        VertexTex vertices[4];
-        GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
-        // TODO: Adjustment based on alignment to be done here
+        GLushort indexPtr = 0;
         float x = xOffset;
         float y = yOffset;
+        
+        // TODO: Adjustment based on alignment to be done here
 
+        stringVertexData_.clear();
+        stringIndices_.clear();
+        
         const char *chars = str.c_str();
         FontGlyph glyph;
         uint16_t code;
@@ -1109,7 +1228,8 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
         auto texHandle = textureAtlas->getTextureHandle();
         auto tex = textureService->getTextureLockless(texHandle);
 
-        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram("FullColorFont"));
+        bool shaderChanged;
+        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorFontShaderProgramId, shaderChanged));
         GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
         GLint positionLocation = glShader->locationForAttribute("Position");
 
@@ -1176,14 +1296,10 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
 
         glDisable(GL_BLEND);
 
-        glActiveTexture(GL_TEXTURE0);
-
         uint16_t prev = 0;
 
         setTexture(tex->getTarget(), tex->getHWTextureId());
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+        
         glUniform1i(textureUniform, 0);
         glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
 
@@ -1213,41 +1329,33 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
                 if (tex) {
                     const Vector2 *xys = tex->getXYs();
                     const Vector2 *uvs = tex->getUVs();
+                    float w_2 = tex->getWidth() / 2.0;
+                    float h_2 = tex->getHeight() / 2.0;
 
-                    vertices[0].position.x = x + xys[0].x;
-                    vertices[0].position.y = y + xys[0].y;
-                    vertices[0].position.z = 0;
-                    vertices[0].tex.x = uvs[0].x;
-                    vertices[0].tex.y = uvs[0].y;
-
-                    vertices[1].position.x = x + xys[1].x;
-                    vertices[1].position.y = y + xys[1].y;
-                    vertices[1].position.z = 0;
-                    vertices[1].tex.x = uvs[1].x;
-                    vertices[1].tex.y = uvs[1].y;
-
-                    vertices[2].position.x = x + xys[2].x;
-                    vertices[2].position.y = y + xys[2].y;
-                    vertices[2].position.z = 0;
-                    vertices[2].tex.x = uvs[2].x;
-                    vertices[2].tex.y = uvs[2].y;
-
-                    vertices[3].position.x = x + xys[3].x;
-                    vertices[3].position.y = y + xys[3].y;
-                    vertices[3].position.z = 0;
-                    vertices[3].tex.x = uvs[3].x;
-                    vertices[3].tex.y = uvs[3].y;
-
-                    glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                          sizeof(VertexTex), &vertices[0]);
-                    glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
-                                          sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
-
-                    glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
-                                   GL_UNSIGNED_BYTE, &indices[0]);
+                    auto numIndices = sizeof(VertexIndices)/sizeof(VertexIndices[0]);
+#ifdef RENDER_STRING_WITH_GL_ARRAY
+                    for (size_t i=0;i<numIndices;++i) {
+                        auto index = VertexIndices[i];
+                        VertexTex vtex{{{x + xys[index].x + w_2, y + xys[index].y + h_2, 0.0}}, {{uvs[index].x, uvs[index].y}}};
+                        stringVertexData_.push_back(vtex);
+                        stringIndices_.push_back(indexPtr++);
+                    }
+#else
+                    VertexTex vtex{{{x + xys[0].x + w_2, y + xys[0].y + h_2, 0.0}}, {{uvs[0].x, uvs[0].y}}};
+                    stringVertexData_.push_back(vtex);
+                    vtex = VertexTex{{{x + xys[1].x + w_2, y + xys[1].y + h_2, 0.0}}, {{uvs[1].x, uvs[1].y}}};
+                    stringVertexData_.push_back(vtex);
+                    vtex = VertexTex{{{x + xys[2].x + w_2, y + xys[2].y + h_2, 0.0}}, {{uvs[2].x, uvs[2].y}}};
+                    stringVertexData_.push_back(vtex);
+                    vtex = VertexTex{{{x + xys[3].x + w_2, y + xys[3].y + h_2, 0.0}}, {{uvs[3].x, uvs[3].y}}};
+                    stringVertexData_.push_back(vtex);
+                    for (size_t i=0;i<numIndices;++i) {
+                        stringIndices_.push_back(indexPtr + VertexIndices[i]);
+                    }
+                    indexPtr += 4;
+#endif
 #ifdef SUPPORT_PROFILING
                     ++numFontCharactersDrawn_;
-                    ++numDrawCalls_;
 #endif /* SUPPORT_PROFILING */
                 }
 
@@ -1258,11 +1366,62 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
 
             prev = code;
         }
+        
+        // Draw here
+        if (textureAtlas) {
+            bool shaderChanged;
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorFontShaderProgramId, shaderChanged));
+            GLint texCoordLocation = glShader->locationForAttribute("TexCoordIn");
+            GLint positionLocation = glShader->locationForAttribute("Position");
+            
+            glEnableVertexAttribArray(positionLocation);
+            glEnableVertexAttribArray(texCoordLocation);
+            
+            GLint textureUniform = glShader->locationForUniform("Texture");
+            GLint projectionLocation = glShader->locationForUniform("Projection");
+            GLint modelLocation = glShader->locationForUniform("ModelView");
+            GLint colorUniform = glShader->locationForUniform("SourceColor");
+            GLint colorMatrixLocation = glShader->locationForUniform("ColorMatrix");
+            GLint colorMatOffsetLocation = glShader->locationForUniform("ColorMatOffset");
+            auto colorMultiplierLocation = glShader->locationForUniform("ColorMultiplier");
+            auto colorOffsetLocation = glShader->locationForUniform("ColorOffset");
+            
+            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
+            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
+            
+            glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
+            glUniform4fv(colorMatOffsetLocation, 1, (GLfloat *) colorMatrix.offset.v);
+            
+            glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) colorTransform.multiplier.v);
+            glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorTransform.offset.v);
+            glDisable(GL_BLEND);
+            
+            setTexture(textureAtlas->getTarget(), textureAtlas->getHWTextureId());
+            
+            glUniform1i(textureUniform, 0);
+            glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
+
+            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                                  sizeof(VertexTex), &stringVertexData_[0]);
+            glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                                  sizeof(VertexTex), (GLvoid*) (&stringVertexData_[0].tex));
+
+#ifdef RENDER_STRING_WITH_GL_ARRAY
+            glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(stringVertexData_.size()));
+#else
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(stringIndices_.size()),
+                           GL_UNSIGNED_SHORT, &stringIndices_[0]);
+#endif
+#ifdef SUPPORT_PROFILING
+            ++numFontCharactersDrawn_;
+            ++numDrawCalls_;
+#endif /* SUPPORT_PROFILING */
+        }
     }
 }
 
 
-uint8_t BGE::RenderServiceOpenGLES2::enableMask(Space *space, GameObject *gameObject) {
+uint8_t BGE::RenderServiceOpenGLES2::enableMask(Space *space, GameObject *gameObject, TransformComponent *transform) {
     uint8_t maskValue = 0;
     
     if (this->activeMasks_ != 0xFF) {
@@ -1285,9 +1444,9 @@ uint8_t BGE::RenderServiceOpenGLES2::enableMask(Space *space, GameObject *gameOb
             glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
             
             if (gameObject->hasComponent<MaskComponent>()) {
-                drawMaskRect(space, gameObject);
+                drawMaskRect(space, gameObject, transform);
             } else if (gameObject->hasComponent<TextureMaskComponent>()) {
-                drawTextureMask(space, gameObject);
+                drawTextureMask(space, gameObject, transform);
             }
       
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -1462,7 +1621,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, Space 
         }
         
         if (gameObj->hasComponent<SpriteRenderComponent>()) {
-            drawSprite(space, gameObj);
+            drawSprite(space, gameObj, transformComponent);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
@@ -1479,25 +1638,25 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, Space 
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
 #endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<PolyLineRenderComponent>()) {
-            drawPolyLines(space, gameObj);
+            drawPolyLines(space, gameObj, transformComponent);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
 #endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<LineRenderComponent>()) {
-            drawLines(space, gameObj);
+            drawLines(space, gameObj, transformComponent);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
 #endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<FlatRectRenderComponent>()) {
-            drawFlatRect(space, gameObj);
+            drawFlatRect(space, gameObj, transformComponent);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
 #endif /* SUPPORT_PROFILING */
         } else if (gameObj->hasComponent<MaskComponent>() || gameObj->hasComponent<TextureMaskComponent>()) {
-            maskValue = enableMask(space, gameObj);
+            maskValue = enableMask(space, gameObj, transformComponent);
 #ifdef SUPPORT_PROFILING
             ++numGameObjectsDrawn_;
             --numGameObjectsIgnored_;   // We tagged ourselves as ignored, remove us from the count as we are actually drawn
@@ -1511,7 +1670,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, Space 
         }
         
         // Determine if we have children, if we do process them.
-        transformComponent->getOrderedChildrenHandles(space, orderedChildrenHandles_[depth], orderedChildrenScratch_);
+        transformComponent->getOrderedChildrenHandles(orderedChildrenHandles_[depth]);
         auto length = orderedChildrenHandles_[depth].size();
 
         for (size_t i=0;i<length;++i) {
@@ -1566,6 +1725,7 @@ void BGE::RenderServiceOpenGLES2::popColorTransform() {
 
 void BGE::RenderServiceOpenGLES2::setTexture(GLenum target, GLuint texId) {
     if (currentTextureId_ != texId) {
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(target, texId);
         currentTextureId_ = texId;
 #ifdef SUPPORT_PROFILING
@@ -1609,9 +1769,82 @@ void BGE::RenderServiceOpenGLES2::createTexture(const RenderCommandItem& item) {
 
 void BGE::RenderServiceOpenGLES2::destroyTexture(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(item.data);
-    glDeleteTextures(1, &data->glHwId);
+    std::shared_ptr<Error> error;
+    if (data->glHwId) {
+        glDeleteTextures(1, &data->glHwId);
+    }
     if (item.callback) {
-        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+        item.callback(item, error);
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::createVbo(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderVboCommandData>(item.data);
+    std::shared_ptr<Error> error;
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexTex) * data->numVertexTex, data->vertexTexData, GL_STATIC_DRAW);
+    GLenum glErr = glGetError();
+    if (glErr == GL_NO_ERROR) {
+        data->glVboId = vbo;
+        
+        if (!indexBufferId_) {
+            // We need to create at least one index buffer
+            glGenBuffers(1, &indexBufferId_);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        }
+    } else {
+        error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorVboAllocation);
+    }
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    if (item.callback) {
+        item.callback(item, error);
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::destroyVbo(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderVboCommandData>(item.data);
+    std::shared_ptr<Error> error;
+    if (data->glVboId != 0) {
+        glDeleteBuffers(1, &data->glVboId);
+    }
+    if (item.callback) {
+        item.callback(item, error);
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::createIbo(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderIboCommandData>(item.data);
+    std::shared_ptr<Error> error;
+    GLuint ibo;
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data->numIndices * data->indexSize, data->indices, GL_STATIC_DRAW);
+    GLenum glErr = glGetError();
+    if (glErr == GL_NO_ERROR) {
+        data->glIboId = ibo;
+    } else {
+        error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorVboAllocation);
+    }
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
+    if (item.callback) {
+        item.callback(item, error);
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::destroyIbo(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderIboCommandData>(item.data);
+    std::shared_ptr<Error> error;
+    if (data->glIboId != 0) {
+        glDeleteBuffers(1, &data->glIboId);
+    }
+    if (item.callback) {
+        item.callback(item, error);
     }
 }
 

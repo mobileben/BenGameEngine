@@ -2608,7 +2608,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
             if (filename && strlen(filename)) {
                 FilePath filePath(baseDirectory_);
                 filePath.basename = filename;
-                TextureQueueItem item{name, filePath, TextureFormat::RGBA8888};
+                TextureQueueItem item{name, filePath, TextureFormat::RGBA8888, true};
                 textureQueue_.push_back(item);
             }
         }
@@ -2621,7 +2621,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
                 if (it != subTextures_.end()) {
                     TextureAtlas *atlas;
                     std::shared_ptr<Error> error;
-                    std::tie(atlas, error) = Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.name, tex.filePath.filename(), it->second, tex.format);
+                    std::tie(atlas, error) = Game::getInstance()->getTextureService()->createTextureAtlasFromFile(getHandle(), tex.name, tex.filePath.filename(), it->second, tex.format, tex.createVbo);
                     if (atlas) {
                         loadedTextureAtlases_.push_back(atlas->getHandle());
                     }

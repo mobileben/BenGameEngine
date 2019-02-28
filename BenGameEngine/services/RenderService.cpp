@@ -151,6 +151,30 @@ void BGE::RenderService::queueDestroyTexture(const RenderTextureCommandData& tex
     renderQueue_.push(command);
 }
 
+void BGE::RenderService::queueCreateVbo(const RenderVboCommandData& vboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto data = std::make_shared<RenderVboCommandData>(vboData);
+    auto command = RenderCommandItem(RenderCommand::VboCreate, data, callback);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueDestroyVbo(const RenderVboCommandData& vboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto data = std::make_shared<RenderVboCommandData>(vboData);
+    auto command = RenderCommandItem(RenderCommand::VboDestroy, data, callback);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueCreateIbo(const RenderIboCommandData& iboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto data = std::make_shared<RenderIboCommandData>(iboData);
+    auto command = RenderCommandItem(RenderCommand::IboCreate, data, callback);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueDestroyIbo(const RenderIboCommandData& iboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto data = std::make_shared<RenderIboCommandData>(iboData);
+    auto command = RenderCommandItem(RenderCommand::IboDestroy, data, callback);
+    renderQueue_.push(command);
+}
+
 void BGE::RenderService::queueRender() {
     auto command = RenderCommandItem(RenderCommand::Render);
     renderQueue_.push(command);
@@ -163,6 +187,30 @@ void BGE::RenderService::createTexture(const RenderCommandItem& item) {
 }
 
 void BGE::RenderService::destroyTexture(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
+}
+
+void BGE::RenderService::createVbo(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
+}
+
+void BGE::RenderService::destroyVbo(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
+}
+
+void BGE::RenderService::createIbo(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
+}
+
+void BGE::RenderService::destroyIbo(const RenderCommandItem& item) {
     if (item.callback) {
         item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
     }
@@ -232,6 +280,50 @@ void BGE::RenderService::threadFunction() {
             }
                 break;
 
+            case RenderCommand::VboCreate: {
+                auto data = std::dynamic_pointer_cast<RenderVboCommandData>(command.data);
+                if (data) {
+                    createVbo(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+                
+            case RenderCommand::VboDestroy: {
+                auto data = std::dynamic_pointer_cast<RenderVboCommandData>(command.data);
+                if (data) {
+                    destroyVbo(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+                
+            case RenderCommand::IboCreate: {
+                auto data = std::dynamic_pointer_cast<RenderIboCommandData>(command.data);
+                if (data) {
+                    createIbo(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+                
+            case RenderCommand::IboDestroy: {
+                auto data = std::dynamic_pointer_cast<RenderIboCommandData>(command.data);
+                if (data) {
+                    destroyIbo(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+                
             case RenderCommand::Render:
                 render();
                 break;

@@ -25,8 +25,8 @@ namespace BGE {
     class ShaderProgramOpenGLES2 : public ShaderProgram
     {
     public:
-        ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders);
-        ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms);
+        ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders);
+        ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms);
         
         GLuint getProgram() const { return program_; }
         

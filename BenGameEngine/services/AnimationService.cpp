@@ -48,7 +48,7 @@ void BGE::AnimationService::update(double deltaTime) {
                 handleServicesLock();
                 auto obj = space->getGameObjectLockless(handle);
                 
-                if (obj && obj->isActive() && obj->isVisibleLockless(space)) {
+                if (obj && obj->isActive() && obj->isVisible()) {
                     auto animSeq = obj->getComponentLockless<AnimationSequenceComponent>(space);
                     auto animator = obj->getComponentLockless<AnimatorComponent>(space);
                     

@@ -17,24 +17,30 @@
 
 namespace BGE {
     enum class ShaderProgramState {
-        Unitialized = 0,
+        Uninitialized = 0,
         GLError,
         IllegalShader,
         LinkError,
         Ready
     };
     
+    using ShaderProgramId = int32_t;
+    const ShaderProgramId ShaderProgramIdUndefined = -1;
+    
     class ShaderProgram
     {
     public:
-        ShaderProgram(std::string name, std::vector<std::shared_ptr<Shader>> shaders);
-        ShaderProgram(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms);
+        ShaderProgram() : id_(ShaderProgramIdUndefined), state_(ShaderProgramState::Uninitialized) {}
+        ShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders);
+        ShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms);
         virtual ~ShaderProgram() {}
         
-        std::string getName() { return name_; }
+        inline ShaderProgramId getId() const { return id_; }
+        inline std::string getName() const { return name_; }
         
     protected:
-        std::string name_;
+        ShaderProgramId id_;
+        std::string     name_;
         
         std::vector<std::shared_ptr<Shader>> shaders_;
         

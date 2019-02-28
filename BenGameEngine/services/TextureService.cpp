@@ -974,7 +974,7 @@ std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::crea
 
 #endif /* TARGET_OS_IPHONE */
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(ScenePackageHandle scenePackageHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, bool createVbo) {
     std::lock_guard<std::mutex> lock(packageTextureAtlasesMutex_);
     auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
     auto tex = scenePackage.find(name);
@@ -982,7 +982,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     if (tex == scenePackage.end()) {
         TextureAtlas *atlas;
         std::shared_ptr<Error> error;
-        std::tie(atlas, error) = createTextureAtlasFromFile(name, filename, subTextureDefs, format);
+        std::tie(atlas, error) = createTextureAtlasFromFile(name, filename, subTextureDefs, format, createVbo);
         if (atlas) {
             auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
             scenePackage[name] = atlas->getHandle();
@@ -1001,7 +1001,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     }
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(ScenePackageHandle scenePackageHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(ScenePackageHandle scenePackageHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, bool createVbo) {
     std::lock_guard<std::mutex> lock(packageTextureAtlasesMutex_);
     auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
     auto tex = scenePackage.find(name);
@@ -1009,7 +1009,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     if (tex == scenePackage.end()) {
         TextureAtlas *atlas;
         std::shared_ptr<Error> error;
-        std::tie(atlas, error) = createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs);
+        std::tie(atlas, error) = createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs, createVbo);
         if (atlas) {
             auto &scenePackage = packageTextureAtlases_[scenePackageHandle];
             scenePackage[name] = atlas->getHandle();
@@ -1020,7 +1020,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     }
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(SpaceHandle spaceHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, bool createVbo) {
     std::lock_guard<std::mutex> lock(spaceTextureAtlasesMutex_);
     auto &space = spaceTextureAtlases_[spaceHandle];
     auto tex = space.find(name);
@@ -1028,7 +1028,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     if (tex == space.end()) {
         TextureAtlas *atlas;
         std::shared_ptr<Error> error;
-        std::tie(atlas, error) = createTextureAtlasFromFile(name, filename, subTextureDefs, format);
+        std::tie(atlas, error) = createTextureAtlasFromFile(name, filename, subTextureDefs, format, createVbo);
         if (atlas) {
             auto &space = spaceTextureAtlases_[spaceHandle];
             space[name] = atlas->getHandle();
@@ -1039,7 +1039,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     }
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(SpaceHandle spaceHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(SpaceHandle spaceHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, bool createVbo) {
     std::lock_guard<std::mutex> lock(spaceTextureAtlasesMutex_);
     auto &space = spaceTextureAtlases_[spaceHandle];
     auto tex = space.find(name);
@@ -1047,7 +1047,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     if (tex == space.end()) {
         TextureAtlas *atlas;
         std::shared_ptr<Error> error;
-        std::tie(atlas, error) = createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs);
+        std::tie(atlas, error) = createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs, createVbo);
         if (atlas) {
             auto &space = spaceTextureAtlases_[spaceHandle];
             space[name] = atlas->getHandle();
@@ -1058,7 +1058,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     }
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(FontHandle fontHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(FontHandle fontHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, bool createVbo) {
     std::lock_guard<std::mutex> lock(fontTextureAtlasesMutex_);
     auto &font = fontTextureAtlases_[fontHandle];
     auto tex = font.find(name);
@@ -1066,7 +1066,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     if (tex == font.end()) {
         TextureAtlas *atlas;
         std::shared_ptr<Error> error;
-        std::tie(atlas, error) = createTextureAtlasFromFile(name, filename, subTextureDefs, format);
+        std::tie(atlas, error) = createTextureAtlasFromFile(name, filename, subTextureDefs, format, createVbo);
         if (atlas) {
             auto &font = fontTextureAtlases_[fontHandle];
             font[name] = atlas->getHandle();
@@ -1077,7 +1077,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     }
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(FontHandle fontHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(FontHandle fontHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, bool createVbo) {
     std::lock_guard<std::mutex> lock(fontTextureAtlasesMutex_);
     auto &font = fontTextureAtlases_[fontHandle];
     auto tex = font.find(name);
@@ -1085,7 +1085,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     if (tex == font.end()) {
         TextureAtlas *atlas;
         std::shared_ptr<Error> error;
-        std::tie(atlas, error) = createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs);
+        std::tie(atlas, error) = createTextureAtlasFromBuffer(name, buffer, format, width, height, subTextureDefs, createVbo);
         if (atlas) {
             auto &font = fontTextureAtlases_[fontHandle];
             font[name] = atlas->getHandle();
@@ -1096,7 +1096,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     }
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, bool createVbo) {
     std::shared_ptr<Error> error;
     TextureAtlasHandle atlasHandle;
     TextureAtlas *atlas;
@@ -1104,7 +1104,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     
     if (atlas) {
         atlas->initialize(atlasHandle, name);
-        std::tie(atlas, error) = atlas->createFromFile(filename, subTextureDefs, format);
+        std::tie(atlas, error) = atlas->createFromFile(filename, subTextureDefs, format, createVbo);
         if (!atlas) {
             // We had a problem, release the handle
             textureAtlasHandleService_.release(atlasHandle);
@@ -1115,7 +1115,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     return std::make_pair(atlas, error);
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, bool createVbo) {
     std::shared_ptr<Error> error;
     TextureAtlasHandle atlasHandle;
     TextureAtlas *atlas;
@@ -1123,7 +1123,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     if (atlas) {
         atlas->initialize(atlasHandle, name);
         
-        std::tie(atlas, error) = atlas->createFromBuffer(buffer, format, width, height, subTextureDefs);
+        std::tie(atlas, error) = atlas->createFromBuffer(buffer, format, width, height, subTextureDefs, createVbo);
         if (!atlas) {
             // We had a problem, release the handle
             textureAtlasHandleService_.release(atlasHandle);

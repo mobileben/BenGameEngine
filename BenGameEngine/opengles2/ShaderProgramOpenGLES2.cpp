@@ -10,11 +10,11 @@
 
 #include "ShaderProgramOpenGLES2.h"
 
-BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders) : ShaderProgram(name, shaders), error_(GL_NO_ERROR) {
+BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders) : ShaderProgram(id, name, shaders), error_(GL_NO_ERROR) {
     state_ = createShaderProgram(name, shaders);
 }
 
-BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms) : ShaderProgram(name, shaders), error_(GL_NO_ERROR)
+BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms) : ShaderProgram(id, name, shaders), error_(GL_NO_ERROR)
 {
     state_ = createShaderProgram(name, shaders);
     
@@ -42,7 +42,7 @@ BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(__attri
             }
         }
         
-        if (state_ == ShaderProgramState::Unitialized) {
+        if (state_ == ShaderProgramState::Uninitialized) {
             glLinkProgram(program_);
             
             GLint linkSuccess;

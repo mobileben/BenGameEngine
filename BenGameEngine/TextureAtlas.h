@@ -70,8 +70,8 @@ namespace BGE {
 
         size_t getMemoryUsage() const;
 
-        std::pair<TextureAtlas *, std::shared_ptr<Error>> createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format);
-        std::pair<TextureAtlas *, std::shared_ptr<Error>> createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures);
+        std::pair<TextureAtlas *, std::shared_ptr<Error>> createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format, bool createVbo);
+        std::pair<TextureAtlas *, std::shared_ptr<Error>> createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextures, bool createVbo);
         
     private:
         // TODO: valid_ needs to become state or status
@@ -92,6 +92,7 @@ namespace BGE {
         std::map<std::string, TextureHandle> subTextures_;
         
         void reset();
+        void buildVertexTexData(Texture *texture);
     };
 }
 

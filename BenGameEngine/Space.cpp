@@ -1524,12 +1524,12 @@ std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::Space::createTexture
 }
 #endif /* TARGET_OS_IPHONE */
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::Space::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format) {
-    return Game::getInstance()->getTextureService()->createTextureAtlasFromFile(spaceHandle_, name, filename, subTextureDefs, format);
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::Space::createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, bool createVbo) {
+    return Game::getInstance()->getTextureService()->createTextureAtlasFromFile(spaceHandle_, name, filename, subTextureDefs, format, createVbo);
 }
 
-std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::Space::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs) {
-    return Game::getInstance()->getTextureService()->createTextureAtlasFromBuffer(spaceHandle_, name, buffer, format, width, height, subTextureDefs);
+std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::Space::createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, bool createVbo) {
+    return Game::getInstance()->getTextureService()->createTextureAtlasFromBuffer(spaceHandle_, name, buffer, format, width, height, subTextureDefs, createVbo);
 }
 
 BGE::TextureHandle BGE::Space::getTextureHandle(std::string name) const {

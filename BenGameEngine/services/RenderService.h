@@ -34,10 +34,7 @@ namespace BGE {
         Vector4 color;
     } VertexColor;
     
-    typedef struct {
-        Vector3 position;
-        Vector2 tex;
-    } VertexTex;
+    // VertexTex moved to Texture.h
     
     typedef struct {
         Vector3 position;
@@ -59,7 +56,7 @@ namespace BGE {
         OpenGLCentered          // Center of screen (X-right, Y-up)
     };
 
-    enum class RenderCommand { None, BindWindow, SetIsReady, CreateBuiltinShaders, CreateShader, Render, TextureCreate, TextureDestroy };
+    enum class RenderCommand { None, BindWindow, SetIsReady, CreateBuiltinShaders, CreateShader, Render, TextureCreate, TextureDestroy, VboCreate, VboDestroy, IboCreate, IboDestroy };
 
     struct RenderCommandData {
         virtual ~RenderCommandData() {}
@@ -124,6 +121,43 @@ namespace BGE {
 #endif /* SUPPORT_OPENGL */
     };
 
+    struct RenderVboCommandData : public RenderCommandData {
+        VertexTex   *vertexTexData;
+        uint32_t    numVertexTex;
+#ifdef SUPPORT_OPENGL
+        GLuint  glVboId;
+#endif /* SUPPORT_OPENGL */
+        
+        RenderVboCommandData() =delete;
+        RenderVboCommandData(VertexTex *data, uint32_t num) : vertexTexData(data), numVertexTex(num) {
+#ifdef SUPPORT_OPENGL
+            glVboId = 0;
+#endif /* SUPPORT_OPENGL */
+        }
+#ifdef SUPPORT_OPENGL
+        RenderVboCommandData(GLuint id) : vertexTexData(nullptr), numVertexTex(0), glVboId(id) {}
+#endif /* SUPPORT_OPENGL */
+    };
+    
+    struct RenderIboCommandData : public RenderCommandData {
+        void        *indices;
+        uint32_t    numIndices;
+        uint32_t    indexSize;
+#ifdef SUPPORT_OPENGL
+        GLuint      glIboId;
+#endif /* SUPPORT_OPENGL */
+        
+        RenderIboCommandData() =delete;
+        RenderIboCommandData(void *indices, uint32_t num, uint32_t size) : indices(indices), numIndices(num), indexSize(size) {
+#ifdef SUPPORT_OPENGL
+            glIboId = 0;
+#endif /* SUPPORT_OPENGL */
+        }
+#ifdef SUPPORT_OPENGL
+        RenderIboCommandData(GLuint id) : indices(nullptr), numIndices(0), indexSize(0), glIboId(id) {}
+#endif /* SUPPORT_OPENGL */
+    };
+    
     struct RenderCommandItem {
         RenderCommand                                                   command;
         std::shared_ptr<RenderCommandData>                              data;
@@ -202,7 +236,8 @@ namespace BGE {
         int64_t getProcessingTime() const { return processingTime_; }
 #endif /* SUPPORT_PROFILING */
 
-        virtual std::shared_ptr<ShaderProgram> useShaderProgram(const std::string& program) =0;
+        virtual std::shared_ptr<ShaderProgram> useShaderProgram(ShaderProgramId progam, bool& changed) =0;
+        virtual std::shared_ptr<ShaderProgram> useShaderProgram(const std::string& program, bool& changed) =0;
         virtual std::shared_ptr<ShaderProgram> pushShaderProgram(const std::string& program) =0;
         virtual std::shared_ptr<ShaderProgram> popShaderProgram() =0;
         
@@ -214,6 +249,10 @@ namespace BGE {
         void queueSetIsReady();
         void queueCreateTexture(const RenderTextureCommandData& texData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
         void queueDestroyTexture(const RenderTextureCommandData& texData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueCreateVbo(const RenderVboCommandData& vboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueDestroyVbo(const RenderVboCommandData& vboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueCreateIbo(const RenderIboCommandData& iboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueDestroyIbo(const RenderIboCommandData& iboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
         void queueRender();
 
     protected:
@@ -232,6 +271,10 @@ namespace BGE {
 
         virtual void createTexture(const RenderCommandItem& item);
         virtual void destroyTexture(const RenderCommandItem& item);
+        virtual void createVbo(const RenderCommandItem& item);
+        virtual void destroyVbo(const RenderCommandItem& item);
+        virtual void createIbo(const RenderCommandItem& item);
+        virtual void destroyIbo(const RenderCommandItem& item);
 
 #ifdef SUPPORT_PROFILING
         profiling::FrameRateCalculator frameRateCalculator_;

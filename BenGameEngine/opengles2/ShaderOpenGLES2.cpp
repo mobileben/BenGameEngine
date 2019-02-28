@@ -12,7 +12,7 @@
 #include "ShaderOpenGLES2.h"
 #include "ShaderServiceOpenGLES2.h"
 
-BGE::ShaderOpenGLES2::ShaderOpenGLES2(ShaderType shaderType, std::string name) : Shader(shaderType, name), shader_(0), error_(GL_NO_ERROR)
+BGE::ShaderOpenGLES2::ShaderOpenGLES2(ShaderType shaderType, ShaderId id, std::string name) : Shader(shaderType, id, name), shader_(0), error_(GL_NO_ERROR)
 {
     NSString *path = [ShaderServiceOpenGLES2::getShaderBundle() pathForResource:[[NSString alloc] initWithCString:name.c_str() encoding:NSUTF8StringEncoding] ofType:@"glsl"];
     NSError *error = nil;

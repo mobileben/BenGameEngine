@@ -29,6 +29,9 @@
 #endif /* SUPPORT_OPENGLES2 */
 #endif /* SUPPORT_OPENGL */
 
+#include <vector>
+#include <map>
+
 namespace BGE {
     typedef enum {
         TextureErrorNone = 0,
@@ -40,6 +43,7 @@ namespace BGE {
         TextureErrorAllocation,
         TextureErrorInvalidSubTexture,
         TextureErrorExistingTextureWrongType,
+        TextureErrorVboAllocation
     } TextureError;
     
     enum class TextureState : uint32_t {
@@ -65,6 +69,11 @@ namespace BGE {
         RGBA8888
     };
     
+    struct VertexTex {
+        Vector3 position;
+        Vector2 tex;
+    };
+
     class TextureAtlas;
     
     class Texture : public NamedObject
@@ -108,6 +117,12 @@ namespace BGE {
 #endif /* SUPPORT_GLKTEXTURELOADER */
 #ifdef SUPPORT_OPENGL
         inline uint32_t getHWTextureId() const { return hwId_; }
+        inline uint32_t getHWVboId() const { return vboId_; }
+        inline uint32_t getHWIboId() const { return iboId_; }
+        inline GLushort *getVboIndices() const { return const_cast<GLushort *>(&vboIndices_[0]); }
+        inline GLsizei getVboIndicesSize() const { return static_cast<GLsizei>(sizeof(vboIndices_)); }
+        inline GLsizei getVboIndicesCount() const { return static_cast<GLsizei>(sizeof(vboIndices_)/sizeof(vboIndices_[0])); }
+        inline GLenum getVboIndexType() const { return static_cast<GLenum>(GL_UNSIGNED_SHORT); }
         inline GLenum getTarget() const { return target_; }
 #endif /* SUPPORT_OPENGL */
         inline size_t getMemoryUsage() const { return memoryUsage_; }
@@ -141,6 +156,7 @@ namespace BGE {
         
     private:
         friend class TextureService;
+        friend class TextureAtlas;
         
         // TODO: valid_ needs to become state or status
         bool                valid_;
@@ -148,6 +164,10 @@ namespace BGE {
 #ifdef SUPPORT_OPENGL
         GLuint              hwId_;
         GLenum              target_;
+        GLuint              vboId_;
+        GLuint              iboId_;
+        std::vector<VertexTex>  vertexTexData_;
+        GLushort            vboIndices_[6];
 #endif /* SUPPORT_OPENGL */
         Vector2             xys_[4];
         Vector2             uvs_[4];
@@ -186,6 +206,7 @@ namespace BGE {
         std::shared_ptr<Error> createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
         std::shared_ptr<Error> createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
         
+        void buildVertexTexData(const std::map<std::string, TextureHandle>& subTextures);
         size_t computeMemoryUsage(TextureFormat format, uint32_t width, uint32_t height);
     };
 }

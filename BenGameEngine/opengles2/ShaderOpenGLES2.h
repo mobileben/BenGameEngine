@@ -20,7 +20,7 @@ namespace BGE {
     class ShaderOpenGLES2 : public Shader
     {
     public:
-        ShaderOpenGLES2(ShaderType shaderType, std::string name);
+        ShaderOpenGLES2(ShaderType shaderType, ShaderId id, std::string name);
         
         GLuint getShader() { return shader_; }
         

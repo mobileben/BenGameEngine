@@ -19,6 +19,8 @@ BGE::Texture::Texture() : NamedObject(), valid_(false), width_(0), height_(0), x
 #ifdef SUPPORT_OPENGL
     hwId_ = 0;
     target_ = GL_TEXTURE_2D;
+    vboId_ = 0;
+    iboId_ = 0;
 #endif /* SUPPORT_OPENGL */
 #ifdef SUPPORT_GLKTEXTURELOADER
     textureInfo_ = nil;
@@ -32,6 +34,8 @@ BGE::Texture::Texture(uint32_t texId) : NamedObject(texId), valid_(false), width
 #ifdef SUPPORT_OPENGL
     hwId_ = 0;
     target_ = GL_TEXTURE_2D;
+    vboId_ = 0;
+    iboId_ = 0;
 #endif /* SUPPORT_OPENGL */
 #ifdef SUPPORT_GLKTEXTURELOADER
     textureInfo_ = nil;
@@ -44,6 +48,8 @@ BGE::Texture::Texture(uint32_t texId, std::string name) : NamedObject(texId, nam
 #ifdef SUPPORT_OPENGL
     hwId_ = 0;
     target_ = GL_TEXTURE_2D;
+    vboId_ = 0;
+    iboId_ = 0;
 #endif /* SUPPORT_OPENGL */
 #ifdef SUPPORT_GLKTEXTURELOADER
     textureInfo_ = nil;
@@ -61,6 +67,8 @@ BGE::Texture::Texture(uint32_t texId, std::string name, GLKTextureInfo *textureI
 #ifdef SUPPORT_OPENGL
         hwId_ = textureInfo.name;
         target_ = textureInfo.target;
+        vboId_ = 0;
+        iboId_ = 0;
 #endif /* SUPPORT_OPENGL */
         width_ = textureInfo.width;
         height_ = textureInfo.height;
@@ -86,6 +94,8 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFor
 #ifdef SUPPORT_OPENGL
     hwId_ = 0;
     target_ = GL_TEXTURE_2D;
+    vboId_ = 0;
+    iboId_ = 0;
 #endif /* SUPPORT_OPENGL */
 
     atlasHandle_ = TextureAtlasHandle();
@@ -103,6 +113,8 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFor
 #ifdef SUPPORT_OPENGL
         hwId_ = texInfo.name;
         target_ = texInfo.target;
+        vboId_ = 0;
+        iboId_ = 0;
 #endif /* SUPPORT_OPENGL */
         width_ = texInfo.width;
         height_ = texInfo.height;
@@ -207,17 +219,30 @@ void BGE::Texture::destroy() {
         data.glHwId = name;
 #endif /* SUPPORT_OPENGL */
 
-        // Always delete textures on main thread (for now)
-        auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
-        auto fut = prom->get_future();
-        Game::getInstance()->getRenderService()->queueDestroyTexture(data, [prom](RenderCommandItem, std::shared_ptr<Error> error) {
-            prom->set_value(error);
+        Game::getInstance()->getRenderService()->queueDestroyTexture(data, [](RenderCommandItem, __attribute__((unused)) std::shared_ptr<Error> error) {
         });
-        fut.get();
+#ifdef SUPPORT_OPENGL
+        if (vboId_) {
+            RenderVboCommandData vboData(vboId_);
+            Game::getInstance()->getRenderService()->queueDestroyVbo(vboData, [](RenderCommandItem, __attribute__((unused)) std::shared_ptr<Error> error) {
+            });
+        }
+#endif /* SUPPORT_OPENGL */
+    } else {
+#ifdef SUPPORT_OPENGL
+        if (iboId_) {
+            RenderIboCommandData iboData(iboId_);
+            Game::getInstance()->getRenderService()->queueDestroyIbo(iboData, [](RenderCommandItem, __attribute__((unused)) std::shared_ptr<Error> error) {
+            });
+        }
+#endif /* SUPPORT_OPENGL */
     }
 
 #ifdef SUPPORT_OPENGL
     hwId_ = 0;
+    vboId_ = 0;
+    iboId_ = 0;
+    vertexTexData_.clear();
 #endif /* SUPPORT_OPENGL */
 #ifdef SUPPORT_GLKTEXTURELOADER
     textureInfo_ = nil;
@@ -332,19 +357,24 @@ void BGE::Texture::updateXYs() {
          
          0 - 1 - 2
          0 - 2 - 3
+         
+         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+         
          */
         
-        xys_[0].x = 0;
-        xys_[0].y = getHeight();
+        float w_2 = getWidth() / 2.0;
+        float h_2 = getHeight() / 2.0;
+        xys_[0].x = -w_2;
+        xys_[0].y = h_2;
         
-        xys_[1].x = getWidth();
-        xys_[1].y = getHeight();
+        xys_[1].x = w_2;
+        xys_[1].y = h_2;
         
-        xys_[2].x = getWidth();
-        xys_[2].y = 0;
+        xys_[2].x = w_2;
+        xys_[2].y = -h_2;
         
-        xys_[3].x = 0;
-        xys_[3].y = 0;
+        xys_[3].x = -w_2;
+        xys_[3].y = -h_2;
     } else {
         /*
          
@@ -362,19 +392,25 @@ void BGE::Texture::updateXYs() {
          
          0 - 1 - 2
          0 - 2 - 3
+         
+         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+         
          */
         
-        xys_[0].x = 0;
-        xys_[0].y = 0;
+        float w_2 = getWidth() / 2.0;
+        float h_2 = getHeight() / 2.0;
+
+        xys_[0].x = -w_2;
+        xys_[0].y = -h_2;
         
-        xys_[1].x = getWidth();
-        xys_[1].y = 0;
+        xys_[1].x = w_2;
+        xys_[1].y = -h_2;
         
-        xys_[2].x = getWidth();
-        xys_[2].y = getHeight();
+        xys_[2].x = w_2;
+        xys_[2].y = h_2;
         
-        xys_[3].x = 0;
-        xys_[3].y = getHeight();
+        xys_[3].x = -w_2;
+        xys_[3].y = h_2;
     }
 }
 
@@ -548,6 +584,40 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA8888Buffer(unsign
         return fut.get();
     } else {
         return std::make_shared<Error>(Texture::ErrorDomain, TextureErrorNoBuffer);
+    }
+}
+
+static uint32_t indexOrdering[] = { 0, 3, 2, 2, 1, 0 };
+static uint32_t kNumVertices = 4;
+
+void BGE::Texture::buildVertexTexData(const std::map<std::string, TextureHandle>& subTextures) {
+    vertexTexData_.clear();
+    vertexTexData_.reserve(subTextures.size() * kNumVertices);
+    
+    auto textureService = Game::getInstance()->getTextureService();
+
+    VertexTex vt;
+    vt.position.z = 0.0;
+    
+    uint32_t dataIndex = 0;
+    for (auto it : subTextures) {
+        auto handle = it.second;
+        auto subTex = textureService->getTexture(handle);
+        if (subTex) {
+            for (size_t i=0;i<kNumVertices;++i) {
+                vt.position.x = subTex->xys_[i].x;
+                vt.position.y = subTex->xys_[i].y;
+                vt.tex.x = subTex->uvs_[i].x;
+                vt.tex.y = subTex->uvs_[i].y;
+                vertexTexData_.push_back(vt);
+            }
+#ifdef SUPPORT_OPENGL
+            for (size_t i=0;i<sizeof(indexOrdering)/sizeof(uint32_t);++i) {
+                subTex->vboIndices_[i] = static_cast<GLuint>(dataIndex + indexOrdering[i]);
+            }
+            dataIndex += kNumVertices;
+#endif /* SUPPORT_OPENGL */
+        }
     }
 }
 
