@@ -114,9 +114,6 @@ namespace BGE {
         
         struct InputEventItem {
             Space                               *space;
-#ifdef OBSOLETE
-            SpaceHandle                         spaceHandle;
-#endif
             GameObjectHandle                    gameObjHandle;
             ButtonComponentHandle               buttonComponentHandle;
             InputTouchComponentHandle           inputTouchComponentHandle;

@@ -249,9 +249,6 @@ void BGE::InputService::checkInput(Input *input, Space *space, GameObject *gameO
                     InputEventItem eventItem;
                     
                     eventItem.space = space;
-#ifdef OBSOLETE
-                    eventItem.spaceHandle = space->getHandle();
-#endif
                     eventItem.gameObjHandle = gameObj->getHandle();
                     eventItem.buttonComponentHandle = button->getHandle<ButtonComponent>();
                     eventItem.inputTouchComponentHandle = InputTouchComponentHandle();
@@ -283,9 +280,6 @@ void BGE::InputService::checkInput(Input *input, Space *space, GameObject *gameO
                                 InputEventItem eventItem;
 
                                 eventItem.space = space;
-#ifdef OBSOLETE
-                                eventItem.spaceHandle = space->getHandle();
-#endif
                                 eventItem.gameObjHandle = gameObj->getHandle();
                                 eventItem.buttonComponentHandle = ButtonComponentHandle();
                                 eventItem.inputTouchComponentHandle = InputTouchComponentHandle();
@@ -314,9 +308,6 @@ void BGE::InputService::checkInput(Input *input, Space *space, GameObject *gameO
                             InputEventItem eventItem;
                             
                             eventItem.space = space;
-#ifdef OBSOLETE
-                            eventItem.spaceHandle = space->getHandle();
-#endif
                             eventItem.gameObjHandle = gameObj->getHandle();
                             eventItem.buttonComponentHandle = ButtonComponentHandle();
                             eventItem.inputTouchComponentHandle = inputTouch->getHandle<InputTouchComponent>();
@@ -427,11 +418,7 @@ void BGE::InputService::update(double deltaTime) {
             // Now clear out any touch tags that match
             handleServicesLock();
             for (auto &item : inputEventWorkQueue_) {
-#ifdef OBSOLETE
-                auto space = spaceService->getSpace(item.spaceHandle);
-#else
                 auto space = item.space;
-#endif
                 
                 if (space) {
                     auto button = space->getComponentLockless(item.buttonComponentHandle);
@@ -469,11 +456,7 @@ void BGE::InputService::update(double deltaTime) {
     auto eventService = eventService_;
 
     for (auto &item : inputEventQueue_) {
-#ifdef OBSOLETE
-        auto space = spaceService->getSpace(item.spaceHandle);
-#else
         auto space = item.space;
-#endif /* OBSOLETE */
         auto gameObj = space->getGameObject(item.gameObjHandle);
         
         if (gameObj) {
