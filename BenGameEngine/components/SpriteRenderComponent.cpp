@@ -150,6 +150,9 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices(bool force) {
                          
                          0 - 1 - 2
                          0 - 2 - 3
+                         
+                         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+                         
                          */
                         
                         vertices[0].position.x = x - w_2;
@@ -192,6 +195,9 @@ void BGE::SpriteRenderComponent::updateLocalBoundsAndVertices(bool force) {
                          
                          0 - 1 - 2
                          0 - 2 - 3
+                         
+                         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+                         
                          */
                         
                         vertices[0].position.x = x - w_2;

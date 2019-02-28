@@ -148,6 +148,9 @@ void BGE::TextureMaskComponent::updateLocalBoundsAndVertices(Vector2& wh) {
 
                  0 - 1 - 2
                  0 - 2 - 3
+                 
+                 NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+                 
                  */
 
                 vertices[0].position.x = x - w_2;
@@ -181,7 +184,10 @@ void BGE::TextureMaskComponent::updateLocalBoundsAndVertices(Vector2& wh) {
                  3--------2
 
                  0 - 2 - 1
-                 0 -
+                 0 - 2 - 3
+                 
+                 NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+                 
                  */
 
 
@@ -256,6 +262,9 @@ void BGE::TextureMaskComponent::updateLocalBoundsAndVertices() {
 
                          0 - 1 - 2
                          0 - 2 - 3
+                         
+                         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+                         
                          */
 
                         vertices[0].position.x = x - w_2;
@@ -298,6 +307,9 @@ void BGE::TextureMaskComponent::updateLocalBoundsAndVertices() {
 
                          0 - 1 - 2
                          0 - 2 - 3
+                         
+                         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+                         
                          */
 
                         vertices[0].position.x = x - w_2;

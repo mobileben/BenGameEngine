@@ -143,6 +143,9 @@ void BGE::MaskComponent::updateLocalBoundsAndVertices(Vector2& wh) {
                  
                  0 - 1 - 2
                  0 - 2 - 3
+                 
+                 NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+                 
                  */
                 
                 vertices[0].x = x - w_2;
