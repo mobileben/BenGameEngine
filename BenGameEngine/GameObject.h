@@ -21,6 +21,7 @@
 namespace BGE {
     class Space;
     class GameObjectService;
+    class TransformComponent;
     
     class GameObject : public NamedObject
     {
@@ -219,9 +220,7 @@ namespace BGE {
         void upgradeToAnimationSequence();
         
         // Convenience methods
-        bool isVisible(void);
-        bool isVisible(const Space *space);
-        bool isVisibleLockless(const Space *space);
+        inline bool isVisible(void) { return cachedVisibility_; }
         void setVisibility(bool visible);
         
         bool isClipped(void);
@@ -243,13 +242,19 @@ namespace BGE {
         
     private:
         friend GameObjectService;
+        friend TransformComponent;
         
         bool                            active_;
+        bool                            cachedVisibility_;
         bool                            destroy_;
         uint32_t                        componentBitmask_;
         GameObjectHandle                handle_;
         SpaceHandle                     spaceHandle_;
         std::vector<ComponentHandle>    components_;
+        
+        void setCachedVisibility(bool visible) {
+            cachedVisibility_ = visible;
+        }
         
         void setSpaceHandle(SpaceHandle spaceHandle) { spaceHandle_ = spaceHandle; }
         

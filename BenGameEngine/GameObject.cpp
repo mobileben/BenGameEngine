@@ -18,7 +18,7 @@
 #include "TransformComponent.h"
 #include "LogicComponent.h"
 
-BGE::GameObject::GameObject() : NamedObject(), active_(false), componentBitmask_(0) {
+BGE::GameObject::GameObject() : NamedObject(), active_(false), cachedVisibility_(true), componentBitmask_(0) {
 }
 
 BGE::GameObject::GameObject(ObjectId objId) : NamedObject(objId), active_(false), componentBitmask_(0) {
@@ -56,7 +56,8 @@ void BGE::GameObject::markForDestroy() {
 
 void BGE::GameObject::destroy() {
     active_ = false;
-
+    cachedVisibility_ = true;
+    
     removeAllComponents();
     
     handle_ = GameObjectHandle();
@@ -65,7 +66,8 @@ void BGE::GameObject::destroy() {
 
 void BGE::GameObject::destroyDontReleaseComponents() {
     active_ = false;
-    
+    cachedVisibility_ = true;
+
     componentBitmask_ = 0;
     components_.clear();
 
@@ -165,41 +167,13 @@ BGE::GameObject *BGE::GameObject::findWithPrefix(ComponentTypeId componentTypeId
     return nullptr;
 }
 
-bool BGE::GameObject::isVisible(void) {
-    auto xform = getComponent<TransformComponent>();
-    
-    if (xform) {
-        return xform->isVisible();
-    }
-    
-    return false;
-}
-
-bool BGE::GameObject::isVisible(const Space *space) {
-    auto xform = getComponent<TransformComponent>(space);
-    
-    if (xform) {
-        return xform->isVisible();
-    }
-    
-    return false;
-}
-
-bool BGE::GameObject::isVisibleLockless(const Space *space) {
-    auto xform = getComponentLockless<TransformComponent>(space);
-    
-    if (xform) {
-        return xform->isVisible();
-    }
-    
-    return false;
-}
-
 void BGE::GameObject::setVisibility(bool visible) {
     auto xform = getComponent<TransformComponent>();
     if (xform) {
-        xform->setVisibility(visible);
+        xform->setVisibility_(visible);
     }
+
+    cachedVisibility_ = visible;
     
     auto button = getComponent<ButtonComponent>();
     if (button) {
@@ -417,13 +391,37 @@ void BGE::GameObject::removeFromParent() {
 }
 
 void BGE::GameObject::addComponentEpilogue(ComponentTypeId componentTypeId) {
-    if (componentTypeId == LogicComponent::typeId_) {
-        Game::getInstance()->getLogicService()->addGameObject(this);
-    } if (componentTypeId == AnimationSequenceComponent::typeId_) {
+    if (componentTypeId == TransformComponent::typeId_) {
         auto space = getSpace();
-        auto animSeq = getComponent<AnimationSequenceComponent>();
+        auto xform = getComponent<TransformComponent>(space);
+        if (xform) {
+            cachedVisibility_ = xform->isVisible();
+        }
+    } else if (componentTypeId == LogicComponent::typeId_) {
+        Game::getInstance()->getLogicService()->addGameObject(this);
+    } else if (componentTypeId == AnimationSequenceComponent::typeId_) {
+        auto space = getSpace();
+        auto animSeq = getComponent<AnimationSequenceComponent>(space);
         if (animSeq->totalFrames > 1) {
             space->addAnimObject(getHandle());
+        }
+    }
+    
+    // Now sort based on type index
+    auto size = components_.size();
+    if (size > 1) {
+        ComponentHandle *handles = &components_[0];
+        size_t i, j;
+        
+        for (i=1;i<size;++i) {
+            j = i;
+            
+            while (j > 0 && handles[j].typeId < handles[j-1].typeId) {
+                auto temp = handles[j];
+                handles[j] = handles[j-1];
+                handles[j-1] = temp;
+                --j;
+            }
         }
     }
 }
