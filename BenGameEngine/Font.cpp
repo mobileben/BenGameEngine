@@ -138,6 +138,7 @@ std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::Font::load(std::str
             error = FT_Set_Pixel_Sizes(face, 0, pixelSize_);
             
             if (!error) {
+                auto textureService = Game::getInstance()->getTextureService();
                 FT_Glyph_Metrics metrics[NumSupportedCharacters];
                 FT_Bitmap bitmaps[NumSupportedCharacters];
                 long maxBearing = 0;
@@ -293,7 +294,7 @@ std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::Font::load(std::str
                     }
 
                     TextureAtlas *atlas;
-                    std::tie(atlas, bgeError) = Game::getInstance()->getTextureService()->createTextureAtlasFromBuffer(getHandle(), FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, TextureFormat::Alpha, atlasW, atlasH, subTexDefs);
+                    std::tie(atlas, bgeError) = textureService->createTextureAtlasFromBuffer(getHandle(), FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, TextureFormat::Alpha, atlasW, atlasH, subTexDefs, true);
                     if (atlas) {
                         textureAtlasHandle_ = atlas->getHandle();
                         glyphs_.clear();
