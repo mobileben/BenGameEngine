@@ -32,7 +32,7 @@ namespace BGE {
 
         virtual std::shared_ptr<Shader> createShader(ShaderType shaderType, ShaderId id, std::string name) =0;
         virtual std::shared_ptr<ShaderProgram> createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders) =0;
-        virtual std::shared_ptr<ShaderProgram> createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms) =0;
+        virtual std::shared_ptr<ShaderProgram> createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated) =0;
         
         std::shared_ptr<Shader> getShader(ShaderId id);
         std::shared_ptr<Shader> getShader(std::string name);
@@ -43,6 +43,8 @@ namespace BGE {
         void removeShader(std::string name);
         void removeProgram(ShaderProgramId id);
         void removeProgram(std::string name);
+        
+        void windowMappedDimensionsUpdated();
         
     protected:
         // Vector variants

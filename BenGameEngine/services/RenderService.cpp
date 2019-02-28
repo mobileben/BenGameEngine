@@ -38,6 +38,8 @@ void BGE::RenderService::bindRenderWindow(std::shared_ptr<RenderContext> context
     this->renderContext_ = context;
     this->renderWindow_ = window;
     window->setRenderContext(context);
+    
+    windowMappedDimensionsUpdated(window);
 }
 
 void BGE::RenderService::resizeRenderWindow()

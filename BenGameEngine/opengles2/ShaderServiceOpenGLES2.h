@@ -27,7 +27,7 @@ namespace BGE {
         
         std::shared_ptr<Shader> createShader(ShaderType shaderType, ShaderId id, std::string name);
         std::shared_ptr<ShaderProgram> createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders);
-        std::shared_ptr<ShaderProgram> createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms);
+        std::shared_ptr<ShaderProgram> createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated);
         
     private:
         static NSBundle *shaderBundle_;    

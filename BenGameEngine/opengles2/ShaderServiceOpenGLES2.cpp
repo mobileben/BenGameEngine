@@ -72,12 +72,12 @@ std::shared_ptr<BGE::ShaderProgram> BGE::ShaderServiceOpenGLES2::createShaderPro
     return program;
 }
 
-std::shared_ptr<BGE::ShaderProgram> BGE::ShaderServiceOpenGLES2::createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms)
+std::shared_ptr<BGE::ShaderProgram> BGE::ShaderServiceOpenGLES2::createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated)
 {
     std::shared_ptr<ShaderProgramOpenGLES2> program = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(shaderPrograms_[name]);
 
     if (!program) {
-        program = std::make_shared<ShaderProgramOpenGLES2>(id, name, shaders, attributes, uniforms);
+        program = std::make_shared<ShaderProgramOpenGLES2>(id, name, shaders, attributes, uniforms, firstUseFunction, windowMappedDimensionsUpdated);
         
         if (program) {
             // Check if id already exists, if so throw assert

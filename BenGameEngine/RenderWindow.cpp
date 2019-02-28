@@ -16,6 +16,7 @@
 #include "BGERenderViewIOS.h"
 #endif /* TARGET_OS_IPHONE */
 
+#include "Game.h"
 #include "RenderWindow.h"
 #include "RenderView.h"
 
@@ -47,21 +48,31 @@ float BGE::RenderWindow::getContentScaleFactor() const {
 }
 
 void BGE::RenderWindow::setMappedWidth(float width) {
+    bool notify = mappedWidth_ != width;
     auto nativeWidth = width_ * contentScaleFactor_;
     mappedWidth_ = width;
     toMappedXScale_ = nativeWidth / mappedWidth_;
     fromMappedXScale_ = mappedWidth_ / nativeWidth;
     Matrix4MakeScale(toMappedMatrix_, toMappedXScale_, toMappedYScale_, 1.0);
     Matrix4MakeScale(fromMappedMatrix_, fromMappedXScale_, fromMappedYScale_, 1.0);
+    
+    if (notify) {
+        Game::getInstance()->getRenderService()->windowMappedDimensionsUpdated(shared_from_this());
+    }
 }
 
 void BGE::RenderWindow::setMappedHeight(float height) {
+    bool notify = mappedHeight_ != height;
     auto nativeHeight = height_ * contentScaleFactor_;
     mappedHeight_ = height;
     toMappedYScale_ = nativeHeight / mappedHeight_;
     fromMappedYScale_ = mappedHeight_ / nativeHeight;
     Matrix4MakeScale(toMappedMatrix_, toMappedXScale_, toMappedYScale_, 1.0);
     Matrix4MakeScale(fromMappedMatrix_, fromMappedXScale_, fromMappedYScale_, 1.0);
+    
+    if (notify) {
+        Game::getInstance()->getRenderService()->windowMappedDimensionsUpdated(shared_from_this());
+    }
 }
 
 void BGE::RenderWindow::addRenderView(std::string name, std::shared_ptr<RenderView> renderView) {

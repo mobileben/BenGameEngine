@@ -68,3 +68,9 @@ void BGE::ShaderService::removeProgram(std::string name)
 {
     shaderPrograms_.erase(name);
 }
+
+void BGE::ShaderService::windowMappedDimensionsUpdated() {
+    for (auto program : shaderProgramVector_) {
+        program->windowMappedDimensionsUpdated();
+    }
+}

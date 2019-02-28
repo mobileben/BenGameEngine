@@ -243,6 +243,8 @@ namespace BGE {
         
         virtual void render() =0;
 
+        virtual void windowMappedDimensionsUpdated(__attribute__((unused)) std::shared_ptr<RenderWindow> window) {}
+        
         // Queuing methods
         void queueBindRenderWindow(const std::shared_ptr<RenderContext>& context, const std::shared_ptr<RenderWindow>& window);
         void queueCreateBuiltinShaders();

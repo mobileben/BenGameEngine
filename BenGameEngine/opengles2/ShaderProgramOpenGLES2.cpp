@@ -14,15 +14,22 @@ BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::str
     state_ = createShaderProgram(name, shaders);
 }
 
-BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms) : ShaderProgram(id, name, shaders), error_(GL_NO_ERROR)
+BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated) : ShaderProgram(id, name, shaders), error_(GL_NO_ERROR)
 {
     state_ = createShaderProgram(name, shaders);
-    
+    windowMappedDimensionsUpdated_ = windowMappedDimensionsUpdated;
     
     if (state_ == ShaderProgramState::Ready) {
         glUseProgram(program_);
 
         createAttributesAndUniforms(attributes, uniforms);
+        
+        if (firstUseFunction) {
+            firstUseFunction(this);
+        }
+        if (windowMappedDimensionsUpdated) {
+            windowMappedDimensionsUpdated(this);
+        }
     }
 }
 

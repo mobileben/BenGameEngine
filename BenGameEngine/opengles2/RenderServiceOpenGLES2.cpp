@@ -318,41 +318,52 @@ void BGE::RenderServiceOpenGLES2::resizeRenderWindow()
 
 void BGE::RenderServiceOpenGLES2::createShaders()
 {
+    auto firstUseFunction = [](ShaderProgram *program) {
+        auto shader = static_cast<ShaderProgramOpenGLES2 *>(program);
+        GLint textureUniform = shader->locationForUniform(TextureShaderUniformId);
+        glUniform1i(textureUniform, 0);
+    };
+    auto mappedFunction = [this](ShaderProgram *program) {
+        auto shader = static_cast<ShaderProgramOpenGLES2 *>(program);
+        GLint projectionLocation = shader->locationForUniform(ProjectionShaderUniformId);
+        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
+    };
+    
     std::shared_ptr<Shader> vShader = this->getShaderService()->createShader(ShaderType::Vertex, SimpleVertexShaderId, SimpleVertexShaderName);
     std::shared_ptr<Shader> fShader = this->getShaderService()->createShader(ShaderType::Fragment, SimpleFragmentShaderId, SimpleFragmentShaderName);
-    std::shared_ptr<ShaderProgram> program = this->getShaderService()->createShaderProgram(SimpleShaderProgramId, SimpleShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {SourceColorShaderAttributeId, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}});
+    std::shared_ptr<ShaderProgram> program = this->getShaderService()->createShaderProgram(SimpleShaderProgramId, SimpleShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {SourceColorShaderAttributeId, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}}, nullptr, mappedFunction);
 
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, LineVertexShaderId, LineVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, LineFragmentShaderId, LineFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(LineShaderProgramId, LineShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {ColorShaderUniformId, ColorShaderUniformName}});
+    program = this->getShaderService()->createShaderProgram(LineShaderProgramId, LineShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {ColorShaderUniformId, ColorShaderUniformName}}, nullptr, mappedFunction);
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, TextureVertexShaderId, TextureVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, TextureFragmentShaderId, TextureFragmentShaderName);
-        program = this->getShaderService()->createShaderProgram(TextureShaderProgramId, TextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {SourceColorShaderAttributeId, SourceColorShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}});
+    program = this->getShaderService()->createShaderProgram(TextureShaderProgramId, TextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {SourceColorShaderAttributeId, SourceColorShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}}, firstUseFunction, mappedFunction);
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, ColorMatrixTextureVertexShaderId, ColorMatrixTextureVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, ColorMatrixTextureFragmentShaderId, ColorMatrixTextureFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(ColorMatrixTextureShaderProgramId, ColorMatrixTextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}});
+    program = this->getShaderService()->createShaderProgram(ColorMatrixTextureShaderProgramId, ColorMatrixTextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}}, firstUseFunction, mappedFunction);
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, FullColorTextureVertexShaderId, FullColorTextureVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, FullColorTextureFragmentShaderId, FullColorTextureFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(FullColorTextureShaderProgramId, FullColorTextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMultiplierShaderUniformId, ColorMultiplierShaderUniformName}, {ColorOffsetShaderUniformId, ColorOffsetShaderUniformName}});
+    program = this->getShaderService()->createShaderProgram(FullColorTextureShaderProgramId, FullColorTextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMultiplierShaderUniformId, ColorMultiplierShaderUniformName}, {ColorOffsetShaderUniformId, ColorOffsetShaderUniformName}}, firstUseFunction, mappedFunction);
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, MaskColorMatrixTextureVertexShaderId, MaskColorMatrixTextureVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, MaskColorMatrixTextureFragmentShaderId, MaskColorMatrixTextureFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(MaskColorMatrixTextureShaderProgramId, MaskColorMatrixTextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}, {MaskTexCoordInShaderAttributeId, MaskTexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {MaskTextureShaderUniformId, MaskTextureShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}});
+    program = this->getShaderService()->createShaderProgram(MaskColorMatrixTextureShaderProgramId, MaskColorMatrixTextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}, {MaskTexCoordInShaderAttributeId, MaskTexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {MaskTextureShaderUniformId, MaskTextureShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}}, firstUseFunction, mappedFunction);
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, FontVertexShaderId, FontVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, FontFragmentShaderId, FontFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(FontShaderProgramId, FontShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {SourceColorShaderUniformId, SourceColorShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}});
+    program = this->getShaderService()->createShaderProgram(FontShaderProgramId, FontShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {SourceColorShaderUniformId, SourceColorShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}}, firstUseFunction, mappedFunction);
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, FullColorFontVertexShaderId, FullColorFontVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, FullColorFontFragmentShaderId, FullColorFontFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(FullColorFontShaderProgramId, FullColorFontShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {SourceColorShaderUniformId, SourceColorShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMultiplierShaderUniformId, ColorMultiplierShaderUniformName}, {ColorOffsetShaderUniformId, ColorOffsetShaderUniformName}});
+    program = this->getShaderService()->createShaderProgram(FullColorFontShaderProgramId, FullColorFontShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {SourceColorShaderUniformId, SourceColorShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMultiplierShaderUniformId, ColorMultiplierShaderUniformName}, {ColorOffsetShaderUniformId, ColorOffsetShaderUniformName}}, firstUseFunction, mappedFunction);
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, PolyLineVertexShaderId, PolyLineVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, PolyLineFragmentShaderId, PolyLineFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(PolyLineShaderProgramId, PolyLineShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {SourceColorShaderAttributeId, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}});
+    program = this->getShaderService()->createShaderProgram(PolyLineShaderProgramId, PolyLineShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {SourceColorShaderAttributeId, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}}, nullptr, mappedFunction);
 }
 
 std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::useShaderProgram(ShaderProgramId program, bool& changed) {
@@ -435,7 +446,6 @@ std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::popShaderProgra
 void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vector4 &color)
 {
     VertexColor vertices[4];
-    GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };
     
     if (hasInvertedYAxis()) {
         /*
@@ -530,8 +540,8 @@ void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vec
     glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
                           sizeof(VertexColor), (GLvoid*) (&vertices[0].color));
     
-    glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
-                   GL_UNSIGNED_BYTE, &indices[0]);
+    glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
+                   GL_UNSIGNED_BYTE, &VertexIndices[0]);
 #ifdef SUPPORT_PROFILING
     ++numRectsDrawn_;
     ++numDrawCalls_;
@@ -541,7 +551,6 @@ void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vec
 void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &size, Vector4 color[4])
 {
     VertexColor vertices[4];
-    GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };
     
     if (hasInvertedYAxis()) {
         /*
@@ -635,8 +644,8 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
     glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
                           sizeof(VertexColor), (GLvoid*) (&vertices[0].color));
     
-    glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
-                   GL_UNSIGNED_BYTE, &indices[0]);
+    glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
+                   GL_UNSIGNED_BYTE, &VertexIndices[0]);
 #ifdef SUPPORT_PROFILING
     ++numRectsDrawn_;
     ++numDrawCalls_;
@@ -647,7 +656,6 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
 {
     if (texture) {
         VertexTex vertices[4];
-        GLubyte indices[6] = { 0, 1, 2, 0, 2, 3 };  // TODO: Make these indices constant
 
         if (texture && texture->isValid()) {
             const Vector2 *xys = texture->getXYs();
@@ -685,11 +693,7 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             
             glEnableVertexAttribArray(positionLocation);
             glEnableVertexAttribArray(texCoordLocation);
-            
-            GLint textureUniform = glShader->locationForUniform(TextureShaderUniformId);
-            GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
-            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
-            
+
             // This is a hack for now
 
             GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
@@ -709,10 +713,8 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
             
-            glUniform1i(textureUniform, 0);
-            
-            glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]),
-                           GL_UNSIGNED_BYTE, &indices[0]);
+            glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
+                           GL_UNSIGNED_BYTE, &VertexIndices[0]);
 #ifdef SUPPORT_PROFILING
             ++numSpritesDrawn_; // Treated like a sprite
             ++numDrawCalls_;
@@ -734,7 +736,6 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
 
                 GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-                GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
                 GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
                 GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
 
@@ -747,7 +748,6 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
                 glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 
                 material->getColor(color);
-                glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
 
                 if (transform) {
@@ -785,7 +785,6 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
                 
                 GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-                GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
                 GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
                 GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
 
@@ -807,7 +806,6 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
                 Color color;
 
                 material->getColor(color);
-                glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
                 glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
                                GL_UNSIGNED_BYTE, &VertexIndices[0]);
@@ -841,10 +839,6 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                         
                         glEnableVertexAttribArray(positionLocation);
                         glEnableVertexAttribArray(texCoordLocation);
-                        
-                        GLint textureUniform = glShader->locationForUniform(TextureShaderUniformId);
-                        GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
-                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                         GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
                         
                         if (transform) {
@@ -865,8 +859,6 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                         glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
                                               sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
                         
-                        glUniform1i(textureUniform, 0);
-                        
                         glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
                                        GL_UNSIGNED_BYTE, &VertexIndices[0]);
 #ifdef SUPPORT_PROFILING
@@ -885,13 +877,10 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
     std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
     
     GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-    GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
     GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
     GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
     
     glEnableVertexAttribArray(positionLocation);
-    glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
-
     Matrix4 mat;
     
     Matrix4MakeIdentity(mat);
@@ -936,7 +925,6 @@ void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject
             std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
             
             GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-            GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
             GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
             
@@ -945,8 +933,6 @@ void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject
             Color color;
             
             material->getColor(color);
-            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
-
             if (transform) {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
             } else {
@@ -993,12 +979,9 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
             
             GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
             GLint colorLocation = glShader->locationForAttribute(SourceColorShaderAttributeId);
-            GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
             GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             
             glEnableVertexAttribArray(positionLocation);
-            
-            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
             
             if (transform) {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
@@ -1129,9 +1112,6 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         glEnableVertexAttribArray(positionLocation);
                         glEnableVertexAttribArray(texCoordLocation);
                         
-                        GLint textureUniform = glShader->locationForUniform(TextureShaderUniformId);
-                        GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
-                        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
                         GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
                         GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
                         GLint colorMatOffsetLocation = glShader->locationForUniform(ColorMatOffsetShaderUniformId);
@@ -1157,8 +1137,6 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         glDisable(GL_BLEND);
                         
                         setTexture(texture->getTarget(), texture->getHWTextureId());
-
-                        glUniform1i(textureUniform, 0);
 
                         auto vboId = texture->getHWVboId();
                         if (vboId) {
@@ -1269,8 +1247,6 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
         glEnableVertexAttribArray(positionLocation);
         glEnableVertexAttribArray(texCoordLocation);
 
-        GLint textureUniform = glShader->locationForUniform(TextureShaderUniformId);
-        GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
         GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
         GLint colorUniform = glShader->locationForUniform(SourceColorShaderUniformId);
         GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
@@ -1278,7 +1254,6 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
         auto colorMultiplierLocation = glShader->locationForUniform(ColorMultiplierShaderUniformId);
         auto colorOffsetLocation = glShader->locationForUniform(ColorOffsetShaderUniformId);
 
-        glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
         glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
 
         glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
@@ -1333,7 +1308,6 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
 
         setTexture(tex->getTarget(), tex->getHWTextureId());
         
-        glUniform1i(textureUniform, 0);
         glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
 
         for (size_t i=0;i<length;i++) {
@@ -1410,8 +1384,6 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
             glEnableVertexAttribArray(positionLocation);
             glEnableVertexAttribArray(texCoordLocation);
             
-            GLint textureUniform = glShader->locationForUniform(TextureShaderUniformId);
-            GLint projectionLocation = glShader->locationForUniform(ProjectionShaderUniformId);
             GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             GLint colorUniform = glShader->locationForUniform(SourceColorShaderUniformId);
             GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
@@ -1419,7 +1391,6 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
             auto colorMultiplierLocation = glShader->locationForUniform(ColorMultiplierShaderUniformId);
             auto colorOffsetLocation = glShader->locationForUniform(ColorOffsetShaderUniformId);
             
-            glUniformMatrix4fv(projectionLocation, 1, 0, (GLfloat *) getMappedProjectionMatrix()->m);
             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
             
             glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
@@ -1431,7 +1402,6 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
             
             setTexture(textureAtlas->getTarget(), textureAtlas->getHWTextureId());
             
-            glUniform1i(textureUniform, 0);
             glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
 
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
@@ -1764,6 +1734,20 @@ void BGE::RenderServiceOpenGLES2::setTexture(GLenum target, GLuint texId) {
 #ifdef SUPPORT_PROFILING
         ++numTexturesChanged_;
 #endif /* SUPPORT_PROFILING */
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::windowMappedDimensionsUpdated(std::shared_ptr<RenderWindow> window) {
+    if (window == renderWindow_) {
+        auto window = this->getRenderWindow();
+        auto view = window->getRenderView(RenderWindow::DefaultRenderViewName);
+        glViewport(0, 0, view->getWidth() * this->getRenderWindow()->getContentScaleFactor(), view->getHeight() * window->getContentScaleFactor());
+        
+        mappedProjectionMatrix_ = projectionMatrix_;
+        Matrix4Scale(mappedProjectionMatrix_, window->getToMappedXScale(), window->getToMappedYScale(), 1.0);
+        
+        // Now notify shaders through Shader Service
+        getShaderService()->windowMappedDimensionsUpdated();
     }
 }
 

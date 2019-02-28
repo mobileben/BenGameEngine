@@ -89,7 +89,9 @@ namespace BGE {
         void disableMask(uint8_t maskBits);
         
         void render();
-
+        
+        virtual void windowMappedDimensionsUpdated(std::shared_ptr<RenderWindow> window);
+        
 #if TARGET_OS_IPHONE
         void setGLKTextureInfo(GLKTextureInfo *info) { textureInfo_ = info; }
 #endif /* TARGET_OS_IPHONE */
