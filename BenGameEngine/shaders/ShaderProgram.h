@@ -26,6 +26,12 @@ namespace BGE {
     
     using ShaderProgramId = int32_t;
     const ShaderProgramId ShaderProgramIdUndefined = -1;
+
+    using ShaderAttributeId = int32_t;
+    using ShaderUniformId = int32_t;
+    
+    const ShaderAttributeId ShaderAttributeIdUndefined = -1;
+    const ShaderUniformId ShaderUniformIdUndefined = -1;
     
     class ShaderProgram
     {

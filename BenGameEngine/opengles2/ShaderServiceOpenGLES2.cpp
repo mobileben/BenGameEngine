@@ -72,7 +72,7 @@ std::shared_ptr<BGE::ShaderProgram> BGE::ShaderServiceOpenGLES2::createShaderPro
     return program;
 }
 
-std::shared_ptr<BGE::ShaderProgram> BGE::ShaderServiceOpenGLES2::createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms)
+std::shared_ptr<BGE::ShaderProgram> BGE::ShaderServiceOpenGLES2::createShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms)
 {
     std::shared_ptr<ShaderProgramOpenGLES2> program = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(shaderPrograms_[name]);
 

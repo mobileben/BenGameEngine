@@ -14,7 +14,7 @@ BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::str
     state_ = createShaderProgram(name, shaders);
 }
 
-BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms) : ShaderProgram(id, name, shaders), error_(GL_NO_ERROR)
+BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms) : ShaderProgram(id, name, shaders), error_(GL_NO_ERROR)
 {
     state_ = createShaderProgram(name, shaders);
     
@@ -70,17 +70,37 @@ BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(__attri
     return state_;
 }
 
-void BGE::ShaderProgramOpenGLES2::createAttributesAndUniforms(std::vector<std::string> attributes, std::vector<std::string> uniforms)
+GLint BGE::ShaderProgramOpenGLES2::locationForAttribute(ShaderAttributeId attribute) {
+    auto it = attributesById_.find(attribute);
+    if (it != attributesById_.end()) {
+        return it->second;
+    } else {
+        return 0;
+    }
+}
+
+GLint BGE::ShaderProgramOpenGLES2::locationForUniform(ShaderUniformId uniform) {
+    auto it = uniformsById_.find(uniform);
+    if (it != uniformsById_.end()) {
+        return it->second;
+    } else {
+        return 0;
+    }
+}
+
+void BGE::ShaderProgramOpenGLES2::createAttributesAndUniforms(std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms)
 {
-    for (std::string key: attributes) {
+    for (auto& attr : attributes) {
+        auto& key = attr.second;
         GLint location = glGetAttribLocation(program_, key.c_str());
-        
+        attributesById_[attr.first] = location;
         attributes_[key] = location;
     }
     
-    for (std::string key: uniforms) {
+    for (auto& uni : uniforms) {
+        auto& key = uni.second;
         GLint location = glGetUniformLocation(program_, key.c_str());
-        
+        uniformsById_[uni.first] = location;
         uniforms_[key] = location;
     }
 }
