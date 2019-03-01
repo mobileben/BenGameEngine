@@ -153,6 +153,15 @@ namespace BGE {
     static const std::string TextureShaderUniformName = "Texture";
 }
 
+#ifdef DEBUG_OPEN_GL
+void CheckGLError() {
+    auto err = glGetError();
+    if (err != GL_NO_ERROR) {
+        printf("GL ERROR %d\n", err);
+    }
+}
+#endif
+
 BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), indexBufferId_(0), currentTextureId_(0), currentShaderProgramId_(ShaderProgramIdUndefined) {
     shaderService_ = std::make_shared<ShaderServiceOpenGLES2>();
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
@@ -161,6 +170,12 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), indexBu
     Matrix4MakeIdentity(mappedProjectionMatrix_);
     Matrix4MakeIdentity(identifyMatrix_);
 
+    currentBlend_ = false;
+    currentBlendFunc_ = BlendFunc::Src_ONE_Dst_ZERO;
+    currentLineWidth_ = 1;
+    currentVbo_ = 0;
+    currentIbo_ = 0;
+    
 #ifdef SUPPORT_PROFILING
     resetProfilingStats();
 #endif /* SUPPORT_PROFILING */
@@ -533,9 +548,12 @@ void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vec
 
     bool shaderChanged;
     std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(SimpleShaderProgramId, shaderChanged));
-    
+
     GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
     GLint colorLocation = glShader->locationForAttribute(SourceColorShaderAttributeId);
+    
+    // This doesn't use VBO/IBO
+    disableVboIbo();
     
     glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                           sizeof(VertexColor), &vertices[0]);
@@ -641,6 +659,9 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
     GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
     GLint colorLocation = glShader->locationForAttribute(SourceColorShaderAttributeId);
     
+    // This doesn't use VBO/IBO
+    disableVboIbo();
+
     glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                           sizeof(VertexColor), &vertices[0]);
     glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
@@ -690,19 +711,21 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             bool shaderChanged;
             std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(TextureShaderProgramId, shaderChanged));
             
+            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
+            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
+        
+            setBlend(true);
+            setBlendFunc(BlendFunc::Src_ONE_Dst_ONE_MINUS_SRC_ALPHA);
+            setTexture(texture->getTarget(), texture->getHWTextureId());
+            
             GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
             GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
 
             glEnableVertexAttribArray(positionLocation);
             glEnableVertexAttribArray(texCoordLocation);
 
-            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
-        
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            glEnable(GL_BLEND);
-            
-            setTexture(texture->getTarget(), texture->getHWTextureId());
+            // This doesn't use VBO/IBO
+            disableVboIbo();
             
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), &vertices[0]);
@@ -731,18 +754,10 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
                 bool shaderChanged;
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
 
-                GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
                 GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
                 GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
-
-                glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
-                                      sizeof(Vertex), &vertices[0]);
                 
                 Color color;
-                
-                glEnable (GL_BLEND);
-                glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                
                 material->getColor(color);
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
 
@@ -751,6 +766,16 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
                 } else {
                     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
                 }
+
+                setBlend(true);
+                setBlendFunc(BlendFunc::Src_SRC_ALPHA_Dst_ONE_MINUS_SRC_ALPHA);
+                
+                GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
+
+                // This doesn't use VBO/IBO
+                disableVboIbo();
+                
+                glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), &vertices[0]);
 
                 glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
                                GL_UNSIGNED_BYTE, &VertexIndices[0]);
@@ -776,25 +801,28 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
                 bool shaderChanged;
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
                 
-                GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
                 GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
                 GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
-
-                glEnableVertexAttribArray(positionLocation);
 
                 if (transform) {
                     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
                 } else {
                     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
                 }
+                
+                GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
+                glEnableVertexAttribArray(positionLocation);
+                
+                // This doesn't use VBO/IBO
+                disableVboIbo();
 
                 glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                       sizeof(Vertex), &vertices[0]);
                 
                 Color color;
-
                 material->getColor(color);
                 glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
+                
                 glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
                                GL_UNSIGNED_BYTE, &VertexIndices[0]);
 #ifdef SUPPORT_PROFILING
@@ -822,11 +850,6 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                         bool shaderChanged;
                         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(TextureShaderProgramId, shaderChanged));
                         
-                        GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
-                        GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-                        
-                        glEnableVertexAttribArray(positionLocation);
-                        glEnableVertexAttribArray(texCoordLocation);
                         GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
                         
                         if (transform) {
@@ -835,14 +858,23 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
                         }
                         
-                        glDisable(GL_BLEND);
-                        
+                        setBlend(false);
                         setTexture(texture->getTarget(), texture->getHWTextureId());
+                        
+                        GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
+                        GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
+
+                        glEnableVertexAttribArray(positionLocation);
+                        glEnableVertexAttribArray(texCoordLocation);
+                        
+                        // This doesn't use VBO/IBO
+                        disableVboIbo();
+                        
                         glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                               sizeof(VertexTex), &vertices[0]);
                         glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
                                               sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
-                        
+
                         glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
                                        GL_UNSIGNED_BYTE, &VertexIndices[0]);
 #ifdef SUPPORT_PROFILING
@@ -860,16 +892,20 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
     bool shaderChanged;
     std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
     
-    GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
     GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
     GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
     
-    glEnableVertexAttribArray(positionLocation);
     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
     
     glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
 
-    glLineWidth(2);
+    setLineWidth(2);
+    
+    GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
+    glEnableVertexAttribArray(positionLocation);
+
+    // This doesn't use VBO/IBO
+    disableVboIbo();
 
     auto numPoints = points.size();
     for (size_t index=0;index<numPoints;index += 4) {
@@ -905,29 +941,31 @@ void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject
             bool shaderChanged;
             std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
             
-            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
             GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
-            
-            glEnableVertexAttribArray(positionLocation);
-            
+
             Color color;
-            
             material->getColor(color);
+            glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
+
             if (transform) {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
             } else {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
             }
             
-            glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
-            // 2
+            setLineWidth(line->getThickness());
+            
+            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
+            glEnableVertexAttribArray(positionLocation);
+
+            // This doesn't use VBO/IBO
+            disableVboIbo();
+            
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(Vertex), &vertices[0]);
-            glLineWidth(line->getThickness());
-            // 3
-            GLenum mode;
             
+            GLenum mode;
             if (line->isLineLoop()) {
                 mode = GL_LINE_LOOP;
             } else {
@@ -951,23 +989,6 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
             const auto& points = line->getPoints();
             const auto& colors = line->getColors();
             
-            bool shaderChanged;
-            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(PolyLineShaderProgramId, shaderChanged));
-            
-            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-            GLint colorLocation = glShader->locationForAttribute(SourceColorShaderAttributeId);
-            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
-            
-            glEnableVertexAttribArray(positionLocation);
-            
-            if (transform) {
-                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
-            } else {
-                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
-            }
-            
-            glEnable(GL_BLEND);
-
             // Convert our data to what VASEr needs
             auto numColors = colors.size();
             VASEr::Vec2 *vPoints = new VASEr::Vec2[points.size()];
@@ -1037,7 +1058,28 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
             opt.no_feather_at_cap = line->getNoFeatherAtCap();
             opt.no_feather_at_core = line->getNoFeatherAtCore();
             
+            bool shaderChanged;
+            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(PolyLineShaderProgramId, shaderChanged));
+            GLint colorLocation = glShader->locationForAttribute(SourceColorShaderAttributeId);
+            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
+            
+            if (transform) {
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
+            } else {
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
+            }
+
+            setBlend(true);
+            setBlendFunc(BlendFunc::Src_SRC_ALPHA_Dst_ONE_MINUS_SRC_ALPHA);
+            
+            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
+            glEnableVertexAttribArray(positionLocation);
+
+            // This doesn't use VBO/IBO
+            disableVboIbo();
+            
             VASEr::VASErin::backend::set_uniforms(positionLocation, colorLocation);
+
             VASEr::polyline(vPoints, vColors, line->getThickness(), static_cast<int>(points.size()), &opt);
             
             if (vPoints) {
@@ -1078,13 +1120,6 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorTextureShaderProgramId, shaderChanged));
 #endif
                         
-                        GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
-                        
-                        GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-                        
-                        glEnableVertexAttribArray(positionLocation);
-                        glEnableVertexAttribArray(texCoordLocation);
-                        
                         GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
                         GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
                         GLint colorMatOffsetLocation = glShader->locationForUniform(ColorMatOffsetShaderUniformId);
@@ -1096,28 +1131,35 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         } else {
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
                         }
-                        
+
                         glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) currentColorMatrix_.matrix.m);
                         glUniform4fv(colorMatOffsetLocation, 1, (GLfloat *) currentColorMatrix_.offset.v);
 
                         glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) currentColorTransform_.multiplier.v);
                         glUniform4fv(colorOffsetLocation, 1, (GLfloat *) currentColorTransform_.offset.v);
-                        
-                        glDisable(GL_BLEND);
-                        
+
+                        setBlend(false);
                         setTexture(texture->getTarget(), texture->getHWTextureId());
 
+                        GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
+                        GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
+                        glEnableVertexAttribArray(positionLocation);
+                        glEnableVertexAttribArray(texCoordLocation);
+                        
                         auto vboId = texture->getHWVboId();
                         if (vboId) {
-                            glBindBuffer(GL_ARRAY_BUFFER, texture->getHWVboId());
+                            setVbo(texture->getHWVboId());
 #ifdef USE_IBO
                             auto iboId = texture->getHWIboId();
                             if (iboId) {
-                                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
+                                setIbo(iboId);
                             } else {
-                                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId_);
-                                glBufferData(GL_ELEMENT_ARRAY_BUFFER, texture->getVboIndicesSize(), texture->getVboIndices(), GL_DYNAMIC_DRAW);
+                                if (setIbo(indexBufferId_)) {
+                                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, texture->getVboIndicesSize(), texture->getVboIndices(), GL_DYNAMIC_DRAW);
+                                }
                             }
+#else
+                            setIbo(0);
 #endif
                             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                                   sizeof(VertexTex), 0);
@@ -1128,10 +1170,10 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
 #else
                             glDrawElements(GL_TRIANGLES, texture->getVboIndicesCount(), texture->getVboIndexType(), texture->getVboIndices());
 #endif
-                            
-                            glBindBuffer(GL_ARRAY_BUFFER, 0);
-                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
                         } else {
+                            // This doesn't use VBO/IBO
+                            disableVboIbo();
+
                             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                                   sizeof(VertexTex), &vertices[0]);
                             glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
@@ -1205,32 +1247,6 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
         FontGlyph glyph;
         uint16_t code;
         size_t length = str.length();
-        auto texHandle = textureAtlas->getTextureHandle();
-        auto tex = textureService->getTextureLockless(texHandle);
-
-        bool shaderChanged;
-        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorFontShaderProgramId, shaderChanged));
-        GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
-        GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-
-        glEnableVertexAttribArray(positionLocation);
-        glEnableVertexAttribArray(texCoordLocation);
-
-        GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
-        GLint colorUniform = glShader->locationForUniform(SourceColorShaderUniformId);
-        GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
-        GLint colorMatOffsetLocation = glShader->locationForUniform(ColorMatOffsetShaderUniformId);
-        auto colorMultiplierLocation = glShader->locationForUniform(ColorMultiplierShaderUniformId);
-        auto colorOffsetLocation = glShader->locationForUniform(ColorOffsetShaderUniformId);
-
-        glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
-
-        glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
-        glUniform4fv(colorMatOffsetLocation, 1, (GLfloat *) colorMatrix.offset.v);
-
-        glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) colorTransform.multiplier.v);
-        glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorTransform.offset.v);
-
 
         // Compute the offsets if needed
         switch (horizAlignment) {
@@ -1271,13 +1287,7 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
         float gridX = x;
         float gridY = y;
 
-        glDisable(GL_BLEND);
-
         uint16_t prev = 0;
-
-        setTexture(tex->getTarget(), tex->getHWTextureId());
-        
-        glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
 
         for (size_t i=0;i<length;i++) {
             code = chars[i];
@@ -1342,15 +1352,10 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
         }
         
         // Draw here
+        textureAtlas = textureService->getTextureAtlasLockless(font->getTextureAtlasHandle()); // Refresh
         if (textureAtlas) {
             bool shaderChanged;
             std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorFontShaderProgramId, shaderChanged));
-            GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
-            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-            
-            glEnableVertexAttribArray(positionLocation);
-            glEnableVertexAttribArray(texCoordLocation);
-            
             GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             GLint colorUniform = glShader->locationForUniform(SourceColorShaderUniformId);
             GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
@@ -1362,15 +1367,21 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
             
             glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
             glUniform4fv(colorMatOffsetLocation, 1, (GLfloat *) colorMatrix.offset.v);
-            
             glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) colorTransform.multiplier.v);
             glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorTransform.offset.v);
-            glDisable(GL_BLEND);
-            
-            setTexture(textureAtlas->getTarget(), textureAtlas->getHWTextureId());
-            
             glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
 
+            setBlend(false);
+            setTexture(textureAtlas->getTarget(), textureAtlas->getHWTextureId());
+            
+            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
+            GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
+            glEnableVertexAttribArray(positionLocation);
+            glEnableVertexAttribArray(texCoordLocation);
+
+            // This doesn't use VBO/IBO
+            disableVboIbo();
+            
             glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), &stringVertexData_[0]);
             glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
@@ -1693,7 +1704,7 @@ void BGE::RenderServiceOpenGLES2::popColorTransform() {
     colorTransformStack_.pop_back();
 }
 
-void BGE::RenderServiceOpenGLES2::setTexture(GLenum target, GLuint texId) {
+bool BGE::RenderServiceOpenGLES2::setTexture(GLenum target, GLuint texId) {
     if (currentTextureId_ != texId) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(target, texId);
@@ -1701,7 +1712,79 @@ void BGE::RenderServiceOpenGLES2::setTexture(GLenum target, GLuint texId) {
 #ifdef SUPPORT_PROFILING
         ++numTexturesChanged_;
 #endif /* SUPPORT_PROFILING */
+        return true;
     }
+    return false;
+}
+
+bool BGE::RenderServiceOpenGLES2::setBlend(bool blend) {
+    if (currentBlend_ != blend) {
+        currentBlend_ = blend;
+        if (blend) {
+            glEnable(GL_BLEND);
+        } else {
+            glDisable(GL_BLEND);
+        }
+#ifdef SUPPORT_PROFILING
+        ++numBlendChanged_;
+#endif /* SUPPORT_PROFILING */
+        return true;
+    }
+    return false;
+}
+
+bool BGE::RenderServiceOpenGLES2::setBlendFunc(BlendFunc blendFunc) {
+    if (currentBlendFunc_ != blendFunc) {
+        currentBlendFunc_ = blendFunc;
+        switch (blendFunc) {
+            case BlendFunc::Src_ONE_Dst_ONE_MINUS_SRC_ALPHA:
+                glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                break;
+            case BlendFunc::Src_SRC_ALPHA_Dst_ONE_MINUS_SRC_ALPHA:
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                break;
+            default:
+                glBlendFunc(GL_ONE, GL_ZERO);
+                break;
+        }
+#ifdef SUPPORT_PROFILING
+        ++numBlendFuncChanged_;
+#endif /* SUPPORT_PROFILING */
+        return true;
+    }
+    return false;
+}
+
+bool BGE::RenderServiceOpenGLES2::setLineWidth(GLfloat width) {
+    if (currentLineWidth_ != width) {
+        currentLineWidth_ = width;
+        glLineWidth(width);
+        return true;
+    }
+    return false;
+}
+
+bool BGE::RenderServiceOpenGLES2::setVbo(GLuint vbo) {
+    if (currentVbo_ != vbo) {
+        currentVbo_ = vbo;
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        return true;
+    }
+    return false;
+}
+
+bool BGE::RenderServiceOpenGLES2::setIbo(GLuint ibo) {
+    if (currentIbo_ != ibo) {
+        currentIbo_ = ibo;
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+        return true;
+    }
+    return false;
+}
+
+void BGE::RenderServiceOpenGLES2::disableVboIbo() {
+    setVbo(0);
+    setIbo(0);
 }
 
 void BGE::RenderServiceOpenGLES2::windowMappedDimensionsUpdated(std::shared_ptr<RenderWindow> window) {
@@ -1718,6 +1801,15 @@ void BGE::RenderServiceOpenGLES2::windowMappedDimensionsUpdated(std::shared_ptr<
     }
 }
 
+void BGE::RenderServiceOpenGLES2::threadCleanup() {
+    if (indexBufferId_) {
+        setIbo(0);
+        glDeleteBuffers(1, &indexBufferId_);
+        indexBufferId_ = 0;
+    }
+}
+
+
 void BGE::RenderServiceOpenGLES2::createTexture(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(item.data);
     GLuint tex;
@@ -1730,6 +1822,10 @@ void BGE::RenderServiceOpenGLES2::createTexture(const RenderCommandItem& item) {
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     }
     glBindTexture(GL_TEXTURE_2D, tex);
+    
+    // Indicate we're the current texture since we did a bind
+    currentTextureId_ = tex;
+    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1754,8 +1850,13 @@ void BGE::RenderServiceOpenGLES2::createTexture(const RenderCommandItem& item) {
 void BGE::RenderServiceOpenGLES2::destroyTexture(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(item.data);
     std::shared_ptr<Error> error;
-    if (data->glHwId) {
-        glDeleteTextures(1, &data->glHwId);
+    GLuint texId = data->glHwId;
+    if (texId) {
+        if (currentTextureId_ == texId) {
+            // If our current texture is being destroyed, reset to no texture
+            setTexture(GL_TEXTURE_2D, 0);
+        }
+        glDeleteTextures(1, &texId);
     }
     if (item.callback) {
         item.callback(item, error);
@@ -1767,7 +1868,9 @@ void BGE::RenderServiceOpenGLES2::createVbo(const RenderCommandItem& item) {
     std::shared_ptr<Error> error;
     GLuint vbo;
     glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    
+    // set Vbo since we are going to glBufferData
+    setVbo(vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VertexTex) * data->numVertexTex, data->vertexTexData, GL_STATIC_DRAW);
     GLenum glErr = glGetError();
     if (glErr == GL_NO_ERROR) {
@@ -1776,13 +1879,13 @@ void BGE::RenderServiceOpenGLES2::createVbo(const RenderCommandItem& item) {
         if (!indexBufferId_) {
             // We need to create at least one index buffer
             glGenBuffers(1, &indexBufferId_);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
     } else {
         error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorVboAllocation);
     }
     
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // Unbind vbo
+    setVbo(0);
     
     if (item.callback) {
         item.callback(item, error);
@@ -1792,8 +1895,13 @@ void BGE::RenderServiceOpenGLES2::createVbo(const RenderCommandItem& item) {
 void BGE::RenderServiceOpenGLES2::destroyVbo(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderVboCommandData>(item.data);
     std::shared_ptr<Error> error;
-    if (data->glVboId != 0) {
-        glDeleteBuffers(1, &data->glVboId);
+    GLuint vbo = data->glVboId;
+    if (vbo != 0) {
+        if (vbo == currentVbo_) {
+            // If we're destroying the current Vbo, unbind
+            setVbo(0);
+        }
+        glDeleteBuffers(1, &vbo);
     }
     if (item.callback) {
         item.callback(item, error);
@@ -1805,7 +1913,9 @@ void BGE::RenderServiceOpenGLES2::createIbo(const RenderCommandItem& item) {
     std::shared_ptr<Error> error;
     GLuint ibo;
     glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    
+    // set Ibo since we are going to glBufferData
+    setIbo(ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, data->numIndices * data->indexSize, data->indices, GL_STATIC_DRAW);
     GLenum glErr = glGetError();
     if (glErr == GL_NO_ERROR) {
@@ -1814,7 +1924,8 @@ void BGE::RenderServiceOpenGLES2::createIbo(const RenderCommandItem& item) {
         error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorVboAllocation);
     }
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    // Unbind ibo
+    setIbo(0);
     
     if (item.callback) {
         item.callback(item, error);
@@ -1824,8 +1935,13 @@ void BGE::RenderServiceOpenGLES2::createIbo(const RenderCommandItem& item) {
 void BGE::RenderServiceOpenGLES2::destroyIbo(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderIboCommandData>(item.data);
     std::shared_ptr<Error> error;
-    if (data->glIboId != 0) {
-        glDeleteBuffers(1, &data->glIboId);
+    GLuint ibo = data->glIboId;
+    if (ibo != 0) {
+        if (ibo == currentIbo_) {
+            // If we're destroying the current Ibo, unbind
+            setIbo(0);
+        }
+        glDeleteBuffers(1, &ibo);
     }
     if (item.callback) {
         item.callback(item, error);

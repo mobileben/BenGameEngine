@@ -271,6 +271,8 @@ namespace BGE {
 
         Queue<RenderCommandItem>    renderQueue_;
 
+        virtual void threadCleanup() {}
+        
         virtual void createTexture(const RenderCommandItem& item);
         virtual void destroyTexture(const RenderCommandItem& item);
         virtual void createVbo(const RenderCommandItem& item);
@@ -292,6 +294,8 @@ namespace BGE {
         int32_t numMasksDrawn_;
         int32_t numShadersChanged_;
         int32_t numTexturesChanged_;
+        int32_t numBlendChanged_;
+        int32_t numBlendFuncChanged_;
         int32_t numProcessedObjects_;
         int64_t processingTime_;
 

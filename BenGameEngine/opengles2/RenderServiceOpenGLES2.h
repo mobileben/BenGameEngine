@@ -101,6 +101,10 @@ namespace BGE {
 #endif /* SUPPORT_PROFILING */
 
     protected:
+        enum class BlendFunc : uint32_t { Src_ONE_Dst_ZERO, Src_ONE_Dst_ONE_MINUS_SRC_ALPHA, Src_SRC_ALPHA_Dst_ONE_MINUS_SRC_ALPHA };
+        
+        virtual void threadCleanup();
+
         virtual void createTexture(const RenderCommandItem& item);
         virtual void destroyTexture(const RenderCommandItem& item);
 
@@ -133,6 +137,13 @@ namespace BGE {
         ShaderProgramId                 currentShaderProgramId_;
         std::shared_ptr<ShaderProgram>  currentShaderProgram_;
 
+        // Render states
+        bool                            currentBlend_;
+        BlendFunc                       currentBlendFunc_;
+        GLfloat                         currentLineWidth_;
+        GLuint                          currentVbo_;
+        GLuint                          currentIbo_;
+        
         std::vector<SpaceHandle>                            spaceHandles_;
         std::vector<GameObject *>                           rootGameObjects_;
         std::vector<std::vector<TransformComponentHandle>>  orderedChildrenHandles_;
@@ -152,8 +163,14 @@ namespace BGE {
         void pushColorTransform();
         void popColorTransform();
 
-        void setTexture(GLenum target, GLuint texId);
-
+        bool setTexture(GLenum target, GLuint texId);
+        bool setBlend(bool blend);
+        bool setBlendFunc(BlendFunc blendFunc);
+        bool setLineWidth(GLfloat width);
+        bool setVbo(GLuint vbo);
+        bool setIbo(GLuint ibo);
+        void disableVboIbo();
+        
         void drawString(Space *space, std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
     };
 }

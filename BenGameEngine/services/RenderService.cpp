@@ -227,6 +227,7 @@ void BGE::RenderService::threadFunction() {
         std::unique_lock<std::mutex> lock(threadRunningMutex_);
         if (!threadRunning_) {
             lock.unlock();
+            threadCleanup();
             return;
         }
         lock.unlock();
@@ -354,6 +355,8 @@ void BGE::RenderService::resetProfilingStats() {
     numMasksDrawn_ = 0;
     numShadersChanged_ = 0;
     numTexturesChanged_ = 0;
+    numBlendChanged_ = 0;
+    numBlendFuncChanged_ = 0;
     numProcessedObjects_ = 0;
     processingTime_ = 0;
 }
