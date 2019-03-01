@@ -159,6 +159,8 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), indexBu
     
     Matrix4MakeIdentity(projectionMatrix_);
     Matrix4MakeIdentity(mappedProjectionMatrix_);
+    Matrix4MakeIdentity(identifyMatrix_);
+
 #ifdef SUPPORT_PROFILING
     resetProfilingStats();
 #endif /* SUPPORT_PROFILING */
@@ -690,18 +692,12 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             
             GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
             GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-            
+            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
+
             glEnableVertexAttribArray(positionLocation);
             glEnableVertexAttribArray(texCoordLocation);
 
-            // This is a hack for now
-
-            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
-            Matrix4 mat;
-            
-            Matrix4MakeIdentity(mat);
-            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
-            // END HACK
+            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
         
             glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             glEnable(GL_BLEND);
@@ -753,11 +749,7 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
                 if (transform) {
                     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
                 } else {
-                    // TODO: This is a hack for now
-                    Matrix4 mat;
-                    
-                    Matrix4MakeIdentity(mat);
-                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
                 }
 
                 glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
@@ -793,11 +785,7 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
                 if (transform) {
                     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
                 } else {
-                    // This is a hack for now
-                    Matrix4 mat;
-                    
-                    Matrix4MakeIdentity(mat);
-                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
                 }
 
                 glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
@@ -844,11 +832,7 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                         if (transform) {
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
                         } else {
-                            // TODO: This is a hack for now
-                            Matrix4 mat;
-                            
-                            Matrix4MakeIdentity(mat);
-                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
                         }
                         
                         glDisable(GL_BLEND);
@@ -881,10 +865,7 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
     GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
     
     glEnableVertexAttribArray(positionLocation);
-    Matrix4 mat;
-    
-    Matrix4MakeIdentity(mat);
-    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+    glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
     
     glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
 
@@ -936,11 +917,7 @@ void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject
             if (transform) {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
             } else {
-                // TODO: This is a hack for now
-                Matrix4 mat;
-                
-                Matrix4MakeIdentity(mat);
-                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
             }
             
             glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
@@ -986,11 +963,7 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
             if (transform) {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
             } else {
-                // TODO: This is a hack for now
-                Matrix4 mat;
-                
-                Matrix4MakeIdentity(mat);
-                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
             }
             
             glEnable(GL_BLEND);
@@ -1121,11 +1094,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         if (transform) {
                             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
                         } else {
-                            // TODO: This is a hack for now
-                            Matrix4 mat;
-                            
-                            Matrix4MakeIdentity(mat);
-                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) mat.m);
+                            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
                         }
                         
                         glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) currentColorMatrix_.matrix.m);

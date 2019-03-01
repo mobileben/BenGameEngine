@@ -120,6 +120,8 @@ namespace BGE {
         
         Matrix4 projectionMatrix_;
         Matrix4 mappedProjectionMatrix_;
+        Matrix4 identifyMatrix_;
+        
         GLKTextureInfo *textureInfo_;
         uint8_t activeMasks_;
 
