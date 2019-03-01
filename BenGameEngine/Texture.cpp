@@ -159,7 +159,11 @@ std::shared_ptr<BGE::Error> BGE::Texture::initialize(TextureHandle handle, std::
     auto width = rawTexture->getWidth();
     auto height = rawTexture->getHeight();
     auto buffer = rawTexture->getBuffer();
+#ifdef DEBUG_RENDER_COMMAND
+    RenderTextureCommandData data(name, getHandle(), getFormat(), buffer, width, height);
+#else
     RenderTextureCommandData data(getHandle(), getFormat(), buffer, width, height);
+#endif /* DEBUG_RENDER_COMMAND */
     auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
     auto fut = prom->get_future();
 
@@ -203,7 +207,11 @@ void BGE::Texture::destroy() {
     
     if (!isSubTexture_) {
         // Only non-subtextures can be freed, since the atlas is freed separately
+#ifdef DEBUG_RENDER_COMMAND
+        RenderTextureCommandData data(getName(), getHandle());
+#else
         RenderTextureCommandData data(getHandle());
+#endif /* DEBUG_RENDER_COMMAND */
 #ifdef SUPPORT_OPENGL
         GLuint name;
 
@@ -584,7 +592,11 @@ std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, 
 
 std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromAlphaBuffer(unsigned char *buffer, uint32_t width, uint32_t height) {
     if (buffer) {
+#ifdef DEBUG_RENDER_COMMAND
+        RenderTextureCommandData data(getName(), getHandle(), getFormat(), buffer, width, height);
+#else
         RenderTextureCommandData data(getHandle(), getFormat(), buffer, width, height);
+#endif /* DEBUG_RENDER_COMMAND */
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
 #ifdef SUPPORT_OPENGL
@@ -612,7 +624,11 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGB565Buffer(__attrib
 
 std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGB888Buffer(unsigned char *buffer, uint32_t width, uint32_t height) {
     if (buffer) {
+#ifdef DEBUG_RENDER_COMMAND
+        RenderTextureCommandData data(getName(), getHandle(), getFormat(), buffer, width, height);
+#else
         RenderTextureCommandData data(getHandle(), getFormat(), buffer, width, height);
+#endif /* DEBUG_RENDER_COMMAND */
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
 #ifdef SUPPORT_OPENGL
@@ -644,7 +660,11 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA4444Buffer(__attr
 
 std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height) {
     if (buffer) {
+#ifdef DEBUG_RENDER_COMMAND
+        RenderTextureCommandData data(getName(), getHandle(), getFormat(), buffer, width, height);
+#else
         RenderTextureCommandData data(getHandle(), getFormat(), buffer, width, height);
+#endif /* DEBUG_RENDER_COMMAND */
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
 #ifdef SUPPORT_OPENGL

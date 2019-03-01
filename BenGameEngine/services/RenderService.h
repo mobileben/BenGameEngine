@@ -23,6 +23,10 @@
 
 #include <thread>
 
+#ifndef APPSTORE_RELEASE
+#define DEBUG_RENDER_COMMAND
+#endif /* APPSTORE_RELEASE */
+
 namespace BGE {
     class ComponentService;
     class Texture;
@@ -79,6 +83,9 @@ namespace BGE {
     };
 
     struct RenderTextureCommandData : public RenderCommandData {
+#ifdef DEBUG_RENDER_COMMAND
+        std::string                 name;
+#endif /* DEBUG_RENDER_COMMAND */
         TextureHandle               textureHandle;
         TextureFormat               textureFormat;
         uint8_t                     *textureBuffer;
@@ -95,29 +102,66 @@ namespace BGE {
             glHwId = 0;
 #endif /* SUPPORT_OPENGL */
         }
+        
         RenderTextureCommandData(TextureHandle textureHandle) : textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0) {
 #ifdef SUPPORT_OPENGL
             glFormat = 0;
             glHwId = 0;
 #endif /* SUPPORT_OPENGL */
         }
+        
+#ifdef DEBUG_RENDER_COMMAND
+        RenderTextureCommandData(const std::string& name, TextureHandle textureHandle) : name(name), textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0) {
+#ifdef SUPPORT_OPENGL
+            glFormat = 0;
+            glHwId = 0;
+#endif /* SUPPORT_OPENGL */
+        }
+#endif /* DEBUG_RENDER_COMMAND */
+
 #ifdef SUPPORT_OPENGL
         RenderTextureCommandData(TextureHandle textureHandle, GLuint hwId) : textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0) {
             glFormat = 0;
             glHwId = hwId;
         }
+        
+#ifdef DEBUG_RENDER_COMMAND
+        RenderTextureCommandData(const std::string& name, TextureHandle textureHandle, GLuint hwId) : name(name), textureHandle(textureHandle), textureFormat(TextureFormat::Undefined), textureBuffer(nullptr), textureWidth(0), textureHeight(0) {
+            glFormat = 0;
+            glHwId = hwId;
+        }
+#endif /* DEBUG_RENDER_COMMAND */
+        
 #endif /* SUPPORT_OPENGL */
+        
         RenderTextureCommandData(TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height) : textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height) {
 #ifdef SUPPORT_OPENGL
             glFormat = 0;
             glHwId = 0;
 #endif /* SUPPORT_OPENGL */
         }
+        
+#ifdef DEBUG_RENDER_COMMAND
+        RenderTextureCommandData(const std::string& name, TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height) : name(name), textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height) {
+#ifdef SUPPORT_OPENGL
+            glFormat = 0;
+            glHwId = 0;
+#endif /* SUPPORT_OPENGL */
+        }
+#endif /* DEBUG_RENDER_COMMAND */
+        
 #ifdef SUPPORT_OPENGL
         RenderTextureCommandData(TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat) : textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height) {
             this->glFormat = glFormat;
             glHwId = 0;
         }
+        
+#ifdef DEBUG_RENDER_COMMAND
+        RenderTextureCommandData(const std::string& name, TextureHandle textureHandle, TextureFormat format, uint8_t *buffer, uint32_t width, uint32_t height, GLint glFormat) : name(name), textureHandle(textureHandle), textureFormat(format), textureBuffer(buffer), textureWidth(width), textureHeight(height) {
+            this->glFormat = glFormat;
+            glHwId = 0;
+        }
+#endif /* DEBUG_RENDER_COMMAND */
 #endif /* SUPPORT_OPENGL */
     };
 

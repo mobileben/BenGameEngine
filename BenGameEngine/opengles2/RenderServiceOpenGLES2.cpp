@@ -1815,6 +1815,9 @@ void BGE::RenderServiceOpenGLES2::createTexture(const RenderCommandItem& item) {
     GLuint tex;
     GLint alignment = 0;
     auto glFormat = data->glFormat;
+#ifdef DEBUG_RENDER_COMMAND
+    auto name = data->name;
+#endif
     std::shared_ptr<Error> error;
     glGenTextures(1, &tex);
     if (glFormat == GL_RGB) {
@@ -1851,6 +1854,9 @@ void BGE::RenderServiceOpenGLES2::destroyTexture(const RenderCommandItem& item) 
     auto data = std::dynamic_pointer_cast<RenderTextureCommandData>(item.data);
     std::shared_ptr<Error> error;
     GLuint texId = data->glHwId;
+#ifdef DEBUG_RENDER_COMMAND
+    auto name = data->name;
+#endif
     if (texId) {
         if (currentTextureId_ == texId) {
             // If our current texture is being destroyed, reset to no texture

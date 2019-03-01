@@ -136,7 +136,7 @@ void BGE::RenderService::queueSetIsReady() {
 }
 
 void BGE::RenderService::queueCreateTexture(const RenderTextureCommandData& texData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
-    auto data = std::make_shared<RenderTextureCommandData>(texData.textureHandle, texData.textureFormat, texData.textureBuffer, texData.textureWidth, texData.textureHeight);
+    auto data = std::make_shared<RenderTextureCommandData>(texData);
 #ifdef SUPPORT_OPENGL
     data->glFormat = texData.glFormat;
 #endif /* SUPPORT_OPENGL */
@@ -145,7 +145,7 @@ void BGE::RenderService::queueCreateTexture(const RenderTextureCommandData& texD
 }
 
 void BGE::RenderService::queueDestroyTexture(const RenderTextureCommandData& texData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
-    auto data = std::make_shared<RenderTextureCommandData>(texData.textureHandle);
+    auto data = std::make_shared<RenderTextureCommandData>(texData);
 #ifdef SUPPORT_OPENGL
     data->glHwId = texData.glHwId;
 #endif /* SUPPORT_OPENGL */
