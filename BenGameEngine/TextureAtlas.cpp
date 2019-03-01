@@ -107,13 +107,15 @@ size_t BGE::TextureAtlas::getMemoryUsage() const {
 }
 
 std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::createFromFile(std::string filename, std::vector<SubTextureDef> &subTextures, TextureFormat format, bool createVbo) {
+    auto textureService = Game::getInstance()->getTextureService();
     Texture *texture;
     std::shared_ptr<Error> error;
-    std::tie(texture, error) = Game::getInstance()->getTextureService()->createTextureFromFile(getHandle(), atlasTextureKey(), filename, format);
+    std::tie(texture, error) = textureService->createTextureFromFile(getHandle(), atlasTextureKey(), filename, format);
     if (!error) {
         TextureAtlas *atlas = this;
 
         if (texture) {
+            
             // Texture needs to be set before processing subTex
             this->textureHandle_ = texture->getHandle();
 
@@ -130,7 +132,7 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
             if (subTextures.size() > 0) {
                 for (auto const &st : subTextures) {
                     std::string key = st.name;
-                    auto subTex = Game::getInstance()->getTextureService()->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
+                    auto subTex = textureService->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated, st.font);
 
                     if (subTex) {
                         this->subTextures_[key] = subTex->getHandle();
@@ -138,6 +140,8 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
                 }
                 
                 if (createVbo) {
+                    // Refresh texture just in case, since there have been times it has gone stale
+                    texture = textureService->getTexture(getTextureHandle());
                     buildVertexTexData(texture);
                 }
             } else {
@@ -188,13 +192,15 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureAtlas::c
             if (subTextures.size() > 0) {
                 for (auto const &st : subTextures) {
                     std::string key = st.name;
-                    auto subTex = textureService->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated);
+                    auto subTex = textureService->createSubTexture(getHandle(), key, this, st.x, st.y, st.width, st.height, st.rotated, st.font);
 
                     if (subTex) {
                         subTextures_[key] = subTex->getHandle();
                     }
                 }
                 if (createVbo) {
+                    // Refresh texture just in case, since there have been times it has gone stale
+                    texture = textureService->getTexture(getTextureHandle());
                     buildVertexTexData(texture);
                 }
             } else {
@@ -225,24 +231,56 @@ const std::map<std::string, BGE::TextureHandle>& BGE::TextureAtlas::getSubTextur
     return subTextures_;
 }
 
+static uint32_t indexOrdering[] = { 0, 3, 2, 2, 1, 0 };
+static uint32_t kNumVertices = 4;
+
 void BGE::TextureAtlas::buildVertexTexData(Texture *texture) {
     if (texture) {
-        texture->buildVertexTexData(subTextures_);
-
+        auto handle = texture->getHandle();
         auto renderService = Game::getInstance()->getRenderService();
         auto textureService = Game::getInstance()->getTextureService();
+        std::vector<VertexTex>  vertexTexData;
+        uint32_t dataIndex = 0;
+
+        VertexTex vt;
+        vt.position.z = 0.0;
+        
+        for (auto it : subTextures_) {
+            auto handle = it.second;
+            auto subTex = textureService->getTexture(handle);
+            if (subTex) {
+                for (size_t i=0;i<kNumVertices;++i) {
+                    vt.position.x = subTex->xys_[i].x;
+                    vt.position.y = subTex->xys_[i].y;
+                    vt.tex.x = subTex->uvs_[i].x;
+                    vt.tex.y = subTex->uvs_[i].y;
+                    vertexTexData.push_back(vt);
+                }
+#ifdef SUPPORT_OPENGL
+                for (size_t i=0;i<sizeof(indexOrdering)/sizeof(uint32_t);++i) {
+                    subTex->vboIndices_[i] = static_cast<GLuint>(dataIndex + indexOrdering[i]);
+                }
+                dataIndex += kNumVertices;
+#endif /* SUPPORT_OPENGL */
+            }
+        }
+        
+        // Refresh just in case
+        texture = textureService->getTexture(handle);
+        texture->moveToVertexTexData(vertexTexData);    // Note this does a std::move
 
         RenderVboCommandData data(&texture->vertexTexData_[0], static_cast<uint32_t>(texture->vertexTexData_.size()));
         auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
         auto fut = prom->get_future();
 
-        renderService->queueCreateVbo(data, [this, texture, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
+        renderService->queueCreateVbo(data, [this, handle, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
             if (!error) {
                 auto data = std::dynamic_pointer_cast<RenderVboCommandData>(command.data);
 #ifdef SUPPORT_OPENGL
+                auto textureService = Game::getInstance()->getTextureService();
+                auto texture = textureService->getTexture(handle);
                 texture->vboId_ = data->glVboId;
                 if (texture->vboId_) {
-                    auto textureService = Game::getInstance()->getTextureService();
                     for (auto it : subTextures_) {
                         auto subTex = textureService->getTexture(it.second);
                         if (subTex) {

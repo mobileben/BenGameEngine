@@ -128,7 +128,7 @@ namespace BGE {
         inline size_t getMemoryUsage() const { return memoryUsage_; }
         
         std::shared_ptr<Error> createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height);
-        std::shared_ptr<Error> createSubTexture(TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated=false);
+        std::shared_ptr<Error> createSubTexture(TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated, bool font);
         
         inline TextureAtlasHandle getTextureAtlasHandle() { return atlasHandle_; }
         
@@ -198,6 +198,7 @@ namespace BGE {
         
         void updateUVs(bool rotated = false);
         void updateXYs();
+        void updateXYsForFont();
 
         std::shared_ptr<Error> createTextureFromAlphaBuffer(unsigned char *buffer, uint32_t width, uint32_t height);
         std::shared_ptr<Error> createTextureFromRGB565Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
@@ -206,7 +207,8 @@ namespace BGE {
         std::shared_ptr<Error> createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
         std::shared_ptr<Error> createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
         
-        void buildVertexTexData(const std::map<std::string, TextureHandle>& subTextures);
+        // This will do a std::move
+        void moveToVertexTexData(std::vector<VertexTex>& data);
         size_t computeMemoryUsage(TextureFormat format, uint32_t width, uint32_t height);
     };
 }

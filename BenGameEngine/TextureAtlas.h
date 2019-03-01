@@ -23,6 +23,7 @@ namespace BGE {
         int         width;
         int         height;
         bool        rotated;
+        bool        font;
     } SubTextureDef;
     
     class TextureAtlas : public NamedObject

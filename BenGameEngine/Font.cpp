@@ -251,7 +251,7 @@ std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::Font::load(std::str
                             }
                             
                             subTexDef.rotated = false;
-                            
+                            subTexDef.font = true;
                             subTexDefs.push_back(subTexDef);
                         }
                     }

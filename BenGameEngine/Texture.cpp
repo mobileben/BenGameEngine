@@ -414,6 +414,81 @@ void BGE::Texture::updateXYs() {
     }
 }
 
+void BGE::Texture::updateXYsForFont() {
+    if (Game::getInstance()->getRenderService()->hasInvertedYAxis()) {
+        /*
+         
+         +Y down
+         
+         0 ------- 1
+         | \      |
+         |  \     |
+         |   \    |
+         |    \   |
+         |     \  |
+         |      \ |
+         |       \|
+         3--------2
+         
+         0 - 1 - 2
+         0 - 2 - 3
+         
+         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+         
+         */
+        
+        float w = getWidth();
+        float h = getHeight();
+        xys_[0].x = 0;
+        xys_[0].y = h;
+        
+        xys_[1].x = w;
+        xys_[1].y = h;
+        
+        xys_[2].x = w;
+        xys_[2].y = 0;
+        
+        xys_[3].x = 0;
+        xys_[3].y = 0;
+    } else {
+        /*
+         
+         +Y up
+         
+         0 ------- 1
+         | \      |
+         |  \     |
+         |   \    |
+         |    \   |
+         |     \  |
+         |      \ |
+         |       \|
+         3--------2
+         
+         0 - 1 - 2
+         0 - 2 - 3
+         
+         NOTE: Should render using CCW. The convention normally seems index 0 in lower left corner going CCW.
+         
+         */
+        
+        float w = getWidth();
+        float h = getHeight();
+        
+        xys_[0].x = 0;
+        xys_[0].y = 0;
+        
+        xys_[1].x = w;
+        xys_[1].y = 0;
+        
+        xys_[2].x = w;
+        xys_[2].y = h;
+        
+        xys_[3].x = 0;
+        xys_[3].y = h;
+    }
+}
+
 std::shared_ptr<BGE::Error> BGE::Texture::createFromBuffer(void *buffer, TextureFormat format, uint32_t width, uint32_t height) {
     std::shared_ptr<Error> error = std::make_shared<Error>(ErrorDomain, TextureErrorUnsupported);
     switch (format) {
@@ -461,7 +536,7 @@ std::shared_ptr<BGE::Error> BGE::Texture::createFromBuffer(void *buffer, Texture
     return error;
 }
 
-std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated) {
+std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated, bool font) {
     std::shared_ptr<Error> error;
 
     // Must tag as sub-texture up front so we don't falsely release texture
@@ -491,7 +566,11 @@ std::shared_ptr<BGE::Error> BGE::Texture::createSubTexture(TextureAtlas *atlas, 
 #endif /* SUPPORT_OPENGL */
 
             updateUVs(rotated);
-            updateXYs();
+            if (font) {
+                updateXYsForFont();
+            } else {
+                updateXYs();
+            }
             
             // Memory usage is considered 0 since the underlying texture of the atlas tracks memory usage
             memoryUsage_ = 0;
@@ -587,38 +666,9 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA8888Buffer(unsign
     }
 }
 
-static uint32_t indexOrdering[] = { 0, 3, 2, 2, 1, 0 };
-static uint32_t kNumVertices = 4;
 
-void BGE::Texture::buildVertexTexData(const std::map<std::string, TextureHandle>& subTextures) {
-    vertexTexData_.clear();
-    vertexTexData_.reserve(subTextures.size() * kNumVertices);
-    
-    auto textureService = Game::getInstance()->getTextureService();
-
-    VertexTex vt;
-    vt.position.z = 0.0;
-    
-    uint32_t dataIndex = 0;
-    for (auto it : subTextures) {
-        auto handle = it.second;
-        auto subTex = textureService->getTexture(handle);
-        if (subTex) {
-            for (size_t i=0;i<kNumVertices;++i) {
-                vt.position.x = subTex->xys_[i].x;
-                vt.position.y = subTex->xys_[i].y;
-                vt.tex.x = subTex->uvs_[i].x;
-                vt.tex.y = subTex->uvs_[i].y;
-                vertexTexData_.push_back(vt);
-            }
-#ifdef SUPPORT_OPENGL
-            for (size_t i=0;i<sizeof(indexOrdering)/sizeof(uint32_t);++i) {
-                subTex->vboIndices_[i] = static_cast<GLuint>(dataIndex + indexOrdering[i]);
-            }
-            dataIndex += kNumVertices;
-#endif /* SUPPORT_OPENGL */
-        }
-    }
+void BGE::Texture::moveToVertexTexData(std::vector<VertexTex>& data) {
+    vertexTexData_ = std::move(data);
 }
 
 size_t BGE::Texture::computeMemoryUsage(TextureFormat format, uint32_t width, uint32_t height) {

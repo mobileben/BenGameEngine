@@ -1633,7 +1633,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                 subTexDef.width = subTexDict[kScenePackageKeyWidth].GetFloat() * pixelsPerPoint_;
                 subTexDef.height = subTexDict[kScenePackageKeyHeight].GetFloat() * pixelsPerPoint_;
                 subTexDef.rotated = subTexDict[kScenePackageKeyRotated].GetBool();
-
+                subTexDef.font = false;
                 std::string atlasName = subTexDict[kScenePackageKeyAtlas].GetString();
 #if 0
                 std::vector<SubTextureDef> &subTexDefs = subTextures_[atlasName];
@@ -2594,7 +2594,7 @@ void BGE::ScenePackage::loadTextures(std::function<void()> callback) {
             for (auto idx=0;idx<texAtlasSubTexDefInt->numSubTextures;++idx) {
                 const SubTextureDefIntermediate& curr = subTexDefs[idx];
                 auto subTexName = strings_.addressOf(curr.name);
-                SubTextureDef subTexDef { subTexName, curr.x, curr.y, curr.width, curr.height, curr.rotated };
+                SubTextureDef subTexDef { subTexName, curr.x, curr.y, curr.width, curr.height, curr.rotated, false };
                 atlasSubTexDefs.push_back(subTexDef);
             }
             subTextures_[name] = atlasSubTexDefs;

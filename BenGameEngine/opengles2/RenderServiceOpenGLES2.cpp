@@ -1336,25 +1336,23 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
                 if (tex) {
                     const Vector2 *xys = tex->getXYs();
                     const Vector2 *uvs = tex->getUVs();
-                    float w_2 = tex->getWidth() / 2.0;
-                    float h_2 = tex->getHeight() / 2.0;
 
                     auto numIndices = sizeof(VertexIndices)/sizeof(VertexIndices[0]);
 #ifdef RENDER_STRING_WITH_GL_ARRAY
                     for (size_t i=0;i<numIndices;++i) {
                         auto index = VertexIndices[i];
-                        VertexTex vtex{{{x + xys[index].x + w_2, y + xys[index].y + h_2, 0.0}}, {{uvs[index].x, uvs[index].y}}};
+                        VertexTex vtex{{{x + xys[index].x, y + xys[index].y, 0.0}}, {{uvs[index].x, uvs[index].y}}};
                         stringVertexData_.push_back(vtex);
                         stringIndices_.push_back(indexPtr++);
                     }
 #else
-                    VertexTex vtex{{{x + xys[0].x + w_2, y + xys[0].y + h_2, 0.0}}, {{uvs[0].x, uvs[0].y}}};
+                    VertexTex vtex{{{x + xys[0].x, y + xys[0].y, 0.0}}, {{uvs[0].x, uvs[0].y}}};
                     stringVertexData_.push_back(vtex);
-                    vtex = VertexTex{{{x + xys[1].x + w_2, y + xys[1].y + h_2, 0.0}}, {{uvs[1].x, uvs[1].y}}};
+                    vtex = VertexTex{{{x + xys[1].x, y + xys[1].y, 0.0}}, {{uvs[1].x, uvs[1].y}}};
                     stringVertexData_.push_back(vtex);
-                    vtex = VertexTex{{{x + xys[2].x + w_2, y + xys[2].y + h_2, 0.0}}, {{uvs[2].x, uvs[2].y}}};
+                    vtex = VertexTex{{{x + xys[2].x, y + xys[2].y, 0.0}}, {{uvs[2].x, uvs[2].y}}};
                     stringVertexData_.push_back(vtex);
-                    vtex = VertexTex{{{x + xys[3].x + w_2, y + xys[3].y + h_2, 0.0}}, {{uvs[3].x, uvs[3].y}}};
+                    vtex = VertexTex{{{x + xys[3].x, y + xys[3].y, 0.0}}, {{uvs[3].x, uvs[3].y}}};
                     stringVertexData_.push_back(vtex);
                     for (size_t i=0;i<numIndices;++i) {
                         stringIndices_.push_back(indexPtr + VertexIndices[i]);

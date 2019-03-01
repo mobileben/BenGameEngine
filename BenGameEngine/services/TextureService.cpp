@@ -1134,14 +1134,14 @@ std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> BGE::TextureService:
     return std::make_pair(atlas, error);
 }
 
-BGE::Texture *BGE::TextureService::createSubTexture(TextureAtlasHandle atlasHandle, std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated) {
+BGE::Texture *BGE::TextureService::createSubTexture(TextureAtlasHandle atlasHandle, std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated, bool font) {
     std::lock_guard<std::mutex> lock(atlasTexturesMutex_);
     auto &atlasSubTex = atlasTextures_[atlasHandle];
     auto tex = atlasSubTex.find(name);
     
     if (tex == atlasSubTex.end()) {
         std::shared_ptr<Error> error;
-        auto texture = createSubTexture(name, atlas, x, y, width, height, rotated);
+        auto texture = createSubTexture(name, atlas, x, y, width, height, rotated, font);
         
         if (texture) {
             atlasSubTex[name] = texture->getHandle();
@@ -1154,7 +1154,7 @@ BGE::Texture *BGE::TextureService::createSubTexture(TextureAtlasHandle atlasHand
 }
 
 
-BGE::Texture *BGE::TextureService::createSubTexture(std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated) {
+BGE::Texture *BGE::TextureService::createSubTexture(std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated, bool font) {
     TextureHandle textureHandle;
     Texture *texture;
     
@@ -1163,7 +1163,7 @@ BGE::Texture *BGE::TextureService::createSubTexture(std::string name, TextureAtl
     if (texture) {
         texture->initialize(textureHandle, name, atlas->getFormat());
 
-        auto error = texture->createSubTexture(atlas, x, y, width, height, rotated);
+        auto error = texture->createSubTexture(atlas, x, y, width, height, rotated, font);
         
         if (error) {
             releaseTexture(texture);

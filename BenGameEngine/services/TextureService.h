@@ -151,7 +151,7 @@ namespace BGE {
         std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> createTextureAtlasFromFile(FontHandle fontHandle, std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, bool createVbo);
         std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> createTextureAtlasFromBuffer(FontHandle fontHandle, std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, bool createVbo);
         
-        Texture *createSubTexture(TextureAtlasHandle atlasHandle, std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated = false);
+        Texture *createSubTexture(TextureAtlasHandle atlasHandle, std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated, bool font);
     
     private:
         static const uint32_t InitialTextureReserve = 4096;
@@ -188,7 +188,7 @@ namespace BGE {
 
         std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> createTextureAtlasFromFile(std::string name, std::string filename, std::vector<SubTextureDef> &subTextureDefs, TextureFormat format, bool createVbo);
         std::pair<BGE::TextureAtlas *, std::shared_ptr<BGE::Error>> createTextureAtlasFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height, std::vector<SubTextureDef> subTextureDefs, bool createVbo);
-        BGE::Texture *createSubTexture(std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated);
+        BGE::Texture *createSubTexture(std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated, bool font);
         
         void removeTexture(TextureAtlasHandle atlasHandle, TextureHandle handle);
 
