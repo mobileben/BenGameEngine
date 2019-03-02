@@ -74,14 +74,6 @@ namespace BGE {
         RenderCommandBindWindowData(const std::shared_ptr<RenderContext>& context, const std::shared_ptr<RenderWindow>& window) : context(context), window(window) {}
     };
 
-    struct RenderShaderCommandData : public RenderCommandData {
-        std::string                 vertexShaderName;
-        std::string                 fragmentShaderName;
-        std::string                 programName;
-        std::vector<std::string>    attributes;
-        std::vector<std::string>    uniforms;
-    };
-
     struct RenderTextureCommandData : public RenderCommandData {
 #ifdef DEBUG_RENDER_COMMAND
         std::string                 name;

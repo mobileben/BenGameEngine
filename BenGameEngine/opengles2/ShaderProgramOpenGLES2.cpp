@@ -11,18 +11,19 @@
 #include "ShaderProgramOpenGLES2.h"
 
 BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders) : ShaderProgram(id, name, shaders), error_(GL_NO_ERROR) {
-    state_ = createShaderProgram(name, shaders);
+    state_ = createShaderProgram(name, shaders, std::vector<std::pair<ShaderVertexAttributeIndex, std::string>>());
 }
 
-BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated) : ShaderProgram(id, name, shaders), error_(GL_NO_ERROR)
+BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderVertexAttributeIndex, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated, std::function<void(ShaderProgram *program)> shaderChangedSetup) : ShaderProgram(id, name, shaders), error_(GL_NO_ERROR)
 {
-    state_ = createShaderProgram(name, shaders);
+    state_ = createShaderProgram(name, shaders, attributes);
     windowMappedDimensionsUpdated_ = windowMappedDimensionsUpdated;
+    shaderChangedSetup_ = shaderChangedSetup;
     
     if (state_ == ShaderProgramState::Ready) {
         glUseProgram(program_);
 
-        createAttributesAndUniforms(attributes, uniforms);
+        createUniforms(uniforms);
         
         if (firstUseFunction) {
             firstUseFunction(this);
@@ -33,7 +34,7 @@ BGE::ShaderProgramOpenGLES2::ShaderProgramOpenGLES2(ShaderProgramId id, std::str
     }
 }
 
-BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(__attribute__ ((unused)) std::string name, std::vector<std::shared_ptr<Shader>> shaders)
+BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(__attribute__ ((unused)) std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderVertexAttributeIndex, std::string>> attributes)
 {
     program_ = glCreateProgram();
     
@@ -50,23 +51,28 @@ BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(__attri
         }
         
         if (state_ == ShaderProgramState::Uninitialized) {
-            glLinkProgram(program_);
-            
-            GLint linkSuccess;
-            
-            glGetProgramiv(program_, GL_LINK_STATUS, &linkSuccess);
-            
-            if (linkSuccess == GL_TRUE) {
-                state_ = ShaderProgramState::Ready;
-            } else {
-                GLchar message[256];
-                // Terminate, just in case
-                message[0] = '\0';
-                glGetProgramInfoLog(program_, sizeof(message), 0, &message[0]);
+            if (createAttributes(attributes) == GL_NO_ERROR) {
+                glLinkProgram(program_);
+
+                GLint linkSuccess;
+                glGetProgramiv(program_, GL_LINK_STATUS, &linkSuccess);
                 
-                error_ = glGetError();
-                errorString_ = std::string(message);
-                state_ = ShaderProgramState::LinkError;
+                if (linkSuccess == GL_TRUE) {
+                    state_ = ShaderProgramState::Ready;
+                } else {
+                    GLchar message[256];
+                    // Terminate, just in case
+                    message[0] = '\0';
+                    glGetProgramInfoLog(program_, sizeof(message), 0, &message[0]);
+                    
+                    error_ = glGetError();
+                    errorString_ = std::string(message);
+                    state_ = ShaderProgramState::LinkError;
+                    assert(false);
+                }
+            } else {
+                state_ = ShaderProgramState::GLError;
+                assert(false);
             }
         }
     } else {
@@ -75,15 +81,6 @@ BGE::ShaderProgramState BGE::ShaderProgramOpenGLES2::createShaderProgram(__attri
     }
     
     return state_;
-}
-
-GLint BGE::ShaderProgramOpenGLES2::locationForAttribute(ShaderAttributeId attribute) {
-    auto it = attributesById_.find(attribute);
-    if (it != attributesById_.end()) {
-        return it->second;
-    } else {
-        return 0;
-    }
 }
 
 GLint BGE::ShaderProgramOpenGLES2::locationForUniform(ShaderUniformId uniform) {
@@ -95,15 +92,21 @@ GLint BGE::ShaderProgramOpenGLES2::locationForUniform(ShaderUniformId uniform) {
     }
 }
 
-void BGE::ShaderProgramOpenGLES2::createAttributesAndUniforms(std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms)
+GLenum BGE::ShaderProgramOpenGLES2::createAttributes(std::vector<std::pair<ShaderVertexAttributeIndex, std::string>> attributes)
 {
     for (auto& attr : attributes) {
         auto& key = attr.second;
-        GLint location = glGetAttribLocation(program_, key.c_str());
-        attributesById_[attr.first] = location;
-        attributes_[key] = location;
+        glBindAttribLocation(program_, attr.first, key.c_str());
+        auto err = glGetError();
+        if (err != GL_NO_ERROR) {
+            return err;
+        }
     }
-    
+    return GL_NO_ERROR;
+}
+
+void BGE::ShaderProgramOpenGLES2::createUniforms(std::vector<std::pair<ShaderUniformId, std::string>> uniforms)
+{
     for (auto& uni : uniforms) {
         auto& key = uni.second;
         GLint location = glGetUniformLocation(program_, key.c_str());

@@ -27,29 +27,24 @@ namespace BGE {
     {
     public:
         ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders);
-        ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated);
+        ShaderProgramOpenGLES2(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderVertexAttributeIndex, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated, std::function<void(ShaderProgram *program)> shaderChangedSetup);
         
         GLuint getProgram() const { return program_; }
         
-        std::map<std::string, GLint> getAttributes() const { return attributes_; }
-        
-        GLint locationForAttribute(ShaderAttributeId attribute);
-        GLint locationForAttribute(std::string attribute) { return attributes_[attribute]; }
         GLint locationForUniform(ShaderUniformId uniform);
         GLint locationForUniform(std::string uniform) { return uniforms_[uniform]; }
 
     private:
         GLuint program_;
-        std::map<ShaderAttributeId, GLint> attributesById_;
-        std::map<std::string, GLint> attributes_;
         std::map<ShaderUniformId, GLint> uniformsById_;
         std::map<std::string, GLint> uniforms_;
         
         GLenum error_;
         std::string errorString_;
         
-        ShaderProgramState createShaderProgram(std::string name, std::vector<std::shared_ptr<Shader>> shaders);
-        void createAttributesAndUniforms(std::vector<std::pair<ShaderAttributeId, std::string>> attributes, std::vector<std::pair<ShaderUniformId, std::string>> uniforms);
+        ShaderProgramState createShaderProgram(std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::pair<ShaderVertexAttributeIndex, std::string>> attributes);
+        GLenum createAttributes(std::vector<std::pair<ShaderVertexAttributeIndex, std::string>> attributes);
+        void createUniforms(std::vector<std::pair<ShaderUniformId, std::string>> uniforms);
     };
 }
 

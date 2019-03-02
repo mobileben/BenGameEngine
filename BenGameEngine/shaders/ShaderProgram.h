@@ -27,10 +27,9 @@ namespace BGE {
     using ShaderProgramId = int32_t;
     const ShaderProgramId ShaderProgramIdUndefined = -1;
 
-    using ShaderAttributeId = int32_t;
+    using ShaderVertexAttributeIndex = uint32_t;
     using ShaderUniformId = int32_t;
     
-    const ShaderAttributeId ShaderAttributeIdUndefined = -1;
     const ShaderUniformId ShaderUniformIdUndefined = -1;
     
     class ShaderProgram
@@ -38,13 +37,14 @@ namespace BGE {
     public:
         ShaderProgram() : id_(ShaderProgramIdUndefined), state_(ShaderProgramState::Uninitialized), windowMappedDimensionsUpdated_(nullptr) {}
         ShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders);
-        ShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated);
+        ShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated, std::function<void(ShaderProgram *program)> shaderChangedSetup);
         virtual ~ShaderProgram() {}
         
         inline ShaderProgramId getId() const { return id_; }
         inline std::string getName() const { return name_; }
         
         void windowMappedDimensionsUpdated();
+        void shaderChangedSetup();
 
     protected:
         ShaderProgramId id_;
@@ -55,6 +55,7 @@ namespace BGE {
         ShaderProgramState state_;
 
         std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated_;
+        std::function<void(ShaderProgram *program)> shaderChangedSetup_;
 
     private:
     };

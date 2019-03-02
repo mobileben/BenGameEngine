@@ -120,11 +120,13 @@ namespace BGE {
     static const std::string PolyLineFragmentShaderName = "PolyLineFragment";
     static const std::string PolyLineShaderProgramName = "PolyLine";
 
-    static const ShaderAttributeId MaskTexCoordInShaderAttributeId = 0;
-    static const ShaderAttributeId PositionShaderAttributeId = 1;
-    static const ShaderAttributeId SourceColorShaderAttributeId = 2;
-    static const ShaderAttributeId TexCoordInShaderAttributeId = 3;
-
+    // Vertex Attributes are fixed indexes
+    static const ShaderVertexAttributeIndex PositionVertexAttributeIndex = 0;
+    static const ShaderVertexAttributeIndex TexCoordInVertexAttributeIndex = 1;
+    static const ShaderVertexAttributeIndex SourceColorVertexAttributeIndex = 2;
+    static const __attribute__((unused)) ShaderVertexAttributeIndex MaskTexCoordInVertexAttributeIndex = 3;
+    static const ShaderVertexAttributeIndex NumVertexAttributeIndex = 4;    // This is the total number of possible vertex attributes
+    
     static const std::string MaskTexCoordInShaderAttributeName = "MaskTexCoordIn";
     static const std::string PositionShaderAttributeName = "Position";
     static const std::string SourceColorShaderAttributeName = "SourceColor";
@@ -176,6 +178,9 @@ BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), indexBu
     currentVbo_ = 0;
     currentIbo_ = 0;
     
+    for (uint32_t i=0;i<NumVertexAttributeIndex;++i) {
+        currentVertexAttributes_.push_back(false);
+    }
 #ifdef SUPPORT_PROFILING
     resetProfilingStats();
 #endif /* SUPPORT_PROFILING */
@@ -348,39 +353,84 @@ void BGE::RenderServiceOpenGLES2::createShaders()
     
     std::shared_ptr<Shader> vShader = this->getShaderService()->createShader(ShaderType::Vertex, SimpleVertexShaderId, SimpleVertexShaderName);
     std::shared_ptr<Shader> fShader = this->getShaderService()->createShader(ShaderType::Fragment, SimpleFragmentShaderId, SimpleFragmentShaderName);
-    std::shared_ptr<ShaderProgram> program = this->getShaderService()->createShaderProgram(SimpleShaderProgramId, SimpleShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {SourceColorShaderAttributeId, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}}, nullptr, mappedFunction);
+    std::shared_ptr<ShaderProgram> program = this->getShaderService()->createShaderProgram(SimpleShaderProgramId, SimpleShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {SourceColorVertexAttributeIndex, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}}, nullptr, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+        setVertexAttribute(PositionVertexAttributeIndex, true);
+        setVertexAttribute(TexCoordInVertexAttributeIndex, false);
+        setVertexAttribute(SourceColorVertexAttributeIndex, true);
+        setVertexAttribute(MaskTexCoordInVertexAttributeIndex, false);
+    });
 
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, LineVertexShaderId, LineVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, LineFragmentShaderId, LineFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(LineShaderProgramId, LineShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {ColorShaderUniformId, ColorShaderUniformName}}, nullptr, mappedFunction);
+    program = this->getShaderService()->createShaderProgram(LineShaderProgramId, LineShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {ColorShaderUniformId, ColorShaderUniformName}}, nullptr, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+        setVertexAttribute(PositionVertexAttributeIndex, true);
+        setVertexAttribute(TexCoordInVertexAttributeIndex, false);
+        setVertexAttribute(SourceColorVertexAttributeIndex, false);
+        setVertexAttribute(MaskTexCoordInVertexAttributeIndex, false);
+    });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, TextureVertexShaderId, TextureVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, TextureFragmentShaderId, TextureFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(TextureShaderProgramId, TextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {SourceColorShaderAttributeId, SourceColorShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}}, firstUseFunction, mappedFunction);
+    program = this->getShaderService()->createShaderProgram(TextureShaderProgramId, TextureShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {SourceColorVertexAttributeIndex, SourceColorShaderAttributeName}, {TexCoordInVertexAttributeIndex, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}}, firstUseFunction, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+        setVertexAttribute(PositionVertexAttributeIndex, true);
+        setVertexAttribute(TexCoordInVertexAttributeIndex, true);
+        setVertexAttribute(SourceColorVertexAttributeIndex, true);
+        setVertexAttribute(MaskTexCoordInVertexAttributeIndex, false);
+    });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, ColorMatrixTextureVertexShaderId, ColorMatrixTextureVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, ColorMatrixTextureFragmentShaderId, ColorMatrixTextureFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(ColorMatrixTextureShaderProgramId, ColorMatrixTextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}}, firstUseFunction, mappedFunction);
+    program = this->getShaderService()->createShaderProgram(ColorMatrixTextureShaderProgramId, ColorMatrixTextureShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {TexCoordInVertexAttributeIndex, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}}, firstUseFunction, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+        setVertexAttribute(PositionVertexAttributeIndex, true);
+        setVertexAttribute(TexCoordInVertexAttributeIndex, true);
+        setVertexAttribute(SourceColorVertexAttributeIndex, false);
+        setVertexAttribute(MaskTexCoordInVertexAttributeIndex, false);
+    });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, FullColorTextureVertexShaderId, FullColorTextureVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, FullColorTextureFragmentShaderId, FullColorTextureFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(FullColorTextureShaderProgramId, FullColorTextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMultiplierShaderUniformId, ColorMultiplierShaderUniformName}, {ColorOffsetShaderUniformId, ColorOffsetShaderUniformName}}, firstUseFunction, mappedFunction);
+    program = this->getShaderService()->createShaderProgram(FullColorTextureShaderProgramId, FullColorTextureShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {TexCoordInVertexAttributeIndex, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMultiplierShaderUniformId, ColorMultiplierShaderUniformName}, {ColorOffsetShaderUniformId, ColorOffsetShaderUniformName}}, firstUseFunction, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+        setVertexAttribute(PositionVertexAttributeIndex, true);
+        setVertexAttribute(TexCoordInVertexAttributeIndex, true);
+        setVertexAttribute(SourceColorVertexAttributeIndex, false);
+        setVertexAttribute(MaskTexCoordInVertexAttributeIndex, false);
+    });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, MaskColorMatrixTextureVertexShaderId, MaskColorMatrixTextureVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, MaskColorMatrixTextureFragmentShaderId, MaskColorMatrixTextureFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(MaskColorMatrixTextureShaderProgramId, MaskColorMatrixTextureShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}, {MaskTexCoordInShaderAttributeId, MaskTexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {MaskTextureShaderUniformId, MaskTextureShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}}, firstUseFunction, mappedFunction);
+    program = this->getShaderService()->createShaderProgram(MaskColorMatrixTextureShaderProgramId, MaskColorMatrixTextureShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {TexCoordInVertexAttributeIndex, TexCoordInShaderAttributeName}, {MaskTexCoordInVertexAttributeIndex, MaskTexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {MaskTextureShaderUniformId, MaskTextureShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}}, firstUseFunction, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+        setVertexAttribute(PositionVertexAttributeIndex, true);
+        setVertexAttribute(TexCoordInVertexAttributeIndex, true);
+        setVertexAttribute(SourceColorVertexAttributeIndex, false);
+        setVertexAttribute(MaskTexCoordInVertexAttributeIndex, true);
+    });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, FontVertexShaderId, FontVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, FontFragmentShaderId, FontFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(FontShaderProgramId, FontShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {SourceColorShaderUniformId, SourceColorShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}}, firstUseFunction, mappedFunction);
+    program = this->getShaderService()->createShaderProgram(FontShaderProgramId, FontShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {TexCoordInVertexAttributeIndex, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {SourceColorShaderUniformId, SourceColorShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}}, firstUseFunction, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+        setVertexAttribute(PositionVertexAttributeIndex, true);
+        setVertexAttribute(TexCoordInVertexAttributeIndex, true);
+        setVertexAttribute(SourceColorVertexAttributeIndex, false);
+        setVertexAttribute(MaskTexCoordInVertexAttributeIndex, false);
+    });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, FullColorFontVertexShaderId, FullColorFontVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, FullColorFontFragmentShaderId, FullColorFontFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(FullColorFontShaderProgramId, FullColorFontShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {TexCoordInShaderAttributeId, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {SourceColorShaderUniformId, SourceColorShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMultiplierShaderUniformId, ColorMultiplierShaderUniformName}, {ColorOffsetShaderUniformId, ColorOffsetShaderUniformName}}, firstUseFunction, mappedFunction);
+    program = this->getShaderService()->createShaderProgram(FullColorFontShaderProgramId, FullColorFontShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {TexCoordInVertexAttributeIndex, TexCoordInShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}, {TextureShaderUniformId, TextureShaderUniformName}, {SourceColorShaderUniformId, SourceColorShaderUniformName}, {ColorMatOffsetShaderUniformId, ColorMatOffsetShaderUniformName}, {ColorMatrixShaderUniformId, ColorMatrixShaderUniformName}, {ColorMultiplierShaderUniformId, ColorMultiplierShaderUniformName}, {ColorOffsetShaderUniformId, ColorOffsetShaderUniformName}}, firstUseFunction, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+        setVertexAttribute(PositionVertexAttributeIndex, true);
+        setVertexAttribute(TexCoordInVertexAttributeIndex, true);
+        setVertexAttribute(SourceColorVertexAttributeIndex, false);
+        setVertexAttribute(MaskTexCoordInVertexAttributeIndex, false);
+    });
     
     vShader = this->getShaderService()->createShader(ShaderType::Vertex, PolyLineVertexShaderId, PolyLineVertexShaderName);
     fShader = this->getShaderService()->createShader(ShaderType::Fragment, PolyLineFragmentShaderId, PolyLineFragmentShaderName);
-    program = this->getShaderService()->createShaderProgram(PolyLineShaderProgramId, PolyLineShaderProgramName, {vShader,  fShader}, {{PositionShaderAttributeId, PositionShaderAttributeName}, {SourceColorShaderAttributeId, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}}, nullptr, mappedFunction);
+    program = this->getShaderService()->createShaderProgram(PolyLineShaderProgramId, PolyLineShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {SourceColorVertexAttributeIndex, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}}, nullptr, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+        setVertexAttribute(PositionVertexAttributeIndex, true);
+        setVertexAttribute(TexCoordInVertexAttributeIndex, false);
+        setVertexAttribute(SourceColorVertexAttributeIndex, true);
+        setVertexAttribute(MaskTexCoordInVertexAttributeIndex, false);
+    });
 }
 
 std::shared_ptr<BGE::ShaderProgram> BGE::RenderServiceOpenGLES2::useShaderProgram(ShaderProgramId program, bool& changed) {
@@ -548,16 +598,17 @@ void BGE::RenderServiceOpenGLES2::drawRect(Vector2 &position, Vector2 &size, Vec
 
     bool shaderChanged;
     std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(SimpleShaderProgramId, shaderChanged));
-
-    GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-    GLint colorLocation = glShader->locationForAttribute(SourceColorShaderAttributeId);
     
+    if (shaderChanged) {
+        glShader->shaderChangedSetup();
+    }
+
     // This doesn't use VBO/IBO
     disableVboIbo();
     
-    glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                           sizeof(VertexColor), &vertices[0]);
-    glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(SourceColorVertexAttributeIndex, 4, GL_FLOAT, GL_FALSE,
                           sizeof(VertexColor), (GLvoid*) (&vertices[0].color));
     
     glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
@@ -656,15 +707,16 @@ void BGE::RenderServiceOpenGLES2::drawShadedRect(Vector2 &position, Vector2 &siz
     bool shaderChanged;
     std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(SimpleShaderProgramId, shaderChanged));
     
-    GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-    GLint colorLocation = glShader->locationForAttribute(SourceColorShaderAttributeId);
-    
+    if (shaderChanged) {
+        glShader->shaderChangedSetup();
+    }
+
     // This doesn't use VBO/IBO
     disableVboIbo();
 
-    glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                           sizeof(VertexColor), &vertices[0]);
-    glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(SourceColorVertexAttributeIndex, 4, GL_FLOAT, GL_FALSE,
                           sizeof(VertexColor), (GLvoid*) (&vertices[0].color));
     
     glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
@@ -711,6 +763,10 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             bool shaderChanged;
             std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(TextureShaderProgramId, shaderChanged));
             
+            if (shaderChanged) {
+                glShader->shaderChangedSetup();
+            }
+
             GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
         
@@ -718,18 +774,12 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             setBlendFunc(BlendFunc::Src_ONE_Dst_ONE_MINUS_SRC_ALPHA);
             setTexture(texture->getTarget(), texture->getHWTextureId());
             
-            GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
-            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-
-            glEnableVertexAttribArray(positionLocation);
-            glEnableVertexAttribArray(texCoordLocation);
-
             // This doesn't use VBO/IBO
             disableVboIbo();
             
-            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+            glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), &vertices[0]);
-            glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+            glVertexAttribPointer(TexCoordInVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
             
             glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
@@ -753,6 +803,10 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
             if (material) {
                 bool shaderChanged;
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
+                
+                if (shaderChanged) {
+                    glShader->shaderChangedSetup();
+                }
 
                 GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
                 GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
@@ -770,12 +824,10 @@ void BGE::RenderServiceOpenGLES2::drawFlatRect(Space *space, GameObject *gameObj
                 setBlend(true);
                 setBlendFunc(BlendFunc::Src_SRC_ALPHA_Dst_ONE_MINUS_SRC_ALPHA);
                 
-                GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-
                 // This doesn't use VBO/IBO
                 disableVboIbo();
                 
-                glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), &vertices[0]);
+                glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), &vertices[0]);
 
                 glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
                                GL_UNSIGNED_BYTE, &VertexIndices[0]);
@@ -801,6 +853,10 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
                 bool shaderChanged;
                 std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
                 
+                if (shaderChanged) {
+                    glShader->shaderChangedSetup();
+                }
+
                 GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
                 GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
 
@@ -810,13 +866,10 @@ void BGE::RenderServiceOpenGLES2::drawMaskRect(Space *space, GameObject *gameObj
                     glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
                 }
                 
-                GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-                glEnableVertexAttribArray(positionLocation);
-                
                 // This doesn't use VBO/IBO
                 disableVboIbo();
-
-                glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                
+                glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                                       sizeof(Vertex), &vertices[0]);
                 
                 Color color;
@@ -850,6 +903,10 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                         bool shaderChanged;
                         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(TextureShaderProgramId, shaderChanged));
                         
+                        if (shaderChanged) {
+                            glShader->shaderChangedSetup();
+                        }
+
                         GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
                         
                         if (transform) {
@@ -861,18 +918,12 @@ void BGE::RenderServiceOpenGLES2::drawTextureMask(Space *space, GameObject *game
                         setBlend(false);
                         setTexture(texture->getTarget(), texture->getHWTextureId());
                         
-                        GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-                        GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
-
-                        glEnableVertexAttribArray(positionLocation);
-                        glEnableVertexAttribArray(texCoordLocation);
-                        
                         // This doesn't use VBO/IBO
                         disableVboIbo();
-                        
-                        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+
+                        glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                                               sizeof(VertexTex), &vertices[0]);
-                        glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                        glVertexAttribPointer(TexCoordInVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
                                               sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
 
                         glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
@@ -892,6 +943,10 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
     bool shaderChanged;
     std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
     
+    if (shaderChanged) {
+        glShader->shaderChangedSetup();
+    }
+
     GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
     GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
     
@@ -900,16 +955,13 @@ void BGE::RenderServiceOpenGLES2::drawDebugQuads(std::vector<Vector3> points, Co
     glUniform4fv(colorLocation, 1, (GLfloat *) &color.v[0]);
 
     setLineWidth(2);
-    
-    GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-    glEnableVertexAttribArray(positionLocation);
 
     // This doesn't use VBO/IBO
     disableVboIbo();
-
+    
     auto numPoints = points.size();
     for (size_t index=0;index<numPoints;index += 4) {
-        glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                               sizeof(Vertex), &points[index]);
         glDrawArrays(GL_LINE_LOOP, 0, (GLsizei) 4);
 #ifdef SUPPORT_PROFILING
@@ -941,6 +993,10 @@ void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject
             bool shaderChanged;
             std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(LineShaderProgramId, shaderChanged));
             
+            if (shaderChanged) {
+                glShader->shaderChangedSetup();
+            }
+
             GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             GLint colorLocation = glShader->locationForUniform(ColorShaderUniformId);
 
@@ -955,14 +1011,11 @@ void BGE::RenderServiceOpenGLES2::drawLines(Space *space, GameObject *gameObject
             }
             
             setLineWidth(line->getThickness());
-            
-            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-            glEnableVertexAttribArray(positionLocation);
 
             // This doesn't use VBO/IBO
             disableVboIbo();
             
-            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+            glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(Vertex), &vertices[0]);
             
             GLenum mode;
@@ -1060,9 +1113,12 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
             
             bool shaderChanged;
             std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(PolyLineShaderProgramId, shaderChanged));
-            GLint colorLocation = glShader->locationForAttribute(SourceColorShaderAttributeId);
-            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             
+            if (shaderChanged) {
+                glShader->shaderChangedSetup();
+            }
+
+            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             if (transform) {
                 glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) transform->worldMatrix_.m);
             } else {
@@ -1072,13 +1128,10 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
             setBlend(true);
             setBlendFunc(BlendFunc::Src_SRC_ALPHA_Dst_ONE_MINUS_SRC_ALPHA);
             
-            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-            glEnableVertexAttribArray(positionLocation);
-
             // This doesn't use VBO/IBO
             disableVboIbo();
             
-            VASEr::VASErin::backend::set_uniforms(positionLocation, colorLocation);
+            VASEr::VASErin::backend::set_uniforms(PositionVertexAttributeIndex, SourceColorVertexAttributeIndex);
 
             VASEr::polyline(vPoints, vColors, line->getThickness(), static_cast<int>(points.size()), &opt);
             
@@ -1120,6 +1173,10 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorTextureShaderProgramId, shaderChanged));
 #endif
                         
+                        if (shaderChanged) {
+                            glShader->shaderChangedSetup();
+                        }
+
                         GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
                         GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
                         GLint colorMatOffsetLocation = glShader->locationForUniform(ColorMatOffsetShaderUniformId);
@@ -1141,11 +1198,6 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         setBlend(false);
                         setTexture(texture->getTarget(), texture->getHWTextureId());
 
-                        GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-                        GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
-                        glEnableVertexAttribArray(positionLocation);
-                        glEnableVertexAttribArray(texCoordLocation);
-                        
                         auto vboId = texture->getHWVboId();
                         if (vboId) {
                             setVbo(texture->getHWVboId());
@@ -1161,9 +1213,9 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
 #else
                             setIbo(0);
 #endif
-                            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                            glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                                                   sizeof(VertexTex), 0);
-                            glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                            glVertexAttribPointer(TexCoordInVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
                                                   sizeof(VertexTex), (void *) sizeof(Vector3));
 #ifdef USE_IBO
                             glDrawElements(GL_TRIANGLES, texture->getVboIndicesCount(), texture->getVboIndexType(), 0);
@@ -1174,9 +1226,9 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                             // This doesn't use VBO/IBO
                             disableVboIbo();
 
-                            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+                            glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                                                   sizeof(VertexTex), &vertices[0]);
-                            glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+                            glVertexAttribPointer(TexCoordInVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
                                                   sizeof(VertexTex), (GLvoid*) (&vertices[0].tex));
                             glDrawElements(GL_TRIANGLES, sizeof(VertexIndices)/sizeof(VertexIndices[0]),
                                            GL_UNSIGNED_BYTE, &VertexIndices[0]);
@@ -1356,6 +1408,11 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
         if (textureAtlas) {
             bool shaderChanged;
             std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorFontShaderProgramId, shaderChanged));
+            
+            if (shaderChanged) {
+                glShader->shaderChangedSetup();
+            }
+
             GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
             GLint colorUniform = glShader->locationForUniform(SourceColorShaderUniformId);
             GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
@@ -1373,18 +1430,13 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font
 
             setBlend(false);
             setTexture(textureAtlas->getTarget(), textureAtlas->getHWTextureId());
-            
-            GLint positionLocation = glShader->locationForAttribute(PositionShaderAttributeId);
-            GLint texCoordLocation = glShader->locationForAttribute(TexCoordInShaderAttributeId);
-            glEnableVertexAttribArray(positionLocation);
-            glEnableVertexAttribArray(texCoordLocation);
 
             // This doesn't use VBO/IBO
             disableVboIbo();
             
-            glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE,
+            glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), &stringVertexData_[0]);
-            glVertexAttribPointer(texCoordLocation, 2, GL_FLOAT, GL_FALSE,
+            glVertexAttribPointer(TexCoordInVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
                                   sizeof(VertexTex), (GLvoid*) (&stringVertexData_[0].tex));
 
 #ifdef RENDER_STRING_WITH_GL_ARRAY
@@ -1787,6 +1839,17 @@ void BGE::RenderServiceOpenGLES2::disableVboIbo() {
     setIbo(0);
 }
 
+void BGE::RenderServiceOpenGLES2::setVertexAttribute(GLuint index, bool enabled) {
+    if (enabled != currentVertexAttributes_[index]) {
+        currentVertexAttributes_[index] = enabled;
+        if (enabled) {
+            glEnableVertexAttribArray(index);
+        } else {
+            glDisableVertexAttribArray(index);
+        }
+    }
+}
+
 void BGE::RenderServiceOpenGLES2::windowMappedDimensionsUpdated(std::shared_ptr<RenderWindow> window) {
     if (window == renderWindow_) {
         auto window = this->getRenderWindow();
@@ -1824,6 +1887,7 @@ void BGE::RenderServiceOpenGLES2::createTexture(const RenderCommandItem& item) {
         glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     }
+    
     glBindTexture(GL_TEXTURE_2D, tex);
     
     // Indicate we're the current texture since we did a bind

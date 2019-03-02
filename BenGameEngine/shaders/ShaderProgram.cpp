@@ -18,3 +18,9 @@ void BGE::ShaderProgram::windowMappedDimensionsUpdated() {
         windowMappedDimensionsUpdated_(this);
     }
 }
+
+void BGE::ShaderProgram::shaderChangedSetup() {
+    if (shaderChangedSetup_) {
+        shaderChangedSetup_(this);
+    }
+}

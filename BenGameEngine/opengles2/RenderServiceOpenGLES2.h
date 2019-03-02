@@ -144,6 +144,8 @@ namespace BGE {
         GLuint                          currentVbo_;
         GLuint                          currentIbo_;
         
+        std::vector<bool>               currentVertexAttributes_;
+
         std::vector<SpaceHandle>                            spaceHandles_;
         std::vector<GameObject *>                           rootGameObjects_;
         std::vector<std::vector<TransformComponentHandle>>  orderedChildrenHandles_;
@@ -170,6 +172,8 @@ namespace BGE {
         bool setVbo(GLuint vbo);
         bool setIbo(GLuint ibo);
         void disableVboIbo();
+        
+        void setVertexAttribute(GLuint index, bool enabled);
         
         void drawString(Space *space, std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
     };
