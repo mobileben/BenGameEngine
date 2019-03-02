@@ -119,9 +119,11 @@ namespace BGE {
         inline uint32_t getHWTextureId() const { return hwId_; }
         inline uint32_t getHWVboId() const { return vboId_; }
         inline uint32_t getHWIboId() const { return iboId_; }
+        inline GLsizei getHwIboOffset() const { return iboOffset_; }
         inline GLushort *getVboIndices() const { return const_cast<GLushort *>(&vboIndices_[0]); }
         inline GLsizei getVboIndicesSize() const { return static_cast<GLsizei>(sizeof(vboIndices_)); }
         inline GLsizei getVboIndicesCount() const { return static_cast<GLsizei>(sizeof(vboIndices_)/sizeof(vboIndices_[0])); }
+        inline GLsizei getVboIndexSize() const { return sizeof(vboIndices_[0]); }
         inline GLenum getVboIndexType() const { return static_cast<GLenum>(GL_UNSIGNED_SHORT); }
         inline GLenum getTarget() const { return target_; }
 #endif /* SUPPORT_OPENGL */
@@ -166,7 +168,7 @@ namespace BGE {
         GLenum              target_;
         GLuint              vboId_;
         GLuint              iboId_;
-        std::vector<VertexTex>  vertexTexData_;
+        GLsizei             iboOffset_;
         GLushort            vboIndices_[6];
 #endif /* SUPPORT_OPENGL */
         Vector2             xys_[4];
@@ -207,8 +209,6 @@ namespace BGE {
         std::shared_ptr<Error> createTextureFromRGBA4444Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
         std::shared_ptr<Error> createTextureFromRGBA8888Buffer(unsigned char *buffer, uint32_t width, uint32_t height);
         
-        // This will do a std::move
-        void moveToVertexTexData(std::vector<VertexTex>& data);
         size_t computeMemoryUsage(TextureFormat format, uint32_t width, uint32_t height);
     };
 }

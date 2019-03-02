@@ -21,6 +21,7 @@ BGE::Texture::Texture() : NamedObject(), valid_(false), width_(0), height_(0), x
     target_ = GL_TEXTURE_2D;
     vboId_ = 0;
     iboId_ = 0;
+    iboOffset_ = 0;
 #endif /* SUPPORT_OPENGL */
 #ifdef SUPPORT_GLKTEXTURELOADER
     textureInfo_ = nil;
@@ -36,6 +37,7 @@ BGE::Texture::Texture(uint32_t texId) : NamedObject(texId), valid_(false), width
     target_ = GL_TEXTURE_2D;
     vboId_ = 0;
     iboId_ = 0;
+    iboOffset_ = 0;
 #endif /* SUPPORT_OPENGL */
 #ifdef SUPPORT_GLKTEXTURELOADER
     textureInfo_ = nil;
@@ -50,6 +52,7 @@ BGE::Texture::Texture(uint32_t texId, std::string name) : NamedObject(texId, nam
     target_ = GL_TEXTURE_2D;
     vboId_ = 0;
     iboId_ = 0;
+    iboOffset_ = 0;
 #endif /* SUPPORT_OPENGL */
 #ifdef SUPPORT_GLKTEXTURELOADER
     textureInfo_ = nil;
@@ -69,6 +72,7 @@ BGE::Texture::Texture(uint32_t texId, std::string name, GLKTextureInfo *textureI
         target_ = textureInfo.target;
         vboId_ = 0;
         iboId_ = 0;
+        iboOffset_ = 0;
 #endif /* SUPPORT_OPENGL */
         width_ = textureInfo.width;
         height_ = textureInfo.height;
@@ -96,6 +100,7 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFor
     target_ = GL_TEXTURE_2D;
     vboId_ = 0;
     iboId_ = 0;
+    iboOffset_ = 0;
 #endif /* SUPPORT_OPENGL */
 
     atlasHandle_ = TextureAtlasHandle();
@@ -115,6 +120,7 @@ void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFor
         target_ = texInfo.target;
         vboId_ = 0;
         iboId_ = 0;
+        iboOffset_ = 0;
 #endif /* SUPPORT_OPENGL */
         width_ = texInfo.width;
         height_ = texInfo.height;
@@ -235,9 +241,6 @@ void BGE::Texture::destroy() {
             Game::getInstance()->getRenderService()->queueDestroyVbo(vboData, [](RenderCommandItem, __attribute__((unused)) std::shared_ptr<Error> error) {
             });
         }
-#endif /* SUPPORT_OPENGL */
-    } else {
-#ifdef SUPPORT_OPENGL
         if (iboId_) {
             RenderIboCommandData iboData(iboId_);
             Game::getInstance()->getRenderService()->queueDestroyIbo(iboData, [](RenderCommandItem, __attribute__((unused)) std::shared_ptr<Error> error) {
@@ -250,7 +253,7 @@ void BGE::Texture::destroy() {
     hwId_ = 0;
     vboId_ = 0;
     iboId_ = 0;
-    vertexTexData_.clear();
+    iboOffset_ = 0;
 #endif /* SUPPORT_OPENGL */
 #ifdef SUPPORT_GLKTEXTURELOADER
     textureInfo_ = nil;
@@ -686,10 +689,6 @@ std::shared_ptr<BGE::Error> BGE::Texture::createTextureFromRGBA8888Buffer(unsign
     }
 }
 
-
-void BGE::Texture::moveToVertexTexData(std::vector<VertexTex>& data) {
-    vertexTexData_ = std::move(data);
-}
 
 size_t BGE::Texture::computeMemoryUsage(TextureFormat format, uint32_t width, uint32_t height) {
     switch (format) {

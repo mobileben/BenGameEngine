@@ -239,8 +239,19 @@ void BGE::TextureAtlas::buildVertexTexData(Texture *texture) {
         auto handle = texture->getHandle();
         auto renderService = Game::getInstance()->getRenderService();
         auto textureService = Game::getInstance()->getTextureService();
-        std::vector<VertexTex>  vertexTexData;
         uint32_t dataIndex = 0;
+#ifdef SUPPORT_OPENGL
+        // We need to protect the lifetime of the vectors, so create shared_ptr versions
+        std::shared_ptr<std::vector<VertexTex>> vertexTexDataShared = std::make_shared<std::vector<VertexTex>>();
+        auto& vertexTexData = *vertexTexDataShared;
+        
+        // We need to protect the lifetime of the vectors, so create shared_ptr versions
+        std::shared_ptr<std::vector<GLushort>>     vertexIndicesShared = std::make_shared<std::vector<GLushort>>();
+        auto& vertexIndices = *vertexIndicesShared;
+        std::map<std::string, GLsizei> subTexVertexIndicesOffset;
+        
+        static_assert(sizeof(GLushort) == sizeof(texture->vboIndices_[0]), "Mismatch in index sizes");
+        vertexIndices.reserve(subTextures_.size() * sizeof(indexOrdering)/sizeof(uint32_t));
 
         VertexTex vt;
         vt.position.z = 0.0;
@@ -256,74 +267,71 @@ void BGE::TextureAtlas::buildVertexTexData(Texture *texture) {
                     vt.tex.y = subTex->uvs_[i].y;
                     vertexTexData.push_back(vt);
                 }
-#ifdef SUPPORT_OPENGL
+                subTexVertexIndicesOffset[subTex->getName()] = static_cast<GLsizei>(vertexIndices.size() * subTex->getVboIndexSize());
                 for (size_t i=0;i<sizeof(indexOrdering)/sizeof(uint32_t);++i) {
-                    subTex->vboIndices_[i] = static_cast<GLuint>(dataIndex + indexOrdering[i]);
+                    auto index = static_cast<GLushort>(dataIndex + indexOrdering[i]);
+                    subTex->vboIndices_[i] = index;
+                    vertexIndices.push_back(index);
                 }
                 dataIndex += kNumVertices;
-#endif /* SUPPORT_OPENGL */
             }
         }
-        
+#endif /* SUPPORT_OPENGL */
+
         // Refresh just in case
         texture = textureService->getTexture(handle);
-        texture->moveToVertexTexData(vertexTexData);    // Note this does a std::move
 
-        RenderVboCommandData data(&texture->vertexTexData_[0], static_cast<uint32_t>(texture->vertexTexData_.size()));
-        auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
-        auto fut = prom->get_future();
-
-        renderService->queueCreateVbo(data, [this, handle, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
+        RenderVboCommandData data(&vertexTexData[0], static_cast<uint32_t>(vertexTexData.size()));
+        // We use lambda capture (which does not optimize out the variable) to maintain the lifetime of the vector
+        renderService->queueCreateVbo(data, [this, vertexTexDataShared, handle](RenderCommandItem command, std::shared_ptr<Error> error) {
             if (!error) {
-                auto data = std::dynamic_pointer_cast<RenderVboCommandData>(command.data);
 #ifdef SUPPORT_OPENGL
-                auto textureService = Game::getInstance()->getTextureService();
-                auto texture = textureService->getTexture(handle);
-                texture->vboId_ = data->glVboId;
-                if (texture->vboId_) {
-                    for (auto it : subTextures_) {
-                        auto subTex = textureService->getTexture(it.second);
-                        if (subTex) {
-                            subTex->vboId_ = texture->vboId_;
+                std::async(std::launch::async, [this, handle, command]() {
+                    auto data = std::dynamic_pointer_cast<RenderVboCommandData>(command.data);
+                    auto textureService = Game::getInstance()->getTextureService();
+                    auto texture = textureService->getTexture(handle);
+                    if (data->glVboId) {
+                        for (auto it : subTextures_) {
+                            auto subTex = textureService->getTexture(it.second);
+                            if (subTex) {
+                                subTex->vboId_ = data->glVboId;
+                            }
                         }
+                        texture->vboId_ = data->glVboId;
                     }
-                }
+                });
 #endif /* SUPPORT_OPENGL */
-            } else {
-                
             }
-            prom->set_value(error);
         });
         
-        fut.get();
-        
 #ifdef SUPPORT_OPENGL
-        std::vector<std::shared_future<std::shared_ptr<Error>>> futures;
-        
-        for (auto& it : subTextures_) {
-            auto subTexHandle = it.second;
-            auto subTex = textureService->getTexture(subTexHandle);
-            if (subTex) {
-                RenderIboCommandData data(subTex->getVboIndices(), static_cast<uint32_t>(subTex->getVboIndicesCount()), static_cast<uint32_t>(subTex->getVboIndicesSize() / subTex->getVboIndicesCount()));
-                auto prom = std::make_shared<std::promise<std::shared_ptr<Error>>>();
-                futures.push_back(std::shared_future<std::shared_ptr<Error>>(prom->get_future()));
-                
-                renderService->queueCreateIbo(data, [textureService, subTexHandle, prom](RenderCommandItem command, std::shared_ptr<Error> error) {
-                    if (!error) {
-                        auto subTex = textureService->getTexture(subTexHandle);
-                        if (subTex) {
-                            auto data = std::dynamic_pointer_cast<RenderIboCommandData>(command.data);
-                            subTex->iboId_ = data->glIboId;
+        texture = textureService->getTexture(handle);
+        RenderIboCommandData iboData(&vertexIndices[0], static_cast<uint32_t>(vertexIndices.size()), static_cast<uint32_t>(texture->getVboIndexSize()));
+        // We use lambda capture (which does not optimize out the variable) to maintain the lifetime of the vector
+        renderService->queueCreateIbo(iboData, [this, vertexIndicesShared, handle, subTexVertexIndicesOffset](RenderCommandItem command, std::shared_ptr<Error> error) {
+            if (!error) {
+#ifdef SUPPORT_OPENGL
+                std::async(std::launch::async, [this, subTexVertexIndicesOffset, handle, command]() {
+                    auto data = std::dynamic_pointer_cast<RenderIboCommandData>(command.data);
+                    auto textureService = Game::getInstance()->getTextureService();
+                    if (data->glIboId) {
+                        for (auto it : subTextures_) {
+                            auto subTex = textureService->getTexture(it.second);
+                            if (subTex) {
+                                auto sit = subTexVertexIndicesOffset.find(subTex->getName());
+                                if (sit != subTexVertexIndicesOffset.end()) {
+                                    subTex->iboId_ = data->glIboId;
+                                    subTex->iboOffset_ = sit->second;
+                                }
+                            }
                         }
+                        auto texture = textureService->getTexture(handle);
+                        texture->iboId_ = data->glIboId;
                     }
-                    prom->set_value(error);
                 });
+#endif /* SUPPORT_OPENGL */
             }
-        }
-        
-        for (auto& f : futures) {
-            f.get();
-        }
+        });
 #endif /* SUPPORT_OPENGL */
     }
 }

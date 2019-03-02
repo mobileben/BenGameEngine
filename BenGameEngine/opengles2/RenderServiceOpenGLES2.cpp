@@ -164,7 +164,7 @@ void CheckGLError() {
 }
 #endif
 
-BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), indexBufferId_(0), currentTextureId_(0), currentShaderProgramId_(ShaderProgramIdUndefined) {
+BGE::RenderServiceOpenGLES2::RenderServiceOpenGLES2() : activeMasks_(0), currentTextureId_(0), currentShaderProgramId_(ShaderProgramIdUndefined) {
     shaderService_ = std::make_shared<ShaderServiceOpenGLES2>();
     ShaderServiceOpenGLES2::mapShaderBundle("BenGameEngineBundle");
     
@@ -1206,9 +1206,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                             if (iboId) {
                                 setIbo(iboId);
                             } else {
-                                if (setIbo(indexBufferId_)) {
-                                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, texture->getVboIndicesSize(), texture->getVboIndices(), GL_DYNAMIC_DRAW);
-                                }
+                                setIbo(0);
                             }
 #else
                             setIbo(0);
@@ -1218,7 +1216,11 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                             glVertexAttribPointer(TexCoordInVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
                                                   sizeof(VertexTex), (void *) sizeof(Vector3));
 #ifdef USE_IBO
-                            glDrawElements(GL_TRIANGLES, texture->getVboIndicesCount(), texture->getVboIndexType(), 0);
+                            if (iboId) {
+                                glDrawElements(GL_TRIANGLES, texture->getVboIndicesCount(), texture->getVboIndexType(), (void *) (size_t) (texture->getHwIboOffset()));
+                            } else {
+                                glDrawElements(GL_TRIANGLES, texture->getVboIndicesCount(), texture->getVboIndexType(), texture->getVboIndices());
+                            }
 #else
                             glDrawElements(GL_TRIANGLES, texture->getVboIndicesCount(), texture->getVboIndexType(), texture->getVboIndices());
 #endif
@@ -1865,11 +1867,6 @@ void BGE::RenderServiceOpenGLES2::windowMappedDimensionsUpdated(std::shared_ptr<
 }
 
 void BGE::RenderServiceOpenGLES2::threadCleanup() {
-    if (indexBufferId_) {
-        setIbo(0);
-        glDeleteBuffers(1, &indexBufferId_);
-        indexBufferId_ = 0;
-    }
 }
 
 
@@ -1883,6 +1880,7 @@ void BGE::RenderServiceOpenGLES2::createTexture(const RenderCommandItem& item) {
 #endif
     std::shared_ptr<Error> error;
     glGenTextures(1, &tex);
+
     if (glFormat == GL_RGB) {
         glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -1938,18 +1936,13 @@ void BGE::RenderServiceOpenGLES2::createVbo(const RenderCommandItem& item) {
     std::shared_ptr<Error> error;
     GLuint vbo;
     glGenBuffers(1, &vbo);
-    
+
     // set Vbo since we are going to glBufferData
     setVbo(vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(VertexTex) * data->numVertexTex, data->vertexTexData, GL_STATIC_DRAW);
     GLenum glErr = glGetError();
     if (glErr == GL_NO_ERROR) {
         data->glVboId = vbo;
-        
-        if (!indexBufferId_) {
-            // We need to create at least one index buffer
-            glGenBuffers(1, &indexBufferId_);
-        }
     } else {
         error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorVboAllocation);
     }
@@ -1983,7 +1976,7 @@ void BGE::RenderServiceOpenGLES2::createIbo(const RenderCommandItem& item) {
     std::shared_ptr<Error> error;
     GLuint ibo;
     glGenBuffers(1, &ibo);
-    
+
     // set Ibo since we are going to glBufferData
     setIbo(ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, data->numIndices * data->indexSize, data->indices, GL_STATIC_DRAW);

@@ -129,9 +129,6 @@ namespace BGE {
         GLKTextureInfo *textureInfo_;
         uint8_t activeMasks_;
 
-        // IBO
-        GLuint                          indexBufferId_;
-        
         // TODO: Proper way for maintaining texture state would be for each texture unit as well as tracking the target
         GLuint                          currentTextureId_;
         ShaderProgramId                 currentShaderProgramId_;
