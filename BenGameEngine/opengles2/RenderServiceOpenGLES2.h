@@ -82,9 +82,7 @@ namespace BGE {
         void drawDebugQuads(std::vector<Vector3> points, Color &color);
 
         void drawString(Space *space, TextComponent *text, Font *font, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum=true);
-
-        void drawString(Space *space, std::vector<std::string> &strs, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
-
+        
         uint8_t enableMask(Space *space, GameObject *gameObject, TransformComponent *transform);
         void disableMask(uint8_t maskBits);
         
@@ -110,9 +108,18 @@ namespace BGE {
 
         virtual void createVbo(const RenderCommandItem& item);
         virtual void destroyVbo(const RenderCommandItem& item);
+        
+        GLuint createVbo_(VertexTex *data, uint32_t numVertexTex);
+        void destroyVbo_(GLuint vbo);
 
         virtual void createIbo(const RenderCommandItem& item);
         virtual void destroyIbo(const RenderCommandItem& item);
+        
+        GLuint createIbo_(void *indices, uint32_t numIndices, uint32_t indexSize);
+        void destroyIbo_(GLuint ibo);
+
+        virtual void createStringCacheEntry(const RenderCommandItem& item);
+        virtual void destroyStringCacheEntry(const RenderCommandItem& item);
 
     private:
         ColorMatrix currentColorMatrix_;
@@ -150,10 +157,14 @@ namespace BGE {
         std::vector<VertexTex>                              stringVertexData_;
         std::vector<GLushort>                               stringIndices_;
         
+        // String caches
+        std::map<CachedStringRenderDataKey, CachedStringRenderData> stringVertexCache_;
+        std::map<CachedStringRenderDataKey, CachedStringRenderData> dropShadowStringVertexCache_;
+
         void queueRender(double deltaTime);
         
         int8_t renderGameObject(GameObject *gameObj, Space *space, uint32_t depth, bool hasNextSibling = false);
-
+        
         void resetStacks();
         
         void pushColorMatrix();
@@ -172,7 +183,8 @@ namespace BGE {
         
         void setVertexAttribute(GLuint index, bool enabled);
         
-        void drawString(Space *space, std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        void drawString(CachedStringRenderData *cache, std::vector<std::string> &strs, bool dirty, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
+        void drawString(CachedStringRenderData *cache, const std::string& str, bool dirty, bool last, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment=FontHorizontalAlignment::Center, FontVerticalAlignment vertAlignment=FontVerticalAlignment::Center, bool minimum=true);
     };
 }
 

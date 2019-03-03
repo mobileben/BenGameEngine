@@ -294,7 +294,8 @@ std::pair<BGE::FontHandle, std::shared_ptr<BGE::Error>> BGE::Font::load(std::str
                     }
 
                     TextureAtlas *atlas;
-                    std::tie(atlas, bgeError) = textureService->createTextureAtlasFromBuffer(getHandle(), FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, TextureFormat::Alpha, atlasW, atlasH, subTexDefs, true);
+                    // createVbo is false, we don't want to create VBO/IBO for font since this is done by our string cache
+                    std::tie(atlas, bgeError) = textureService->createTextureAtlasFromBuffer(getHandle(), FontService::fontAsKey(getName(), pixelSize_), atlasBuffer, TextureFormat::Alpha, atlasW, atlasH, subTexDefs, false);
                     if (atlas) {
                         textureAtlasHandle_ = atlas->getHandle();
                         glyphs_.clear();

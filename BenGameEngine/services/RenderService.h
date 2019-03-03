@@ -29,6 +29,8 @@
 
 namespace BGE {
     class ComponentService;
+    class Space;
+    class TextComponent;
     class Texture;
     
     typedef Vector3 Vertex;
@@ -59,8 +61,28 @@ namespace BGE {
         OpenGL,                 // Lower left (X-right, Y-up)
         OpenGLCentered          // Center of screen (X-right, Y-up)
     };
+    
+    using CachedStringRenderDataKey = uint64_t;
+    
+    struct CachedStringRenderData {
+        SpaceHandle             spaceHandle;
+        TextComponentHandle     textHandle;
+#if DEBUG
+        uint32_t                lifetime;
+#endif
+#ifdef SUPPORT_OPENGL
+        GLuint                  vbo;
+        GLuint                  ibo;
+        size_t                  numVertices;
+        size_t                  numIndices;
+        size_t                  maxIndices;
+        size_t                  maxVertices;
+        std::vector<GLushort>   indices;
+        std::vector<VertexTex>  vertices;
+#endif /* SUPPORT_OPENGL */
+    };
 
-    enum class RenderCommand { None, BindWindow, SetIsReady, CreateBuiltinShaders, CreateShader, Render, TextureCreate, TextureDestroy, VboCreate, VboDestroy, IboCreate, IboDestroy };
+    enum class RenderCommand { None, BindWindow, SetIsReady, CreateBuiltinShaders, CreateShader, Render, TextureCreate, TextureDestroy, VboCreate, VboDestroy, IboCreate, IboDestroy, CreateStringCacheEntry, DestroyStringCacheEntry };
 
     struct RenderCommandData {
         virtual ~RenderCommandData() {}
@@ -194,6 +216,14 @@ namespace BGE {
 #endif /* SUPPORT_OPENGL */
     };
     
+    struct RenderStringCacheCommandData : public RenderCommandData {
+        SpaceHandle         spaceHandle;
+        TextComponentHandle textHandle;
+        
+        RenderStringCacheCommandData() = delete;
+        RenderStringCacheCommandData(SpaceHandle spaceHandle, TextComponentHandle textHandle) : spaceHandle(spaceHandle), textHandle(textHandle) {}
+    };
+
     struct RenderCommandItem {
         RenderCommand                                                   command;
         std::shared_ptr<RenderCommandData>                              data;
@@ -291,6 +321,8 @@ namespace BGE {
         void queueDestroyVbo(const RenderVboCommandData& vboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
         void queueCreateIbo(const RenderIboCommandData& iboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
         void queueDestroyIbo(const RenderIboCommandData& iboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueCreateStringCacheEntry(const RenderStringCacheCommandData& cacheData);
+        void queueDestroyStringCacheEntry(const RenderStringCacheCommandData& cacheData);
         void queueRender();
 
     protected:
@@ -315,6 +347,13 @@ namespace BGE {
         virtual void destroyVbo(const RenderCommandItem& item);
         virtual void createIbo(const RenderCommandItem& item);
         virtual void destroyIbo(const RenderCommandItem& item);
+        virtual void createStringCacheEntry(const RenderCommandItem& item);
+        virtual void destroyStringCacheEntry(const RenderCommandItem& item);
+        
+        CachedStringRenderDataKey getCachedStringRenderDataKey(Space *space, TextComponent *text);
+        CachedStringRenderDataKey getCachedStringRenderDataKey(SpaceHandle spaceHandle, TextComponentHandle textHandle);
+        SpaceHandle getSpaceHandleFromCachedStringRenderDataKey(CachedStringRenderDataKey key);
+        TextComponentHandle getTextComponentHandleFromCachedStringRenderDataKey(CachedStringRenderDataKey key);
 
 #ifdef SUPPORT_PROFILING
         profiling::FrameRateCalculator frameRateCalculator_;

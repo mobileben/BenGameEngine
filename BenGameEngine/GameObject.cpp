@@ -16,6 +16,7 @@
 #include "AnimatorComponent.h"
 #include "FrameAnimatorComponent.h"
 #include "TransformComponent.h"
+#include "TextComponent.h"
 #include "LogicComponent.h"
 
 BGE::GameObject::GameObject() : NamedObject(), active_(false), cachedVisibility_(true), componentBitmask_(0) {
@@ -405,6 +406,11 @@ void BGE::GameObject::addComponentEpilogue(ComponentTypeId componentTypeId) {
         if (animSeq->totalFrames > 1) {
             space->addAnimObject(getHandle());
         }
+    } else if (componentTypeId == TextComponent::typeId_) {
+        auto space = getSpace();
+        auto text = getComponent<TextComponent>(space);
+        RenderStringCacheCommandData data(getSpaceHandle(), text->getHandle<TextComponent>());
+        Game::getInstance()->getRenderService()->queueCreateStringCacheEntry(data);
     }
     
     // Now sort based on type index

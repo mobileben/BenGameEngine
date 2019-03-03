@@ -36,6 +36,8 @@ namespace BGE {
             text_.clear();
             fontHandle_ = FontHandle();
         }
+        
+        void destroy() final;
 
         const std::string& getText() const {
             return text_;
@@ -111,6 +113,8 @@ namespace BGE {
         const auto &getMultiTextY() const { return textY_; }
         
     protected:
+        void destroyFast() final;
+
         void materialsUpdated();
 
     private:
@@ -132,6 +136,7 @@ namespace BGE {
         float                       leading_;
         bool                        multiline_;
         bool                        dropShadow_;
+        bool                        dirty_;
         
         void updateBoundingBox();
         

@@ -1248,34 +1248,90 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
 }
 
 void BGE::RenderServiceOpenGLES2::drawString(Space *space, TextComponent *text, Font *font, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum) {
+    auto cacheKey = getCachedStringRenderDataKey(space, text);
+    CachedStringRenderData *cache = nullptr;
+    CachedStringRenderData *dropShadowCache = nullptr;
+    auto it = stringVertexCache_.find(cacheKey);
+    if (it != stringVertexCache_.end()) {
+        auto& entry = it->second;
+        cache = &entry;
+    }
+    if (text->isDropShadow()) {
+        auto it = dropShadowStringVertexCache_.find(cacheKey);
+        if (it != dropShadowStringVertexCache_.end()) {
+            auto& entry = it->second;
+            dropShadowCache = &entry;
+        }
+    }
+    
+    if (text->dirty_) {
+        // Dirty text requires us to clear our buffers if we have them
+        if (cache) {
+            cache->numIndices = 0;
+            cache->numVertices = 0;
+            cache->indices.clear();
+            cache->vertices.clear();
+        }
+        if (dropShadowCache) {
+            dropShadowCache->numIndices = 0;
+            dropShadowCache->numVertices = 0;
+            dropShadowCache->indices.clear();
+            dropShadowCache->vertices.clear();
+        }
+    }
+    
     if (text->isMultiline()) {
         auto multiText = text->getMultiText();
         auto yPos = text->getMultiTextY();
 
         if (text->isDropShadow()) {
+            if (!dropShadowCache) {
+                // If we have no cache, we'll be drawing using our own vertex and index buffers
+                stringVertexData_.clear();
+                stringIndices_.clear();
+            }
             auto off = text->getDropShadowOffset();
-            drawString(space, multiText, font, off.x, off.y, yPos, text->getBoundsWidth(), transform, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+            drawString(dropShadowCache, multiText, text->dirty_, font, off.x, off.y, yPos, text->getBoundsWidth(), transform, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
         }
 
-        drawString(space, multiText, font, 0, 0, yPos, text->getBoundsWidth(), transform, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+        if (!cache) {
+            // If we have no cache, we'll be drawing using our own vertex and index buffers
+            stringVertexData_.clear();
+            stringIndices_.clear();
+        }
+        drawString(cache, multiText, text->dirty_, font, 0, 0, yPos, text->getBoundsWidth(), transform, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
     } else {
         if (text->isDropShadow()) {
+            if (!dropShadowCache) {
+                // If we have no cache, we'll be drawing using our own vertex and index buffers
+                stringVertexData_.clear();
+                stringIndices_.clear();
+            }
             auto off = text->getDropShadowOffset();
-            drawString(space, text->getText(), font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), off.x, off.y, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+            drawString(dropShadowCache, text->getText(), text->dirty_, true, font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), off.x, off.y, (Color&) text->getDropShadowColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
         }
 
-        drawString(space, text->getText(), font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), 0, 0, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
+        if (!cache) {
+            // If we have no cache, we'll be drawing using our own vertex and index buffers
+            stringVertexData_.clear();
+            stringIndices_.clear();
+        }
+        drawString(cache, text->getText(), text->dirty_, true, font, transform->getWorldMatrixRaw(), text->getBoundsWidth(), 0, 0, (Color&) text->getColor(), colorMatrix, colorTransform, text->getHorizontalAlignment(), text->getVerticalAlignment(), minimum);
     }
+    
+    // Clear our dirty flag if we have one
+    text->dirty_ = false;
 }
 
-void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::vector<std::string> &strs, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+void BGE::RenderServiceOpenGLES2::drawString(CachedStringRenderData *cache, std::vector<std::string> &strs, bool dirty, Font *font, float xOffset, float yOffset, std::vector<float> &yPos, float defWidth, TransformComponent *transform, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     const float *rawMatrix = transform->getWorldMatrixRaw();
-    auto index = 0;
-
+    size_t index = 0;
+    size_t lastIndex = strs.size() - 1;
+    
     for (auto &str : strs) {
         float yOff = yPos[index] + yOffset;
 
-        drawString(space, str, font, rawMatrix, defWidth, xOffset, yOff, color, colorMatrix, colorTransform, horizAlignment, vertAlignment, minimum);
+        drawString(cache, str, dirty, index == lastIndex, font, rawMatrix, defWidth, xOffset, yOff, color, colorMatrix, colorTransform, horizAlignment, vertAlignment, minimum);
 
         index++;
     }
@@ -1283,174 +1339,307 @@ void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::vector<std::stri
 
 #define RENDER_STRING_WITH_GL_ARRAY
 
-void BGE::RenderServiceOpenGLES2::drawString(Space *space, std::string str, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
+void BGE::RenderServiceOpenGLES2::drawString(CachedStringRenderData *cache, const std::string& str, bool dirty, bool last, Font *font, const float *rawMatrix, float defWidth, float xOffset, float yOffset, Color &color, ColorMatrix& colorMatrix, ColorTransform& colorTransform, FontHorizontalAlignment horizAlignment, FontVerticalAlignment vertAlignment, bool minimum) {
     auto textureService = Game::getInstance()->getTextureService();
     auto textureAtlas = textureService->getTextureAtlasLockless(font->getTextureAtlasHandle());
 
     if (str.length() > 0 && textureAtlas && textureAtlas->isValid()) {
-        GLushort indexPtr = 0;
-        float x = xOffset;
-        float y = yOffset;
+        bool generate = false;
         
-        // TODO: Adjustment based on alignment to be done here
-
-        stringVertexData_.clear();
-        stringIndices_.clear();
-        
-        const char *chars = str.c_str();
-        FontGlyph glyph;
-        uint16_t code;
-        size_t length = str.length();
-
-        // Compute the offsets if needed
-        switch (horizAlignment) {
-            case FontHorizontalAlignment::Center:
-                x -= font->getStringWidth(str, minimum) / 2.0;
-                break;
-
-            case FontHorizontalAlignment::Right:
-                x -= font->getStringWidth(str, minimum) - defWidth / 2.0;
-                break;
-
-            default:
-                x -= defWidth / 2.0;
-                break;
+        if (!cache || dirty) {
+            generate = true;
         }
 
-        float deltaY = 0;
-
-        switch (vertAlignment) {
-            case FontVerticalAlignment::Center:
-                deltaY = font->getHeight() / 2.0;
-                break;
-
-            case FontVerticalAlignment::Bottom:
-                deltaY = font->getHeight();
-                break;
-
-            case FontVerticalAlignment::Baseline:
-                deltaY = font->getBaseline();
-                break;
-
-            default:
-                break;
+        std::vector<VertexTex> *vertexData;
+        std::vector<GLushort> *indices;
+        
+        if (cache) {
+            vertexData = &cache->vertices;
+            indices = &cache->indices;
+        } else {
+            vertexData = &stringVertexData_;
+            indices = &stringIndices_;
         }
-
-        y -= deltaY;
-
-        float gridX = x;
-        float gridY = y;
-
-        uint16_t prev = 0;
-
-        for (size_t i=0;i<length;i++) {
-            code = chars[i];
-
-            auto glyph = font->glyphs_.find(code);
-
-            if (glyph != font->glyphs_.end()) {
-                if (i == 0 && !minimum) {
-                    x += glyph->second.getOffsetX();
-                } else {
-                    x += glyph->second.getOffsetX();
-                }
-
-                if (font->hasKerning() && prev) {
-                    int32_t kerning = font->kerningForPair(prev, code);
-                    x += kerning;
-                    gridX += kerning;
-                }
-
-                y += glyph->second.getOffsetY();
-
-                auto texHandle = glyph->second.getTextureHandle();
-                auto tex = textureService->getTextureLockless(texHandle);
-
-                if (tex) {
-                    const Vector2 *xys = tex->getXYs();
-                    const Vector2 *uvs = tex->getUVs();
-
-                    auto numIndices = sizeof(VertexIndices)/sizeof(VertexIndices[0]);
+        
+        auto& stringVertexData = *vertexData;
+        auto& stringIndices = *indices;
+        
+        if (generate) {
+            GLushort indexPtr = static_cast<GLushort>(stringIndices.size());
+            float x = xOffset;
+            float y = yOffset;
+            
+            // TODO: Adjustment based on alignment to be done here
+            
+            const char *chars = str.c_str();
+            FontGlyph glyph;
+            uint16_t code;
+            size_t length = str.length();
+            
+            // Compute the offsets if needed
+            switch (horizAlignment) {
+                case FontHorizontalAlignment::Center:
+                    x -= font->getStringWidth(str, minimum) / 2.0;
+                    break;
+                    
+                case FontHorizontalAlignment::Right:
+                    x -= font->getStringWidth(str, minimum) - defWidth / 2.0;
+                    break;
+                    
+                default:
+                    x -= defWidth / 2.0;
+                    break;
+            }
+            
+            float deltaY = 0;
+            
+            switch (vertAlignment) {
+                case FontVerticalAlignment::Center:
+                    deltaY = font->getHeight() / 2.0;
+                    break;
+                    
+                case FontVerticalAlignment::Bottom:
+                    deltaY = font->getHeight();
+                    break;
+                    
+                case FontVerticalAlignment::Baseline:
+                    deltaY = font->getBaseline();
+                    break;
+                    
+                default:
+                    break;
+            }
+            
+            y -= deltaY;
+            
+            float gridX = x;
+            float gridY = y;
+            
+            uint16_t prev = 0;
+            
+            for (size_t i=0;i<length;i++) {
+                code = chars[i];
+                
+                auto glyph = font->glyphs_.find(code);
+                
+                if (glyph != font->glyphs_.end()) {
+                    if (i == 0 && !minimum) {
+                        x += glyph->second.getOffsetX();
+                    } else {
+                        x += glyph->second.getOffsetX();
+                    }
+                    
+                    if (font->hasKerning() && prev) {
+                        int32_t kerning = font->kerningForPair(prev, code);
+                        x += kerning;
+                        gridX += kerning;
+                    }
+                    
+                    y += glyph->second.getOffsetY();
+                    
+                    auto texHandle = glyph->second.getTextureHandle();
+                    auto tex = textureService->getTextureLockless(texHandle);
+                    
+                    if (tex) {
+                        const Vector2 *xys = tex->getXYs();
+                        const Vector2 *uvs = tex->getUVs();
+                        
+                        auto numIndices = sizeof(VertexIndices)/sizeof(VertexIndices[0]);
 #ifdef RENDER_STRING_WITH_GL_ARRAY
-                    for (size_t i=0;i<numIndices;++i) {
-                        auto index = VertexIndices[i];
-                        VertexTex vtex{{{x + xys[index].x, y + xys[index].y, 0.0}}, {{uvs[index].x, uvs[index].y}}};
+                        for (size_t i=0;i<numIndices;++i) {
+                            auto index = VertexIndices[i];
+                            VertexTex vtex{{{x + xys[index].x, y + xys[index].y, 0.0}}, {{uvs[index].x, uvs[index].y}}};
+                            stringVertexData.push_back(vtex);
+                            stringIndices.push_back(indexPtr++);
+                        }
+#else
+                        VertexTex vtex{{{x + xys[0].x, y + xys[0].y, 0.0}}, {{uvs[0].x, uvs[0].y}}};
                         stringVertexData_.push_back(vtex);
-                        stringIndices_.push_back(indexPtr++);
-                    }
-#else
-                    VertexTex vtex{{{x + xys[0].x, y + xys[0].y, 0.0}}, {{uvs[0].x, uvs[0].y}}};
-                    stringVertexData_.push_back(vtex);
-                    vtex = VertexTex{{{x + xys[1].x, y + xys[1].y, 0.0}}, {{uvs[1].x, uvs[1].y}}};
-                    stringVertexData_.push_back(vtex);
-                    vtex = VertexTex{{{x + xys[2].x, y + xys[2].y, 0.0}}, {{uvs[2].x, uvs[2].y}}};
-                    stringVertexData_.push_back(vtex);
-                    vtex = VertexTex{{{x + xys[3].x, y + xys[3].y, 0.0}}, {{uvs[3].x, uvs[3].y}}};
-                    stringVertexData_.push_back(vtex);
-                    for (size_t i=0;i<numIndices;++i) {
-                        stringIndices_.push_back(indexPtr + VertexIndices[i]);
-                    }
-                    indexPtr += 4;
+                        vtex = VertexTex{{{x + xys[1].x, y + xys[1].y, 0.0}}, {{uvs[1].x, uvs[1].y}}};
+                        stringVertexData_.push_back(vtex);
+                        vtex = VertexTex{{{x + xys[2].x, y + xys[2].y, 0.0}}, {{uvs[2].x, uvs[2].y}}};
+                        stringVertexData_.push_back(vtex);
+                        vtex = VertexTex{{{x + xys[3].x, y + xys[3].y, 0.0}}, {{uvs[3].x, uvs[3].y}}};
+                        stringVertexData_.push_back(vtex);
+                        for (size_t i=0;i<numIndices;++i) {
+                            stringIndices.push_back(indexPtr + VertexIndices[i]);
+                        }
+                        indexPtr += 4;
 #endif
 #ifdef SUPPORT_PROFILING
-                    ++numFontCharactersDrawn_;
+                        ++numFontCharactersDrawn_;
 #endif /* SUPPORT_PROFILING */
+                    }
+                    
+                    gridX += glyph->second.getAdvance();
+                    x = gridX;
+                    y = gridY;
                 }
-
-                gridX += glyph->second.getAdvance();
-                x = gridX;
-                y = gridY;
+                
+                prev = code;
             }
-
-            prev = code;
         }
-        
-        // Draw here
-        textureAtlas = textureService->getTextureAtlasLockless(font->getTextureAtlasHandle()); // Refresh
-        if (textureAtlas) {
-            bool shaderChanged;
-            std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorFontShaderProgramId, shaderChanged));
-            
-            if (shaderChanged) {
-                glShader->shaderChangedSetup();
-            }
 
-            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
-            GLint colorUniform = glShader->locationForUniform(SourceColorShaderUniformId);
-            GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
-            GLint colorMatOffsetLocation = glShader->locationForUniform(ColorMatOffsetShaderUniformId);
-            auto colorMultiplierLocation = glShader->locationForUniform(ColorMultiplierShaderUniformId);
-            auto colorOffsetLocation = glShader->locationForUniform(ColorOffsetShaderUniformId);
-            
-            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
-            
-            glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
-            glUniform4fv(colorMatOffsetLocation, 1, (GLfloat *) colorMatrix.offset.v);
-            glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) colorTransform.multiplier.v);
-            glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorTransform.offset.v);
-            glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
-
-            setBlend(false);
-            setTexture(textureAtlas->getTarget(), textureAtlas->getHWTextureId());
-
-            // This doesn't use VBO/IBO
-            disableVboIbo();
-            
-            glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
-                                  sizeof(VertexTex), &stringVertexData_[0]);
-            glVertexAttribPointer(TexCoordInVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
-                                  sizeof(VertexTex), (GLvoid*) (&stringVertexData_[0].tex));
-
-#ifdef RENDER_STRING_WITH_GL_ARRAY
-            glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(stringVertexData_.size()));
-#else
-            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(stringIndices_.size()),
-                           GL_UNSIGNED_SHORT, &stringIndices_[0]);
+        if (last) {
+            // If we have a cache and are dirty, then commit
+            if (cache) {
+#ifdef DEBUG
+                cache->lifetime++;
 #endif
+                if (!cache->vbo) {
+                    glGenBuffers(1, &cache->vbo);
+                    if (cache->vbo) {
+                        setVbo(cache->vbo);
+                        auto num = stringVertexData.size();
+                        cache->numVertices = num;
+                        cache->maxVertices = num;
+                        glBufferData(GL_ARRAY_BUFFER, sizeof(VertexTex) * num, &stringVertexData[0], GL_DYNAMIC_DRAW);
+                        GLenum glErr = glGetError();
+                        if (glErr == GL_NO_ERROR) {
+                            // We no longer need the vertex data so clear it
+                            stringVertexData.clear();
+                        } else {
+                            glDeleteBuffers(1, &cache->vbo);
+                            cache->vbo = 0;
+                            setVbo(0);  // Only reset if we deleted
+                        }
+                    }
+                } else if (dirty) {
+                    // We have an existing VBO, determine if we use glBufferData or glBufferSubData
+                    setVbo(cache->vbo);
+                    auto num = stringVertexData.size();
+                    cache->numVertices = num;
+                    if (num > cache->maxVertices) {
+                        // We need to use glBufferData since our size is larger
+                        cache->maxVertices = num;
+                        glBufferData(GL_ARRAY_BUFFER, sizeof(VertexTex) * num, &stringVertexData[0], GL_DYNAMIC_DRAW);
+                    } else {
+                        // Use glBufferSubData
+                        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VertexTex) * num, &stringVertexData[0]);
+                    }
+                    
+                    GLenum glErr = glGetError();
+                    if (glErr == GL_NO_ERROR) {
+                        // We no longer need the vertex data so clear it
+                        stringVertexData.clear();
+                    } else {
+                        glDeleteBuffers(1, &cache->vbo);
+                        cache->vbo = 0;
+                        setVbo(0);  // Only reset if we deleted
+                    }
+#if DEBUG
+                    cache->lifetime = 0;
+#endif
+                }
+                if (!cache->ibo) {
+                    glGenBuffers(1, &cache->ibo);
+                    if (cache->ibo) {
+                        setIbo(cache->ibo);
+                        auto num = stringIndices.size();
+                        cache->numIndices = num;
+                        cache->maxIndices = num;
+                        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(stringIndices[0]) * num, &stringIndices[0], GL_DYNAMIC_DRAW);
+                        GLenum glErr = glGetError();
+                        if (glErr == GL_NO_ERROR) {
+                            // We no longer need the index data so clear it
+                            stringIndices.clear();
+                        } else {
+                            glDeleteBuffers(1, &cache->ibo);
+                            cache->ibo = 0;
+                            setIbo(0);  // Only reset if we deleted
+                        }
+                    }
+                } else if (dirty) {
+                    // We have an existing IBO, determine if we use glBufferData or glBufferSubData
+                    setIbo(cache->ibo);
+                    auto num = stringIndices.size();
+                    cache->numIndices = num;
+                    if (num > cache->maxIndices) {
+                        // We need to use glBufferData since our size is larger
+                        cache->maxIndices = num;
+                        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(stringIndices[0]) * num, &stringIndices[0], GL_DYNAMIC_DRAW);
+                    } else {
+                        // Use glBufferSubData
+                        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(stringIndices[0]) * num, &stringIndices[0]);
+                    }
+                    
+                    GLenum glErr = glGetError();
+                    if (glErr == GL_NO_ERROR) {
+                        // We no longer need the index data so clear it
+                        stringIndices.clear();
+                    } else {
+                        glDeleteBuffers(1, &cache->ibo);
+                        cache->ibo = 0;
+                        setIbo(0);  // Only reset if we deleted
+                    }
+                }
+            }
+            
+            // Draw here
+            textureAtlas = textureService->getTextureAtlasLockless(font->getTextureAtlasHandle()); // Refresh
+            if (textureAtlas) {
+                bool shaderChanged;
+                std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorFontShaderProgramId, shaderChanged));
+                
+                if (shaderChanged) {
+                    glShader->shaderChangedSetup();
+                }
+                
+                GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
+                GLint colorUniform = glShader->locationForUniform(SourceColorShaderUniformId);
+                GLint colorMatrixLocation = glShader->locationForUniform(ColorMatrixShaderUniformId);
+                GLint colorMatOffsetLocation = glShader->locationForUniform(ColorMatOffsetShaderUniformId);
+                auto colorMultiplierLocation = glShader->locationForUniform(ColorMultiplierShaderUniformId);
+                auto colorOffsetLocation = glShader->locationForUniform(ColorOffsetShaderUniformId);
+                
+                glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) rawMatrix);
+                
+                glUniformMatrix4fv(colorMatrixLocation, 1, 0, (GLfloat *) colorMatrix.matrix.m);
+                glUniform4fv(colorMatOffsetLocation, 1, (GLfloat *) colorMatrix.offset.v);
+                glUniform4fv(colorMultiplierLocation, 1, (GLfloat *) colorTransform.multiplier.v);
+                glUniform4fv(colorOffsetLocation, 1, (GLfloat *) colorTransform.offset.v);
+                glUniform4f(colorUniform, color.r, color.g, color.b, color.a);
+                
+                setBlend(false);
+                setTexture(textureAtlas->getTarget(), textureAtlas->getHWTextureId());
+                
+                // This doesn't use VBO/IBO
+                if (cache && cache->vbo && cache->ibo) {
+                    // Render using VBO/IBO
+                    setVbo(cache->vbo);
+                    setIbo(cache->ibo);
+                    
+                    glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
+                                          sizeof(VertexTex), 0);
+                    glVertexAttribPointer(TexCoordInVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
+                                          sizeof(VertexTex), (GLvoid*) (sizeof(Vector3)));
+                    
+#ifdef RENDER_STRING_WITH_GL_ARRAY
+                    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(cache->numVertices));
+#else
+                    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cache->numIndices),
+                                   GL_UNSIGNED_SHORT, 0);
+#endif
+                } else {
+                    // Render using local
+                    disableVboIbo();
+                    
+                    glVertexAttribPointer(PositionVertexAttributeIndex, 3, GL_FLOAT, GL_FALSE,
+                                          sizeof(VertexTex), &stringVertexData[0]);
+                    glVertexAttribPointer(TexCoordInVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
+                                          sizeof(VertexTex), (GLvoid*) (&stringVertexData[0].tex));
+                    
+#ifdef RENDER_STRING_WITH_GL_ARRAY
+                    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(stringVertexData.size()));
+#else
+                    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(stringIndices.size()),
+                                   GL_UNSIGNED_SHORT, &stringIndices_[0]);
+#endif
+                }
 #ifdef SUPPORT_PROFILING
-            ++numFontCharactersDrawn_;
-            ++numDrawCalls_;
+                ++numDrawCalls_;
 #endif /* SUPPORT_PROFILING */
+            }
         }
     }
 }
@@ -1934,21 +2123,12 @@ void BGE::RenderServiceOpenGLES2::destroyTexture(const RenderCommandItem& item) 
 void BGE::RenderServiceOpenGLES2::createVbo(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderVboCommandData>(item.data);
     std::shared_ptr<Error> error;
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-
-    // set Vbo since we are going to glBufferData
-    setVbo(vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexTex) * data->numVertexTex, data->vertexTexData, GL_STATIC_DRAW);
-    GLenum glErr = glGetError();
-    if (glErr == GL_NO_ERROR) {
+    GLuint vbo = createVbo_(data->vertexTexData, data->numVertexTex);
+    if (vbo) {
         data->glVboId = vbo;
     } else {
         error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorVboAllocation);
     }
-    
-    // Unbind vbo
-    setVbo(0);
     
     if (item.callback) {
         item.callback(item, error);
@@ -1959,6 +2139,34 @@ void BGE::RenderServiceOpenGLES2::destroyVbo(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderVboCommandData>(item.data);
     std::shared_ptr<Error> error;
     GLuint vbo = data->glVboId;
+    destroyVbo_(vbo);
+    if (item.callback) {
+        item.callback(item, error);
+    }
+}
+
+GLuint BGE::RenderServiceOpenGLES2::createVbo_(VertexTex *data, uint32_t numVertexTex) {
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    
+    if (vbo) {
+        // set Vbo since we are going to glBufferData
+        setVbo(vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(VertexTex) * numVertexTex, data, GL_STATIC_DRAW);
+        GLenum glErr = glGetError();
+        if (glErr != GL_NO_ERROR) {
+            glDeleteBuffers(1, &vbo);
+            vbo = 0;
+        }
+        
+        // Unbind vbo
+        setVbo(0);
+    }
+
+    return vbo;
+}
+
+void BGE::RenderServiceOpenGLES2::destroyVbo_(GLuint vbo) {
     if (vbo != 0) {
         if (vbo == currentVbo_) {
             // If we're destroying the current Vbo, unbind
@@ -1966,29 +2174,17 @@ void BGE::RenderServiceOpenGLES2::destroyVbo(const RenderCommandItem& item) {
         }
         glDeleteBuffers(1, &vbo);
     }
-    if (item.callback) {
-        item.callback(item, error);
-    }
 }
 
 void BGE::RenderServiceOpenGLES2::createIbo(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderIboCommandData>(item.data);
     std::shared_ptr<Error> error;
-    GLuint ibo;
-    glGenBuffers(1, &ibo);
-
-    // set Ibo since we are going to glBufferData
-    setIbo(ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data->numIndices * data->indexSize, data->indices, GL_STATIC_DRAW);
-    GLenum glErr = glGetError();
-    if (glErr == GL_NO_ERROR) {
+    GLuint ibo = createIbo_(data->indices, data->numIndices, data->indexSize);
+    if (ibo) {
         data->glIboId = ibo;
     } else {
         error = std::make_shared<Error>(Texture::ErrorDomain, TextureErrorVboAllocation);
     }
-    
-    // Unbind ibo
-    setIbo(0);
     
     if (item.callback) {
         item.callback(item, error);
@@ -1999,12 +2195,76 @@ void BGE::RenderServiceOpenGLES2::destroyIbo(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderIboCommandData>(item.data);
     std::shared_ptr<Error> error;
     GLuint ibo = data->glIboId;
+    destroyIbo_(ibo);
+    if (item.callback) {
+        item.callback(item, error);
+    }
+}
+
+GLuint BGE::RenderServiceOpenGLES2::createIbo_(void *indices, uint32_t numIndices, uint32_t indexSize) {
+    GLuint ibo;
+    glGenBuffers(1, &ibo);
+    
+    if (ibo) {
+        // set Ibo since we are going to glBufferData
+        setIbo(ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * indexSize, indices, GL_STATIC_DRAW);
+        GLenum glErr = glGetError();
+        if (glErr != GL_NO_ERROR) {
+            // Delete the buffer on error
+            glDeleteBuffers(1, &ibo);
+            ibo = 0;
+        }
+        
+        // Unbind ibo
+        setIbo(0);
+    }
+    
+    return ibo;
+}
+
+void BGE::RenderServiceOpenGLES2::destroyIbo_(GLuint ibo) {
     if (ibo != 0) {
         if (ibo == currentIbo_) {
             // If we're destroying the current Ibo, unbind
             setIbo(0);
         }
         glDeleteBuffers(1, &ibo);
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::createStringCacheEntry(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderStringCacheCommandData>(item.data);
+    auto cacheKey = getCachedStringRenderDataKey(data->spaceHandle, data->textHandle);
+    stringVertexCache_[cacheKey] = CachedStringRenderData{};
+    dropShadowStringVertexCache_[cacheKey] = CachedStringRenderData{};
+}
+
+void BGE::RenderServiceOpenGLES2::destroyStringCacheEntry(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderStringCacheCommandData>(item.data);
+    std::shared_ptr<Error> error;
+    auto cacheKey = getCachedStringRenderDataKey(data->spaceHandle, data->textHandle);
+    auto it = stringVertexCache_.find(cacheKey);
+    if (it != stringVertexCache_.end()) {
+        auto& cached = it->second;
+        if (cached.vbo) {
+            destroyVbo_(cached.vbo);
+        }
+        if (cached.ibo) {
+            destroyIbo_(cached.ibo);
+        }
+        stringVertexCache_.erase(it);
+    }
+    it =  dropShadowStringVertexCache_.find(cacheKey);
+    if (it != dropShadowStringVertexCache_.end()) {
+        auto& cached = it->second;
+        if (cached.vbo) {
+            destroyVbo_(cached.vbo);
+        }
+        if (cached.ibo) {
+            destroyIbo_(cached.ibo);
+        }
+        dropShadowStringVertexCache_.erase(it);
     }
     if (item.callback) {
         item.callback(item, error);

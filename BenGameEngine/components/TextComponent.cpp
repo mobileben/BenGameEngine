@@ -13,12 +13,28 @@ uint32_t BGE::TextComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::TextComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::TextComponent::type_index_ = typeid(BGE::TextComponent);
 
-BGE::TextComponent::TextComponent() : RenderComponent(), multiline_(false), dropShadow_(false) {
+BGE::TextComponent::TextComponent() : RenderComponent(), multiline_(false), dropShadow_(false), dirty_(false) {
     dropShadowColor_ = Color{{0, 0, 0, 0}};
     dropShadowOffset_ = Vector2{};
 }
 
 void BGE::TextComponent::materialsUpdated() {
+}
+
+void BGE::TextComponent::destroy() {
+    dirty_ = false;
+    text_ = std::string();
+
+    // Component::destroy last
+    Component::destroy();
+}
+
+void BGE::TextComponent::destroyFast() {
+    dirty_ = false;
+    text_ = std::string();
+
+    // Component::destroyFast last
+    Component::destroyFast();
 }
 
 void BGE::TextComponent::setTextReference(const TextReference& textRef) {
@@ -36,6 +52,10 @@ void BGE::TextComponent::setTextReference(const TextReference& textRef) {
 }
 
 void BGE::TextComponent::setText(std::string const &text) {
+    if (text_ != text) {
+        dirty_ = true;
+    }
+    
     text_ = text;
 
     multiText_.clear();
@@ -47,6 +67,10 @@ void BGE::TextComponent::setText(std::string const &text) {
 }
 
 void BGE::TextComponent::setFont(FontHandle fontHandle) {
+    if (fontHandle_ != fontHandle) {
+        dirty_ = true;
+    }
+    
     fontHandle_ = fontHandle;
     
     updateBoundingBox();

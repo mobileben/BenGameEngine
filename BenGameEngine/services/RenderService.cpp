@@ -8,6 +8,8 @@
 
 #include "RenderService.h"
 #include "FontService.h"
+#include "Space.h"
+#include "TextComponent.h"
 
 #if DEBUG
 #include <pthread.h>
@@ -177,6 +179,18 @@ void BGE::RenderService::queueDestroyIbo(const RenderIboCommandData& iboData, st
     renderQueue_.push(command);
 }
 
+void BGE::RenderService::queueCreateStringCacheEntry(const RenderStringCacheCommandData& cacheData) {
+    auto data = std::make_shared<RenderStringCacheCommandData>(cacheData);
+    auto command = RenderCommandItem(RenderCommand::CreateStringCacheEntry, data);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueDestroyStringCacheEntry(const RenderStringCacheCommandData& cacheData) {
+    auto data = std::make_shared<RenderStringCacheCommandData>(cacheData);
+    auto command = RenderCommandItem(RenderCommand::DestroyStringCacheEntry, data);
+    renderQueue_.push(command);
+}
+
 void BGE::RenderService::queueRender() {
     auto command = RenderCommandItem(RenderCommand::Render);
     renderQueue_.push(command);
@@ -216,6 +230,45 @@ void BGE::RenderService::destroyIbo(const RenderCommandItem& item) {
     if (item.callback) {
         item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
     }
+}
+
+void BGE::RenderService::createStringCacheEntry(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
+}
+
+void BGE::RenderService::destroyStringCacheEntry(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
+}
+
+BGE::CachedStringRenderDataKey BGE::RenderService::getCachedStringRenderDataKey(Space *space, TextComponent *text) {
+    uint32_t sh;
+    uint32_t th;
+    if (space) {
+        sh = space->getHandle().getHandle();
+    } else {
+        sh = 0;
+    }
+    if (text) {
+        th = text->getHandle<TextComponent>().getHandle();
+    } else {
+        th = 0;
+    }
+    return static_cast<uint64_t>(sh) << 32 | static_cast<uint64_t>(th);
+}
+
+BGE::CachedStringRenderDataKey BGE::RenderService::getCachedStringRenderDataKey(SpaceHandle spaceHandle, TextComponentHandle textHandle) {
+    return static_cast<uint64_t>(spaceHandle.getHandle()) << 32 | static_cast<uint64_t>(textHandle.getHandle());
+}
+BGE::SpaceHandle BGE::RenderService::getSpaceHandleFromCachedStringRenderDataKey(CachedStringRenderDataKey key) {
+    return SpaceHandle(static_cast<HandleBackingType>((key >> 32)&0xFFFFFFFF));
+}
+
+BGE::TextComponentHandle BGE::RenderService::getTextComponentHandleFromCachedStringRenderDataKey(CachedStringRenderDataKey key) {
+    return TextComponentHandle(static_cast<HandleBackingType>(key&0xFFFFFFFF));
 }
 
 void BGE::RenderService::threadFunction() {
@@ -320,6 +373,28 @@ void BGE::RenderService::threadFunction() {
                 auto data = std::dynamic_pointer_cast<RenderIboCommandData>(command.data);
                 if (data) {
                     destroyIbo(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+                
+            case RenderCommand::CreateStringCacheEntry: {
+                auto data = std::dynamic_pointer_cast<RenderStringCacheCommandData>(command.data);
+                if (data) {
+                    createStringCacheEntry(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+                
+            case RenderCommand::DestroyStringCacheEntry: {
+                auto data = std::dynamic_pointer_cast<RenderStringCacheCommandData>(command.data);
+                if (data) {
+                    destroyStringCacheEntry(command);
                 } else if (command.callback) {
                     // TODO: We failed :(
                     command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));

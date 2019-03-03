@@ -110,7 +110,6 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
     }
 
     lock();
-
     auto isHandleBackingNull = componentHandleServiceIsHandleBackingNull_[typeId];
     if (!isHandleBackingNull(handle.handle)) {
         for (size_t i=0;i<size;++i) {
@@ -139,6 +138,8 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
                 } else if (typeId == LogicComponent::typeId_) {
                     releaseComponentHandle<LogicComponent>(handle);
                 } else if (typeId == TextComponent::typeId_) {
+                    RenderStringCacheCommandData data(getSpaceHandle(), TextComponentHandle(handle.handle));
+                    Game::getInstance()->getRenderService()->queueDestroyStringCacheEntry(data);
                     releaseComponentHandle<TextComponent>(handle);
                 } else if (typeId == PlacementComponent::typeId_) {
                     releaseComponentHandle<PlacementComponent>(handle);
@@ -179,6 +180,7 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
 
 void BGE::ComponentService::removeAllComponents() {
     lock();
+    auto renderService = Game::getInstance()->getRenderService();
     auto size = componentHandles_.size();
     for (ComponentTypeId typeId=0;typeId<size;++typeId) {
         auto& handles = componentHandles_[typeId];
@@ -208,6 +210,8 @@ void BGE::ComponentService::removeAllComponents() {
                 } else if (typeId == LogicComponent::typeId_) {
                     releaseFastComponentHandle<LogicComponent>(handle);
                 } else if (typeId == TextComponent::typeId_) {
+                    RenderStringCacheCommandData data(getSpaceHandle(), TextComponentHandle(handle.handle));
+                    renderService->queueDestroyStringCacheEntry(data);
                     releaseFastComponentHandle<TextComponent>(handle);
                 } else if (typeId == PlacementComponent::typeId_) {
                     releaseFastComponentHandle<PlacementComponent>(handle);
