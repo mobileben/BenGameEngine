@@ -353,7 +353,11 @@ void BGE::RenderServiceOpenGLES2::createShaders()
     
     std::shared_ptr<Shader> vShader = this->getShaderService()->createShader(ShaderType::Vertex, SimpleVertexShaderId, SimpleVertexShaderName);
     std::shared_ptr<Shader> fShader = this->getShaderService()->createShader(ShaderType::Fragment, SimpleFragmentShaderId, SimpleFragmentShaderName);
-    std::shared_ptr<ShaderProgram> program = this->getShaderService()->createShaderProgram(SimpleShaderProgramId, SimpleShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {SourceColorVertexAttributeIndex, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}}, nullptr, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
+    std::shared_ptr<ShaderProgram> program = this->getShaderService()->createShaderProgram(SimpleShaderProgramId, SimpleShaderProgramName, {vShader,  fShader}, {{PositionVertexAttributeIndex, PositionShaderAttributeName}, {SourceColorVertexAttributeIndex, SourceColorShaderAttributeName}}, {{ModelViewShaderUniformId, ModelViewShaderUniformName}, {ProjectionShaderUniformId, ProjectionShaderUniformName}}, [this](ShaderProgram *program) {
+            auto shader = static_cast<ShaderProgramOpenGLES2 *>(program);
+            GLint modelLocation = shader->locationForUniform(ModelViewShaderUniformId);
+            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
+    }, mappedFunction, [this](__attribute__((unused)) ShaderProgram *program) {
         setVertexAttribute(PositionVertexAttributeIndex, true);
         setVertexAttribute(TexCoordInVertexAttributeIndex, false);
         setVertexAttribute(SourceColorVertexAttributeIndex, true);
@@ -766,10 +770,8 @@ void BGE::RenderServiceOpenGLES2::drawTexture(Vector2 &position, std::shared_ptr
             if (shaderChanged) {
                 glShader->shaderChangedSetup();
             }
-
-            GLint modelLocation = glShader->locationForUniform(ModelViewShaderUniformId);
-            glUniformMatrix4fv(modelLocation, 1, 0, (GLfloat *) identifyMatrix_.m);
         
+            // Model matrix set upon first use
             setBlend(true);
             setBlendFunc(BlendFunc::Src_ONE_Dst_ONE_MINUS_SRC_ALPHA);
             setTexture(texture->getTarget(), texture->getHWTextureId());
