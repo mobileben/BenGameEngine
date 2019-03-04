@@ -407,17 +407,35 @@ void BGE::TransformComponent::updateMatrix(const Space *space) {
         Matrix4 mat1;
         Matrix4 mat2;
 
-        Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
-        
-        if (useSkew_) {
-            Matrix4MakeFlashSkew(mat2, skew_.x, skew_.y);
+        if (notNearlyEqual(scale_.x, 1.0f) || notNearlyEqual(scale_.y, 1.0f)) {
+            Matrix4MakeScale(mat1, scale_.x, scale_.y, 1.0f);
         } else {
-            Matrix4MakeRotationZ(mat2, rotation_);
+            Matrix4MakeIdentity(mat1);
         }
         
-        localMatrix_ = mat2 * mat1;
-        Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
-        localMatrix_ = mat1 * localMatrix_;
+        bool mat2Update = false;
+        if (useSkew_) {
+            if (notNearlyZero(skew_.x) || notNearlyZero(skew_.y)) {
+                Matrix4MakeFlashSkew(mat2, skew_.x, skew_.y);
+                mat2Update = true;
+            }
+        } else {
+            if (notNearlyZero(rotation_)) {
+                Matrix4MakeRotationZ(mat2, rotation_);
+                mat2Update = true;
+            }
+        }
+        
+        if (mat2Update) {
+            localMatrix_ = mat2 * mat1;
+        } else {
+            localMatrix_ = std::move(mat1);
+        }
+        
+        if (notNearlyZero(position_.x) || notNearlyZero(position_.y)) {
+            Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
+            localMatrix_ = mat1 * localMatrix_;
+        }
     }
     
     if (worldDirty_ || localDirty_) {
@@ -440,17 +458,35 @@ void BGE::TransformComponent::updateMatrixLockless(const Space *space) {
         Matrix4 mat1;
         Matrix4 mat2;
 
-        Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
-        
-        if (useSkew_) {
-            Matrix4MakeFlashSkew(mat2, skew_.x, skew_.y);
+        if (notNearlyEqual(scale_.x, 1.0f) || notNearlyEqual(scale_.y, 1.0f)) {
+            Matrix4MakeScale(mat1, scale_.x, scale_.y, 1.0f);
         } else {
-            Matrix4MakeRotationZ(mat2, rotation_);
+            Matrix4MakeIdentity(mat1);
         }
         
-        localMatrix_ = mat2 * mat1;
-        Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
-        localMatrix_ = mat1 * localMatrix_;
+        bool mat2Update = false;
+        if (useSkew_) {
+            if (notNearlyZero(skew_.x) || notNearlyZero(skew_.y)) {
+                Matrix4MakeFlashSkew(mat2, skew_.x, skew_.y);
+                mat2Update = true;
+            }
+        } else {
+            if (notNearlyZero(rotation_)) {
+                Matrix4MakeRotationZ(mat2, rotation_);
+                mat2Update = true;
+            }
+        }
+        
+        if (mat2Update) {
+            localMatrix_ = mat2 * mat1;
+        } else {
+            localMatrix_ = std::move(mat1);
+        }
+        
+        if (notNearlyZero(position_.x) || notNearlyZero(position_.y)) {
+            Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
+            localMatrix_ = mat1 * localMatrix_;
+        }
     }
     
     if (worldDirty_ || localDirty_) {
@@ -478,17 +514,35 @@ void BGE::TransformComponent::updateMatrixAndChildren(bool parentDirty) {
         Matrix4 mat1;
         Matrix4 mat2;
         
-        Matrix4MakeScale(mat1, scale_.x, scale_.y, 1);
-        
-        if (useSkew_) {
-            Matrix4MakeFlashSkew(mat2, skew_.x, skew_.y);
+        if (notNearlyEqual(scale_.x, 1.0f) || notNearlyEqual(scale_.y, 1.0f)) {
+            Matrix4MakeScale(mat1, scale_.x, scale_.y, 1.0f);
         } else {
-            Matrix4MakeRotationZ(mat2, rotation_);
+            Matrix4MakeIdentity(mat1);
         }
         
-        localMatrix_ = mat2 * mat1;
-        Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
-        localMatrix_ = mat1 * localMatrix_;
+        bool mat2Update = false;
+        if (useSkew_) {
+            if (notNearlyZero(skew_.x) || notNearlyZero(skew_.y)) {
+                Matrix4MakeFlashSkew(mat2, skew_.x, skew_.y);
+                mat2Update = true;
+            }
+        } else {
+            if (notNearlyZero(rotation_)) {
+                Matrix4MakeRotationZ(mat2, rotation_);
+                mat2Update = true;
+            }
+        }
+        
+        if (mat2Update) {
+            localMatrix_ = mat2 * mat1;
+        } else {
+            localMatrix_ = std::move(mat1);
+        }
+        
+        if (notNearlyZero(position_.x) || notNearlyZero(position_.y)) {
+            Matrix4MakeTranslation(mat1, position_.x, position_.y, 0);
+            localMatrix_ = mat1 * localMatrix_;
+        }
     }
     
     if (parentDirty) {
