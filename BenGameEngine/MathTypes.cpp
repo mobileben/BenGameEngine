@@ -53,7 +53,7 @@ namespace BGE {
 
     bool operator==(const Matrix4& lhs, const Matrix4& rhs) {
         for (auto i=0u;i<sizeof(lhs.m)/sizeof(float);++i) {
-            if (lhs.m[i] != rhs.m[i]) {
+            if (notNearlyEqual(lhs.m[i], rhs.m[i])) {
                 return false;
             }
         }
@@ -279,66 +279,21 @@ namespace BGE {
     }
 
     bool operator==(const ColorTransform& lhs, const ColorTransform& rhs) {
-        if (lhs.c[0] != rhs.c[0]) {
-            return false;
+        for (auto i=0u;i<sizeof(lhs.c)/sizeof(lhs.c[0]);++i) {
+            if (notNearlyEqual(lhs.c[i], rhs.c[i])) {
+                return false;
+            }
         }
-        if (lhs.c[1] != rhs.c[1]) {
-            return false;
-        }
-        if (lhs.c[2] != rhs.c[2]) {
-            return false;
-        }
-        if (lhs.c[3] != rhs.c[3]) {
-            return false;
-        }
-        if (lhs.c[4] != rhs.c[4]) {
-            return false;
-        }
-        if (lhs.c[5] != rhs.c[5]) {
-            return false;
-        }
-        if (lhs.c[6] != rhs.c[6]) {
-            return false;
-        }
-        if (lhs.c[7] != rhs.c[7]) {
-            return false;
-        }
-        if (lhs.c[8] != rhs.c[8]) {
-            return false;
-        }
-
         return true;
     }
     
     bool operator!=(const ColorTransform& lhs, const ColorTransform& rhs) {
-        if (lhs.c[0] != rhs.c[0]) {
-            return true;
+        for (auto i=0u;i<sizeof(lhs.c)/sizeof(lhs.c[0]);++i) {
+            if (notNearlyEqual(lhs.c[i], rhs.c[i])) {
+                return true;
+            }
         }
-        if (lhs.c[1] != rhs.c[1]) {
-            return true;
-        }
-        if (lhs.c[2] != rhs.c[2]) {
-            return true;
-        }
-        if (lhs.c[3] != rhs.c[3]) {
-            return true;
-        }
-        if (lhs.c[4] != rhs.c[4]) {
-            return true;
-        }
-        if (lhs.c[5] != rhs.c[5]) {
-            return true;
-        }
-        if (lhs.c[6] != rhs.c[6]) {
-            return true;
-        }
-        if (lhs.c[7] != rhs.c[7]) {
-            return true;
-        }
-        if (lhs.c[8] != rhs.c[8]) {
-            return true;
-        }
-        
+
         return false;
     }
     
@@ -817,19 +772,19 @@ namespace BGE {
     }
 
     bool Matrix2IsIdentity(Matrix2& matrix) {
-        if (matrix.m00 != 1) {
+        if (notNearlyEqual(matrix.m00, 1.0f)) {
             return false;
         }
         
-        if (matrix.m01 != 0) {
+        if (notNearlyZero(matrix.m01)) {
             return false;
         }
         
-        if (matrix.m10 != 0) {
+        if (notNearlyZero(matrix.m10)) {
             return false;
         }
         
-        if (matrix.m11 != 1) {
+        if (notNearlyEqual(matrix.m11, 1.0f)) {
             return false;
         }
         
@@ -837,39 +792,39 @@ namespace BGE {
     }
     
     bool Matrix3IsIdentity(Matrix3& matrix) {
-        if (matrix.m00 != 1) {
+        if (notNearlyEqual(matrix.m00, 1.0f)) {
             return false;
         }
         
-        if (matrix.m01 != 0) {
+        if (notNearlyZero(matrix.m01)) {
             return false;
         }
         
-        if (matrix.m02 != 0) {
+        if (notNearlyZero(matrix.m02)) {
             return false;
         }
         
-        if (matrix.m10 != 0) {
+        if (notNearlyZero(matrix.m10)) {
             return false;
         }
         
-        if (matrix.m11 != 1) {
+        if (notNearlyEqual(matrix.m11, 1.0f)) {
             return false;
         }
         
-        if (matrix.m12 != 0) {
+        if (notNearlyZero(matrix.m12)) {
             return false;
         }
         
-        if (matrix.m20 != 0) {
+        if (notNearlyZero(matrix.m20)) {
             return false;
         }
         
-        if (matrix.m21 != 0) {
+        if (notNearlyZero(matrix.m21)) {
             return false;
         }
         
-        if (matrix.m22 != 1) {
+        if (notNearlyEqual(matrix.m22, 1.0f)) {
             return false;
         }
         
@@ -877,67 +832,67 @@ namespace BGE {
     }
     
     bool Matrix4IsIdentity(Matrix4& matrix) {
-        if (matrix.m00 != 1) {
+        if (notNearlyEqual(matrix.m00, 1.0f)) {
             return false;
         }
         
-        if (matrix.m01 != 0) {
+        if (notNearlyZero(matrix.m01)) {
             return false;
         }
         
-        if (matrix.m02 != 0) {
+        if (notNearlyZero(matrix.m02)) {
             return false;
         }
         
-        if (matrix.m03 != 0) {
+        if (notNearlyZero(matrix.m03)) {
             return false;
         }
         
-        if (matrix.m10 != 0) {
+        if (notNearlyZero(matrix.m10)) {
             return false;
         }
         
-        if (matrix.m11 != 1) {
+        if (notNearlyEqual(matrix.m11, 1.0f)) {
             return false;
         }
         
-        if (matrix.m12 != 0) {
+        if (notNearlyZero(matrix.m12)) {
             return false;
         }
         
-        if (matrix.m13 != 0) {
+        if (notNearlyZero(matrix.m13)) {
             return false;
         }
         
-        if (matrix.m20 != 0) {
+        if (notNearlyZero(matrix.m20)) {
             return false;
         }
         
-        if (matrix.m21 != 0) {
+        if (!notNearlyZero(matrix.m21)) {
             return false;
         }
         
-        if (matrix.m22 != 1) {
+        if (notNearlyEqual(matrix.m22, 1.0f)) {
             return false;
         }
         
-        if (matrix.m23 != 0) {
+        if (notNearlyZero(matrix.m23)) {
             return false;
         }
         
-        if (matrix.m30 != 0) {
+        if (notNearlyZero(matrix.m30)) {
             return false;
         }
         
-        if (matrix.m31 != 0) {
+        if (notNearlyZero(matrix.m31)) {
             return false;
         }
         
-        if (matrix.m32 != 0) {
+        if (notNearlyZero(matrix.m32)) {
             return false;
         }
         
-        if (matrix.m33 != 1) {
+        if (notNearlyEqual(matrix.m33, 1.0f)) {
             return false;
         }
         
