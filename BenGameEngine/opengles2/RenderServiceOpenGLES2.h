@@ -25,6 +25,8 @@
 #include "GameObject.h"
 #include "Font.h"
 
+#include "vaser.h"
+
 #if TARGET_OS_IPHONE
 #include <GLKit/GLKit.h>
 #endif /* TARGET_OS_IPHONE */
@@ -121,6 +123,9 @@ namespace BGE {
         virtual void createStringCacheEntry(const RenderCommandItem& item);
         virtual void destroyStringCacheEntry(const RenderCommandItem& item);
 
+        virtual void createPolyLineCacheEntry(const RenderCommandItem& item);
+        virtual void destroyPolyLineCacheEntry(const RenderCommandItem& item);
+
     private:
         ColorMatrix currentColorMatrix_;
         std::vector<ColorMatrix> colorMatrixStack_;
@@ -158,8 +163,14 @@ namespace BGE {
         std::vector<GLushort>                               stringIndices_;
         
         // String caches
-        std::map<CachedStringRenderDataKey, CachedStringRenderData> stringVertexCache_;
-        std::map<CachedStringRenderDataKey, CachedStringRenderData> dropShadowStringVertexCache_;
+        std::map<CachedComponentRenderDataKey, CachedStringRenderData> stringVertexCache_;
+        std::map<CachedComponentRenderDataKey, CachedStringRenderData> dropShadowStringVertexCache_;
+
+        // Polylines
+        std::vector<VASEr::Vec2>        scratchPolylinePoints_;
+        std::vector<VASEr::Color>       scratchPolylineColors_;
+
+        std::map<CachedComponentRenderDataKey, CachedPolyLineRenderData> polyLineCache_;
 
         void queueRender(double deltaTime);
         

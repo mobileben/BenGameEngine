@@ -9,7 +9,7 @@ namespace VASEr {
         GLint backend::positionLocation_ = -1;
         GLint backend::colorLocation_ = -1;
 
-        void backend::set_uniforms(GLint positionLocation, GLint colorLocation) {
+        void backend::set_vertex_attributes(GLint positionLocation, GLint colorLocation) {
             backend::positionLocation_ = positionLocation;
             backend::colorLocation_ = colorLocation;
         }

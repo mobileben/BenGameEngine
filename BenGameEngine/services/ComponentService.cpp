@@ -148,6 +148,8 @@ void BGE::ComponentService::removeComponent(ComponentHandle handle) {
                 } else if (typeId == InputTouchComponent::typeId_) {
                     releaseComponentHandle<InputTouchComponent>(handle);
                 } else if (typeId == PolyLineRenderComponent::typeId_) {
+                    RenderPolyLineCacheCommandData data(getSpaceHandle(), PolyLineRenderComponentHandle(handle.handle));
+                    Game::getInstance()->getRenderService()->queueDestroyPolyLineCacheEntry(data);
                     releaseComponentHandle<PolyLineRenderComponent>(handle);
                 } else if (typeId == LineRenderComponent::typeId_) {
                     releaseComponentHandle<LineRenderComponent>(handle);
@@ -220,6 +222,8 @@ void BGE::ComponentService::removeAllComponents() {
                 } else if (typeId == InputTouchComponent::typeId_) {
                     releaseFastComponentHandle<InputTouchComponent>(handle);
                 } else if (typeId == PolyLineRenderComponent::typeId_) {
+                    RenderPolyLineCacheCommandData data(getSpaceHandle(), PolyLineRenderComponentHandle(handle.handle));
+                    renderService->queueDestroyPolyLineCacheEntry(data);
                     releaseFastComponentHandle<PolyLineRenderComponent>(handle);
                 } else if (typeId == LineRenderComponent::typeId_) {
                     releaseFastComponentHandle<LineRenderComponent>(handle);

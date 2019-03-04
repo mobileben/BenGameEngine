@@ -21,6 +21,8 @@
 #include "Profiling.h"
 #include "Queue.h"
 
+#include "vaser.h"
+
 #include <thread>
 
 #ifndef APPSTORE_RELEASE
@@ -29,6 +31,7 @@
 
 namespace BGE {
     class ComponentService;
+    class PolyLineRenderComponent;
     class Space;
     class TextComponent;
     class Texture;
@@ -62,11 +65,9 @@ namespace BGE {
         OpenGLCentered          // Center of screen (X-right, Y-up)
     };
     
-    using CachedStringRenderDataKey = uint64_t;
+    using CachedComponentRenderDataKey = uint64_t;
     
     struct CachedStringRenderData {
-        SpaceHandle             spaceHandle;
-        TextComponentHandle     textHandle;
 #if DEBUG
         uint32_t                lifetime;
 #endif
@@ -82,7 +83,20 @@ namespace BGE {
 #endif /* SUPPORT_OPENGL */
     };
 
-    enum class RenderCommand { None, BindWindow, SetIsReady, CreateBuiltinShaders, CreateShader, Render, TextureCreate, TextureDestroy, VboCreate, VboDestroy, IboCreate, IboDestroy, CreateStringCacheEntry, DestroyStringCacheEntry };
+    struct CachedPolyLineRenderData {
+#if DEBUG
+        uint32_t                                lifetime;
+#endif
+#ifdef SUPPORT_OPENGL
+        GLuint                                  vbo;
+        size_t                                  numVertices;
+        size_t                                  maxVertices;
+        VASEr::LineContext                      context;
+        VASEr::LineRenderContext                renderContext;
+#endif /* SUPPORT_OPENGL */
+    };
+    
+    enum class RenderCommand { None, BindWindow, SetIsReady, CreateBuiltinShaders, CreateShader, Render, TextureCreate, TextureDestroy, VboCreate, VboDestroy, IboCreate, IboDestroy, CreateStringCacheEntry, DestroyStringCacheEntry, CreatePolyLineCacheEntry, DestroyPolyLineCacheEntry };
 
     struct RenderCommandData {
         virtual ~RenderCommandData() {}
@@ -223,6 +237,14 @@ namespace BGE {
         RenderStringCacheCommandData() = delete;
         RenderStringCacheCommandData(SpaceHandle spaceHandle, TextComponentHandle textHandle) : spaceHandle(spaceHandle), textHandle(textHandle) {}
     };
+    
+    struct RenderPolyLineCacheCommandData : public RenderCommandData {
+        SpaceHandle                             spaceHandle;
+        PolyLineRenderComponentHandle           polyHandle;
+        
+        RenderPolyLineCacheCommandData() = delete;
+        RenderPolyLineCacheCommandData(SpaceHandle spaceHandle, PolyLineRenderComponentHandle polyHandle) : spaceHandle(spaceHandle), polyHandle(polyHandle) {}
+    };
 
     struct RenderCommandItem {
         RenderCommand                                                   command;
@@ -323,6 +345,8 @@ namespace BGE {
         void queueDestroyIbo(const RenderIboCommandData& iboData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
         void queueCreateStringCacheEntry(const RenderStringCacheCommandData& cacheData);
         void queueDestroyStringCacheEntry(const RenderStringCacheCommandData& cacheData);
+        void queueCreatePolyLineCacheEntry(const RenderPolyLineCacheCommandData& cacheData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
+        void queueDestroyPolyLineCacheEntry(const RenderPolyLineCacheCommandData& cacheData);
         void queueRender();
 
     protected:
@@ -349,11 +373,20 @@ namespace BGE {
         virtual void destroyIbo(const RenderCommandItem& item);
         virtual void createStringCacheEntry(const RenderCommandItem& item);
         virtual void destroyStringCacheEntry(const RenderCommandItem& item);
+        virtual void createPolyLineCacheEntry(const RenderCommandItem& item);
+        virtual void destroyPolyLineCacheEntry(const RenderCommandItem& item);
+
+        template <typename T>
+        CachedComponentRenderDataKey getCachedComponentRenderDataKey(SpaceHandle spaceHandle, T componentHandle) {
+            return static_cast<uint64_t>(spaceHandle.getHandle()) << 32 | static_cast<uint64_t>(componentHandle.getHandle());
+        }
         
-        CachedStringRenderDataKey getCachedStringRenderDataKey(Space *space, TextComponent *text);
-        CachedStringRenderDataKey getCachedStringRenderDataKey(SpaceHandle spaceHandle, TextComponentHandle textHandle);
-        SpaceHandle getSpaceHandleFromCachedStringRenderDataKey(CachedStringRenderDataKey key);
-        TextComponentHandle getTextComponentHandleFromCachedStringRenderDataKey(CachedStringRenderDataKey key);
+        SpaceHandle getSpaceHandleFromCachedComponentRenderDataKey(CachedComponentRenderDataKey key);
+        
+        template <typename T>
+        Handle<T> getComponentHandleFromCachedComponentRenderDataKey(CachedComponentRenderDataKey key) {
+            return Handle<T>(static_cast<HandleBackingType>(key&0xFFFFFFFF));
+        }
 
 #ifdef SUPPORT_PROFILING
         profiling::FrameRateCalculator frameRateCalculator_;

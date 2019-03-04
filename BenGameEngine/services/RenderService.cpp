@@ -191,6 +191,18 @@ void BGE::RenderService::queueDestroyStringCacheEntry(const RenderStringCacheCom
     renderQueue_.push(command);
 }
 
+void BGE::RenderService::queueCreatePolyLineCacheEntry(const RenderPolyLineCacheCommandData& cacheData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto data = std::make_shared<RenderPolyLineCacheCommandData>(cacheData);
+    auto command = RenderCommandItem(RenderCommand::CreatePolyLineCacheEntry, data, callback);
+    renderQueue_.push(command);
+}
+
+void BGE::RenderService::queueDestroyPolyLineCacheEntry(const RenderPolyLineCacheCommandData& cacheData) {
+    auto data = std::make_shared<RenderPolyLineCacheCommandData>(cacheData);
+    auto command = RenderCommandItem(RenderCommand::DestroyPolyLineCacheEntry, data);
+    renderQueue_.push(command);
+}
+
 void BGE::RenderService::queueRender() {
     auto command = RenderCommandItem(RenderCommand::Render);
     renderQueue_.push(command);
@@ -244,31 +256,20 @@ void BGE::RenderService::destroyStringCacheEntry(const RenderCommandItem& item) 
     }
 }
 
-BGE::CachedStringRenderDataKey BGE::RenderService::getCachedStringRenderDataKey(Space *space, TextComponent *text) {
-    uint32_t sh;
-    uint32_t th;
-    if (space) {
-        sh = space->getHandle().getHandle();
-    } else {
-        sh = 0;
+void BGE::RenderService::createPolyLineCacheEntry(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
     }
-    if (text) {
-        th = text->getHandle<TextComponent>().getHandle();
-    } else {
-        th = 0;
-    }
-    return static_cast<uint64_t>(sh) << 32 | static_cast<uint64_t>(th);
 }
 
-BGE::CachedStringRenderDataKey BGE::RenderService::getCachedStringRenderDataKey(SpaceHandle spaceHandle, TextComponentHandle textHandle) {
-    return static_cast<uint64_t>(spaceHandle.getHandle()) << 32 | static_cast<uint64_t>(textHandle.getHandle());
+void BGE::RenderService::destroyPolyLineCacheEntry(const RenderCommandItem& item) {
+    if (item.callback) {
+        item.callback(item, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::Unimplemented)));
+    }
 }
-BGE::SpaceHandle BGE::RenderService::getSpaceHandleFromCachedStringRenderDataKey(CachedStringRenderDataKey key) {
+
+BGE::SpaceHandle BGE::RenderService::getSpaceHandleFromCachedComponentRenderDataKey(CachedComponentRenderDataKey key) {
     return SpaceHandle(static_cast<HandleBackingType>((key >> 32)&0xFFFFFFFF));
-}
-
-BGE::TextComponentHandle BGE::RenderService::getTextComponentHandleFromCachedStringRenderDataKey(CachedStringRenderDataKey key) {
-    return TextComponentHandle(static_cast<HandleBackingType>(key&0xFFFFFFFF));
 }
 
 void BGE::RenderService::threadFunction() {
@@ -395,6 +396,28 @@ void BGE::RenderService::threadFunction() {
                 auto data = std::dynamic_pointer_cast<RenderStringCacheCommandData>(command.data);
                 if (data) {
                     destroyStringCacheEntry(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+                
+            case RenderCommand::CreatePolyLineCacheEntry: {
+                auto data = std::dynamic_pointer_cast<RenderPolyLineCacheCommandData>(command.data);
+                if (data) {
+                    createPolyLineCacheEntry(command);
+                } else if (command.callback) {
+                    // TODO: We failed :(
+                    command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));
+                }
+            }
+                break;
+                
+            case RenderCommand::DestroyPolyLineCacheEntry: {
+                auto data = std::dynamic_pointer_cast<RenderPolyLineCacheCommandData>(command.data);
+                if (data) {
+                    destroyPolyLineCacheEntry(command);
                 } else if (command.callback) {
                     // TODO: We failed :(
                     command.callback(command, std::make_shared<Error>(RenderService::ErrorDomain, static_cast<int32_t>(RenderServiceError::RenderCommandMissingData)));

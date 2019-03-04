@@ -1813,7 +1813,7 @@ C[1],C[2],C[2])
                              const double* W,
                              int length,
                              const polyline_opt* opt,
-                             const polyline_inopt* inopt)
+                             const polyline_inopt* inopt, LineContext *vertex_color_out)
         {
             const Point* P=(Point*)points;
             bool cap_first= inopt? !inopt->no_cap_first :true;
@@ -1913,20 +1913,20 @@ C[1],C[2],C[2])
             }
             else
             {
-                vcore.draw();
-                vfadeo.draw();
-                vfadei.draw();
-                SA1.vah.draw();
-                SA2.vah.draw();
+                vcore.draw(vertex_color_out);
+                vfadeo.draw(vertex_color_out);
+                vfadei.draw(vertex_color_out);
+                SA1.vah.draw(vertex_color_out);
+                SA2.vah.draw(vertex_color_out);
             }
             
             if ( opt && opt->tess && opt->tess->triangulation)
             {
-                vcore.draw_triangles();
-                vfadeo.draw_triangles();
-                vfadei.draw_triangles();
-                SA1.vah.draw_triangles();
-                SA2.vah.draw_triangles();
+                vcore.draw_triangles(vertex_color_out);
+                vfadeo.draw_triangles(vertex_color_out);
+                vfadei.draw_triangles(vertex_color_out);
+                SA1.vah.draw_triangles(vertex_color_out);
+                SA2.vah.draw_triangles(vertex_color_out);
             }
         }
         
@@ -1936,7 +1936,7 @@ C[1],C[2],C[2])
                             const double* W,
                             int size_of_P,
                             const polyline_opt* opt,
-                            const polyline_inopt* inopt)
+                            const polyline_inopt* inopt, LineContext *vertex_color_out)
         {
             bool cap_first= inopt? !inopt->no_cap_first :true;
             bool cap_last=  inopt? !inopt->no_cap_last  :true;
@@ -1989,10 +1989,10 @@ C[1],C[2],C[2])
             if( opt && opt->tess && opt->tess->tessellate_only && opt->tess->holder)
                 (*(vertex_array_holder*)opt->tess->holder).push(SA.vah);
             else
-                SA.vah.draw();
+                SA.vah.draw(vertex_color_out);
             //draw triangles
             if( opt && opt->tess && opt->tess->triangulation)
-                SA.vah.draw_triangles();
+                SA.vah.draw_triangles(vertex_color_out);
             
 #undef color
 #undef weight
@@ -2006,7 +2006,7 @@ C[1],C[2],C[2])
                             const polyline_opt* opt,
                             const polyline_inopt* in_options,
                             int from, int to,
-                            bool approx)
+                            bool approx, LineContext *vertex_color_out)
         {
             polyline_inopt inopt={};
             if( in_options) inopt=*in_options;
@@ -2017,9 +2017,9 @@ C[1],C[2],C[2])
             inopt.no_cap_last = inopt.no_cap_last || inopt.join_last;
             
             if( approx)
-                polyline_approx( P+from, C+(inopt.const_color?0:from), W+(inopt.const_weight?0:from), to-from+1, opt, &inopt);
+                polyline_approx( P+from, C+(inopt.const_color?0:from), W+(inopt.const_weight?0:from), to-from+1, opt, &inopt, vertex_color_out);
             else
-                polyline_exact ( P+from, C+(inopt.const_color?0:from), W+(inopt.const_weight?0:from), to-from+1, opt, &inopt);
+                polyline_exact ( P+from, C+(inopt.const_color?0:from), W+(inopt.const_weight?0:from), to-from+1, opt, &inopt, vertex_color_out);
         }
         
         void polyline(
@@ -2028,7 +2028,8 @@ C[1],C[2],C[2])
                       const double* W, //array of weight
                       int length, //size of the buffer P
                       const polyline_opt* options, //options
-                      const polyline_inopt* in_options) //internal options
+                      const polyline_inopt* in_options,
+                      LineContext *vertex_color_out) //internal options
         {
             polyline_opt   opt={};
             polyline_inopt inopt={};
@@ -2053,7 +2054,7 @@ C[1],C[2],C[2])
             
             if( inopt.const_weight && W[0] < cri_segment_approx)
             {
-                polyline_exact(PP,C,W,length,&opt,&inopt);
+                polyline_exact(PP,C,W,length,&opt,&inopt, vertex_color_out);
                 return;
             }
             
@@ -2092,24 +2093,24 @@ C[1],C[2],C[2])
                     A=i; if( A==1) A=0;
                     on=true;
                     if( A>1)
-                        polyline_range(PP,C,W,length,&opt,&inopt,B,A,false);
+                        polyline_range(PP,C,W,length,&opt,&inopt,B,A,false, vertex_color_out);
                 }
                 else if( !approx && on)
                 {
                     B=i;
                     on=false;
-                    polyline_range(PP,C,W,length,&opt,&inopt,A,B,true);
+                    polyline_range(PP,C,W,length,&opt,&inopt,A,B,true, vertex_color_out);
                 }
             }
             if( on && B<length-1)
             {
                 B=length-1;
-                polyline_range(PP,C,W,length,&opt,&inopt,A,B,true);
+                polyline_range(PP,C,W,length,&opt,&inopt,A,B,true, vertex_color_out);
             }
             else if( !on && A<length-1)
             {
                 A=length-1;
-                polyline_range(PP,C,W,length,&opt,&inopt,B,A,false);
+                polyline_range(PP,C,W,length,&opt,&inopt,B,A,false, vertex_color_out);
             }
         }
         
@@ -2121,26 +2122,50 @@ C[1],C[2],C[2])
     
     void polyline( const Vec2* P, const Color* C, const double* W, int length, const polyline_opt* opt)
     {
-        VASErin::polyline(P,C,W,length,opt,0);
+        VASErin::polyline(P,C,W,length,opt,0, nullptr);
     }
     void polyline( const Vec2* P, Color C, double W, int length, const polyline_opt* opt) //constant color and weight
     {
         VASErin::polyline_inopt inopt={};
         inopt.const_color=true;
         inopt.const_weight=true;
-        VASErin::polyline(P,&C,&W,length,opt,&inopt);
+        VASErin::polyline(P,&C,&W,length,opt,&inopt, nullptr);
     }
     void polyline( const Vec2* P, const Color* C, double W, int length, const polyline_opt* opt) //constant weight
     {
         VASErin::polyline_inopt inopt={};
         inopt.const_weight=true;
-        VASErin::polyline(P,C,&W,length,opt,&inopt);
+        VASErin::polyline(P,C,&W,length,opt,&inopt, nullptr);
     }
     void polyline( const Vec2* P, Color C, const double* W, int length, const polyline_opt* opt) //constant color
     {
         VASErin::polyline_inopt inopt={};
         inopt.const_color=true;
-        VASErin::polyline(P,&C,W,length,opt,&inopt);
+        VASErin::polyline(P,&C,W,length,opt,&inopt, nullptr);
+    }
+    
+    void polyline( const Vec2* P, const Color* C, const double* W, int length, const polyline_opt* opt, LineContext *vertex_color_out)
+    {
+        VASErin::polyline(P,C,W,length,opt,0, vertex_color_out);
+    }
+    void polyline( const Vec2* P, Color C, double W, int length, const polyline_opt* opt, LineContext *vertex_color_out) //constant color and weight
+    {
+        VASErin::polyline_inopt inopt={};
+        inopt.const_color=true;
+        inopt.const_weight=true;
+        VASErin::polyline(P,&C,&W,length,opt,&inopt, vertex_color_out);
+    }
+    void polyline( const Vec2* P, const Color* C, double W, int length, const polyline_opt* opt, LineContext *vertex_color_out) //constant weight
+    {
+        VASErin::polyline_inopt inopt={};
+        inopt.const_weight=true;
+        VASErin::polyline(P,C,&W,length,opt,&inopt, vertex_color_out);
+    }
+    void polyline( const Vec2* P, Color C, const double* W, int length, const polyline_opt* opt, LineContext *vertex_color_out) //constant color
+    {
+        VASErin::polyline_inopt inopt={};
+        inopt.const_color=true;
+        VASErin::polyline(P,&C,W,length,opt,&inopt, vertex_color_out);
     }
     
     void segment(  Vec2 P1, Vec2 P2, Color C1, Color C2, double W1, double W2, const polyline_opt* options)

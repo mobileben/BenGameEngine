@@ -22,9 +22,56 @@ typedef your_color Color;
 
 namespace VASEr
 {
+    struct VertexColor {
+        float x, y;
+        float r, g, b, a;
+    };
+
+    // The ideal is to reduce the amount of needed draw calls
+    // So we split by primitive type
+    struct LineSectionType {
+        int                         glmode;     // GLenum (note this is really uint32_t)
+        std::vector<VertexColor>    vertices;
+        LineSectionType(int mode) : glmode(mode) {}
+    };
+    
+    struct LineRenderSection {
+        int                         glmode;     // GLenum (note this is really uint32_t)
+        uint32_t                    offset;
+        int32_t                     count;
+        LineRenderSection(int mode) : glmode(mode), offset(0), count(0) {}
+    };
+    
+    struct LineRenderContext {
+        std::vector<LineRenderSection>  sections;
+        std::vector<VertexColor>        vertices;
+    };
+
+    struct LineContext {
+        std::vector<LineSectionType>    sections;
+        
+        void reset() {
+            sections.clear();
+        }
+        
+        void toLineRenderContext(LineRenderContext& renderContext) {
+            renderContext.sections.clear();
+            renderContext.vertices.clear();
+            auto& vertices = renderContext.vertices;
+            uint32_t offset = 0;
+            for (auto& section : sections) {
+                LineRenderSection rSection(section.glmode);
+                rSection.offset = offset;
+                rSection.count = static_cast<int32_t>(section.vertices.size());
+                renderContext.sections.push_back(rSection);
+                vertices.insert(vertices.end(), section.vertices.begin(), section.vertices.end());
+                offset += rSection.count;
+            }
+        }
+    };
+    
     struct Vec2 { double x,y,z;};
     struct Color { float r,g,b,a;};
-    
     namespace VASErin
     {	//VASEr internal namespace
         extern const double vaser_min_alw;
@@ -117,6 +164,12 @@ void polyline( const Vec2*, const Color*, const double*, int length, const polyl
 void polyline( const Vec2*, Color, double W, int length, const polyline_opt*); //constant color and weight
 void polyline( const Vec2*, const Color*, double W, int length, const polyline_opt*); //constant weight
 void polyline( const Vec2*, Color, const double* W, int length, const polyline_opt*); //constant color
+
+void polyline( const Vec2*, const Color*, const double*, int length, const polyline_opt*, LineContext *vertex_color_out);
+void polyline( const Vec2*, Color, double W, int length, const polyline_opt*, LineContext *vertex_color_out); //constant color and weight
+void polyline( const Vec2*, const Color*, double W, int length, const polyline_opt*, LineContext *vertex_color_out); //constant weight
+void polyline( const Vec2*, Color, const double* W, int length, const polyline_opt*, LineContext *vertex_color_out); //constant color
+    
 void segment( Vec2, Vec2, Color, Color, double W1, double W2, const polyline_opt*);
 void segment( Vec2, Vec2, Color, double W, const polyline_opt*); //constant color and weight
 void segment( Vec2, Vec2, Color, Color, double W, const polyline_opt*); //constant weight

@@ -24,16 +24,16 @@ namespace VASEr {
                 jumping = false;
             }
             
-            void set_gl_draw_mode( int gl_draw_mode)
+            inline void set_gl_draw_mode( int gl_draw_mode)
             {
                 glmode = gl_draw_mode;
             }
             
-            void clear()
+            inline void clear()
             {
                 count = 0;
             }
-            void move( int a, int b) //move b into a
+            inline void move( int a, int b) //move b into a
             {
                 vert[a*2]   = vert[b*2];
                 vert[a*2+1] = vert[b*2+1];
@@ -43,7 +43,7 @@ namespace VASEr {
                 color[a*4+2]= color[b*4+2];
                 color[a*4+3]= color[b*4+3];
             }
-            void replace( int a, Point P, Color C)
+            inline void replace( int a, Point P, Color C)
             {
                 vert[a*2]   = P.x;
                 vert[a*2+1] = P.y;
@@ -133,7 +133,7 @@ namespace VASEr {
                 return cur;
             }
             
-            void push3( const Point& P1, const Point& P2, const Point& P3,
+            inline void push3( const Point& P1, const Point& P2, const Point& P3,
                        const Color& C1, const Color& C2, const Color& C3,
                        bool trans1=0, bool trans2=0, bool trans3=0)
             {
@@ -174,14 +174,14 @@ namespace VASEr {
                 }
             }
             
-            Point get(int i)
+            inline Point get(int i)
             {
                 Point P;
                 P.x = vert[i*2];
                 P.y = vert[i*2+1];
                 return P;
             }
-            Color get_color(int b)
+            inline Color get_color(int b)
             {
                 Color C;
                 C.r = color[b*4];
@@ -213,7 +213,7 @@ namespace VASEr {
                 
                 push(P,cc);
             }
-            void jump() //to make a jump in triangle strip by degenerated triangles
+            inline void jump() //to make a jump in triangle strip by degenerated triangles
             {
                 if ( glmode == GL_TRIANGLE_STRIP)
                 {
@@ -221,11 +221,45 @@ namespace VASEr {
                     jumping=true;
                 }
             }
-            void draw()
+            inline void draw()
             {
                 backend::vah_draw(*this);
             }
-            void draw_triangles()
+            void draw(LineContext* vertex_color_out)
+            {
+                if (vertex_color_out) {
+                    // LineContext is based on glmode, we can order it based on
+                    bool found = false;
+                    for (size_t i=0;i<vertex_color_out->sections.size();++i) {
+                        auto& section = vertex_color_out->sections[i];
+                        if (section.glmode == glmode) {
+                            auto& vertices = section.vertices;
+                            vertices.reserve(vertices.size() + count);
+                            for (auto i=0;i<count;++i) {
+                                VertexColor vertex{vert[i*2], vert[i*2+1], color[i*4], color[i*4+1], color[i*4+2], color[i*4+3]};
+                                vertices.push_back(vertex);
+                            }
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        LineSectionType section(glmode);
+                        vertex_color_out->sections.push_back(section);
+                        auto& s = vertex_color_out->sections.back();
+                        auto& vertices = s.vertices;
+                        vertices.reserve(vertices.size() + count);
+                        for (auto i=0;i<count;++i) {
+                            VertexColor vertex{vert[i*2], vert[i*2+1], color[i*4], color[i*4+1], color[i*4+2], color[i*4+3]};
+                            vertices.push_back(vertex);
+                        }
+                    }
+                } else {
+                    draw();
+                }
+            }
+            void draw_triangles(LineContext *vertex_color_out)
             {
                 Color col={1 , 0, 0, 0.5};
                 if ( glmode == GL_TRIANGLES)
@@ -237,7 +271,7 @@ namespace VASEr {
                         P[1] = get(i); i++;
                         P[2] = get(i);
                         P[3] = P[0];
-                        polyline((const Vec2*)P,col,1.0,4, (const polyline_opt*)nullptr);
+                        polyline((const Vec2*)P,col,1.0,4, (const polyline_opt*)nullptr, vertex_color_out);
                     }
                 }
                 else if ( glmode == GL_TRIANGLE_STRIP)
@@ -248,7 +282,7 @@ namespace VASEr {
                         P[0] = get(i-2);
                         P[1] = get(i);
                         P[2] = get(i-1);
-                        polyline((const Vec2*)P,col,1.0,3, (const polyline_opt*) nullptr);
+                        polyline((const Vec2*)P,col,1.0,3, (const polyline_opt*) nullptr, vertex_color_out);
                     }
                 }
             }

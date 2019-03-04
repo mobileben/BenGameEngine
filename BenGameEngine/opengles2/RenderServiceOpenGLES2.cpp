@@ -1039,78 +1039,98 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
         auto line = gameObject->getComponentLockless<PolyLineRenderComponent>(space);
         
         if (line) {
-            const auto& points = line->getPoints();
-            const auto& colors = line->getColors();
-            
-            // Convert our data to what VASEr needs
-            auto numColors = colors.size();
-            VASEr::Vec2 *vPoints = new VASEr::Vec2[points.size()];
-            VASEr::Color *vColors = new VASEr::Color[points.size()];
-            
-            auto numPoints = points.size();
-            assert(numPoints == numColors || numColors == 1);
-            
-            for (size_t i=0;i<numPoints;++i) {
-                auto colorIndex = i;
-                vPoints[i].x = points[i].x;
-                vPoints[i].y = points[i].y;
-                
-                if (numColors == 1) {
-                    colorIndex = 0;
+            auto cacheKey = getCachedComponentRenderDataKey(space->getHandle(), line->getHandle<PolyLineRenderComponent>());
+            CachedPolyLineRenderData *cache = nullptr;
+            auto it = polyLineCache_.find(cacheKey);
+            if (it != polyLineCache_.end()) {
+                auto& entry = it->second;
+                cache = &entry;
+            }
+
+            if (line->dirty_) {
+                if (cache) {
+                    cache->numVertices = 0;
+                    cache->context.reset();
                 }
-                vColors[i].r = colors[colorIndex].r;
-                vColors[i].g = colors[colorIndex].g;
-                vColors[i].b = colors[colorIndex].b;
-                vColors[i].a = colors[colorIndex].a;
             }
             
-            VASEr::polyline_opt opt;
+            // Grab local copy because generateVertexArrayHolder will clear the dirty flag
+            auto dirty = line->dirty_;
             
-            switch (line->getJoint()) {
-                case PolyLineRenderComponent::Joint::bevel:
-                    opt.joint = VASEr::PLJ_bevel;
-                    break;
-                case PolyLineRenderComponent::Joint::round:
-                    opt.joint = VASEr::PLJ_round;
-                    break;
-                default:
-                    opt.joint = VASEr::PLJ_miter;
-                    break;
+            VASEr::LineContext localContext;
+            VASEr::LineRenderContext localRenderContext;
+            VASEr::LineContext *contextPtr;
+            VASEr::LineRenderContext *renderContextPtr;
+            if (cache) {
+                contextPtr = &cache->context;
+                renderContextPtr = &cache->renderContext;
+            } else {
+                contextPtr = &localContext;
+                renderContextPtr = &localRenderContext;
             }
             
-            switch (line->getCap()) {
-                case PolyLineRenderComponent::Cap::butt:
-                    opt.cap = VASEr::PLC_butt;
-                    break;
-                case PolyLineRenderComponent::Cap::round:
-                    opt.cap = VASEr::PLC_round;
-                    break;
-                case PolyLineRenderComponent::Cap::square:
-                    opt.cap = VASEr::PLC_square;
-                    break;
-                case PolyLineRenderComponent::Cap::rect:
-                    opt.cap = VASEr::PLC_rect;
-                    break;
-                case PolyLineRenderComponent::Cap::both:
-                    opt.cap = VASEr::PLC_both;
-                    break;
-                case PolyLineRenderComponent::Cap::first:
-                    opt.cap = VASEr::PLC_first;
-                    break;
-                case PolyLineRenderComponent::Cap::last:
-                    opt.cap = VASEr::PLC_last;
-                    break;
-                case PolyLineRenderComponent::Cap::none:
-                    opt.cap = VASEr::PLC_none;
-                    break;
+            auto& context = *contextPtr;
+            auto& renderContext = *renderContextPtr;
+
+            if (!cache || dirty) {
+                line->generateVertexArrayHolder(context, scratchPolylinePoints_, scratchPolylineColors_);
+                context.toLineRenderContext(renderContext);
             }
             
-            opt.tess = nullptr;
-            opt.feather = line->isFeather();
-            opt.feathering = line->getFeathering();
-            opt.no_feather_at_cap = line->getNoFeatherAtCap();
-            opt.no_feather_at_core = line->getNoFeatherAtCore();
-            
+            if (cache) {
+#ifdef DEBUG
+                cache->lifetime++;
+#endif
+                if (!cache->vbo) {
+                    glGenBuffers(1, &cache->vbo);
+                    if (cache->vbo) {
+                        setVbo(cache->vbo);
+                        auto num = renderContext.vertices.size();
+                        cache->numVertices = num;
+                        cache->maxVertices = num;
+                        glBufferData(GL_ARRAY_BUFFER, sizeof(VASEr::VertexColor) * num, &renderContext.vertices[0], GL_STATIC_DRAW);
+                        GLenum glErr = glGetError();
+                        if (glErr == GL_NO_ERROR) {
+                            // We no longer need the vertex data so clear it
+                            context.reset();
+                            renderContext.vertices.clear();
+                        } else {
+                            glDeleteBuffers(1, &cache->vbo);
+                            cache->vbo = 0;
+                            setVbo(0);  // Only reset if we deleted
+                        }
+                    }
+                } else if (dirty) {
+                    // We have an existing VBO, determine if we use glBufferData or glBufferSubData
+                    setVbo(cache->vbo);
+                    auto num = renderContext.vertices.size();
+                    cache->numVertices = num;
+                    if (num > cache->maxVertices) {
+                        // We need to use glBufferData since our size is larger
+                        cache->maxVertices = num;
+                        glBufferData(GL_ARRAY_BUFFER, sizeof(VASEr::VertexColor) * num, &renderContext.vertices[0], GL_STATIC_DRAW);
+                    } else {
+                        // Use glBufferSubData
+                        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VASEr::VertexColor) * num, &renderContext.vertices[0]);
+                    }
+                    
+                    GLenum glErr = glGetError();
+                    if (glErr == GL_NO_ERROR) {
+                        // We no longer need the vertex data so clear it
+                        context.reset();
+                        renderContext.vertices.clear();
+                    } else {
+                        glDeleteBuffers(1, &cache->vbo);
+                        cache->vbo = 0;
+                        setVbo(0);  // Only reset if we deleted
+                    }
+#if DEBUG
+                    cache->lifetime = 0;
+#endif
+                }
+            }
+
+            // If we have a cache, look to
             bool shaderChanged;
             std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(PolyLineShaderProgramId, shaderChanged));
             
@@ -1127,19 +1147,27 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
 
             setBlend(true);
             setBlendFunc(BlendFunc::Src_SRC_ALPHA_Dst_ONE_MINUS_SRC_ALPHA);
-            
-            // This doesn't use VBO/IBO
-            disableVboIbo();
-            
-            VASEr::VASErin::backend::set_uniforms(PositionVertexAttributeIndex, SourceColorVertexAttributeIndex);
 
-            VASEr::polyline(vPoints, vColors, line->getThickness(), static_cast<int>(points.size()), &opt);
-            
-            if (vPoints) {
-                delete [] vPoints;
-            }
-            if (vColors) {
-                delete [] vColors;
+            if (cache && cache->vbo) {
+                setVbo(cache->vbo);
+                setIbo(0);  // Make sure to turn IBO off
+                for (auto& section : renderContext.sections) {
+                    glVertexAttribPointer(PositionVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
+                                          sizeof(VASEr::VertexColor), (GLvoid *) 0);
+                    glVertexAttribPointer(SourceColorVertexAttributeIndex, 4, GL_FLOAT, GL_FALSE, sizeof(VASEr::VertexColor), (GLvoid *) (sizeof(float) * 2));
+                    glDrawArrays (section.glmode, section.offset, static_cast<GLsizei>(section.count));
+                }
+
+            } else {
+                // This doesn't use VBO/IBO
+                disableVboIbo();
+                
+                for (auto& section : renderContext.sections) {
+                    glVertexAttribPointer(PositionVertexAttributeIndex, 2, GL_FLOAT, GL_FALSE,
+                                          sizeof(VASEr::VertexColor), &renderContext.vertices[section.offset]);
+                    glVertexAttribPointer(SourceColorVertexAttributeIndex, 4, GL_FLOAT, GL_FALSE, sizeof(VASEr::VertexColor), (GLfloat *) &renderContext.vertices[section.offset].r);
+                    glDrawArrays (section.glmode, 0, static_cast<GLsizei>(section.count));
+                }
             }
 #ifdef SUPPORT_PROFILING
             ++numPolylinesDrawn_;
@@ -1248,7 +1276,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
 }
 
 void BGE::RenderServiceOpenGLES2::drawString(Space *space, TextComponent *text, Font *font, TransformComponent *transform, ColorMatrix& colorMatrix, ColorTransform& colorTransform, bool minimum) {
-    auto cacheKey = getCachedStringRenderDataKey(space, text);
+    auto cacheKey = getCachedComponentRenderDataKey(space->getHandle(), text->getHandle<TextComponent>());
     CachedStringRenderData *cache = nullptr;
     CachedStringRenderData *dropShadowCache = nullptr;
     auto it = stringVertexCache_.find(cacheKey);
@@ -2158,7 +2186,6 @@ GLuint BGE::RenderServiceOpenGLES2::createVbo_(VertexTex *data, uint32_t numVert
             glDeleteBuffers(1, &vbo);
             vbo = 0;
         }
-        
         // Unbind vbo
         setVbo(0);
     }
@@ -2235,7 +2262,7 @@ void BGE::RenderServiceOpenGLES2::destroyIbo_(GLuint ibo) {
 
 void BGE::RenderServiceOpenGLES2::createStringCacheEntry(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderStringCacheCommandData>(item.data);
-    auto cacheKey = getCachedStringRenderDataKey(data->spaceHandle, data->textHandle);
+    auto cacheKey = getCachedComponentRenderDataKey(data->spaceHandle, data->textHandle);
     stringVertexCache_[cacheKey] = CachedStringRenderData{};
     dropShadowStringVertexCache_[cacheKey] = CachedStringRenderData{};
 }
@@ -2243,7 +2270,7 @@ void BGE::RenderServiceOpenGLES2::createStringCacheEntry(const RenderCommandItem
 void BGE::RenderServiceOpenGLES2::destroyStringCacheEntry(const RenderCommandItem& item) {
     auto data = std::dynamic_pointer_cast<RenderStringCacheCommandData>(item.data);
     std::shared_ptr<Error> error;
-    auto cacheKey = getCachedStringRenderDataKey(data->spaceHandle, data->textHandle);
+    auto cacheKey = getCachedComponentRenderDataKey(data->spaceHandle, data->textHandle);
     auto it = stringVertexCache_.find(cacheKey);
     if (it != stringVertexCache_.end()) {
         auto& cached = it->second;
@@ -2266,8 +2293,30 @@ void BGE::RenderServiceOpenGLES2::destroyStringCacheEntry(const RenderCommandIte
         }
         dropShadowStringVertexCache_.erase(it);
     }
+}
+
+void BGE::RenderServiceOpenGLES2::createPolyLineCacheEntry(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderPolyLineCacheCommandData>(item.data);
+    auto cacheKey = getCachedComponentRenderDataKey(data->spaceHandle, data->polyHandle);
+    auto renderData = CachedPolyLineRenderData{};
+    std::shared_ptr<Error> error;
+    polyLineCache_[cacheKey] = renderData;
     if (item.callback) {
         item.callback(item, error);
+    }
+}
+
+void BGE::RenderServiceOpenGLES2::destroyPolyLineCacheEntry(const RenderCommandItem& item) {
+    auto data = std::dynamic_pointer_cast<RenderPolyLineCacheCommandData>(item.data);
+    std::shared_ptr<Error> error;
+    auto cacheKey = getCachedComponentRenderDataKey(data->spaceHandle, data->polyHandle);
+    auto it = polyLineCache_.find(cacheKey);
+    if (it != polyLineCache_.end()) {
+        auto& cached = it->second;
+        if (cached.vbo) {
+            destroyVbo_(cached.vbo);
+        }
+        polyLineCache_.erase(it);
     }
 }
 

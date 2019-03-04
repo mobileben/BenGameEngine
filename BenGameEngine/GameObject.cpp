@@ -15,6 +15,7 @@
 #include "ButtonComponent.h"
 #include "AnimatorComponent.h"
 #include "FrameAnimatorComponent.h"
+#include "PolyLineRenderComponent.h"
 #include "TransformComponent.h"
 #include "TextComponent.h"
 #include "LogicComponent.h"
@@ -411,6 +412,11 @@ void BGE::GameObject::addComponentEpilogue(ComponentTypeId componentTypeId) {
         auto text = getComponent<TextComponent>(space);
         RenderStringCacheCommandData data(getSpaceHandle(), text->getHandle<TextComponent>());
         Game::getInstance()->getRenderService()->queueCreateStringCacheEntry(data);
+    } else if (componentTypeId == PolyLineRenderComponent::typeId_) {
+        auto space = getSpace();
+        auto poly = getComponent<PolyLineRenderComponent>(space);
+        RenderPolyLineCacheCommandData data(getSpaceHandle(), poly->getHandle<PolyLineRenderComponent>());
+        Game::getInstance()->getRenderService()->queueCreatePolyLineCacheEntry(data, nullptr);
     }
     
     // Now sort based on type index
