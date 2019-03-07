@@ -79,7 +79,7 @@ namespace BGE {
         void		setMusicEnabled(Boolean enabled);
 
     private:
-        static const uint32_t InitialAudioReserve = 256;
+        static const uint32_t InitialAudioReserve = 384;
         static const uint32_t InitialAudioBufferReserve = 128;
 
         using AudioHandleService = HandleService<Audio, AudioHandle>;
