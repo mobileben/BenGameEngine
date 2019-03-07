@@ -1544,7 +1544,10 @@
 				HEADER_SEARCH_PATHS = "\"$(THIRD_PARTY_PREBUILTS_DIR)/rapidjson/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DNDEBUG",
+					"-DNS_BLOCK_ASSERTIONS",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				THIRD_PARTY_PREBUILTS_DIR = "/Users/ben/Development/third-party-prebuilts-ios";
@@ -1566,6 +1569,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
 				OTHER_CFLAGS = (
+					"$(inherited)",
 					"-DSUPPORT_OPENGL",
 					"-DSUPPORT_OPENGLES2",
 					"-DSUPPORT_PROFILING=1",
@@ -1585,6 +1589,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
 				OTHER_CFLAGS = (
+					"$(inherited)",
 					"-DSUPPORT_OPENGL",
 					"-DSUPPORT_OPENGLES2",
 				);
@@ -1743,6 +1748,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
 				OTHER_CFLAGS = (
+					"$(inherited)",
 					"-DSUPPORT_OPENGL",
 					"-DSUPPORT_OPENGLES2",
 					"-DSUPPORT_PROFILING=1",
@@ -1852,7 +1858,10 @@
 				HEADER_SEARCH_PATHS = "\"$(THIRD_PARTY_PREBUILTS_DIR)/rapidjson/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DNDEBUG",
+					"-DNS_BLOCK_ASSERTIONS",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				THIRD_PARTY_PREBUILTS_DIR = "/Users/ben/Development/third-party-prebuilts-ios";
@@ -1874,6 +1883,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
 				OTHER_CFLAGS = (
+					"$(inherited)",
 					"-DSUPPORT_OPENGL",
 					"-DSUPPORT_OPENGLES2",
 				);
@@ -1978,7 +1988,10 @@
 				HEADER_SEARCH_PATHS = "\"$(THIRD_PARTY_PREBUILTS_DIR)/rapidjson/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DNDEBUG",
+					"-DNS_BLOCK_ASSERTIONS",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				THIRD_PARTY_PREBUILTS_DIR = "/Users/ben/Development/third-party-prebuilts-ios";
@@ -2000,6 +2013,7 @@
 					"$(THIRD_PARTY_PREBUILTS_DIR)/libpng/include",
 				);
 				OTHER_CFLAGS = (
+					"$(inherited)",
 					"-DSUPPORT_OPENGL",
 					"-DSUPPORT_OPENGLES2",
 				);
