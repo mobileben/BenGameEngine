@@ -107,7 +107,8 @@ void BGE::Space::reset_() {
     visible_ = false;
     updatable_ = false;
     
-    // We forcibly remove any handlers. The game should play nice and do the clean up themselves.
+    // We forcibly remove any handlers. The game should play nice and do the clean up themselves, but there are some
+    // internalized cases where this cannot be avoided
     BGE::Game::getInstance()->servicesSpaceReset(this);
     
     // Destroy all scenePackages
@@ -216,7 +217,7 @@ void BGE::Space::outputResourceBreakdown(uint32_t numTabs) const {
         }
     }
     
-    Game::outputValue(numTabs, "Num GameObject: %u\n", num);
+    Game::outputValue(numTabs, "Num GameObject: %u/%u/%u (%u resizes)\n", num, gameObjectService_->maxHandlesAllocated(), gameObjectService_->maxHandles(), gameObjectService_->numHandleResizes());
     
     Game::outputValue(numTabs, "Num Component: %u\n", componentService_->totalNumComponents());
     
