@@ -110,7 +110,7 @@ namespace BGE {
         
         using GameObjectHandleService = HandleService<GameObject, GameObjectHandle>;
 
-        static const uint32_t InitialGameObjectReserve = 4096;
+        static const uint32_t InitialGameObjectReserve = 32768;
         static GameObjectHandleService handleService_;
         
         SpaceHandle         spaceHandle_;

@@ -38,6 +38,8 @@ void BGE::AudioService::update(__attribute__ ((unused)) double deltaTime) {
 }
 
 void BGE::AudioService::garbageCollect() {
+    audioHandleService_.garbageCollect();
+    audioBufferHandleService_.garbageCollect();
     eventService_->garbageCollect();
 }
 
@@ -70,6 +72,10 @@ BGE::AudioBuffer *BGE::AudioService::getAudioBuffer(AudioBufferHandle handle) {
 }
 
 void BGE::AudioService::removeAudio(AudioHandle handle) {
+    auto audio = getAudio(handle);
+    if (audio) {
+        audio->destroy();
+    }
     audioHandles_.erase(std::remove(audioHandles_.begin(), audioHandles_.end(), handle), audioHandles_.end());
     audioHandleService_.release(handle);
 }
@@ -78,6 +84,11 @@ void BGE::AudioService::removeAudioBuffer(std::string name) {
     auto it = audioBufferHandles_.find(name);
     
     if (it != audioBufferHandles_.end()) {
+        auto audio = getAudioBuffer(it->second);
+        if (audio) {
+            audio->destroy();
+        }
+
         audioBufferHandleService_.release(it->second);
 
         audioBufferHandles_.erase(it);

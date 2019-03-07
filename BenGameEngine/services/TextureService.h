@@ -154,8 +154,8 @@ namespace BGE {
         Texture *createSubTexture(TextureAtlasHandle atlasHandle, std::string name, TextureAtlas *atlas, uint32_t x, uint32_t y, uint32_t width, uint32_t height, bool rotated, bool font);
     
     private:
-        static const uint32_t InitialTextureReserve = 4096;
-        static const uint32_t InitialTextureAtlasReserve = 32;
+        static const uint32_t InitialTextureReserve = 5120;
+        static const uint32_t InitialTextureAtlasReserve = 48;
         
         using TextureHandleService = HandleService<Texture, TextureHandle>;
         using TextureAtlasHandleService = HandleService<TextureAtlas, TextureAtlasHandle>;

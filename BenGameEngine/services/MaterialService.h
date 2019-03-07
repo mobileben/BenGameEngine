@@ -64,7 +64,7 @@ namespace BGE {
         Material *getMaterialLockless(ObjectId matId) const;
 
     private:
-        static const uint32_t InitialMaterialReserve = 2048;
+        static const uint32_t InitialMaterialReserve = 18432;
         
         using MaterialHandleService = HandleService<Material, MaterialHandle>;
         
