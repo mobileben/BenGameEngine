@@ -14,7 +14,12 @@ uint32_t BGE::SpriteRenderComponent::bitmask_ = Component::InvalidBitmask;
 BGE::ComponentTypeId BGE::SpriteRenderComponent::typeId_ = Component::InvalidTypeId;
 std::type_index BGE::SpriteRenderComponent::type_index_ = typeid(BGE::SpriteRenderComponent);
 
-BGE::SpriteRenderComponent::SpriteRenderComponent() : RenderComponent() {
+BGE::SpriteRenderComponent::SpriteRenderComponent() : RenderComponent(), useLocalBoundsToRender_(false) {
+}
+
+void BGE::SpriteRenderComponent::initialize(HandleBackingType handle, SpaceHandle spaceHandle) {
+    RenderComponent::initialize(handle, spaceHandle);
+    useLocalBoundsToRender_ = false;
 }
 
 void BGE::SpriteRenderComponent::setTextureReference(TextureReference *texRef) {

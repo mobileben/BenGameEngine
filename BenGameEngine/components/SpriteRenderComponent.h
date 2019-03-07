@@ -27,6 +27,8 @@ namespace BGE {
         
         SpriteRenderComponent();
         ~SpriteRenderComponent() {}
+        
+        void initialize(HandleBackingType handle, SpaceHandle spaceHandle) final;
 
         TextureHandle getTextureHandle();
         void setTextureReference(TextureReference *texRef);
@@ -35,6 +37,9 @@ namespace BGE {
         void setTextureHandle(TextureHandle texHandle);
         void setTexture(Texture *tex);
 
+        void setUseLocalBoundsToRender(bool use) { useLocalBoundsToRender_ = use; }
+        bool getUseLocalBoundsToRender() const { return useLocalBoundsToRender_; }
+        
         void updateLocalBoundsAndVertices(bool force=false);
 
     protected:
@@ -49,6 +54,7 @@ namespace BGE {
 
         static const uint32_t NumVertices = 4;
         
+        bool useLocalBoundsToRender_;
         VertexTex vertices_[NumVertices];
     };
 }
