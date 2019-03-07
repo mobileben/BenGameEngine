@@ -30,7 +30,8 @@ void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameO
     setName(name);
 
     active_ = false;
-
+    cachedVisibility_ = true;
+    
     removeAllComponents();
 
     handle_ = gameObjHandle;
@@ -40,6 +41,7 @@ void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameO
 void BGE::GameObject::markForDestroy() {
     if (!handle_.isNull()) {
         active_ = false;
+        cachedVisibility_ = false;
         destroy_ = true;
 
         auto space = getSpace();
@@ -58,7 +60,7 @@ void BGE::GameObject::markForDestroy() {
 
 void BGE::GameObject::destroy() {
     active_ = false;
-    cachedVisibility_ = true;
+    cachedVisibility_ = false;
     
     removeAllComponents();
     
@@ -68,7 +70,7 @@ void BGE::GameObject::destroy() {
 
 void BGE::GameObject::destroyDontReleaseComponents() {
     active_ = false;
-    cachedVisibility_ = true;
+    cachedVisibility_ = false;
 
     componentBitmask_ = 0;
     components_.clear();
