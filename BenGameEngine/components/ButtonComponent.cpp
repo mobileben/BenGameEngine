@@ -82,6 +82,9 @@ void BGE::ButtonComponent::destroy() {
     auto space = getSpace();
     
     if (space) {
+        Game::getInstance()->getAnimationService()->unregisterEventHandler(highlightedAnimHandlerHandle);
+        highlightedAnimHandlerHandle.nullify();
+
         space->removeGameObject(disabledButtonHandle);
         space->removeGameObject(disabledAnimButtonHandle);
         space->removeGameObject(normalButtonHandle);
@@ -89,9 +92,6 @@ void BGE::ButtonComponent::destroy() {
         space->removeGameObject(highlightedButtonHandle);
         space->removeGameObject(highlightedAnimButtonHandle);
         space->removeGameObject(currentButtonHandle);
-        
-        Game::getInstance()->getAnimationService()->unregisterEventHandler(highlightedAnimHandlerHandle);
-        highlightedAnimHandlerHandle.nullify();
     }
 
     // Component::destroy last
@@ -106,7 +106,13 @@ void BGE::ButtonComponent::destroyFast() {
     // Release reference
     touch = nil;
 #endif /* TARGET_OS_IPHONE */
-
+    auto space = getSpace();
+    
+    if (space) {
+        Game::getInstance()->getAnimationService()->unregisterEventHandler(highlightedAnimHandlerHandle);
+        highlightedAnimHandlerHandle.nullify();
+    }
+    
     // Component::destroyFast last
     Component::destroyFast();
 }
