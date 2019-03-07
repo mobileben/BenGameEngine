@@ -41,3 +41,35 @@ void BGE::EventService::removeEventHandler(EventHandlerHandle handle) {
 void BGE::EventService::spaceReset(__attribute__ ((unused)) Space *space) {
     
 }
+
+uint32_t BGE::EventService::numEventHandlerHandles() const {
+    return handleService_.numUsedHandles();
+}
+
+uint32_t BGE::EventService::numUsedHandles() const {
+    return handleService_.numUsedHandles();
+}
+
+uint32_t BGE::EventService::maxHandles() const {
+    return handleService_.capacity();
+}
+
+uint32_t BGE::EventService::numHandleResizes() const {
+    return handleService_.numResizes();
+}
+
+uint32_t BGE::EventService::maxHandlesAllocated() const {
+    return handleService_.getMaxAllocated();
+}
+
+size_t BGE::EventService::usedHandleMemory() const {
+    return handleService_.usedMemory();
+}
+
+size_t BGE::EventService::unusedHandleMemory() const {
+    return handleService_.unusedMemory();
+}
+
+size_t BGE::EventService::totalHandleMemory() const {
+    return handleService_.totalMemory();
+}

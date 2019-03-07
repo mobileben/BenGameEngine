@@ -23,6 +23,17 @@ namespace BGE {
         EventService();
         ~EventService() {}
         
+        uint32_t numEventHandlerHandles() const;
+        
+        uint32_t numUsedHandles() const final;
+        uint32_t maxHandles() const final;
+        uint32_t numHandleResizes() const final;
+        uint32_t maxHandlesAllocated() const final;
+        
+        size_t usedHandleMemory() const final;
+        size_t unusedHandleMemory() const final;
+        size_t totalHandleMemory() const final;
+
         EventHandlerHandle createEventHandlerHandle(GameObject *gameObj, Event event, EventHandlerFunction function);
         
         EventHandler *getEventHandler(EventHandlerHandle handle) const;
@@ -44,7 +55,7 @@ namespace BGE {
     protected:
         
     private:
-        static const uint32_t InitialEventHandlerReserve = 128;
+        static const uint32_t InitialEventHandlerReserve = 384;
         
         using EventHandlerHandleService = HandleService<EventHandler, EventHandlerHandle>;
         
