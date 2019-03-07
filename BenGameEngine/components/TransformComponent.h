@@ -15,6 +15,7 @@
 #include <vector>
 #include "MathTypes.h"
 #include "Component.h"
+#include "GameObject.h"
 
 namespace BGE {
     class RenderService;
@@ -38,7 +39,7 @@ namespace BGE {
         void setVisibility(bool visible) {
             auto obj = getGameObject();
             if (obj) {
-                
+                obj->cachedVisibility_ = visible;
             }
             visible_ = visible;
         }
@@ -198,7 +199,8 @@ namespace BGE {
         // Hierarchy
         TransformComponentHandle                parentHandle_;
         std::vector<TransformComponentHandle>   childrenHandles_;
-        
+        std::vector<TransformComponentHandle>   sortedChildrenHandles_;
+
         // Control
         // TODO: Support?
         float           speed_;
