@@ -14,6 +14,7 @@
 
 @property (nonatomic, readonly) CADisplayLink *displayLink;
 @property (nonatomic, assign) std::function<void()> tickHandler;
+@property (nonatomic, assign, readonly) double secondsPerFrame;
 
 - (void)platformSuspending;
 - (void)platformResuming;

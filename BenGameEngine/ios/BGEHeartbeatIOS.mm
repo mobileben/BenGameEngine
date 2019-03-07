@@ -8,6 +8,8 @@
 
 #import "BGEHeartbeatIOS.h"
 
+#include "Game.h"
+
 @implementation BGEHeartbeatIOS
 
 - (id)init
@@ -38,6 +40,18 @@
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     }
+}
+
+- (double)secondsPerFrame {
+    auto preferredFramesPerSecond = _displayLink.preferredFramesPerSecond;
+    if (!preferredFramesPerSecond) {
+        preferredFramesPerSecond = [UIScreen mainScreen].maximumFramesPerSecond;
+        if (!preferredFramesPerSecond) {
+            // Use 60fps if 0
+            preferredFramesPerSecond = 60;
+        }
+    }
+    return 1.0 / static_cast<double>(preferredFramesPerSecond);
 }
 
 @end
