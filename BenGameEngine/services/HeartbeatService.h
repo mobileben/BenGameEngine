@@ -52,6 +52,9 @@ namespace BGE {
         bool isRunning() const { return running_; }
         void setRunning(bool running);
         bool runningOnQueueThread() const;
+        
+        double getSecondsPerFrame() const { return secondsPerFrame_; }
+        void setSecondsPerFrame(double sec) { secondsPerFrame_ = sec; }
 
         void dispatchAsync(HeartbeatDispatchFunction func);
         
@@ -76,6 +79,7 @@ namespace BGE {
         uint64_t                    lastCounter_;
         mach_timebase_info_data_t   timebaseInfo_;
         double                      timebaseMultiplier_;
+        double                      secondsPerFrame_;
         bool                        threadRunning_;
         std::mutex                  threadRunningMutex_;
         std::thread                 thread_;

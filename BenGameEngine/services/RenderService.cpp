@@ -203,8 +203,8 @@ void BGE::RenderService::queueDestroyPolyLineCacheEntry(const RenderPolyLineCach
     renderQueue_.push(command);
 }
 
-void BGE::RenderService::queueRender() {
-    auto command = RenderCommandItem(RenderCommand::Render);
+void BGE::RenderService::queueRender(std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback) {
+    auto command = RenderCommandItem(RenderCommand::Render, callback);
     renderQueue_.push(command);
 }
 
@@ -427,6 +427,9 @@ void BGE::RenderService::threadFunction() {
                 
             case RenderCommand::Render:
                 render();
+                if (command.callback) {
+                    command.callback(command, nullptr);
+                }
                 break;
                 
             default:

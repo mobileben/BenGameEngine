@@ -347,7 +347,7 @@ namespace BGE {
         void queueDestroyStringCacheEntry(const RenderStringCacheCommandData& cacheData);
         void queueCreatePolyLineCacheEntry(const RenderPolyLineCacheCommandData& cacheData, std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
         void queueDestroyPolyLineCacheEntry(const RenderPolyLineCacheCommandData& cacheData);
-        void queueRender();
+        void queueRender(std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
 
     protected:
         std::shared_ptr<RenderContext> renderContext_;

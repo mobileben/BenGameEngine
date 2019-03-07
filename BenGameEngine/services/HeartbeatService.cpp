@@ -14,13 +14,16 @@
 #include <pthread.h>
 #endif
 
+#include <future>
+
 #ifdef SUPPORT_PROFILING
 #include "Profiling.h"
 #endif /* SUPPORT_PROFILING */
 
-BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0), threadRunning_(false), currentDispatchQueue_(0) {
+BGE::HeartbeatService::HeartbeatService() : running_(true), counter_(0), lastCounter_(0), secondsPerFrame_(0), threadRunning_(false), currentDispatchQueue_(0) {
 #if TARGET_OS_IPHONE
     iosHeartbeat_ = [[BGEHeartbeatIOS alloc] init];
+    secondsPerFrame_ = iosHeartbeat_.secondsPerFrame;
 #endif /* TARGET_OS_IPHONE */
 
     timebaseInfo_.numer = 0; timebaseInfo_.denom = 0;
@@ -141,11 +144,15 @@ void BGE::HeartbeatService::tickHandler() {
         
         // Dispatch handlers are done prior to any of the listeners
         dispatchHandler();
-        
         for (auto const& entry : orderedListeners_) {
             entry.first(elapsedTime);
         }
-        Game::getInstance()->getRenderService()->queueRender();
+        std::shared_ptr<std::promise<void>> prom = std::make_shared<std::promise<void>>();
+        auto fut = prom->get_future();
+        Game::getInstance()->getRenderService()->queueRender([prom](__attribute__ ((unused)) RenderCommandItem, __attribute__ ((unused)) std::shared_ptr<Error>) {
+            prom->set_value();
+        });
+        fut.get();
     }
 #ifdef SUPPORT_PROFILING
     auto now = profiling::EpochTime::timeInMicroSec();
