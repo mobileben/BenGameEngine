@@ -186,7 +186,7 @@ static void DeriveBufferSize (AudioStreamBasicDescription &ASBDesc,
 
 #endif /* TARGET_OS_IPHONE */
 
-BGE::Audio::Audio() : doneCallback(nullptr), valid_(false), state_(AudioPlayState::Off), type_(AudioType::SFX), streaming_(false), looping_(0), pauseSource_(static_cast<uint32_t>(AudioPauseSource::None)), playbackRate_(1.0)
+BGE::Audio::Audio() : doneCallback(nullptr), valid_(false), state_(AudioPlayState::Off), type_(AudioType::SFX), streaming_(false), looping_(0), pauseSource_(static_cast<uint32_t>(AudioPauseSource::None)), enablePlaybackRate_(false), playbackRate_(1.0), volume_(1.0)
 #if TARGET_OS_IPHONE
 , audioFileId_(nullptr), audioBuffer_(nullptr), audioBufferSize_(0), queue_(nullptr), actualBuffersUsed_(0), bufferSize_(0), currPacket_(0), numPacketsToRead_(0), packetDesc_(nullptr), memoryImageIndex_(0)
 #endif /* TARGET_OS_IPHONE */
@@ -217,6 +217,11 @@ void BGE::Audio::initialize(AudioHandle handle, const std::string& name, AudioBu
     setName(name);
     handle_ = handle;
     valid_ = false;
+    looping_ = 0;
+    pauseSource_ = static_cast<uint32_t>(AudioPauseSource::None);
+    enablePlaybackRate_ = false;
+    playbackRate_ = 1.0f;
+    volume_ = 1.0f;
     doneCallback = nullptr;
 
     if (audioBuffer && audioBuffer->valid_) {
@@ -226,6 +231,8 @@ void BGE::Audio::initialize(AudioHandle handle, const std::string& name, AudioBu
         audioFileId_ = audioBuffer->audioFileId_;
         audioBuffer_ = audioBuffer->audioBuffer_;
         audioBufferSize_ = audioBuffer->audioBufferSize_;
+        actualBuffersUsed_ = 0;
+        
         packetInfo_ = audioBuffer->packetInfo_;
         memcpy(&streamBasicDesc_, &audioBuffer->streamBasicDesc_, sizeof(streamBasicDesc_));
         
@@ -337,14 +344,14 @@ void BGE::Audio::destroy() {
     if (queue_) {
         if (state_ != AudioPlayState::Off) {
             AudioQueueStop(queue_, YES);
-            
-            AudioQueueDispose(queue_, YES);
-            
-            for (auto i=0;i<kAudioQueueNumBuffers;i++) {
-                buffers_[i] = nullptr;
-            }
         }
-        
+
+        AudioQueueDispose(queue_, YES);
+        for (auto i=0;i<kAudioQueueNumBuffers;i++) {
+            buffers_[i] = nullptr;
+        }
+        actualBuffersUsed_ = 0;
+
         queue_ = nullptr;
         
         if (packetDesc_) {
