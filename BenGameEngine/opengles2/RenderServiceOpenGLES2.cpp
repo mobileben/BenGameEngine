@@ -1184,7 +1184,6 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
         auto sprite = gameObject->getComponentLockless<SpriteRenderComponent>(space);
         
         if (sprite) {
-            VertexTex * vertices = sprite->getVertices();
             auto material = sprite->getMaterialLockless();
             if (material) {
                 auto textureHandle = material->getTextureHandle();
@@ -1229,7 +1228,7 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                         setTexture(texture->getTarget(), texture->getHWTextureId());
 
                         auto vboId = texture->getHWVboId();
-                        if (vboId) {
+                        if (!sprite->getUseLocalBoundsToRender() && vboId) {
                             setVbo(texture->getHWVboId());
 #ifdef USE_IBO
                             auto iboId = texture->getHWIboId();
@@ -1255,6 +1254,8 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                             glDrawElements(GL_TRIANGLES, texture->getVboIndicesCount(), texture->getVboIndexType(), texture->getVboIndices());
 #endif
                         } else {
+                            VertexTex * vertices = sprite->getVertices();
+
                             // This doesn't use VBO/IBO
                             disableVboIbo();
 
@@ -1932,7 +1933,7 @@ int8_t BGE::RenderServiceOpenGLES2::renderGameObject(GameObject *gameObj, Space 
             auto childXformHandle = childrenHandles[i];
             auto childXform = componentService_->getComponentLockless<TransformComponent>(childXformHandle.getHandle());
             
-            if (childXform->hasGameObject()) {
+            if (childXform && childXform->hasGameObject()) {
                 auto childObj = childXform->getGameObjectLockless(space);
                 
                 if (childObj) {
