@@ -322,6 +322,7 @@ void BGE::Game::garbageCollect() {
     inputService_->garbageCollect();
     logicService_->garbageCollect();
     eventService_->garbageCollect();
+    audioService_->garbageCollect();
     gameObjectService_->garbageCollect();
     componentService_->garbageCollect();
     
@@ -429,11 +430,12 @@ void BGE::Game::outputResourceBreakdown(uint32_t numTabs) const {
     spaceService_->outputResourceBreakdown(numTabs + 1);
     BGE::Game::outputValue(numTabs, "Num ScenePackage: %u/%u/%u (%u resizes)\n", scenePackageService_->numScenePackages(), scenePackageService_->maxHandlesAllocated(), scenePackageService_->maxHandles(), scenePackageService_->numHandleResizes());
     scenePackageService_->outputResourceBreakdown(numTabs + 1);
-    BGE::Game::outputValue(numTabs, "Num Material: %u/%u/%u (%u resizes)\n", materialService_->numMaterials(), materialService_->maxHandlesAllocated(), materialService_->maxHandles(), materialService_->numMaterials());
+    BGE::Game::outputValue(numTabs, "Num Material: %u/%u/%u (%u resizes)\n", materialService_->numMaterials(), materialService_->maxHandlesAllocated(), materialService_->maxHandles(), materialService_->numHandleResizes());
     BGE::Game::outputValue(numTabs, "Num Font: %u/%u/%u (%u resizes)\n", fontService_->numFonts(), fontService_->maxHandlesAllocated(), fontService_->maxHandles(), fontService_->numHandleResizes());
     BGE::Game::outputValue(numTabs, "Num TextureAtlas: %u/%u/%u (%u resizes)\n", textureService_->numTextureAtlases(), textureService_->maxTextureAtlasHandlesAllocated(), textureService_->maxTextureAtlasHandles(), textureService_->numTextureAtlasHandleResizes());
     BGE::Game::outputValue(numTabs, "Num Texture: %u/%u/%u (%u resizes)\n", textureService_->numTextures(), textureService_->maxTextureHandlesAllocated(), textureService_->maxTextureHandles(), textureService_->numTextureHandleResizes());
     BGE::Game::outputValue(numTabs, "Num Texture (sub): %u\n", textureService_->numSubTextures());
+    BGE::Game::outputValue(numTabs, "Num Event Handlers: %u/%u/%u (%u resizes)\n", eventService_->numEventHandlerHandles(), eventService_->maxHandlesAllocated(), eventService_->maxHandles(), eventService_->numHandleResizes());
     printf("-------- Resource Breakdown END --------\n\n");
 }
 
