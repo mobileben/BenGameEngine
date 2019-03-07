@@ -37,26 +37,26 @@ std::vector<std::function<bool(BGE::HandleBackingType)>> BGE::ComponentService::
 
 void BGE::ComponentService::registerComponents() {
     if (!ComponentService::componentsRegistered_) {
-        registerComponent<TransformComponent>(2048, HandleServiceNoMaxLimit);
-        registerComponent<BoundingBoxComponent>(2048, HandleServiceNoMaxLimit);
-        registerComponent<AnimationChannelComponent>(2048, HandleServiceNoMaxLimit);
-        registerComponent<AnimationSequenceComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<TransformComponent>(40960, HandleServiceNoMaxLimit);
+        registerComponent<BoundingBoxComponent>(20480, HandleServiceNoMaxLimit);
+        registerComponent<AnimationChannelComponent>(20480, HandleServiceNoMaxLimit);
+        registerComponent<AnimationSequenceComponent>(8192, HandleServiceNoMaxLimit);
         registerComponent<AnimatorComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<ChannelFrameAnimatorComponent>(2048, HandleServiceNoMaxLimit);
-        registerComponent<ColorMatrixComponent>(120, HandleServiceNoMaxLimit);
-        registerComponent<ColorTransformComponent>(120, HandleServiceNoMaxLimit);
-        registerComponent<FrameAnimatorComponent>(120, HandleServiceNoMaxLimit);
-        registerComponent<SpriteRenderComponent>(2048, HandleServiceNoMaxLimit);
-        registerComponent<LogicComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<TextComponent>(120, HandleServiceNoMaxLimit);
-        registerComponent<PlacementComponent>(120, HandleServiceNoMaxLimit);
-        registerComponent<ButtonComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<InputTouchComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<PolyLineRenderComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<LineRenderComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<FlatRectRenderComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<MaskComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<TextureMaskComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<ChannelFrameAnimatorComponent>(20480, HandleServiceNoMaxLimit);
+        registerComponent<ColorMatrixComponent>(3072, HandleServiceNoMaxLimit);
+        registerComponent<ColorTransformComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<FrameAnimatorComponent>(7680, HandleServiceNoMaxLimit);
+        registerComponent<SpriteRenderComponent>(20480, HandleServiceNoMaxLimit);
+        registerComponent<LogicComponent>(128, HandleServiceNoMaxLimit);
+        registerComponent<TextComponent>(512, HandleServiceNoMaxLimit);
+        registerComponent<PlacementComponent>(384, HandleServiceNoMaxLimit);
+        registerComponent<ButtonComponent>(256, HandleServiceNoMaxLimit);
+        registerComponent<InputTouchComponent>(64, HandleServiceNoMaxLimit);
+        registerComponent<PolyLineRenderComponent>(2048, HandleServiceNoMaxLimit);
+        registerComponent<LineRenderComponent>(128, HandleServiceNoMaxLimit);
+        registerComponent<FlatRectRenderComponent>(128, HandleServiceNoMaxLimit);
+        registerComponent<MaskComponent>(128, HandleServiceNoMaxLimit);
+        registerComponent<TextureMaskComponent>(256, HandleServiceNoMaxLimit);
     }
     
     componentsRegistered_ = true;
