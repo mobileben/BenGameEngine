@@ -39,12 +39,12 @@ void BGE::ComponentService::registerComponents() {
     if (!ComponentService::componentsRegistered_) {
         registerComponent<TransformComponent>(40960, HandleServiceNoMaxLimit);
         registerComponent<BoundingBoxComponent>(20480, HandleServiceNoMaxLimit);
-        registerComponent<AnimationChannelComponent>(20480, HandleServiceNoMaxLimit);
+        registerComponent<AnimationChannelComponent>(40960, HandleServiceNoMaxLimit);
         registerComponent<AnimationSequenceComponent>(8192, HandleServiceNoMaxLimit);
         registerComponent<AnimatorComponent>(1024, HandleServiceNoMaxLimit);
-        registerComponent<ChannelFrameAnimatorComponent>(20480, HandleServiceNoMaxLimit);
+        registerComponent<ChannelFrameAnimatorComponent>(40960, HandleServiceNoMaxLimit);
         registerComponent<ColorMatrixComponent>(3072, HandleServiceNoMaxLimit);
-        registerComponent<ColorTransformComponent>(1024, HandleServiceNoMaxLimit);
+        registerComponent<ColorTransformComponent>(2048, HandleServiceNoMaxLimit);
         registerComponent<FrameAnimatorComponent>(7680, HandleServiceNoMaxLimit);
         registerComponent<SpriteRenderComponent>(20480, HandleServiceNoMaxLimit);
         registerComponent<LogicComponent>(128, HandleServiceNoMaxLimit);
