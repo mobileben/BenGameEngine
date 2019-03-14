@@ -77,6 +77,7 @@ namespace BGE {
         bool isToggleable() const;
         void setToggleable(bool on);
         bool isDebouncing() const { return debouncing_; }
+        void cancelDebouncing();
         float pressedTime() const;
         float pressedDuration() const;
         bool pressedByDurationTriggered() const;

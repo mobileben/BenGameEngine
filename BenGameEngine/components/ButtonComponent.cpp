@@ -458,6 +458,14 @@ void BGE::ButtonComponent::setToggleable(bool on) {
     toggleable = on;
 }
 
+void BGE::ButtonComponent::cancelDebouncing() {
+    if (debouncing_) {
+        debouncing_ = false;
+        pressedByDurationTriggered_ = false;
+        event_ = Event::None;
+    }
+}
+
 float BGE::ButtonComponent::pressedTime() const {
     return pressedTime_;
 }
