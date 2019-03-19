@@ -1050,7 +1050,7 @@ void BGE::Space::createAutoDisplayObjectsSynchronous_(GameObjectHandle rootHandl
 
         for (auto i=0;i<num;i++) {
             auto elem = &autoDisplayList[i];
-            GameObject *obj;
+            GameObject *obj = nullptr;
 
             switch (elem->referenceType) {
                 case GfxReferenceTypeAnimationSequence:
