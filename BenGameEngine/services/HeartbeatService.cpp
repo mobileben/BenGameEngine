@@ -165,9 +165,11 @@ void BGE::HeartbeatService::registerListener(std::string name, std::function<voi
     assert(listeners_.find(name) == listeners_.end());
     
     // Now make sure our orders are respected. This means orders cannot be the same
+#ifndef NDEBUG
     for (auto const& entry : listeners_) {
         assert(entry.second.second != order);
     }
+#endif
     
     listeners_[name] = std::make_pair(listener, order);
     
