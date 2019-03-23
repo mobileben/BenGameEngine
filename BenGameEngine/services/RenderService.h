@@ -349,6 +349,11 @@ namespace BGE {
         void queueDestroyPolyLineCacheEntry(const RenderPolyLineCacheCommandData& cacheData);
         void queueRender(std::function<void(RenderCommandItem, std::shared_ptr<Error>)> callback);
 
+#if DEBUG
+        virtual uint32_t numVbo() const { return 0; }
+        virtual uint32_t numIbo() const { return 0; }
+#endif /* DEBUG */
+
     protected:
         std::shared_ptr<RenderContext> renderContext_;
         std::shared_ptr<RenderWindow> renderWindow_;

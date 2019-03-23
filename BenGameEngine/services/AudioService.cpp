@@ -88,9 +88,7 @@ void BGE::AudioService::removeAudioBuffer(std::string name) {
         if (audio) {
             audio->destroy();
         }
-
         audioBufferHandleService_.release(it->second);
-
         audioBufferHandles_.erase(it);
     }
 }
@@ -103,6 +101,10 @@ void BGE::AudioService::removeAudioBuffer(AudioBufferHandle handle) {
         }
     }
     
+    auto audio = getAudioBuffer(handle);
+    if (audio) {
+        audio->destroy();
+    }
     audioBufferHandleService_.release(handle);
 }
 
@@ -168,7 +170,6 @@ void BGE::AudioService::createAudioBufferFromFile(std::string name, std::string 
                     if (audioBuffer) {
                         audioBuffer->destroy();
                     }
-                    
                     audioBufferHandleService_.release(handle);
                 }
                 

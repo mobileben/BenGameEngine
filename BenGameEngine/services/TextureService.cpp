@@ -31,7 +31,7 @@ void BGE::TextureService::garbageCollect() {
     textureAtlasHandleService_.garbageCollect();
 }
 
-uint32_t BGE::TextureService::numTextures() {
+uint32_t BGE::TextureService::numTextures() const {
     std::vector<TextureHandle> textures;
     auto packageService = Game::getInstance()->getScenePackageService();
     auto spaceService = Game::getInstance()->getSpaceService();
@@ -99,7 +99,7 @@ uint32_t BGE::TextureService::numTextures() {
     return (uint32_t) textures.size();
 }
 
-uint32_t BGE::TextureService::numSubTextures() {
+uint32_t BGE::TextureService::numSubTextures() const {
     std::vector<TextureHandle> textures;
     auto packageService = Game::getInstance()->getScenePackageService();
     auto spaceService = Game::getInstance()->getSpaceService();
@@ -167,7 +167,7 @@ uint32_t BGE::TextureService::numSubTextures() {
     return (uint32_t) textures.size();
 }
 
-uint32_t BGE::TextureService::numTextureAtlases() {
+uint32_t BGE::TextureService::numTextureAtlases() const {
     std::vector<TextureAtlasHandle> atlases;
     auto packageService = Game::getInstance()->getScenePackageService();
     auto spaceService = Game::getInstance()->getSpaceService();
@@ -236,6 +236,77 @@ uint32_t BGE::TextureService::numTextureAtlases() {
     return (uint32_t) atlases.size();
 }
 
+std::vector<std::string> BGE::TextureService::getTextureNames() const {
+    std::vector<std::string> names;
+    std::vector<TextureHandle> textures;
+    auto packageService = Game::getInstance()->getScenePackageService();
+    auto spaceService = Game::getInstance()->getSpaceService();
+    
+    std::unique_lock<std::mutex> packageTexturesLock(packageTexturesMutex_);
+    
+    for (auto const &packageIt : packageTextures_) {
+        auto package = packageService->getScenePackage(packageIt.first);
+        
+        if (package) {
+            for (auto &texIt : packageIt.second) {
+                auto tex = getTexture(texIt.second);
+                
+                if (tex) {
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        names.push_back(tex->getName());
+                        textures.push_back(texIt.second);
+                    }
+                }
+            }
+        }
+    }
+    
+    packageTexturesLock.unlock();
+    
+    std::unique_lock<std::mutex> spaceTexturesLock(spaceTexturesMutex_);
+    
+    for (auto const &spaceIt : spaceTextures_) {
+        auto space = spaceService->getSpace(spaceIt.first);
+        
+        if (space) {
+            for (auto &texIt : spaceIt.second) {
+                auto tex = getTexture(texIt.second);
+                
+                if (tex) {
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        names.push_back(tex->getName());
+                        textures.push_back(texIt.second);
+                    }
+                }
+            }
+        }
+    }
+    
+    spaceTexturesLock.unlock();
+    
+    std::unique_lock<std::mutex> atlasTexturesLock(atlasTexturesMutex_);
+    
+    for (auto const &atlasIt : atlasTextures_) {
+        auto atlas = getTextureAtlas(atlasIt.first);
+        
+        if (atlas) {
+            for (auto &texIt : atlasIt.second) {
+                auto tex = getTexture(texIt.second);
+                
+                if (tex) {
+                    if (std::find(textures.begin(), textures.end(), texIt.second) == textures.end()) {
+                        names.push_back(tex->getName());
+                        textures.push_back(texIt.second);
+                    }
+                }
+            }
+        }
+    }
+    
+    atlasTexturesLock.unlock();
+    return names;
+}
+
 uint32_t BGE::TextureService::numUsedTextureHandles() const {
     return textureHandleService_.numUsedHandles();
 }
@@ -280,7 +351,7 @@ size_t BGE::TextureService::totalHandleMemory() const {
     return textureHandleService_.totalMemory() + textureAtlasHandleService_.totalMemory();
 }
 
-size_t BGE::TextureService::totalTextureMemory() {
+size_t BGE::TextureService::totalTextureMemory() const {
     std::vector<TextureHandle> textures;
     size_t usage = 0;
     auto packageService = Game::getInstance()->getScenePackageService();
@@ -357,7 +428,7 @@ size_t BGE::TextureService::totalTextureMemory() {
     return usage;
 }
 
-void BGE::TextureService::outputMemoryBreakdown(uint32_t numTabs) {
+void BGE::TextureService::outputMemoryBreakdown(uint32_t numTabs) const {
     std::vector<TextureHandle> textures;
     auto packageService = Game::getInstance()->getScenePackageService();
     auto spaceService = Game::getInstance()->getSpaceService();
@@ -431,7 +502,7 @@ void BGE::TextureService::outputMemoryBreakdown(uint32_t numTabs) {
     }
 }
 
-BGE::TextureHandle BGE::TextureService::getTextureHandle(ScenePackageHandle scenePackageHandle, const std::string&  name) {
+BGE::TextureHandle BGE::TextureService::getTextureHandle(ScenePackageHandle scenePackageHandle, const std::string&  name) const {
     std::lock_guard<std::mutex> lock(packageTexturesMutex_);
     auto scenePackage = packageTextures_.find(scenePackageHandle);
     
@@ -446,7 +517,7 @@ BGE::TextureHandle BGE::TextureService::getTextureHandle(ScenePackageHandle scen
     return TextureHandle();
 }
 
-BGE::TextureHandle BGE::TextureService::getTextureHandle(SpaceHandle spaceHandle, const std::string&  name) {
+BGE::TextureHandle BGE::TextureService::getTextureHandle(SpaceHandle spaceHandle, const std::string&  name) const {
     std::lock_guard<std::mutex> lock(spaceTexturesMutex_);
     auto space = spaceTextures_.find(spaceHandle);
     
@@ -461,7 +532,7 @@ BGE::TextureHandle BGE::TextureService::getTextureHandle(SpaceHandle spaceHandle
     return TextureHandle();
 }
 
-BGE::TextureHandle BGE::TextureService::getTextureHandle(TextureAtlasHandle atlasHandle, const std::string&  name) {
+BGE::TextureHandle BGE::TextureService::getTextureHandle(TextureAtlasHandle atlasHandle, const std::string&  name) const {
     std::lock_guard<std::mutex> lock(atlasTexturesMutex_);
     auto atlas = atlasTextures_.find(atlasHandle);
     
@@ -476,7 +547,7 @@ BGE::TextureHandle BGE::TextureService::getTextureHandle(TextureAtlasHandle atla
     return TextureHandle();
 }
 
-BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, const std::string&  name) {
+BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, const std::string&  name) const {
     std::lock_guard<std::mutex> lock(packageTextureAtlasesMutex_);
     auto scenePackage = packageTextureAtlases_.find(scenePackageHandle);
     
@@ -491,7 +562,7 @@ BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(ScenePackageH
     return TextureAtlasHandle();
 }
 
-BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(SpaceHandle spaceHandle, const std::string&  name) {
+BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(SpaceHandle spaceHandle, const std::string&  name) const {
     std::lock_guard<std::mutex> lock(spaceTextureAtlasesMutex_);
     auto space = spaceTextureAtlases_.find(spaceHandle);
     
@@ -506,7 +577,7 @@ BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(SpaceHandle s
     return TextureAtlasHandle();
 }
 
-BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(FontHandle fontHandle, const std::string&  name) {
+BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(FontHandle fontHandle, const std::string&  name) const {
     std::lock_guard<std::mutex> lock(fontTextureAtlasesMutex_);
     auto font = fontTextureAtlases_.find(fontHandle);
     
@@ -521,27 +592,27 @@ BGE::TextureAtlasHandle BGE::TextureService::getTextureAtlasHandle(FontHandle fo
     return TextureAtlasHandle();
 }
 
-BGE::Texture *BGE::TextureService::getTexture(ScenePackageHandle scenePackageHandle, const std::string&  name) {
+BGE::Texture *BGE::TextureService::getTexture(ScenePackageHandle scenePackageHandle, const std::string&  name) const {
     return textureHandleService_.dereference(getTextureHandle(scenePackageHandle, name));
 }
 
-BGE::Texture *BGE::TextureService::getTexture(SpaceHandle spaceHandle, const std::string&  name) {
+BGE::Texture *BGE::TextureService::getTexture(SpaceHandle spaceHandle, const std::string&  name) const {
     return textureHandleService_.dereference(getTextureHandle(spaceHandle, name));
 }
 
-BGE::Texture *BGE::TextureService::getTexture(TextureAtlasHandle atlasHandle, const std::string& name) {
+BGE::Texture *BGE::TextureService::getTexture(TextureAtlasHandle atlasHandle, const std::string& name) const {
     return textureHandleService_.dereference(getTextureHandle(atlasHandle, name));
 }
 
-BGE::TextureAtlas *BGE::TextureService::getTextureAtlas(ScenePackageHandle scenePackageHandle, const std::string& name) {
+BGE::TextureAtlas *BGE::TextureService::getTextureAtlas(ScenePackageHandle scenePackageHandle, const std::string& name) const {
     return textureAtlasHandleService_.dereference(getTextureAtlasHandle(scenePackageHandle, name));
 }
 
-BGE::TextureAtlas *BGE::TextureService::getTextureAtlas(SpaceHandle spaceHandle, const std::string&  name) {
+BGE::TextureAtlas *BGE::TextureService::getTextureAtlas(SpaceHandle spaceHandle, const std::string&  name) const {
     return textureAtlasHandleService_.dereference(getTextureAtlasHandle(spaceHandle, name));
 }
 
-BGE::TextureAtlas *BGE::TextureService::getTextureAtlas(FontHandle fontHandle, const std::string&  name) {
+BGE::TextureAtlas *BGE::TextureService::getTextureAtlas(FontHandle fontHandle, const std::string&  name) const {
     return textureAtlasHandleService_.dereference(getTextureAtlasHandle(fontHandle, name));
 }
 
@@ -891,6 +962,7 @@ std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::crea
             error = texture->initialize(textureHandle, name, rawTex);
             if (error) {
                 // We had a problem, release the handle
+                texture->destroy();
                 textureHandleService_.release(textureHandle);
                 texture = nullptr;
             }
@@ -918,6 +990,7 @@ std::pair<BGE::Texture *, std::shared_ptr<BGE::Error>> BGE::TextureService::crea
             texture->initialize(textureHandle, name, format);
             error = texture->createFromBuffer(buffer, format, width, height);
             if (error) {
+                texture->destroy();
                 textureHandleService_.release(textureHandle);
                 texture = nullptr;
             }

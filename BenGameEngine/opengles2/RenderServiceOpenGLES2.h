@@ -100,6 +100,14 @@ namespace BGE {
         virtual void resetProfilingStats();
 #endif /* SUPPORT_PROFILING */
 
+#if DEBUG
+        virtual uint32_t numVbo() const;
+        virtual uint32_t numIbo() const;
+#endif /* DEBUG */
+        
+        uint32_t numStringCacheEntries() const;
+        uint32_t numPolyLineCacheEntries() const;
+        
     protected:
         enum class BlendFunc : uint32_t { Src_ONE_Dst_ZERO, Src_ONE_Dst_ONE_MINUS_SRC_ALPHA, Src_SRC_ALPHA_Dst_ONE_MINUS_SRC_ALPHA };
         
@@ -125,7 +133,7 @@ namespace BGE {
 
         virtual void createPolyLineCacheEntry(const RenderCommandItem& item);
         virtual void destroyPolyLineCacheEntry(const RenderCommandItem& item);
-
+        
     private:
         ColorMatrix currentColorMatrix_;
         std::vector<ColorMatrix> colorMatrixStack_;
@@ -152,6 +160,11 @@ namespace BGE {
         GLfloat                         currentLineWidth_;
         GLuint                          currentVbo_;
         GLuint                          currentIbo_;
+
+#if DEBUG
+        std::vector<GLuint>             vbos_;
+        std::vector<GLuint>             ibos_;
+#endif /* DEBUG */
         
         std::vector<bool>               currentVertexAttributes_;
 

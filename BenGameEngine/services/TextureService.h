@@ -35,6 +35,8 @@
 #include <GLKit/GLKit.h>
 #endif /* TARGET_OS_IPHONE */
 
+#include <vector>
+
 namespace BGE {
     class TextureService : public Service
     {
@@ -56,9 +58,9 @@ namespace BGE {
         void update(__attribute__ ((unused)) double deltaTime) {}
         void garbageCollect() final;
         
-        uint32_t numTextures();   // Texture count includes subtextures
-        uint32_t numSubTextures();
-        uint32_t numTextureAtlases();
+        uint32_t numTextures() const;   // Texture count includes subtextures
+        uint32_t numSubTextures() const;
+        uint32_t numTextureAtlases() const;
         
         uint32_t numUsedTextureHandles() const;
         uint32_t maxTextureHandles() const;
@@ -70,41 +72,43 @@ namespace BGE {
         uint32_t numTextureAtlasHandleResizes() const;
         uint32_t maxTextureAtlasHandlesAllocated() const;
 
+        std::vector<std::string> getTextureNames() const;
+        
         size_t usedHandleMemory() const final;
         size_t unusedHandleMemory() const final;
         size_t totalHandleMemory() const final;
 
-        size_t totalTextureMemory();
+        size_t totalTextureMemory() const;
         
         using Service::outputMemoryBreakdown;
         
-        void outputMemoryBreakdown(uint32_t numTabs);
+        void outputMemoryBreakdown(uint32_t numTabs) const;
         
-        TextureHandle getTextureHandle(ScenePackageHandle scenePackageHandle, const std::string& name);
-        TextureHandle getTextureHandle(SpaceHandle spaceHandle, const std::string& name);
-        TextureHandle getTextureHandle(TextureAtlasHandle atlasHandle, const std::string& name);
+        TextureHandle getTextureHandle(ScenePackageHandle scenePackageHandle, const std::string& name) const;
+        TextureHandle getTextureHandle(SpaceHandle spaceHandle, const std::string& name) const;
+        TextureHandle getTextureHandle(TextureAtlasHandle atlasHandle, const std::string& name) const;
         
-        TextureAtlasHandle getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, const std::string& name);
-        TextureAtlasHandle getTextureAtlasHandle(SpaceHandle spaceHandle, const std::string& name);
-        TextureAtlasHandle getTextureAtlasHandle(FontHandle fontHandle, const std::string& name);
+        TextureAtlasHandle getTextureAtlasHandle(ScenePackageHandle scenePackageHandle, const std::string& name) const;
+        TextureAtlasHandle getTextureAtlasHandle(SpaceHandle spaceHandle, const std::string& name) const;
+        TextureAtlasHandle getTextureAtlasHandle(FontHandle fontHandle, const std::string& name) const;
 
-        Texture *getTexture(ScenePackageHandle scenePackageHandle, const std::string& name);
-        Texture *getTexture(SpaceHandle spaceHandle, const std::string& name);
-        Texture *getTexture(TextureAtlasHandle atlasHandle, const std::string& name);
-        inline Texture *getTexture(TextureHandle handle) {
+        Texture *getTexture(ScenePackageHandle scenePackageHandle, const std::string& name) const;
+        Texture *getTexture(SpaceHandle spaceHandle, const std::string& name) const;
+        Texture *getTexture(TextureAtlasHandle atlasHandle, const std::string& name) const;
+        inline Texture *getTexture(TextureHandle handle) const {
             return textureHandleService_.dereference(handle);
         }
-        inline Texture *getTextureLockless(TextureHandle handle) {
+        inline Texture *getTextureLockless(TextureHandle handle) const {
             return textureHandleService_.dereferenceLockless(handle);
         }
 
-        TextureAtlas *getTextureAtlas(ScenePackageHandle scenePackageHandle, const std::string& name);
-        TextureAtlas *getTextureAtlas(SpaceHandle spaceHandle, const std::string& name);
-        TextureAtlas *getTextureAtlas(FontHandle fontHandle, const std::string& name);
-        inline TextureAtlas *getTextureAtlas(TextureAtlasHandle handle) {
+        TextureAtlas *getTextureAtlas(ScenePackageHandle scenePackageHandle, const std::string& name) const;
+        TextureAtlas *getTextureAtlas(SpaceHandle spaceHandle, const std::string& name) const;
+        TextureAtlas *getTextureAtlas(FontHandle fontHandle, const std::string& name) const;
+        inline TextureAtlas *getTextureAtlas(TextureAtlasHandle handle) const {
             return textureAtlasHandleService_.dereference(handle);
         }
-        inline TextureAtlas *getTextureAtlasLockless(TextureAtlasHandle handle) {
+        inline TextureAtlas *getTextureAtlasLockless(TextureAtlasHandle handle) const {
             return textureAtlasHandleService_.dereferenceLockless(handle);
         }
 
@@ -176,12 +180,12 @@ namespace BGE {
         std::unordered_map<FontHandle, std::unordered_map<std::string, TextureAtlasHandle>> fontTextureAtlases_;
 
         // Mutex for each map above
-        std::mutex  packageTexturesMutex_;
-        std::mutex  spaceTexturesMutex_;
-        std::mutex  atlasTexturesMutex_;
-        std::mutex  packageTextureAtlasesMutex_;
-        std::mutex  spaceTextureAtlasesMutex_;
-        std::mutex  fontTextureAtlasesMutex_;
+        mutable std::mutex  packageTexturesMutex_;
+        mutable std::mutex  spaceTexturesMutex_;
+        mutable std::mutex  atlasTexturesMutex_;
+        mutable std::mutex  packageTextureAtlasesMutex_;
+        mutable std::mutex  spaceTextureAtlasesMutex_;
+        mutable std::mutex  fontTextureAtlasesMutex_;
 
         std::pair<Texture *, std::shared_ptr<Error>> createTextureFromFile(std::string name, std::string filename, TextureFormat format);
         std::pair<Texture *, std::shared_ptr<Error>> createTextureFromBuffer(std::string name, void *buffer, TextureFormat format, uint32_t width, uint32_t height);

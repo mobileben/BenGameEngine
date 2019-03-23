@@ -2189,6 +2189,11 @@ GLuint BGE::RenderServiceOpenGLES2::createVbo_(VertexTex *data, uint32_t numVert
             glDeleteBuffers(1, &vbo);
             vbo = 0;
         }
+#if DEBUG
+        else  {
+            vbos_.push_back(vbo);
+        }
+#endif /* DEBUG */
         // Unbind vbo
         setVbo(0);
     }
@@ -2198,6 +2203,14 @@ GLuint BGE::RenderServiceOpenGLES2::createVbo_(VertexTex *data, uint32_t numVert
 
 void BGE::RenderServiceOpenGLES2::destroyVbo_(GLuint vbo) {
     if (vbo != 0) {
+#if DEBUG
+        for (auto it=vbos_.begin();it!=vbos_.end();++it) {
+            if (*it == vbo) {
+                vbos_.erase(it);
+                break;
+            }
+        }
+#endif /* DEBUG */
         if (vbo == currentVbo_) {
             // If we're destroying the current Vbo, unbind
             setVbo(0);
@@ -2245,7 +2258,12 @@ GLuint BGE::RenderServiceOpenGLES2::createIbo_(void *indices, uint32_t numIndice
             glDeleteBuffers(1, &ibo);
             ibo = 0;
         }
-        
+#if DEBUG
+        else {
+            ibos_.push_back(ibo);
+        }
+#endif /* DEBUG */
+
         // Unbind ibo
         setIbo(0);
     }
@@ -2255,6 +2273,14 @@ GLuint BGE::RenderServiceOpenGLES2::createIbo_(void *indices, uint32_t numIndice
 
 void BGE::RenderServiceOpenGLES2::destroyIbo_(GLuint ibo) {
     if (ibo != 0) {
+#if DEBUG
+        for (auto it=ibos_.begin();it!=ibos_.end();++it) {
+            if (*it == ibo) {
+                ibos_.erase(it);
+                break;
+            }
+        }
+#endif /* DEBUG */
         if (ibo == currentIbo_) {
             // If we're destroying the current Ibo, unbind
             setIbo(0);
@@ -2330,6 +2356,24 @@ void BGE::RenderServiceOpenGLES2::resetProfilingStats() {
 }
 
 #endif /* SUPPORT_PROFILING */
+
+#if DEBUG
+uint32_t BGE::RenderServiceOpenGLES2::numVbo() const {
+    return static_cast<uint32_t>(vbos_.size());
+}
+
+uint32_t BGE::RenderServiceOpenGLES2::numIbo() const {
+    return static_cast<uint32_t>(ibos_.size());
+}
+#endif /* DEBUG */
+
+uint32_t BGE::RenderServiceOpenGLES2::numStringCacheEntries() const {
+    return static_cast<uint32_t>(stringVertexCache_.size() + dropShadowStringVertexCache_.size());
+}
+
+uint32_t BGE::RenderServiceOpenGLES2::numPolyLineCacheEntries() const {
+    return static_cast<uint32_t>(polyLineCache_.size());
+}
 
 #endif /* SUPPORT_OPENGLES2 */
 
