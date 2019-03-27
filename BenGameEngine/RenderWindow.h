@@ -46,13 +46,15 @@ namespace BGE {
         std::shared_ptr<RenderContext> getRenderContext() { return renderContext_; }
         void setRenderContext(std::shared_ptr<RenderContext> renderContext);
         
-        float getX() const ;
-        float getY() const ;
-        float getWidth() const ;
-        float getHeight() const ;
+        inline float getX() const { return x_; }
+        inline float getY() const { return y_; }
+        inline float getWidth() const { return width_; }
+        inline float getHeight() const { return height_; }
         
-        float getContentScaleFactor() const;
+        inline float getContentScaleFactor() const { return contentScaleFactor_; }
         
+        inline float getNativeWidth() const { return width_ * contentScaleFactor_; }
+        inline float getNativeHeight() const { return height_ * contentScaleFactor_; }
         void setMappedWidth(float width);
         void setMappedHeight(float height);
         float getMappedWidth() const { return mappedWidth_; }

@@ -1783,9 +1783,8 @@ void BGE::RenderServiceOpenGLES2::render()
         // TODO: Content scale factor
 //        glViewport(0, 0, this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getWidth(), this->getRenderWindow()->getRenderView(RenderWindow::DefaultRenderViewName)->getHeight());
         auto window = this->getRenderWindow();
-        auto view = window->getRenderView(RenderWindow::DefaultRenderViewName);
-        glViewport(0, 0, view->getWidth() * this->getRenderWindow()->getContentScaleFactor(), view->getHeight() * window->getContentScaleFactor());
-        
+        glViewport(0, 0, window->getWidth() * window->getContentScaleFactor(), window->getHeight() * window->getContentScaleFactor());
+
         mappedProjectionMatrix_ = projectionMatrix_;
         Matrix4Scale(mappedProjectionMatrix_, window->getToMappedXScale(), window->getToMappedYScale(), 1.0);
         
@@ -2074,15 +2073,13 @@ void BGE::RenderServiceOpenGLES2::setVertexAttribute(GLuint index, bool enabled)
 
 void BGE::RenderServiceOpenGLES2::windowMappedDimensionsUpdated(std::shared_ptr<RenderWindow> window) {
     if (window == renderWindow_) {
-        auto window = this->getRenderWindow();
         auto view = window->getRenderView(RenderWindow::DefaultRenderViewName);
-        glViewport(0, 0, view->getWidth() * this->getRenderWindow()->getContentScaleFactor(), view->getHeight() * window->getContentScaleFactor());
-        
+        glViewport(0, 0, window->getWidth() * window->getContentScaleFactor(), window->getHeight() * window->getContentScaleFactor());
         mappedProjectionMatrix_ = projectionMatrix_;
         Matrix4Scale(mappedProjectionMatrix_, window->getToMappedXScale(), window->getToMappedYScale(), 1.0);
         
-        // Now notify shaders through Shader Service
-        getShaderService()->windowMappedDimensionsUpdated();
+        // Done at the end
+        RenderService::windowMappedDimensionsUpdated(window);
     }
 }
 

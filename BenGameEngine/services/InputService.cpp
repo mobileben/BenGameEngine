@@ -46,8 +46,10 @@ void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view)
     auto window = BGE::Game::getInstance()->getRenderService()->getRenderWindow();
     auto mapX = scale * window->getFromMappedXScale();
     auto mapY = scale * window->getFromMappedYScale();
-    auto w_2 = window->getMappedWidth() / 2.0;
-    auto h = window->getMappedHeight();
+    // Our offset should be based on the native pixel set adjusted for the mapped (offset)
+    auto w =  window->getMappedWidth();
+    auto w_2 = w / 2.0;
+    auto h =  window->getMappedHeight();
     auto h_2 = h / 2.0;
     
     for (UITouch *touch in touches) {

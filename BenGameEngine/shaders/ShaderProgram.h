@@ -35,7 +35,7 @@ namespace BGE {
     class ShaderProgram
     {
     public:
-        ShaderProgram() : id_(ShaderProgramIdUndefined), state_(ShaderProgramState::Uninitialized), windowMappedDimensionsUpdated_(nullptr) {}
+        ShaderProgram() : id_(ShaderProgramIdUndefined), state_(ShaderProgramState::Uninitialized), needsWindowMappedDimensionsUpdate_(true), windowMappedDimensionsUpdated_(nullptr) {}
         ShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders);
         ShaderProgram(ShaderProgramId id, std::string name, std::vector<std::shared_ptr<Shader>> shaders, std::vector<std::string> attributes, std::vector<std::string> uniforms, std::function<void(ShaderProgram *program)> firstUseFunction, std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated, std::function<void(ShaderProgram *program)> shaderChangedSetup);
         virtual ~ShaderProgram() {}
@@ -52,8 +52,9 @@ namespace BGE {
         
         std::vector<std::shared_ptr<Shader>> shaders_;
         
-        ShaderProgramState state_;
-
+        ShaderProgramState  state_;
+        bool                needsWindowMappedDimensionsUpdate_;
+        
         std::function<void(ShaderProgram *program)> windowMappedDimensionsUpdated_;
         std::function<void(ShaderProgram *program)> shaderChangedSetup_;
 

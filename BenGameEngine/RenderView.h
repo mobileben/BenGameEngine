@@ -29,7 +29,7 @@ namespace BGE {
         void setMappedHeight(float height);
         float getMappedWidth() const { return mappedWidth_; }
         float getMappedHeight() const { return mappedHeight_; }
-
+                       
         std::weak_ptr<RenderWindow> getWindow();
         
     private:

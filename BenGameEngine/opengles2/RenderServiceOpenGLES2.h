@@ -54,7 +54,7 @@ namespace BGE {
         
         size_t totalMemory() const final;
 
-        void setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D);
+        virtual void setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D);
         
         void bindRenderWindow(std::shared_ptr<RenderContext> context, std::shared_ptr<RenderWindow> window);
         void resizeRenderWindow();

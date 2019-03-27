@@ -89,6 +89,13 @@ BGE::Vector2 BGE::RenderService::getWindowMappedWidthHeight() const {
     return wh;
 }
 
+void BGE::RenderService::windowMappedDimensionsUpdated(__attribute__((unused)) std::shared_ptr<RenderWindow> window) {
+    setCoordinateSystem2D(getCoordinateSystem2D());
+    
+    // Now notify shaders through Shader Service
+    getShaderService()->windowMappedDimensionsUpdated();
+}
+
 BGE::Vector2 BGE::RenderService::deviceCoordinatesFromRenderCoordinates(Vector2 pos) {
     // This is the MacOS/iOS implementation
     Vector2 convertedPos;

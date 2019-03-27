@@ -11,6 +11,10 @@
 
 @implementation BGEView
 
+- (void)didMoveToWindow {
+    self.contentScaleFactor = self.window.screen.nativeScale;
+}
+
 #pragma mark - Touch Events
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(__attribute__ ((unused)) UIEvent *)event

@@ -284,7 +284,7 @@ namespace BGE {
         // Y-up is inverted, Y-down is normal
         bool hasInvertedYAxis() const { return invertedYAxis_; }
         
-        void setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D);
+        virtual void setCoordinateSystem2D(Render2DCoordinateSystem coordSystem2D);
         
         std::shared_ptr<RenderContext> getRenderContext() const { return renderContext_; }
         
@@ -331,7 +331,7 @@ namespace BGE {
         
         virtual void render() =0;
 
-        virtual void windowMappedDimensionsUpdated(__attribute__((unused)) std::shared_ptr<RenderWindow> window) {}
+        virtual void windowMappedDimensionsUpdated(__attribute__((unused)) std::shared_ptr<RenderWindow> window);
         
         // Queuing methods
         void queueBindRenderWindow(const std::shared_ptr<RenderContext>& context, const std::shared_ptr<RenderWindow>& window);

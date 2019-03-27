@@ -27,33 +27,15 @@ void BGE::RenderWindow::setRenderContext(std::shared_ptr<RenderContext> renderCo
     renderContext_ = renderContext;
 }
 
-float BGE::RenderWindow::getX() const {
-    return x_;
-}
-
-float BGE::RenderWindow::getY() const {
-    return y_;
-}
-
-float BGE::RenderWindow::getWidth() const {
-    return width_;
-}
-
-float BGE::RenderWindow::getHeight() const {
-    return height_;
-}
-
-float BGE::RenderWindow::getContentScaleFactor() const {
-    return contentScaleFactor_;
-}
-
 void BGE::RenderWindow::setMappedWidth(float width) {
     bool notify = mappedWidth_ != width;
     auto nativeWidth = width_ * contentScaleFactor_;
     mappedWidth_ = width;
     toMappedXScale_ = nativeWidth / mappedWidth_;
     fromMappedXScale_ = mappedWidth_ / nativeWidth;
+    Matrix4MakeIdentity(toMappedMatrix_);
     Matrix4MakeScale(toMappedMatrix_, toMappedXScale_, toMappedYScale_, 1.0);
+    Matrix4MakeIdentity(fromMappedMatrix_);
     Matrix4MakeScale(fromMappedMatrix_, fromMappedXScale_, fromMappedYScale_, 1.0);
     
     if (notify) {
@@ -67,7 +49,9 @@ void BGE::RenderWindow::setMappedHeight(float height) {
     mappedHeight_ = height;
     toMappedYScale_ = nativeHeight / mappedHeight_;
     fromMappedYScale_ = mappedHeight_ / nativeHeight;
+    Matrix4MakeIdentity(toMappedMatrix_);
     Matrix4MakeScale(toMappedMatrix_, toMappedXScale_, toMappedYScale_, 1.0);
+    Matrix4MakeIdentity(fromMappedMatrix_);
     Matrix4MakeScale(fromMappedMatrix_, fromMappedXScale_, fromMappedYScale_, 1.0);
     
     if (notify) {
