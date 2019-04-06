@@ -68,12 +68,16 @@ void BGE::ButtonComponent::initialize(HandleBackingType handle, SpaceHandle spac
     highlightedAnimHandlerHandle = EventHandlerHandle();
     
     pressedTime_ = 0;
+    debounceCompleted_ = nullptr;
+    highlightedAnimCompleted_ = nullptr;
 }
 
 void BGE::ButtonComponent::destroy() {
     touchable_ = false;
     enabled = false;
-
+    debounceCompleted_ = nullptr;
+    highlightedAnimCompleted_ = nullptr;
+    
 #if TARGET_OS_IPHONE
     // Release reference
     touch = nil;
@@ -713,6 +717,13 @@ bool BGE::ButtonComponent::serviceDebounce(double deltaTime, bool forceClear) {
     if (debouncing_) {
         debounceTimer_ += deltaTime;
         if (forceClear || debounceTimer_ >= debounceDuration_) {
+            // Check here if we are a highlighted anim if so, we let it expire
+            if (currentButtonHandle == highlightedAnimButtonHandle) {
+                // Double check we're not null
+                if (!highlightedAnimButtonHandle.isNull()) {
+                    return false;
+                }
+            }
             debouncing_ = false;
             pressedByDurationTriggered_ = false;
             event_ = Event::None;
@@ -730,10 +741,28 @@ bool BGE::ButtonComponent::serviceDebounce(double deltaTime, bool forceClear) {
             } else {
                 useDisabledButton();
             }
+            
+            if (debounceCompleted_) {
+                debounceCompleted_(getGameObject());
+            }
         }
         return true;
     }
     return false;
+}
+
+void BGE::ButtonComponent::setDebounceCompletedFunction(std::function<void(GameObject *)> func) {
+    debounceCompleted_ = func;
+}
+
+void BGE::ButtonComponent::stopHighlightedAnim() {
+    if (currentButtonHandle == highlightedAnimButtonHandle) {
+        handleHighlightedAnimEnd();
+    }
+}
+
+void BGE::ButtonComponent::setHighlightedAnimCompletedFunction(std::function<void(GameObject *)> func) {
+    highlightedAnimCompleted_ = func;
 }
 
 BGE:: Event BGE::ButtonComponent::shouldHandleInput(Input *input, bool inBounds) {
@@ -947,7 +976,7 @@ BGE::Event BGE::ButtonComponent::handleTouchUpEvent(bool inBounds) {
     return event_;
 }
 
-void BGE::ButtonComponent::handleHighlightedAnimEndHandler(__attribute__ ((unused)) GameObject *gameObj, __attribute__ ((unused)) Event event) {
+void BGE::ButtonComponent::handleHighlightedAnimEnd() {
     debouncing_ = false;
     event_ = Event::None;
     
@@ -963,6 +992,14 @@ void BGE::ButtonComponent::handleHighlightedAnimEndHandler(__attribute__ ((unuse
         }
     } else {
         useDisabledButton();
+    }
+}
+
+void BGE::ButtonComponent::handleHighlightedAnimEndHandler(GameObject *gameObj, __attribute__ ((unused)) Event event) {
+    handleHighlightedAnimEnd();
+    
+    if (highlightedAnimCompleted_) {
+        highlightedAnimCompleted_(gameObj);
     }
 }
 

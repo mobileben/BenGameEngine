@@ -94,6 +94,10 @@ namespace BGE {
         
         float getDebounceDuration() const { return debounceDuration_; }
         void setDebounceDuration(float duration) { debounceDuration_ = duration; }
+        void setDebounceCompletedFunction(std::function<void(GameObject *)> func);
+
+        void stopHighlightedAnim();
+        void setHighlightedAnimCompletedFunction(std::function<void(GameObject *)> func);
         
         Event shouldHandleInput(Input *input, bool inBounds);
         
@@ -143,6 +147,9 @@ namespace BGE {
         bool        pressedByDurationTriggered_;
         float       touchUpCollisionScale_;
         
+        std::function<void(GameObject *)> debounceCompleted_;
+        std::function<void(GameObject *)> highlightedAnimCompleted_;
+
 #if TARGET_OS_IPHONE
         UITouch     *touch; // We need this to properly track events
 #endif /* TARGET_OS_IPHONE */
@@ -175,6 +182,7 @@ namespace BGE {
         Event handleTouchCancelEvent();
         Event handleTouchUpEvent(bool inBounds);
         
+        void handleHighlightedAnimEnd();
         void handleHighlightedAnimEndHandler(GameObject *gameObj, Event event);
     };
 }
