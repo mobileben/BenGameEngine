@@ -20,10 +20,10 @@
 #include "TextComponent.h"
 #include "LogicComponent.h"
 
-BGE::GameObject::GameObject() : NamedObject(), active_(false), cachedVisibility_(true), componentBitmask_(0) {
+BGE::GameObject::GameObject() : NamedObject(), active_(false), cachedVisibility_(true), destroy_(false), componentBitmask_(0) {
 }
 
-BGE::GameObject::GameObject(ObjectId objId) : NamedObject(objId), active_(false), componentBitmask_(0) {
+BGE::GameObject::GameObject(ObjectId objId) : NamedObject(objId), active_(false), cachedVisibility_(true), destroy_(false), componentBitmask_(0) {
 }
 
 void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameObjHandle, const std::string& name) {
@@ -31,6 +31,7 @@ void BGE::GameObject::initialize(SpaceHandle spaceHandle, GameObjectHandle gameO
 
     active_ = false;
     cachedVisibility_ = true;
+    destroy_ = false;
     
     removeAllComponents();
 
