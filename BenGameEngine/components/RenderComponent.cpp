@@ -88,6 +88,7 @@ std::vector<BGE::Material *> BGE::RenderComponent::getMaterials() const {
 }
 
 void BGE::RenderComponent::setMaterial(MaterialHandle material) {
+    assert(!material.isNull());
     if (materialHandles_.empty()) {
         materialHandles_.push_back(material);
     } else {

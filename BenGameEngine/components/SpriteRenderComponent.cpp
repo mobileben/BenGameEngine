@@ -52,10 +52,12 @@ void BGE::SpriteRenderComponent::setTextureHandle(TextureHandle texHandle) {
     if (hasMaterials()) {
         auto material = getMaterial();
         if (material) {
+            assert(!texHandle.isNull());
             material->setTextureHandle(texHandle);
             materialHandle = material->getHandle();
         }
     } else {
+        assert(!texHandle.isNull());
         materialHandle = Game::getInstance()->getMaterialService()->createMaterial(texHandle);
     }
     
@@ -64,7 +66,7 @@ void BGE::SpriteRenderComponent::setTextureHandle(TextureHandle texHandle) {
 
 void BGE::SpriteRenderComponent::setTexture(Texture *tex) {
     BGE::MaterialHandle materialHandle;
-    
+    assert(!tex->getHandle().isNull());
     if (hasMaterials()) {
         auto material = getMaterial();
         if (material) {
