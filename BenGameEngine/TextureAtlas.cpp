@@ -278,9 +278,6 @@ void BGE::TextureAtlas::buildVertexTexData(Texture *texture) {
         }
 #endif /* SUPPORT_OPENGL */
 
-        // Refresh just in case
-        texture = textureService->getTexture(handle);
-
         RenderVboCommandData data(&vertexTexData[0], static_cast<uint32_t>(vertexTexData.size()));
         // We use lambda capture (which does not optimize out the variable) to maintain the lifetime of the vector
         renderService->queueCreateVbo(data, [this, vertexTexDataShared, handle](RenderCommandItem command, std::shared_ptr<Error> error) {
@@ -305,7 +302,7 @@ void BGE::TextureAtlas::buildVertexTexData(Texture *texture) {
         });
         
 #ifdef SUPPORT_OPENGL
-        texture = textureService->getTexture(handle);
+        auto texture = textureService->getTexture(handle);
         RenderIboCommandData iboData(&vertexIndices[0], static_cast<uint32_t>(vertexIndices.size()), static_cast<uint32_t>(texture->getVboIndexSize()));
         // We use lambda capture (which does not optimize out the variable) to maintain the lifetime of the vector
         renderService->queueCreateIbo(iboData, [this, vertexIndicesShared, handle, subTexVertexIndicesOffset](RenderCommandItem command, std::shared_ptr<Error> error) {
