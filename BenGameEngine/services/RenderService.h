@@ -305,10 +305,10 @@ namespace BGE {
         
         void setComponentService(std::shared_ptr<ComponentService> componentService);
 
-#ifdef SUPPORT_PROFILING
         double getFps(void) const { return frameRateCalculator_.getFps(); }
         int64_t getCurrentFrameTime(void) { return frameRateCalculator_.getCurrentFrameTime(); }
 
+#ifdef SUPPORT_PROFILING
         int32_t getNumGameObjectsDrawn() const { return numGameObjectsDrawn_; }
         int32_t getNumGameObjectsIgnored() const { return numGameObjectsIgnored_; }
         int32_t getNumDrawCalls() const { return numDrawCalls_; }
@@ -393,9 +393,9 @@ namespace BGE {
             return Handle<T>(static_cast<HandleBackingType>(key&0xFFFFFFFF));
         }
 
-#ifdef SUPPORT_PROFILING
         profiling::FrameRateCalculator frameRateCalculator_;
 
+#ifdef SUPPORT_PROFILING
         int32_t numGameObjectsDrawn_;
         int32_t numGameObjectsIgnored_;
         int32_t numDrawCalls_;

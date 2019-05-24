@@ -1819,8 +1819,8 @@ void BGE::RenderServiceOpenGLES2::render()
 #ifdef SUPPORT_PROFILING
     auto now = profiling::EpochTime::timeInMicroSec();
     processingTime_ = now - startTime;
-    frameRateCalculator_.nextFrame();
 #endif /* SUPPORT_PROFILING */
+    frameRateCalculator_.nextFrame();
     handleServicesUnlock();
     unlock();
 }
