@@ -1086,6 +1086,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -1991,6 +1992,7 @@
 				OTHER_CFLAGS = (
 					"-DNDEBUG",
 					"-DNS_BLOCK_ASSERTIONS",
+					"-DAPPSTORE_RELEASE",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
