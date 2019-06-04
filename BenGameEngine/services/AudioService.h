@@ -93,9 +93,6 @@ namespace BGE {
         AudioHandleService audioHandleService_;
         AudioBufferHandleService audioBufferHandleService_;
         
-#ifdef OBSOLETE
-        std::vector<AudioHandle> audioHandles_;
-#endif /* OBSOLETE */
         std::unordered_map<std::string, AudioBufferHandle>  audioBufferHandles_;
         
         bool sfxEnabled_;

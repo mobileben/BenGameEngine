@@ -78,10 +78,6 @@ void BGE::AudioService::removeAudio(AudioHandle handle) {
     if (audio) {
         audio->destroy();
     }
-#ifdef OBSOLETE
-    // Not sure why we use audioHandles_. This is the only reference to it.
-    audioHandles_.erase(std::remove(audioHandles_.begin(), audioHandles_.end(), handle), audioHandles_.end());
-#endif /* OBSOLETE */
     audioHandleService_.release(handle);
 }
 
