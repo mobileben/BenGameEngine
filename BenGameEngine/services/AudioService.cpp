@@ -48,6 +48,7 @@ BGE::Audio *BGE::AudioService::getAudio(AudioHandle handle) {
 }
 
 BGE::AudioBufferHandle BGE::AudioService::getAudioBufferHandle(std::string name) {
+    std::lock_guard<std::mutex> lock(audioBufferHandlesMutex_);
     auto it = audioBufferHandles_.find(name);
     
     if (it != audioBufferHandles_.end()) {
@@ -58,6 +59,7 @@ BGE::AudioBufferHandle BGE::AudioService::getAudioBufferHandle(std::string name)
 }
 
 BGE::AudioBuffer *BGE::AudioService::getAudioBuffer(std::string name) {
+    std::lock_guard<std::mutex> lock(audioBufferHandlesMutex_);
     auto it = audioBufferHandles_.find(name);
     
     if (it != audioBufferHandles_.end()) {
@@ -76,11 +78,15 @@ void BGE::AudioService::removeAudio(AudioHandle handle) {
     if (audio) {
         audio->destroy();
     }
+#ifdef OBSOLETE
+    // Not sure why we use audioHandles_. This is the only reference to it.
     audioHandles_.erase(std::remove(audioHandles_.begin(), audioHandles_.end(), handle), audioHandles_.end());
+#endif /* OBSOLETE */
     audioHandleService_.release(handle);
 }
 
 void BGE::AudioService::removeAudioBuffer(std::string name) {
+    std::lock_guard<std::mutex> lock(audioBufferHandlesMutex_);
     auto it = audioBufferHandles_.find(name);
     
     if (it != audioBufferHandles_.end()) {
@@ -94,13 +100,14 @@ void BGE::AudioService::removeAudioBuffer(std::string name) {
 }
 
 void BGE::AudioService::removeAudioBuffer(AudioBufferHandle handle) {
+    std::unique_lock<std::mutex> lock(audioBufferHandlesMutex_);
     for (auto it=audioBufferHandles_.begin();it!=audioBufferHandles_.end();++it) {
         if (it->second == handle) {
             audioBufferHandles_.erase(it);
             break;
         }
     }
-    
+    lock.unlock();
     auto audio = getAudioBuffer(handle);
     if (audio) {
         audio->destroy();
@@ -151,6 +158,7 @@ void BGE::AudioService::createAudioBufferFromFile(std::string name, std::string 
         return;
     }
 
+    std::unique_lock<std::mutex> lock(audioBufferHandlesMutex_);
     auto it = audioBufferHandles_.find(name);
     
     if (it == audioBufferHandles_.end()) {
@@ -161,9 +169,11 @@ void BGE::AudioService::createAudioBufferFromFile(std::string name, std::string 
             buffer->initialize(handle, name);
             
             audioBufferHandles_[name] = handle;
-            
+            lock.unlock();
+
             buffer->createFromFile(filename, streaming, [this, name, handle, callback](AudioBuffer *audioBuffer, std::shared_ptr<Error> error) {
                 if (error) {
+                    std::lock_guard<std::mutex> lock(audioBufferHandlesMutex_);
                     // Remove handle as well as erase from buffer
                     audioBufferHandles_.erase(name);
                     
@@ -177,13 +187,18 @@ void BGE::AudioService::createAudioBufferFromFile(std::string name, std::string 
                     callback(audioBuffer, error);
                 }
             });
-        } else if (callback) {
-            callback(nullptr, std::make_shared<Error>(AudioBuffer::ErrorDomain, AudioBufferErrorMemory));
+        } else {
+            lock.unlock();
+            if (callback) {
+                callback(nullptr, std::make_shared<Error>(AudioBuffer::ErrorDomain, AudioBufferErrorMemory));
+            }
         }
-    } else if (callback) {
-        auto buffer = getAudioBuffer(it->second);
-        
-        callback(buffer, nullptr);
+    } else {
+        lock.unlock();
+        if (callback) {
+            auto buffer = getAudioBuffer(it->second);
+            callback(buffer, nullptr);
+        }
     }
 }
 

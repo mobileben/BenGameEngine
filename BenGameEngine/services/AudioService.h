@@ -29,6 +29,8 @@
 #include "HandleService.h"
 #include "Service.h"
 
+#include <mutex>
+
 namespace BGE {
     class EventService;
 
@@ -91,7 +93,9 @@ namespace BGE {
         AudioHandleService audioHandleService_;
         AudioBufferHandleService audioBufferHandleService_;
         
+#ifdef OBSOLETE
         std::vector<AudioHandle> audioHandles_;
+#endif /* OBSOLETE */
         std::unordered_map<std::string, AudioBufferHandle>  audioBufferHandles_;
         
         bool sfxEnabled_;
@@ -103,6 +107,7 @@ namespace BGE {
         NSString            *category_;
 #endif /* _PLATFORM_IPHONE */
 
+        std::mutex  audioBufferHandlesMutex_;        
     };
 }
 
