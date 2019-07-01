@@ -62,9 +62,6 @@ std::vector<BGE::ScenePackageHandle> packageHandles;
     self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
     
     dispatch_source_set_timer(self.timer,  DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC, 1 * NSEC_PER_SEC);
-    
-    NSLog(@"DIDLOAD view is %f %f %f %f", self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
-    
 }
 
 - (void)didReceiveMemoryWarning {
