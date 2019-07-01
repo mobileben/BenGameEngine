@@ -1573,7 +1573,6 @@
 					"$(inherited)",
 					"-DSUPPORT_OPENGL",
 					"-DSUPPORT_OPENGLES2",
-					"-DSUPPORT_PROFILING=1",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1887,6 +1886,7 @@
 					"$(inherited)",
 					"-DSUPPORT_OPENGL",
 					"-DSUPPORT_OPENGLES2",
+					"-DSUPPORT_PROFILING=1",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
