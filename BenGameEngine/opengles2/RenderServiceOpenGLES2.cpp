@@ -1080,7 +1080,7 @@ void BGE::RenderServiceOpenGLES2::drawPolyLines(Space *space, GameObject *gameOb
             }
             
             if (cache) {
-#ifdef DEBUG
+#if DEBUG
                 cache->lifetime++;
 #endif
                 if (!cache->vbo) {
@@ -1514,7 +1514,7 @@ void BGE::RenderServiceOpenGLES2::drawString(CachedStringRenderData *cache, cons
         if (last) {
             // If we have a cache and are dirty, then commit
             if (cache) {
-#ifdef DEBUG
+#if DEBUG
                 cache->lifetime++;
 #endif
                 if (!cache->vbo) {
