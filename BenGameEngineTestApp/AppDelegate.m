@@ -49,9 +49,4 @@ std::shared_ptr<BenGameEngineTestApp> theGame = std::make_shared<BenGameEngineTe
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
-#ifdef NOT_YET
-- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
-    return UIInterfaceOrientationMaskLandscape;
-}
-#endif
 @end

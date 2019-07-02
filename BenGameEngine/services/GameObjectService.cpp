@@ -171,20 +171,6 @@ void BGE::GameObjectService::removeGameObject(GameObject *object) {
     }
 }
 
-#ifdef NOT_YET
-
-void BGE::GameObjectService::removeGameObject(GameObjectHandle handle) {
-    for (auto it = gameObjects_.begin();it != gameObjects_.end();++it) {
-        if (*it == handle) {
-            releaseObject(handle);
-            gameObjects_.erase(it);
-            return;
-        }
-    }
-}
-
-#endif
-
 void BGE::GameObjectService::removeAllGameObjects() {
     for (auto const &handle : gameObjects_) {
         releaseObjectDontReleaseComponents(handle);

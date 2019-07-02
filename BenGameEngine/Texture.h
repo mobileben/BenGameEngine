@@ -82,13 +82,6 @@ namespace BGE {
         static const std::string ErrorDomain;
 
         Texture();
-#ifdef NOT_YET
-        Texture(ObjectId texId);
-        Texture(ObjectId texId, std::string name);
-#ifdef SUPPORT_GLKTEXTURELOADER
-        Texture(uint32_t texId, std::string name, GLKTextureInfo *textureInfo);
-#endif /* SUPPORT_GLKTEXTURELOADER */
-#endif
         ~Texture() {}
         
         void initialize(TextureHandle handle, std::string name, TextureFormat format);

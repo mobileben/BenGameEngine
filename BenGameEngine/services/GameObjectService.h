@@ -81,15 +81,6 @@ namespace BGE {
             return handleService_.dereferenceLockless(handle);
         }
 
-#ifdef NOT_YET
-        void removeGameObject(GameObjectHandle handle);
-        
-        inline void removeGameObject(GameObject *object) {
-            if (object) {
-                removeGameObject(object->getHandle());
-            }
-        }
-#else
         inline void removeGameObject(GameObjectHandle handle) {
             auto object = getGameObject(handle);
             
@@ -99,7 +90,6 @@ namespace BGE {
         }
         
         void removeGameObject(GameObject *object);
-#endif
         
         void removeAllGameObjects();
         

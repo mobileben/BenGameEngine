@@ -70,10 +70,6 @@ namespace BGE {
         uint32_t getGlyphH() const { return glyphH_; }
         int32_t getBaseline() const { return baseline_; }
         
-#ifdef NOT_YET
-        std::shared_ptr<FontGlyph> glyphForExtendedASCII(uint16_t code);
-#endif
-        
         std::string getNameAsKey() const;
         
         bool isValid(void) const { return status_ == FontStatus::Valid; }

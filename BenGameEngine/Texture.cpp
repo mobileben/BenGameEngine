@@ -30,60 +30,6 @@ BGE::Texture::Texture() : NamedObject(), valid_(false), width_(0), height_(0), x
     updateXYs();
 }
 
-#ifdef NOT_YET
-BGE::Texture::Texture(uint32_t texId) : NamedObject(texId), valid_(false), width_(0), height_(0), x_(0), y_(0), isSubTexture_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None) {
-#ifdef SUPPORT_OPENGL
-    hwId_ = 0;
-    target_ = GL_TEXTURE_2D;
-    vboId_ = 0;
-    iboId_ = 0;
-    iboOffset_ = 0;
-#endif /* SUPPORT_OPENGL */
-#ifdef SUPPORT_GLKTEXTURELOADER
-    textureInfo_ = nil;
-#endif /* SUPPORT_GLKTEXTURELOADER */
-    updateUVs();
-    updateXYs();
-}
-
-BGE::Texture::Texture(uint32_t texId, std::string name) : NamedObject(texId, name), valid_(false), width_(0), height_(0), x_(0), y_(0), isSubTexture_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None) {
-#ifdef SUPPORT_OPENGL
-    hwId_ = 0;
-    target_ = GL_TEXTURE_2D;
-    vboId_ = 0;
-    iboId_ = 0;
-    iboOffset_ = 0;
-#endif /* SUPPORT_OPENGL */
-#ifdef SUPPORT_GLKTEXTURELOADER
-    textureInfo_ = nil;
-#endif /* SUPPORT_GLKTEXTURELOADER */
-    updateUVs();
-    updateXYs();
-}
-
-#ifdef SUPPORT_GLKTEXTURELOADER
-BGE::Texture::Texture(uint32_t texId, std::string name, GLKTextureInfo *textureInfo) : NamedObject(texId, name), valid_(false), hwId_(0), target_(GL_TEXTURE_2D), width_(0), height_(0), x_(0), y_(0), isSubTexture_(false), format_(TextureFormat::Undefined), alphaState_(TextureAlphaState::None), textureInfo_(textureInfo) {
-    format_ = TextureFormat::RGBA8888;
-    
-    if (textureInfo) {
-        valid_ = true;
-#ifdef SUPPORT_OPENGL
-        hwId_ = textureInfo.name;
-        target_ = textureInfo.target;
-        vboId_ = 0;
-        iboId_ = 0;
-        iboOffset_ = 0;
-#endif /* SUPPORT_OPENGL */
-        width_ = textureInfo.width;
-        height_ = textureInfo.height;
-        
-        updateUVs();
-        updateXYs();
-    }
-}
-#endif /* SUPPORT_GLKTEXTURELOADER */
-#endif /* NOT_YET */
-
 void BGE::Texture::initialize(TextureHandle handle, std::string name, TextureFormat format) {
     handle_ = handle;
     setName(name);

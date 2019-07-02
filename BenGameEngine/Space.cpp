@@ -1583,9 +1583,6 @@ void BGE::Space::addAnimationSequenceComponentAndSetAnimationSequenceReference(G
     // Add component after totalFrames has been set because addComponentEpilogue relies on this
     root->addComponent(animSeq);
 
-#ifdef NOT_YET
-    NSLog(@"setAnimationSequenceReference");
-#endif
     auto seqXform = root->getComponent<TransformComponent>(this);
     
     if (seqXform) {
@@ -1615,9 +1612,6 @@ void BGE::Space::addAnimationSequenceComponentAndSetAnimationSequenceReference(G
         
         // If this is a sequence keyframe, we need to create more game objects!
         if (channelRef->referenceType == GfxReferenceTypeKeyframe) {
-#ifdef NOT_YET
-            NSLog(@"Adding sequence %s/%s to channel", channelRef->name, channelRef->reference);
-#endif
             auto newObj = this->createFrameAnimSequence(channelRef->reference, channelRef->name, animSeqRef.scenePackage, nullptr);
             
             if (newObj) {
@@ -1649,11 +1643,6 @@ void BGE::Space::setAnimationChannelReference(AnimationChannelComponentHandle ch
             auto package = Game::getInstance()->getScenePackageService()->getScenePackage(channel->channel->scenePackage);
             
             // Now setup the proper render component
-            
-#ifdef NOT_YET
-            // TODO: Do we do this later?
-            NSLog(@"Channel reference %s/%d", channel->channel->reference, channel->channel->referenceType);
-#endif
             switch (channel->channel->referenceType) {
                 case GfxReferenceTypeSprite: {
                     auto sprite = createComponent<SpriteRenderComponent>();
@@ -1681,9 +1670,6 @@ void BGE::Space::setAnimationChannelReference(AnimationChannelComponentHandle ch
                     break;
                     
                 case GfxReferenceTypeAnimationSequence: {
-#ifdef NOT_YET
-                    NSLog(@"WHY");
-#endif
                 }
                     break;
                     
@@ -1699,9 +1685,6 @@ void BGE::Space::setAnimationChannelReference(AnimationChannelComponentHandle ch
                 case GfxReferenceTypeKeyframe: {
                     // Keyframe needs to be filled out later
                     //auto seq =
-#ifdef NOT_YET
-                    NSLog(@"HERE");
-#endif
                 }
                     break;
                     
@@ -1748,13 +1731,6 @@ void BGE::Space::setAnimationChannelReference(AnimationChannelComponentHandle ch
                     break;
             }
         } else {
-#ifdef NOT_YET
-            if (channel->channel) {
-                NSLog(@"You fail %lx %lx %lx", (unsigned long) gameObj, (unsigned long) channel->channel, (unsigned long) channel->channel->referenceData);
-            } else {
-                NSLog(@"You fail %lx", (unsigned long)  gameObj);
-            }
-#endif
         }
     }
 }

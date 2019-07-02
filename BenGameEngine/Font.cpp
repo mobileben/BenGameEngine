@@ -58,12 +58,6 @@ void BGE::Font::destroy() {
     textureAtlasHandle_ = TextureAtlasHandle();
 }
 
-#ifdef NOT_YET
-std::shared_ptr<BGE::FontGlyph> BGE::Font::glyphForExtendedASCII(uint16_t code) {
-    return glyphs_[code];
-}
-#endif
-
 std::string BGE::Font::getNameAsKey() const {
     return FontService::fontAsKey(getName(), pixelSize_);
 }

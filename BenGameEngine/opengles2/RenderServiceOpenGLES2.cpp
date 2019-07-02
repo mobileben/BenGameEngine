@@ -1190,18 +1190,9 @@ void BGE::RenderServiceOpenGLES2::drawSprite(Space *space, GameObject *gameObjec
                 auto texture = Game::getInstance()->getTextureService()->getTextureLockless(textureHandle);
                 
                 if (texture) {
-#ifdef NOT_YET
-                    NSLog(@"Rendering sprite %s", texture->getName().c_str());
-#endif
-                    
                     if (texture && texture->isValid()) {
                         bool shaderChanged;
-#if 0
-                        std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(ColorMatrixTextureShaderProgramId, shaderChanged));
-#else
                         std::shared_ptr<ShaderProgramOpenGLES2> glShader = std::dynamic_pointer_cast<ShaderProgramOpenGLES2>(useShaderProgram(FullColorTextureShaderProgramId, shaderChanged));
-#endif
-                        
                         if (shaderChanged) {
                             glShader->shaderChangedSetup();
                         }

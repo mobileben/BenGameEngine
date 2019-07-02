@@ -36,12 +36,6 @@ void BGE::RenderComponent::destroyFast() {
     Component::destroyFast();
 }
 
-#ifdef NOT_YET
-void BGE::RenderComponent::getGlobalBounds(Rect& bounds) {
-    
-}
-#endif
-
 BGE::MaterialHandle BGE::RenderComponent::getMaterialHandle(uint32_t index) const {
     if (index < materialHandles_.size()) {
         return materialHandles_[index];

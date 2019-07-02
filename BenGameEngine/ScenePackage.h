@@ -25,22 +25,6 @@
 #include "MathTypes.h"
 #include "FileUtilities.h"
 
-#ifdef NOT_YET
-namespace BGE {
-    struct RapidJsonException : public std::exception {
-        virtual const char *what() const throw() {
-            return "rapidjson exception";
-        }
-    };
-}
-
-#ifdef RAPIDJSON_ASSERT
-#undef RAPIDJSON_ASSERT
-#endif
-
-#define RAPIDJSON_ASSERT(x) if (!(x)) throw BGE::RapidJsonException();
-#endif
-
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/document.h"
 

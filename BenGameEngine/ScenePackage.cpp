@@ -1635,11 +1635,7 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                 subTexDef.rotated = subTexDict[kScenePackageKeyRotated].GetBool();
                 subTexDef.font = false;
                 std::string atlasName = subTexDict[kScenePackageKeyAtlas].GetString();
-#if 0
-                std::vector<SubTextureDef> &subTexDefs = subTextures_[atlasName];
-#else
                 std::vector<SubTextureDef> &subTexDefs = subtextureDefs[atlasName];
-#endif
 
                 subTexDefs.push_back(subTexDef);
 
@@ -1650,11 +1646,6 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                 texRef->isAtlas = false;
             }
 
-#if 0
-            texAtlasSubTexDefBuilder.resize((int32_t)subTextures_.size());
-#else
-            //texAtlasSubTexDefBuilder.resize((int32_t)subtextureDefs.size());
-#endif
             for (auto& it : subtextureDefs) {
                 TextureAtlasSubTextureDefIntermediate atlasSubTexDefInt{};
                 atlasSubTexDefInt.name = stringBuilder.add(it.first);
@@ -1863,9 +1854,6 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                                             auto idx = channelRefIntBuilder.size();
                                             channelIndex[childName] = idx;
                                             channelRefIntBuilder.add(newChannel);
-#ifdef OBSOLETE
-                                            channel = channelRefIntBuilder.addressOf(idx);
-#endif
                                             channelRefIntKeyframes.push_back(newChannelKeyframes);
                                             channelKeyframes = &channelRefIntKeyframes[idx];
 
@@ -2410,45 +2398,6 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
 
             computeMemoryUsage();
 
-#if 0
-            ScenePackageFormat format{*this};
-            format.save("");
-            if (!format_) {
-                format_ = std::make_shared<ScenePackageFormat>();
-            }
-            format_->load(format.buffer_, format.bufferSize_);
-            format.managed_ = true;
-
-            NSURL *docUrl = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-            NSString *basename = [NSString stringWithFormat:@"%s.spkg", getName().c_str()];
-            NSURL *url = [docUrl URLByAppendingPathComponent:basename];
-            format_->save([url fileSystemRepresentation]);
-            NSLog(@"HERE %@", [url absoluteString]);
-
-            auto oldBaseDirectory = baseDirectory_;
-            auto oldName = getName();
-            auto handle = getHandle();
-            destroy();
-            initialize(handle, oldName);
-            setBaseDirectory(oldBaseDirectory);
-#if 1
-            create(*format_, [this, callback](ScenePackage *) {
-#if 1
-                // TODO: This will be done later perhaps?
-                loadAllTextures([this, callback]() {
-                    if (callback) {
-                        callback(this);
-                    }
-                });
-
-#else
-                if (callback) {
-                    callback(this);
-                }
-#endif
-            });
-#endif
-#else
 #if TARGET_OS_IPHONE
             // TODO: This will be done later perhaps?
             loadAllTextures([this, callback]() {
@@ -2461,7 +2410,6 @@ void BGE::ScenePackage::create(const std::shared_ptr<rapidjson::Document> jsonDi
                 callback(this);
             }
 #endif /* TARGET_OS_IPHONE */
-#endif
         } catch (std::exception& ex) {
 #if DEBUG
             printf("Exception: could not unmarshal ScenePackage. %s\n", ex.what());

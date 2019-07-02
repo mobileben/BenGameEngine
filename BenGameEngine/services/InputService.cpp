@@ -82,11 +82,6 @@ void BGE::InputService::touchEvent(TouchType type, NSSet* touches, UIView* view)
                 input->y = h_2 - p.y;
                 break;
         }
-        
-        
-#ifdef NOT_YET
-        printf("XXXXX Touch %d %f %f\n", type, input->x, input->y);
-#endif
         inputs_.push_back(input);
     }
     
@@ -466,16 +461,6 @@ void BGE::InputService::update(double deltaTime) {
             
             if (button && button->isTouchable() && button->isEnabled()) {
                 auto event = item.event;
-#ifdef NOT_YET
-                auto parent = gameObj->getParent();
-                std::string parentName = "none";
-                
-                if (parent) {
-                    parentName = parent->getName();
-                }
-                
-                printf("Processed button %s::%s (%d)\n", parentName.c_str(), gameObj->getName().c_str(), item.touchType);
-#endif
                 switch(event) {
                     case Event::TouchDownInside:
                         event = button->handleTouchDownEvent(item.inBounds);
