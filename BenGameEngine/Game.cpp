@@ -216,17 +216,39 @@ void BGE::Game::reset() {
 void BGE::Game::platformSuspending() {
     Service::platformSuspending();
     
-    renderService_->platformSuspending();
-    textureService_->platformSuspending();
-    fontService_->platformSuspending();
-    heartbeatService_->platformSuspending();
-    materialService_->platformSuspending();
-    scenePackageService_->platformSuspending();
-    animationService_->platformSuspending();
-    spaceService_->platformSuspending();
-    inputService_->platformSuspending();
-    logicService_->platformSuspending();
-    eventService_->platformSuspending();
+    if (renderService_) {
+        renderService_->platformSuspending();
+    }
+    if (textureService_) {
+        textureService_->platformSuspending();
+    }
+    if (fontService_) {
+        fontService_->platformSuspending();
+    }
+    if (heartbeatService_) {
+        heartbeatService_->platformSuspending();
+    }
+    if (materialService_) {
+        materialService_->platformSuspending();
+    }
+    if (scenePackageService_) {
+        scenePackageService_->platformSuspending();
+    }
+    if (animationService_) {
+        animationService_->platformSuspending();
+    }
+    if (spaceService_) {
+        spaceService_->platformSuspending();
+    }
+    if (inputService_) {
+        inputService_->platformSuspending();
+    }
+    if (logicService_) {
+        logicService_->platformSuspending();
+    }
+    if (eventService_) {
+        eventService_->platformSuspending();
+    }
 }
 
 void BGE::Game::platformResuming() {
@@ -235,39 +257,30 @@ void BGE::Game::platformResuming() {
     if (renderService_) {
         renderService_->platformResuming();
     }
-    
     if (textureService_) {
         textureService_->platformResuming();
     }
-    
     if (fontService_) {
         fontService_->platformResuming();
     }
-    
     if (heartbeatService_) {
         heartbeatService_->platformResuming();
     }
-    
     if (materialService_) {
         scenePackageService_->platformResuming();
     }
-    
     if (animationService_) {
         animationService_->platformResuming();
     }
-    
     if (spaceService_) {
         spaceService_->platformResuming();
     }
-    
     if (inputService_) {
         inputService_->platformResuming();
     }
-    
     if (logicService_) {
         logicService_->platformResuming();
     }
-    
     if (eventService_) {
         eventService_->platformResuming();
     }
@@ -276,33 +289,77 @@ void BGE::Game::platformResuming() {
 void BGE::Game::pause() {
     Service::pause();
     
-    renderService_->pause();
-    textureService_->pause();
-    fontService_->pause();
-    heartbeatService_->pause();
-    materialService_->pause();
-    scenePackageService_->pause();
-    animationService_->pause();
-    spaceService_->pause();
-    inputService_->pause();
-    logicService_->pause();
-    eventService_->pause();
+    if (renderService_) {
+        renderService_->pause();
+    }
+    if (textureService_) {
+        textureService_->pause();
+    }
+    if (fontService_) {
+        fontService_->pause();
+    }
+    if (heartbeatService_) {
+        heartbeatService_->pause();
+    }
+    if (materialService_) {
+        materialService_->pause();
+    }
+    if (scenePackageService_) {
+        scenePackageService_->pause();
+    }
+    if (animationService_) {
+        animationService_->pause();
+    }
+    if (spaceService_) {
+        spaceService_->pause();
+    }
+    if (inputService_) {
+        inputService_->pause();
+    }
+    if (logicService_) {
+        logicService_->pause();
+    }
+    if (eventService_) {
+        eventService_->pause();
+    }
 }
 
 void BGE::Game::resume() {
     Service::resume();
     
-    renderService_->resume();
-    textureService_->resume();
-    fontService_->resume();
-    heartbeatService_->resume();
-    materialService_->resume();
-    scenePackageService_->resume();
-    animationService_->resume();
-    spaceService_->resume();
-    inputService_->resume();
-    logicService_->resume();
-    eventService_->resume();
+    if (renderService_) {
+        renderService_->resume();
+    }
+    if (textureService_) {
+        textureService_->resume();
+    }
+    if (fontService_) {
+        fontService_->resume();
+    }
+    if (heartbeatService_) {
+        heartbeatService_->resume();
+    }
+    if (materialService_) {
+        materialService_->resume();
+    }
+    if (scenePackageService_) {
+        scenePackageService_->resume();
+    }
+    if (animationService_) {
+        animationService_->resume();
+    }
+    if (spaceService_) {
+        spaceService_->resume();
+    }
+    if (inputService_) {
+        inputService_->resume();
+    }
+    if (logicService_) {
+        logicService_->resume();
+    }
+    if (eventService_) {
+        eventService_->resume();
+    }
 }
 
 void BGE::Game::destroy() {
@@ -311,20 +368,48 @@ void BGE::Game::destroy() {
 void BGE::Game::garbageCollect() {
     handleServicesLock();
     
-    renderService_->garbageCollect();
-    textureService_->garbageCollect();
-    fontService_->garbageCollect();
-    heartbeatService_->garbageCollect();
-    materialService_->garbageCollect();
-    scenePackageService_->garbageCollect();
-    animationService_->garbageCollect();
-    spaceService_->garbageCollect();
-    inputService_->garbageCollect();
-    logicService_->garbageCollect();
-    eventService_->garbageCollect();
-    audioService_->garbageCollect();
-    gameObjectService_->garbageCollect();
-    componentService_->garbageCollect();
+    if (renderService_) {
+        renderService_->garbageCollect();
+    }
+    if (textureService_) {
+        textureService_->garbageCollect();
+    }
+    if (fontService_) {
+        fontService_->garbageCollect();
+    }
+    if (heartbeatService_) {
+        heartbeatService_->garbageCollect();
+    }
+    if (materialService_) {
+        materialService_->garbageCollect();
+    }
+    if (scenePackageService_) {
+        scenePackageService_->garbageCollect();
+    }
+    if (animationService_) {
+        animationService_->garbageCollect();
+    }
+    if (spaceService_) {
+        spaceService_->garbageCollect();
+    }
+    if (inputService_) {
+        inputService_->garbageCollect();
+    }
+    if (logicService_) {
+        logicService_->garbageCollect();
+    }
+    if (eventService_) {
+        eventService_->garbageCollect();
+    }
+    if (audioService_) {
+        audioService_->garbageCollect();
+    }
+    if (gameObjectService_) {
+        gameObjectService_->garbageCollect();
+    }
+    if (componentService_) {
+        componentService_->garbageCollect();
+    }
     
     Service::garbageCollect();
     
