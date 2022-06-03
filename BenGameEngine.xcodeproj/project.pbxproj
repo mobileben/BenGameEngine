@@ -456,7 +456,7 @@
 		B5AE8C981CEC44E100FAA0DC /* ScenePackage.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = ScenePackage.cpp; sourceTree = "<group>"; };
 		B5AE8C991CEC44E100FAA0DC /* ScenePackage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenePackage.h; sourceTree = "<group>"; };
 		B5B9C0F220C9F72E00306FC9 /* libBenGameEngine-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libBenGameEngine-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		B5B9C0FB20CA388400306FC9 /* BGERenderViewIOS.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; name = BGERenderViewIOS.cpp; path = ios/BGERenderViewIOS.cpp; sourceTree = "<group>"; };
+		B5B9C0FB20CA388400306FC9 /* BGERenderViewIOS.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp.preprocessed; name = BGERenderViewIOS.cpp; path = ios/BGERenderViewIOS.cpp; sourceTree = "<group>"; };
 		B5B9C0FC20CA388400306FC9 /* BGERenderViewIOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BGERenderViewIOS.h; path = ios/BGERenderViewIOS.h; sourceTree = "<group>"; };
 		B5BBFAD01DE15A8A0035AA74 /* AudioService.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = AudioService.cpp; path = services/AudioService.cpp; sourceTree = "<group>"; };
 		B5BBFAD11DE15A8A0035AA74 /* AudioService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioService.h; path = services/AudioService.h; sourceTree = "<group>"; };
